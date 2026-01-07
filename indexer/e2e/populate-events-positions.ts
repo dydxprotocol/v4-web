@@ -2,13 +2,10 @@ import { Provider, Wallet, createAssetId } from 'fuels';
 import { StorkMock, TestnetToken, Vault } from '../../contracts/types/index.js';
 import {
   BNB_ASSET,
-  BNB_MAX_LEVERAGE,
   BTC_ASSET,
-  BTC_MAX_LEVERAGE,
   DEFAULT_SUB_ID,
   DEPLOYER_PK,
   ETH_ASSET,
-  ETH_MAX_LEVERAGE,
   USDC_ASSET,
   USER_0_PK,
   USER_1_PK,

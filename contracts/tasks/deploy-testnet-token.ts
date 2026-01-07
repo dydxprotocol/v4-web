@@ -15,7 +15,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 export async function deployTestnetToken(taskArgs: any) {
     const salt = taskArgs.salt || getRandomSalt()
-    // eslint-disable-next-line no-console
+
     console.log("Deploy a token for the testnet")
 
     const provider = new Provider(taskArgs.url)

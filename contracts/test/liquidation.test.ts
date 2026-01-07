@@ -107,9 +107,9 @@ describe("Vault.funding_rate", () => {
         await call(
             vault.functions
                 .set_fees(
-                    30, // mint_burn_fee_basis_points
-                    10, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    30, // liquidity_fee_basis_points
+                    10, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 )
                 .addContracts([vaultImpl]),
         )
@@ -189,9 +189,9 @@ describe("Vault.funding_rate", () => {
         it("cannot liquidate a position with extactly max leverage", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // create a short position just to balance the long position below so that the funding rate is zero
@@ -258,9 +258,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with large funding rate debt", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -293,9 +293,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for fees", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -316,9 +316,9 @@ describe("Vault.funding_rate", () => {
             expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    10, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    10, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             const liquidationState2 = (
@@ -330,9 +330,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for the liquidation fee", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -353,9 +353,9 @@ describe("Vault.funding_rate", () => {
             expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             const liquidationState2 = (
@@ -380,9 +380,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36100, 18)))
             await call(
                 vault.functions.set_fees(
-                    30, // mint_burn_fee_basis_points
-                    100, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    30, // liquidity_fee_basis_points
+                    100, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             const liquidationState2 = (
@@ -448,9 +448,9 @@ describe("Vault.funding_rate", () => {
             // The position state from previous tests affects this one
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // create a short position just to balance the long position below so that the funding rate is zero
@@ -519,9 +519,9 @@ describe("Vault.funding_rate", () => {
             // The position becomes liquidatable before the explicit time advancement
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -554,9 +554,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for fees", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -577,9 +577,9 @@ describe("Vault.funding_rate", () => {
             expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    10, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    10, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             const liquidationState2 = (
@@ -591,9 +591,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for the liquidation fee", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -614,9 +614,9 @@ describe("Vault.funding_rate", () => {
             expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             const liquidationState2 = (
@@ -641,9 +641,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43900, 18)))
             await call(
                 vault.functions.set_fees(
-                    30, // mint_burn_fee_basis_points
-                    100, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    30, // liquidity_fee_basis_points
+                    100, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             const liquidationState2 = (
@@ -704,9 +704,9 @@ describe("Vault.funding_rate", () => {
         it("cannot liquidate a position with extactly max leverage", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // create a short position just to balance the long position below so that the funding rate is zero
@@ -825,9 +825,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position exceeding max leverage, check the funding rate", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
@@ -886,9 +886,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with large funding rate debt", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -916,9 +916,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for fees", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -935,9 +935,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36801, 18)))
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    10, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    10, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
@@ -949,9 +949,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for the liquidation fee", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -968,9 +968,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36801, 18)))
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
@@ -995,9 +995,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36100, 18)))
             await call(
                 vault.functions.set_fees(
-                    30, // mint_burn_fee_basis_points
-                    100, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    30, // liquidity_fee_basis_points
+                    100, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
@@ -1058,9 +1058,9 @@ describe("Vault.funding_rate", () => {
         it("cannot liquidate a position with extactly max leverage", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // create a long position just to balance the short position below so that the funding rate is zero
@@ -1179,9 +1179,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position exceeding max leverage, check the funding rate", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
@@ -1240,9 +1240,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with large funding rate debt", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -1270,9 +1270,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for fees", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -1289,9 +1289,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200 - 1, 18)))
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    10, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    10, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))
@@ -1303,9 +1303,9 @@ describe("Vault.funding_rate", () => {
         it("can liquidate a position with insufficient collateral for the liquidation fee", async () => {
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    0, // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    0, // liquidation_fee
                 ),
             )
             // the actual long position
@@ -1322,9 +1322,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200 - 1, 18)))
             await call(
                 vault.functions.set_fees(
-                    0, // mint_burn_fee_basis_points
-                    0, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    0, // liquidity_fee_basis_points
+                    0, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))
@@ -1349,9 +1349,9 @@ describe("Vault.funding_rate", () => {
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43900, 18)))
             await call(
                 vault.functions.set_fees(
-                    30, // mint_burn_fee_basis_points
-                    100, // margin_fee_basis_points
-                    expandDecimals(5), // liquidation_fee_usd
+                    30, // liquidity_fee_basis_points
+                    100, // position_fee_basis_points
+                    expandDecimals(5), // liquidation_fee
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))

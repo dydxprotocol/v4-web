@@ -95,9 +95,9 @@ describe("Vault SRC20", () => {
 
         await call(
             vault.functions.set_fees(
-                30, // mint_burn_fee_basis_points
-                10, // margin_fee_basis_points
-                expandDecimals(5), // liquidation_fee_usd
+                30, // liquidity_fee_basis_points
+                10, // position_fee_basis_points
+                expandDecimals(5), // liquidation_fee
             ),
         )
 
@@ -146,7 +146,7 @@ describe("Vault SRC20", () => {
     })
 
     describe("decimals", () => {
-        it("should return 9 (collateral asset decimals) for LP asset", async () => {
+        it("should return 9 (base asset decimals) for LP asset", async () => {
             const lpAssetId: AssetId = { bits: LP_ASSET_ID }
             const decimalsResult = (await vault.functions.decimals(lpAssetId).get()).value
 

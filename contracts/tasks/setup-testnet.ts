@@ -28,7 +28,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
     const salt = taskArgs.salt || getRandomSalt()
-    // eslint-disable-next-line no-console
+
     console.log("Setup asset configuration for the testnet")
 
     const [, USDCAssetId] = await deployTestnetToken({

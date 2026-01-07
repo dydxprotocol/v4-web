@@ -98,9 +98,9 @@ describe("Vault.funding_rate", () => {
 
         await call(
             vaultExpose.functions.set_fees(
-                30, // mint_burn_fee_basis_points
-                10, // margin_fee_basis_points
-                expandDecimals(5), // liquidation_fee_usd
+                30, // liquidity_fee_basis_points
+                10, // position_fee_basis_points
+                expandDecimals(5), // liquidation_fee
             ),
         )
 
