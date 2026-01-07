@@ -9,7 +9,7 @@ export const button = style({
   fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.2s',
-  marginTop: '16px',
+  marginTop: '0.5rem',
   textTransform: 'uppercase',
 });
 

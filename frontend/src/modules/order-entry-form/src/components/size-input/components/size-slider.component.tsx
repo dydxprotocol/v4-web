@@ -67,17 +67,25 @@ export const SizeSlider: FC = () => {
       </Slider.Root>
 
       <div css={styles.percentageMarks}>
-        {PERCENTAGE_MARKS.map((mark) => (
-          <button
-            key={mark}
-            type="button"
-            css={styles.percentageMark}
-            style={{ left: `${mark}%` }}
-            onClick={() => handleSliderChange([mark])}
-          >
-            {mark}%
-          </button>
-        ))}
+        {PERCENTAGE_MARKS.map((mark, index) => {
+          const isFirst = index === 0;
+          const isLast = index === PERCENTAGE_MARKS.length - 1;
+          return (
+            <button
+              key={mark}
+              type="button"
+              css={[
+                styles.percentageMark,
+                isFirst && styles.percentageMarkFirst,
+                isLast && styles.percentageMarkLast,
+              ]}
+              style={{ left: `${mark}%` }}
+              onClick={() => handleSliderChange([mark])}
+            >
+              {mark}%
+            </button>
+          );
+        })}
       </div>
     </div>
   );

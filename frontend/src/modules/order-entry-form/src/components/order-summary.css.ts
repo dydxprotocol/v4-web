@@ -1,9 +1,10 @@
 import { style } from '@vanilla-extract/css';
 
 export const container = style({
-  padding: '16px 0',
+  padding: '0.75rem 0',
   borderTop: '1px solid #333',
-  marginTop: '16px',
+  marginTop: '0.5rem',
+  backgroundColor: 'transparent',
 });
 
 export const row = style({
@@ -38,8 +39,8 @@ export const fees = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: '12px',
-  marginBottom: '8px',
+  marginTop: '0.5rem',
+  marginBottom: '0.25rem',
 });
 
 export const feesLabel = style({

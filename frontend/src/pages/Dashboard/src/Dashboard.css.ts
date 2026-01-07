@@ -42,7 +42,7 @@ export const rightSection = style({
 });
 
 export const publicSalesContainer = style({
-  flex: '1 1 50%',
+  flex: '0 0 40%',
   minHeight: 0,
   backgroundColor: 'rgba(255, 255, 255, 0.05)',
   borderRadius: '0.5rem',
@@ -53,14 +53,38 @@ export const publicSalesContainer = style({
 });
 
 export const orderEntryContainer = style({
-  flex: '1 1 50%',
+  flex: '1 1 60%',
   minHeight: 0,
   backgroundColor: 'rgba(255, 255, 255, 0.05)',
   borderRadius: '0.5rem',
   padding: '1rem',
   display: 'flex',
   flexDirection: 'column',
+  overflow: 'hidden',
+  width: '100%',
+  maxWidth: '100%',
+  boxSizing: 'border-box',
+  minWidth: 0,
+});
+
+export const orderEntryFormWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+  height: '100%',
   overflow: 'auto',
+  paddingRight: '0.25rem',
+  marginRight: '-0.25rem',
+  '::-webkit-scrollbar': {
+    width: '4px',
+  },
+  '::-webkit-scrollbar-track': {
+    background: 'transparent',
+  },
+  '::-webkit-scrollbar-thumb': {
+    background: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: '2px',
+  },
 });
 
 export const orderEntryTitle = style({

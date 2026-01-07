@@ -3,7 +3,7 @@ import { style } from '@vanilla-extract/css';
 export const tabsList = style({
   display: 'flex',
   gap: '8px',
-  marginBottom: '16px',
+  marginBottom: '0.5rem',
 });
 
 export const tabsTrigger = style({

@@ -1,7 +1,12 @@
 import { style } from '@vanilla-extract/css';
 
 export const sliderContainer = style({
-  marginTop: '12px',
+  marginTop: '0.5rem',
+  width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box',
+  position: 'relative',
 });
 
 export const sliderRoot = style({
@@ -9,8 +14,11 @@ export const sliderRoot = style({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
   height: '20px',
   marginBottom: '8px',
+  boxSizing: 'border-box',
 });
 
 export const sliderTrack = style({
@@ -46,10 +54,15 @@ export const sliderThumb = style({
 
 export const percentageMarks = style({
   position: 'relative',
-  display: 'flex',
+  display: 'block',
   marginTop: '2px',
-  paddingLeft: '8px',
-  paddingRight: '8px',
+  width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box',
+  paddingLeft: '0',
+  paddingRight: '0',
+  overflow: 'visible',
 });
 
 export const percentageMark = style({
@@ -61,6 +74,7 @@ export const percentageMark = style({
   fontSize: '0.625rem',
   cursor: 'pointer',
   transition: 'color 0.15s',
+  whiteSpace: 'nowrap',
   transform: 'translateX(-50%)',
   ':hover': {
     color: '#999',
@@ -68,4 +82,12 @@ export const percentageMark = style({
   ':active': {
     color: '#ccc',
   },
+});
+
+export const percentageMarkFirst = style({
+  transform: 'translateX(0) !important',
+});
+
+export const percentageMarkLast = style({
+  transform: 'translateX(-100%) !important',
 });

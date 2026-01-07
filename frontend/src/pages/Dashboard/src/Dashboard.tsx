@@ -53,15 +53,17 @@ export function Dashboard() {
           </div>
           <div css={styles.orderEntryContainer}>
             <h2 css={styles.orderEntryTitle}>ORDER ENTRY</h2>
-            <OrderEntryForm
-              baseAssetName="XHT"
-              quoteAssetName="USDT"
-              userBalanceInQuoteAsset={0}
-              userBalanceInBaseAsset={0}
-              currentQuoteAssetPrice={0.3343}
-              onSubmitSuccessful={handleOrderSubmitSuccess}
-              onSubmitFailure={handleOrderSubmitFailure}
-            />
+            <div css={styles.orderEntryFormWrapper}>
+              <OrderEntryForm
+                baseAssetName="XHT"
+                quoteAssetName="USDT"
+                userBalanceInQuoteAsset={2.137}
+                userBalanceInBaseAsset={0.1337}
+                currentQuoteAssetPrice={365.32}
+                onSubmitSuccessful={handleOrderSubmitSuccess}
+                onSubmitFailure={handleOrderSubmitFailure}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -18,6 +18,19 @@ export const title = style({
 export const tableContainer = style({
   flex: 1,
   overflowY: 'auto',
+  overflowX: 'hidden',
+  paddingRight: '0.25rem',
+  marginRight: '-0.25rem',
+  '::-webkit-scrollbar': {
+    width: '4px',
+  },
+  '::-webkit-scrollbar-track': {
+    background: 'transparent',
+  },
+  '::-webkit-scrollbar-thumb': {
+    background: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: '2px',
+  },
 });
 
 export const table = style({
