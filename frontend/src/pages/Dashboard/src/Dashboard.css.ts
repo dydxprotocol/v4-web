@@ -72,45 +72,8 @@ export const rightSection = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '1rem',
-  overflow: 'hidden',
-  '@media': {
-    '(max-width: 1024px)': {
-      display: 'flex',
-      flex: '0 0 auto',
-      width: '100%',
-    },
-  },
-});
-
-export const orderEntryContainer = style({
-  flex: '1 1 60%',
-  minHeight: 0,
-  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  borderRadius: '0.5rem',
-  padding: '1rem',
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  width: '100%',
-  maxWidth: '100%',
-  boxSizing: 'border-box',
-  minWidth: 0,
-  '@media': {
-    '(max-width: 1024px)': {
-      // Ensure width doesn't squish; allow horizontal scroll if needed
-      minWidth: '640px',
-    },
-  },
-});
-
-export const orderEntryFormWrapper = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.5rem',
-  height: '100%',
   overflow: 'auto',
-  paddingRight: '0.25rem',
-  marginRight: '-0.25rem',
+  minHeight: 0,
   '::-webkit-scrollbar': {
     width: '4px',
   },
@@ -121,6 +84,37 @@ export const orderEntryFormWrapper = style({
     background: 'rgba(255, 255, 255, 0.2)',
     borderRadius: '2px',
   },
+  '@media': {
+    '(max-width: 1024px)': {
+      display: 'flex',
+      flex: '0 0 auto',
+      width: '100%',
+    },
+  },
+});
+
+export const orderEntryContainer = style({
+  flex: '0 0 auto',
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  borderRadius: '0.5rem',
+  padding: '1rem',
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  maxWidth: '100%',
+  boxSizing: 'border-box',
+  minWidth: 0,
+  '@media': {
+    '(max-width: 1024px)': {
+      minWidth: '640px',
+    },
+  },
+});
+
+export const orderEntryFormWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
 });
 
 export const orderEntryTitle = style({
