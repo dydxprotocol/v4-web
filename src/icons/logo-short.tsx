@@ -21,14 +21,14 @@ export const LogoShortIcon: React.FC<{ id?: string; width?: number; height?: num
   return (
     <div
       id={id}
-      className="ml-1 flex h-auto w-full flex-row items-start justify-center overflow-hidden object-center"
+      className="flex h-auto w-full flex-row items-start justify-center overflow-hidden object-center"
     >
       <img
         src={logoSrc}
         alt="Bonk"
         width={width}
         height={height}
-        className="h-full w-auto object-contain"
+        className="h-full object-contain"
       />
     </div>
   );
