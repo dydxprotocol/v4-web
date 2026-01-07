@@ -19,6 +19,8 @@ export default {
       black: 'var(--color-black)',
       green: 'var(--color-green)',
       red: 'var(--color-red)',
+      'red-faded': 'var(--color-red-faded)',
+      'green-faded': 'var(--color-green-faded)',
       'white-faded': 'var(--color-white-faded)',
 
       'color-layer-0': 'var(--color-layer-0)',
@@ -130,6 +132,7 @@ export default {
     },
     borderRadius: ({ theme }) => ({
       ...theme('spacing'),
+      full: '9999px',
     }),
     extend: {
       animation: {

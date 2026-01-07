@@ -12,7 +12,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -45,7 +45,7 @@ const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const { isTablet } = useBreakpoints();
 
   const { usdcDenom } = useTokenConfigs();
@@ -121,7 +121,7 @@ const RewardsPage = () => {
                       <CompetitionLeaderboardPanel />
                     </div>
                   ),
-                  label: stringGetter({ key: STRING_KEYS.COMPETITIONS }),
+                  label: stringGetter({ key: STRING_KEYS.REBATES }),
                   value: Tab.Competition,
                 },
               ]}

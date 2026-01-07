@@ -12,8 +12,8 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useCopyValue } from '@/hooks/useCopyValue';
 import { useDepositAddress } from '@/hooks/useDepositAddress';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -26,18 +26,19 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { formatNumberOutput, OutputType } from '@/components/Output';
-import { QrCode } from '@/components/QrCode';
 import { SelectItem, SelectMenu, SelectMenuTrigger } from '@/components/SelectMenu';
-import { TabGroup } from '@/components/TabGroup';
 import { WithLabel } from '@/components/WithLabel';
+import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { calc } from '@/lib/do';
+
+import { DepositAddressCard } from './DepositAddressCard';
+import { SpotDepositForm } from './DepositDialog2/SpotDepositForm';
 
 type DepositTab = 'spot' | 'perpetuals';
 
@@ -52,8 +53,9 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const isSimpleUi = useSimpleUiEnabled();
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
+  const isSpotEnabled = useEnableSpot();
 
-  const { dydxAddress } = useAccounts();
+  const { dydxAddress, solanaAddress } = useAccounts();
   const { isUploadingAddress } = useTurnkeyAuth();
   const {
     depositAddresses,
@@ -64,8 +66,12 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
   useEffect(() => {
     // Optimistic Deposit Initiated for tracking purposes
-    track(AnalyticsEvents.TurnkeyDepositInitiated({}));
-  }, []);
+    if (selectedTab === 'perpetuals') {
+      track(AnalyticsEvents.TurnkeyDepositInitiated({}));
+    } else {
+      track(AnalyticsEvents.SpotDepositInitiated({}));
+    }
+  }, [selectedTab]);
 
   useEffect(() => {
     if (failedToFetchDepositAddresses && dydxAddress) {
@@ -90,25 +96,21 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     return [SOLANA_MAINNET_ID];
   }, [selectedTab]);
 
-  const depositAddress: string | undefined = useMemo(() => {
+  const perpsDepositAddress: string | undefined = useMemo(() => {
     if (depositAddresses == null) {
       return undefined;
     }
 
-    if (selectedTab === 'perpetuals') {
-      if (selectedChain === avalanche.id.toString()) {
-        return depositAddresses.avalancheAddress;
-      }
-
-      if (selectedChain === SOLANA_MAINNET_ID) {
-        return depositAddresses.svmAddress;
-      }
-
-      return depositAddresses.evmAddress;
+    if (selectedChain === avalanche.id.toString()) {
+      return depositAddresses.avalancheAddress;
     }
 
-    return undefined; // TODO(spot): Add spot deposit address
-  }, [depositAddresses, selectedChain, selectedTab]);
+    if (selectedChain === SOLANA_MAINNET_ID) {
+      return depositAddresses.svmAddress;
+    }
+
+    return depositAddresses.evmAddress;
+  }, [depositAddresses, selectedChain]);
 
   useEffect(() => {
     if (chains[0] == null) {
@@ -117,25 +119,6 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
     setSelectedChain(chains[0].toString());
   }, [chains]);
-
-  /**
-   * @description Splits the deposit address into 3 parts: first 5 chars, middle part, last 5 chars to render in the UI
-   */
-  const addressRepresentation = useMemo(() => {
-    if (depositAddress == null || depositAddress.trim().length === 0) {
-      return undefined;
-    }
-
-    const firstPart = depositAddress.slice(0, 5);
-    const middlePart = depositAddress.slice(5, -5);
-    const lastPart = depositAddress.slice(-5);
-
-    return {
-      firstPart,
-      middlePart,
-      lastPart,
-    };
-  }, [depositAddress]);
 
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -185,54 +168,6 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     );
   }, [selectedChain, stringGetter, decimalSeparator, groupSeparator, selectedLocale]);
 
-  const { copied, copy } = useCopyValue({ value: depositAddress });
-
-  const addressCard =
-    isUploadingAddress || isLoadingDepositAddresses ? (
-      <$AddressCard>
-        <div tw="mx-auto flex size-[155px] items-center justify-center">
-          <LoadingSpace />
-        </div>
-      </$AddressCard>
-    ) : failedToFetchDepositAddresses ? (
-      <$AddressCard>
-        <div tw="mx-auto flex h-[155px] flex-col items-center justify-center gap-1">
-          <Icon iconName={IconName.Warning} tw="size-2 text-color-error" />
-          <span tw="text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
-          </span>
-        </div>
-      </$AddressCard>
-    ) : (
-      <$AddressCard onClick={copy} tabIndex={0} role="button">
-        <div tw="flexColumn min-w-0 justify-between">
-          <img
-            tw="size-2.25 rounded-[50%]"
-            src={CHAIN_INFO[selectedChain]?.icon}
-            alt={CHAIN_INFO[selectedChain]?.name}
-          />
-          {addressRepresentation && depositAddress ? (
-            <div tw="row ml-[-0.5rem] cursor-pointer items-end gap-0.125 rounded-[6px] p-0.5 hover:bg-color-layer-1">
-              <div tw="min-w-0 whitespace-normal break-words text-justify">
-                <span tw="text-color-text-2">{addressRepresentation.firstPart}</span>
-                <span tw="text-color-text-0">{addressRepresentation.middlePart}</span>
-                <span tw="text-color-text-2">{addressRepresentation.lastPart}</span>
-              </div>
-              {copied ? (
-                <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
-              ) : (
-                <Icon iconName={IconName.Copy} tw="text-color-accent" />
-              )}
-            </div>
-          ) : null}
-        </div>
-
-        <div tw="flex size-[155px] min-w-[155px]">
-          {depositAddress && <QrCode hasLogo tw="size-full" value={depositAddress} />}
-        </div>
-      </$AddressCard>
-    );
-
   const getAcceptedAssets = (id: string | number) => {
     if (id === SOLANA_MAINNET_ID || id === avalanche.id) {
       return stringGetter({ key: STRING_KEYS.ACCEPTS_ONLY_USDC });
@@ -243,6 +178,90 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       params: { ASSETS: CHAIN_INFO[id]?.gasDenom },
     });
   };
+
+  const handleTabChange = (newTab: 'perps' | 'spot') => {
+    setSelectedTab(newTab === 'perps' ? 'perpetuals' : 'spot');
+  };
+
+  const perpetualsContent = (
+    <div tw="flexColumn gap-1">
+      <SelectMenu
+        fullWidthPopper
+        withPortal={isSimpleUi ? false : undefined}
+        tw="h-4 w-full text-color-text-2"
+        value={selectedChain}
+        onValueChange={setSelectedChain}
+        slotTrigger={
+          <SelectMenuTrigger
+            css={
+              isSimpleUi && {
+                '--trigger-open-backgroundColor': 'var(--color-layer-2)',
+              }
+            }
+          >
+            <$WithLabel label={stringGetter({ key: STRING_KEYS.NETWORK })}>
+              <div tw="w-full">{CHAIN_INFO[selectedChain]?.name}</div>
+            </$WithLabel>
+            <Icon
+              iconName={IconName.Triangle}
+              tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
+            />
+          </SelectMenuTrigger>
+        }
+        position="popper"
+        side="bottom"
+        sideOffset={8}
+        contentCss={{
+          '--popover-backgroundColor': 'var(--color-layer-2)',
+        }}
+      >
+        {chains.map((id) => (
+          <$SelectItem
+            key={id}
+            value={id.toString()}
+            withIcon={false}
+            label={
+              <div tw="row justify-between gap-0.5">
+                <div tw="flexColumn gap-0.25">
+                  <div>{CHAIN_INFO[id]?.name}</div>
+                  <div tw="text-color-text-0 font-small-book">{getAcceptedAssets(id)}</div>
+                </div>
+                <img
+                  tw="size-1.5 rounded-[50%]"
+                  src={CHAIN_INFO[id]?.icon}
+                  alt={CHAIN_INFO[id]?.name}
+                />
+              </div>
+            }
+          />
+        ))}
+      </SelectMenu>
+
+      <DepositAddressCard
+        address={perpsDepositAddress}
+        chainIcon={CHAIN_INFO[selectedChain]?.icon}
+        chainName={CHAIN_INFO[selectedChain]?.name}
+        isLoading={isUploadingAddress || isLoadingDepositAddresses}
+        error={failedToFetchDepositAddresses}
+        errorMessage={stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
+      />
+
+      {warningMessage}
+    </div>
+  );
+
+  const tabs: SpotTabItem[] = [
+    {
+      value: 'perps',
+      label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
+      content: perpetualsContent,
+    },
+    {
+      value: 'spot',
+      label: stringGetter({ key: STRING_KEYS.SPOT }),
+      content: <SpotDepositForm />,
+    },
+  ];
 
   return (
     <$Dialog
@@ -260,100 +279,29 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
         </div>
       }
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
+      hasHeaderBorder
     >
-      <div tw="flexColumn gap-1">
-        {false && ( // TODO(spot): Remove false conditional when spot is supported
-          <div>
-            <TabGroup
-              value={selectedTab}
-              onTabChange={setSelectedTab}
-              options={[
-                { label: stringGetter({ key: STRING_KEYS.SPOT }), value: 'spot', disabled: true },
-                { label: stringGetter({ key: STRING_KEYS.PERPETUALS }), value: 'perpetuals' },
-              ]}
-            />
-          </div>
-        )}
-
-        <SelectMenu
-          fullWidthPopper
-          withPortal={isSimpleUi ? false : undefined}
-          tw="h-4 w-full text-color-text-2"
-          value={selectedChain}
-          onValueChange={setSelectedChain}
-          slotTrigger={
-            <SelectMenuTrigger
-              css={
-                isSimpleUi && {
-                  '--trigger-open-backgroundColor': 'var(--color-layer-2)',
-                }
-              }
-            >
-              <$WithLabel label={stringGetter({ key: STRING_KEYS.NETWORK })}>
-                <div tw="w-full">{CHAIN_INFO[selectedChain]?.name}</div>
-              </$WithLabel>
-              <Icon
-                iconName={IconName.Triangle}
-                tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
-              />
-            </SelectMenuTrigger>
-          }
-          position="popper"
-          side="bottom"
-          sideOffset={8}
-          contentCss={{
-            '--popover-backgroundColor': 'var(--color-layer-2)',
-          }}
-        >
-          {chains.map((id) => (
-            <$SelectItem
-              key={id}
-              value={id.toString()}
-              withIcon={false}
-              label={
-                <div tw="row justify-between gap-0.5">
-                  <div tw="flexColumn gap-0.25">
-                    <div>{CHAIN_INFO[id]?.name}</div>
-                    <div tw="text-color-text-0 font-small-book">{getAcceptedAssets(id)}</div>
-                  </div>
-                  <img
-                    tw="size-1.5 rounded-[50%]"
-                    src={CHAIN_INFO[id]?.icon}
-                    alt={CHAIN_INFO[id]?.name}
-                  />
-                </div>
-              }
-            />
-          ))}
-        </SelectMenu>
-
-        {addressCard}
-
-        {warningMessage}
+      <div tw="h-full w-full overflow-hidden p-1.25">
+        <SpotTabs
+          value={selectedTab === 'perpetuals' ? 'perps' : 'spot'}
+          onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
+          hideTabs={!isSpotEnabled || !solanaAddress}
+          items={tabs}
+        />
       </div>
     </$Dialog>
   );
 };
 
 const $Dialog = styled(Dialog)`
+  --dialog-content-paddingTop: 0;
+  --dialog-content-paddingRight: 0;
+  --dialog-content-paddingBottom: 0;
+  --dialog-content-paddingLeft: 0;
+
   @media ${breakpoints.notMobile} {
     max-width: 26.25rem;
-    --dialog-content-paddingLeft: 1.25rem;
-    --dialog-content-paddingRight: 1.25rem;
-    --dialog-content-paddingBottom: 1.25rem;
-    --dialog-paddingX: 1.25rem;
-    --dialog-header-paddingTop: 1.25rem;
-    --dialog-header-paddingBottom: 1.25rem;
   }
-`;
-
-const $AddressCard = styled.div`
-  display: flex;
-  flex-direction: row;
-  border-radius: 1rem;
-  border: 1px solid var(--border-color);
-  padding: 1rem;
-  gap: 1rem;
 `;
 
 const $WithLabel = styled(WithLabel)`

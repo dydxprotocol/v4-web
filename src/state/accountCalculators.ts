@@ -1,8 +1,8 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { VaultFormAccountData } from '@/bonsai/public-calculators/vaultFormValidation';
 
-import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { ConnectorType } from '@/constants/wallets';
+import { OnboardingState, OnboardingSteps, SpotWalletStatus } from '@/constants/account';
+import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import {
   getDisplayChooseWallet,
@@ -156,4 +156,20 @@ export const selectSubaccountStateForVaults = createAppSelector(
     freeCollateral: freeCollateral ?? undefined,
     canViewAccount,
   })
+);
+
+export const calculateSpotWalletStatus = createAppSelector(
+  [getOnboardingState, getSourceAccount],
+  (onboardingState, sourceAccount): SpotWalletStatus => {
+    const isWalletConnected = onboardingState === OnboardingState.AccountConnected;
+    const canDeriveSolanaWallet = sourceAccount.chain !== WalletNetworkType.Cosmos;
+
+    if (!isWalletConnected) {
+      return SpotWalletStatus.Disconnected;
+    }
+    if (!canDeriveSolanaWallet) {
+      return SpotWalletStatus.Unsupported;
+    }
+    return SpotWalletStatus.Connected;
+  }
 );

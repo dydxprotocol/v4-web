@@ -1,15 +1,22 @@
-import { omit } from 'lodash';
+import { isEqual, omit } from 'lodash';
 import { shallowEqual } from 'react-redux';
+
+import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
-import { createMarketSummary } from '../calculators/markets';
+import { calculateEffectiveSelectedLeverage, createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
-import { selectRawAssets, selectRawMarkets } from './base';
+import {
+  selectRawAssets,
+  selectRawMarkets,
+  selectRawMarketsData,
+  selectRawSelectedMarketLeveragesData,
+} from './base';
 import { selectAllMarketsInfo, selectMarketsFeeDiscounts, selectSparkLinesData } from './markets';
 
 export const selectAllMarketSummariesLoading = createAppSelector(
@@ -58,6 +65,28 @@ export const selectCurrentMarketInfoStable = createAppSelector(
   }
 );
 
+export type StableIndexerWsBaseMarketObject = Omit<IndexerWsBaseMarketObject, UnstablePaths>;
+
+export const selectAllMarketsInfoStable = createAppSelector(
+  [selectRawMarketsData],
+  (markets) => {
+    if (!markets) return markets;
+
+    return Object.entries(markets).reduce<Record<string, StableIndexerWsBaseMarketObject>>(
+      (acc, [marketId, market]) => {
+        acc[marketId] = omit(market, ...unstablePaths);
+        return acc;
+      },
+      {}
+    );
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
+);
+
 export const selectAllMarketsInfoLoading = createAppSelector(
   [selectRawMarkets],
   mergeLoadableStatus
@@ -102,4 +131,27 @@ export const selectMarketSummaryById = createAppSelector(
     }
     return allSummaries?.[marketId];
   }
+);
+
+/**
+ * Get the effective selected leverage for a market.
+ * Returns user-selected leverage if set, otherwise calculates max leverage from IMF only (ignoring OIMF).
+ */
+export const selectEffectiveSelectedMarketLeverage = createAppSelector(
+  [
+    selectRawSelectedMarketLeveragesData,
+    selectMarketSummaryById,
+    (_s, marketId: string | undefined) => marketId,
+  ],
+  (leverages, marketSummary, marketId) => {
+    return calculateEffectiveSelectedLeverage({
+      userSelectedLeverage: marketId ? leverages?.[marketId] : undefined,
+      initialMarginFraction: marketSummary?.initialMarginFraction,
+    });
+  }
+);
+
+export const selectCurrentMarketEffectiveSelectedLeverage = createAppSelector(
+  [(state) => state, getCurrentMarketIdIfTradeable],
+  (state, marketId) => selectEffectiveSelectedMarketLeverage(state, marketId)
 );

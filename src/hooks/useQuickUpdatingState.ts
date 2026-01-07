@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
   If global state updates, we check against a small cache to see if it's an update we caused and ignore it if so, 
   otherwise we override local state with the incoming value.
 */
+const RECEIVE_VAL_TIMEOUT = 1500;
 export function useQuickUpdatingState<T>({
   slowValue,
   setValueSlow,
@@ -21,12 +22,12 @@ export function useQuickUpdatingState<T>({
   const [value, setValueState] = useState(slowValue);
 
   // Cache of recently sent values to check against incoming values
-  const recentSlowValuesSentRef = useRef<Array<T>>([]);
+  const recentSlowValuesSentRef = useRef<Array<{ val: T; time: number }>>([]);
 
   // Helper function to update the cache of sent values
   const updateSentValuesCache = useCallback(
     (newValue: T) => {
-      const newCache = [...recentSlowValuesSentRef.current, newValue];
+      const newCache = [...recentSlowValuesSentRef.current, { val: newValue, time: Date.now() }];
       // Only keep the most recent values up to cacheSize
       if (newCache.length > cacheSize) {
         newCache.shift();
@@ -81,7 +82,8 @@ export function useQuickUpdatingState<T>({
   useEffect(() => {
     // If this is a value we sent ourselves (exact reference match), ignore it
     const wasSentByUs = recentSlowValuesSentRef.current.some(
-      (sentValue) => sentValue === slowValue
+      (sentValue) =>
+        sentValue.val === slowValue && Date.now() - sentValue.time < RECEIVE_VAL_TIMEOUT
     );
 
     if (!wasSentByUs) {

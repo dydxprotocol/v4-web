@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
-import { useQuery } from '@tanstack/react-query';
-import { groupBy, isNumber, max, pick } from 'lodash';
+import { groupBy, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
@@ -26,12 +25,6 @@ import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
-import {
-  CURRENT_REWARDS_SEASON,
-  CURRENT_REWARDS_SEASON_AMOUNT,
-  CURRENT_REWARDS_SEASON_EXPIRATION,
-} from '@/hooks/surgeRewards';
-
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
@@ -50,6 +43,7 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import {
+  getIsAccountConnected,
   getSubaccountFreeCollateral,
   selectOrphanedTriggerOrders,
   selectReclaimableChildSubaccountFunds,
@@ -66,6 +60,7 @@ import {
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { getSwaps } from '@/state/swapSelectors';
+import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
@@ -76,11 +71,11 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS, MaybeBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
-import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
+import { DEC_2025_COMPETITION_DETAILS } from './rewards/util';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
@@ -330,17 +325,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const { type, status } = transfer;
           const id = transfer.id;
 
-          const finalAmount = formatNumberOutput(
-            transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
-            OutputType.Fiat,
-            { decimalSeparator, groupSeparator, selectedLocale }
-          );
+          const finalAmount = isSpotWithdraw(transfer)
+            ? `${formatNumberOutput(transfer.amount, OutputType.Number, { decimalSeparator, groupSeparator, selectedLocale, fractionDigits: 4 })} SOL`
+            : formatNumberOutput(
+                transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
+                OutputType.Fiat,
+                { decimalSeparator, groupSeparator, selectedLocale }
+              );
 
           const isSuccess = status === 'success';
           let body: string = '';
           let title: string = '';
 
-          if (type === 'withdraw') {
+          if (type === 'withdraw' || type === 'spot-withdraw') {
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
             });
@@ -572,160 +569,49 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
-      const currentSeason = CURRENT_REWARDS_SEASON;
+      const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+      const selectedLocale = useAppSelector(getSelectedLocale);
 
-      const { data: rewards } = useQuery({
-        queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
-        enabled:
+      useEffect(() => {
+        if (
+          new Date().getTime() < new Date(DEC_2025_COMPETITION_DETAILS.claimEndtime).getTime() &&
+          new Date().getTime() > new Date(DEC_2025_COMPETITION_DETAILS.claimStartTime).getTime() &&
           dydxAddress != null &&
-          new Date().getTime() < new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime(),
-        retry: false,
-        queryFn: async () => {
-          try {
-            // don't take up bandwidth during sensitive loading time
-            await sleep(1500);
-            const data = await fetch(
-              `https://cloud.chaoslabs.co/query/api/dydx/reward-distribution?season=${currentSeason - 1}`
-            );
-            const result = await data.json();
-            const maybeNumber = result.find((f: any) => f.address === dydxAddress).rewards;
-            if (isNumber(maybeNumber)) {
-              return maybeNumber;
-            }
-            return null;
-          } catch (e) {
-            return null;
-          }
-        },
-      });
-
-      useEffect(() => {
-        const now = new Date().getTime();
-        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
-        if (now < seasonEnd && rewards != null && rewards > 5) {
+          DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress] != null
+        ) {
+          const amount = MustNumber(
+            DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress]
+          );
           trigger({
-            id: `rewards-program-surge-s${currentSeason - 1}-payout`,
+            id: `dec-2025-rebate-1-claim`,
             displayData: {
               icon: <Icon iconName={IconName.Sparkles} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
-                params: { SEASON_NUMBER: currentSeason - 1, DYDX_REWARDS: rewards },
+                key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_TITLE,
               }),
               body: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_BODY,
+                key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_BODY,
                 params: {
-                  SEASON_NUMBER: currentSeason - 1,
+                  AMOUNT: formatNumberOutput(amount, OutputType.Fiat, {
+                    decimalSeparator,
+                    groupSeparator,
+                    selectedLocale,
+                  }),
                 },
               }),
               toastSensitivity: 'foreground',
               groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              actionAltText: stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY }),
               renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/surge" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent>
+                  {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })} →
                 </Link>
               ),
             },
-            updateKey: [`rewards-program-surge-s${currentSeason - 1}-payout`],
+            updateKey: [`dec-2025-rebate-1-claim`, dydxAddress],
           });
         }
-      }, [currentSeason, rewards, stringGetter, trigger]);
-
-      useEffect(() => {
-        const now = new Date().getTime();
-        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
-        const endingSoon = seasonEnd - timeUnits.day * 3;
-
-        if (now <= endingSoon) {
-          trigger({
-            id: `rewards-program-surge-s${currentSeason}-start`,
-            displayData: {
-              icon: <Icon iconName={IconName.Trophy} />,
-              title: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
-                params: {
-                  SEASON_NUMBER: currentSeason,
-                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
-                },
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
-                params: {
-                  SEASON_NUMBER: currentSeason,
-                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
-              renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/surge" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                </Link>
-              ),
-            },
-            updateKey: [`rewards-program-surge-s${currentSeason}-start`],
-          });
-        } else if (now < seasonEnd) {
-          let daysLeft = Math.floor((seasonEnd - now) / timeUnits.day);
-          // oops, we don't want to show 1 days left or 0 days left
-          if (daysLeft < 2) {
-            daysLeft = 2;
-          }
-          trigger({
-            id: `rewards-program-surge-s${currentSeason}-ending`,
-            displayData: {
-              icon: <Icon iconName={IconName.Clock} />,
-              title: stringGetter({
-                key: STRING_KEYS.SURGE_SEASON_ENDING_TITLE,
-                params: { SEASON_NUMBER: currentSeason, DAYS_LEFT: daysLeft },
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.SURGE_SEASON_ENDING_BODY,
-                params: {
-                  SEASON_NUMBER: currentSeason,
-                  DAYS_LEFT: daysLeft,
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
-              renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/surge" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                </Link>
-              ),
-            },
-            updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
-          });
-        }
-      }, [currentSeason, stringGetter, trigger]);
-
-      const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
-      useEffect(() => {
-        if (new Date().getTime() < new Date(PUMP_COMPETITION_EXPIRATION).getTime())
-          trigger({
-            id: `pump-trading-competition-base`,
-            displayData: {
-              icon: <Icon iconName={IconName.Sparkles} />,
-              title: stringGetter({
-                key: STRING_KEYS.PUMP_COMPETITION_TITLE,
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.PUMP_COMPETITION_BODY,
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
-              renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/blog/pump-trading-competition" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                </Link>
-              ),
-            },
-            updateKey: [`pump-trading-competition-base`],
-          });
-      }, [stringGetter, trigger]);
+      }, [decimalSeparator, dydxAddress, groupSeparator, selectedLocale, stringGetter, trigger]);
     },
   },
   {
@@ -1191,12 +1077,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const dispatch = useAppDispatch();
       const stringGetter = useStringGetter();
       const isKeplr = useAppSelector(selectIsKeplrConnected);
+      const isAccountConnected = useAppSelector(getIsAccountConnected);
       const reclaimableChildSubaccountFunds = useAppSelector(selectReclaimableChildSubaccountFunds);
       const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
       const maybeRebalanceAction = useAppSelector(selectShouldAccountRebalanceUsdc);
 
       useEffect(() => {
-        if (!isKeplr) return;
+        if (!isKeplr || !isAccountConnected) return;
 
         if (reclaimableChildSubaccountFunds && reclaimableChildSubaccountFunds.length > 0) {
           const amountBN = reclaimableChildSubaccountFunds.reduce(
@@ -1236,6 +1123,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         hideNotification,
         stringGetter,
         reclaimableChildSubaccountFunds,
+        isAccountConnected,
       ]);
 
       useEffect(() => {

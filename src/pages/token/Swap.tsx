@@ -7,7 +7,11 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
-import { OnboardingState } from '@/constants/account';
+import {
+  AMOUNT_RESERVED_FOR_GAS_DYDX,
+  AMOUNT_RESERVED_FOR_GAS_USDC,
+  OnboardingState,
+} from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
@@ -42,7 +46,7 @@ import { addSwap } from '@/state/swaps';
 
 import { track } from '@/lib/analytics/analytics';
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS } from '@/lib/numbers';
 
 type SwapMode = 'exact-in' | 'exact-out';
 function otherToken(currToken: 'usdc' | 'dydx') {
@@ -66,32 +70,31 @@ export const Swap = () => {
   const [inputToken, setInputToken] = useState<'dydx' | 'usdc'>('usdc');
   const [mode, setMode] = useState<SwapMode>('exact-in');
   const [amount, setAmount] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isToInputFocused, setIsToInputFocused] = useState(false);
   const [isFromInputFocused, setIsFromInputFocused] = useState(false);
 
   const tokenBalances = useMemo(() => {
+    const usableDydxBalance = Math.max(
+      Number(nativeTokenBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_DYDX,
+      0
+    );
     const dydx = {
-      rawBalanceBigInt: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
-      formatted: MustBigNumber(nativeTokenBalance).toFormat(2, BigNumber.ROUND_DOWN),
+      rawBalanceBigInt: parseUnits(`${usableDydxBalance}`, DYDX_DECIMALS),
+      rawBalance: usableDydxBalance,
     };
-
+    const usableUsdcBalance = Math.max(
+      (parentSubaccountUsdcBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_USDC,
+      0
+    );
     const usdc = {
-      rawBalanceBigInt: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
-      formatted: MustBigNumber(parentSubaccountUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
+      rawBalanceBigInt: parseUnits(`${usableUsdcBalance}`, USDC_DECIMALS),
+      rawBalance: usableUsdcBalance,
     };
-
-    if (inputToken === 'usdc') {
-      return {
-        inputBalance: usdc,
-        outputBalance: dydx,
-      };
-    }
 
     return {
-      inputBalance: dydx,
-      outputBalance: usdc,
-      dydx,
-      usdc,
+      inputBalance: inputToken === 'usdc' ? usdc : dydx,
+      outputBalance: inputToken === 'usdc' ? dydx : usdc,
     };
   }, [nativeTokenBalance, parentSubaccountUsdcBalance, inputToken]);
 
@@ -111,9 +114,9 @@ export const Swap = () => {
 
   const setMaxAmount = (m: SwapMode) => {
     if (m === 'exact-in') {
-      setAmount(tokenBalances.inputBalance.formatted);
+      setAmount(`${tokenBalances.inputBalance.rawBalance}`);
     } else {
-      setAmount(tokenBalances.outputBalance.formatted);
+      setAmount(`${tokenBalances.outputBalance.rawBalance}`);
     }
     setMode(m);
   };
@@ -133,17 +136,30 @@ export const Swap = () => {
 
   const hasSufficientBalance = useMemo(() => {
     if (!quote || !amount) return true;
+    const inputBalance =
+      mode === 'exact-in' ? tokenBalances.inputBalance : tokenBalances.outputBalance;
     const inputAmountBigInt = BigInt(quote.amountIn);
-    const inputBalanceBigInt = tokenBalances.inputBalance.rawBalanceBigInt;
+    const inputBalanceBigInt = inputBalance.rawBalanceBigInt;
     if (!inputBalanceBigInt) return true;
     return inputBalanceBigInt >= inputAmountBigInt;
-  }, [quote, amount, tokenBalances.inputBalance.rawBalanceBigInt]);
+  }, [quote, amount, mode, tokenBalances]);
 
   const usdcPerDydx = useMemo(() => {
+    if (quote) {
+      const usdcAmount = formatUnits(
+        BigInt(inputToken === 'usdc' ? quote.amountIn : quote.amountOut),
+        USDC_DECIMALS
+      );
+      const dydxAmount = formatUnits(
+        BigInt(inputToken === 'dydx' ? quote.amountIn : quote.amountOut),
+        DYDX_DECIMALS
+      );
+      return Number(usdcAmount) / Number(dydxAmount);
+    }
     if (!priceQuote) return undefined;
 
     return Number(formatUnits(BigInt(priceQuote.amountOut), USDC_DECIMALS));
-  }, [priceQuote]);
+  }, [priceQuote, quote, inputToken]);
 
   const quotedAmount = useMemo(() => {
     if (!quote || !amount) return '';
@@ -198,15 +214,11 @@ export const Swap = () => {
               onClick={() => setMaxAmount('exact-in')}
             >
               <CardHolderIcon />
-              {tokenBalances.inputBalance.formatted ? (
-                <Output
-                  value={tokenBalances.inputBalance.formatted}
-                  type={OutputType.CompactNumber}
-                  slotRight={` ${getTokenLabel(inputToken)}`}
-                />
-              ) : (
-                `- ${getTokenLabel(inputToken)}`
-              )}
+              <Output
+                value={tokenBalances.inputBalance.rawBalance}
+                type={OutputType.CompactNumber}
+                slotRight={` ${getTokenLabel(inputToken)}`}
+              />
             </Button>
           </div>
 
@@ -245,34 +257,26 @@ export const Swap = () => {
               {stringGetter({ key: STRING_KEYS.SWAP_TO })}
             </div>
             <Button
-              onClick={() => setMaxAmount('exact-out')}
-              disabled={hasPendingSwap}
+              disabled
               buttonStyle={ButtonStyle.WithoutBackground}
               tw="flex h-fit items-center gap-0.375 p-0 font-small-medium hover:[--button-textColor:var(--color-text-1)]"
             >
               <CardHolderIcon />
-              {tokenBalances.outputBalance.formatted ? (
-                <Output
-                  value={tokenBalances.outputBalance.formatted}
-                  type={OutputType.CompactNumber}
-                  slotRight={` ${getTokenLabel(otherToken(inputToken))}`}
-                />
-              ) : (
-                `- ${getTokenLabel(otherToken(inputToken))}`
-              )}
+              <Output
+                value={tokenBalances.outputBalance.rawBalance}
+                type={OutputType.CompactNumber}
+                slotRight={` ${getTokenLabel(otherToken(inputToken))}`}
+              />
             </Button>
           </div>
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
               tw="bg-[unset] font-large-bold"
-              disabled={hasPendingSwap}
+              disabled
               $isLoading={mode === 'exact-in' && (isLoading || isPlaceholderData)}
               type="text"
               placeholder="0"
               value={to}
-              onChange={onValueChange('exact-out')}
-              onFocus={() => setIsToInputFocused(true)}
-              onBlur={() => setIsToInputFocused(false)}
             />
             <TokenLogo token={otherToken(inputToken)} />
           </div>

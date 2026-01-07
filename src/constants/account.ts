@@ -1,6 +1,3 @@
-import type { DydxAddress } from './wallets';
-import { SolAddress } from './wallets';
-
 export enum OnboardingSteps {
   SignIn = 'SignIn',
   ChooseWallet = 'ChooseWallet',
@@ -37,15 +34,17 @@ export enum EvmDerivedAccountStatus {
   Derived,
 }
 
-export type SolDerivedAddresses = {
-  version?: string;
-} & Record<
-  SolAddress,
-  {
-    encryptedSignature?: string;
-    dydxAddress?: DydxAddress;
-  }
->;
+/**
+ * @description Wallet status for spot trading
+ * - Disconnected: wallet not connected
+ * - Unsupported: Cosmos wallets can't derive Solana address
+ * - Connected: EVM/Solana/Turnkey wallets that can trade spot
+ */
+export enum SpotWalletStatus {
+  Disconnected = 'Disconnected',
+  Unsupported = 'Unsupported',
+  Connected = 'Connected',
+}
 
 export type Hdkey = {
   mnemonic: string;

@@ -9,3 +9,6 @@ export const getSubaccountId = (state: RootState) => state.wallet.localWallet?.s
 export const getUserWalletAddress = (state: RootState) => state.wallet.localWallet?.address;
 
 export const getUserSourceWalletAddress = (state: RootState) => state.wallet.sourceAccount.address;
+
+export const getUserSolanaWalletAddress = (state: RootState) =>
+  state.wallet.localWallet?.solanaAddress;

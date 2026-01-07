@@ -14,6 +14,7 @@ export interface LinksConfigs {
   equityTiersLearnMore?: string;
   feedback?: string;
   foundation?: string;
+  fundingComparison?: string;
   governanceLearnMore?: string;
   help?: string;
   initialMarginFractionLearnMore?: string;
@@ -67,6 +68,7 @@ export const useURLConfigs = (): LinksConfigs => {
     equityTiersLearnMore: linksConfigs.equityTiersLearnMore,
     feedback: linksConfigs.feedback ?? FALLBACK_URL,
     foundation: linksConfigs.foundation ?? FALLBACK_URL,
+    fundingComparison: linksConfigs.fundingComparison ?? FALLBACK_URL,
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,
     help: linksConfigs.help ?? FALLBACK_URL,
     vaultLearnMore: linksConfigs.vaultLearnMore ?? FALLBACK_URL,

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { Erc20Approval, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Address, WalletClient, maxUint256 } from 'viem';
@@ -64,21 +63,15 @@ export function useDepositSteps({
   const stringGetter = useStringGetter();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
-  const { dydxAddress } = useAccounts();
+  const { dydxAddress, nobleAddress } = useAccounts();
 
-  const [nobleAddress, osmosisAddress] = useMemo(() => {
-    if (!dydxAddress) return [undefined, undefined];
+  const osmosisAddress = useMemo(() => {
+    if (!dydxAddress) return undefined;
 
-    return [
-      convertBech32Address({
-        address: dydxAddress as string,
-        bech32Prefix: NOBLE_BECH32_PREFIX,
-      }),
-      convertBech32Address({
-        address: dydxAddress as string,
-        bech32Prefix: OSMO_BECH32_PREFIX,
-      }),
-    ];
+    return convertBech32Address({
+      address: dydxAddress as string,
+      bech32Prefix: OSMO_BECH32_PREFIX,
+    });
   }, [dydxAddress]);
 
   async function getStepsQuery() {

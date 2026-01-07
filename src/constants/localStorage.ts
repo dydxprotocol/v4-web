@@ -5,9 +5,10 @@ export enum LocalStorageKey {
   DydxAddress = 'dydx.DydxAddress',
   OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
-  EvmDerivedAddresses = 'dydx.EvmDerivedAddresses', // Deprecated
   KeplrCompliance = 'dydx.KeplrCompliance',
-  SolDerivedAddresses = 'dydx.SolDerivedAddresses',
+
+  EvmDerivedAddresses = 'dydx.EvmDerivedAddresses', // Deprecated
+  SolDerivedAddresses = 'dydx.SolDerivedAddresses', // Deprecated
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',
@@ -23,6 +24,7 @@ export enum LocalStorageKey {
 
   // UI State
   LastViewedMarket = 'dydx.LastViewedMarket',
+  LastViewedSpotToken = 'dydx.LastViewedSpotToken',
   SelectedLocale = 'dydx.SelectedLocale',
   SelectedNetwork = 'dydx.SelectedNetwork',
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',

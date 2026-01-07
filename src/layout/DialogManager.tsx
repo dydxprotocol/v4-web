@@ -25,7 +25,6 @@ import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
 import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
 import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
-import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ManageAccountDialog } from '@/views/dialogs/ManageAccountDialog/ManageAccountDialog';
@@ -40,6 +39,7 @@ import { ReclaimChildSubaccountFundsDialog } from '@/views/dialogs/ReclaimChildS
 import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
+import { SetMarketLeverageDialog } from '@/views/dialogs/SetMarketLeverageDialog';
 import { SetupPasskeyDialog } from '@/views/dialogs/SetupPasskeyDialog';
 import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
@@ -114,7 +114,6 @@ export const DialogManager = React.memo(() => {
     ExternalLink: (args) => <ExternalLinkDialog {...args} {...modalProps} />,
     ExternalNavStride: (args) => <ExternalNavStrideDialog {...args} {...modalProps} />,
     FillDetails: (args) => <FillDetailsDialog {...args} {...modalProps} />,
-    GeoCompliance: (args) => <GeoComplianceDialog {...args} {...modalProps} />,
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
@@ -133,6 +132,7 @@ export const DialogManager = React.memo(() => {
     Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
+    SetMarketLeverage: (args) => <SetMarketLeverageDialog {...args} {...modalProps} />,
     SetupPasskey: (args) => <SetupPasskeyDialog {...args} {...modalProps} />,
     ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,

@@ -1,9 +1,16 @@
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
+import { omit } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
-import { HeightEntry, setIndexerHeightRaw, setValidatorHeightRaw } from '@/state/raw';
+import {
+  GeoHeaders,
+  HeightEntry,
+  setComplianceGeoHeadersRaw,
+  setIndexerHeightRaw,
+  setValidatorHeightRaw,
+} from '@/state/raw';
 
 import { assertNever } from '@/lib/assertNever';
 import { promiseWithTimeout, withRetry } from '@/lib/asyncUtils';
@@ -42,30 +49,46 @@ const heightPollingOptions = {
 
 const manualHeightRetryConfig = { initialDelay: 500, maxRetries: 1 };
 
+// Internal type that includes geo data before it's extracted and stored separately
+type IndexerHeightEntry = HeightEntry & {
+  geo?: Omit<GeoHeaders, 'lastUpdated'>;
+};
+
 const doIndexerHeightQuery = async (
   indexerClient: IndexerClient
-): Promise<Loadable<HeightEntry>> => {
+): Promise<Loadable<IndexerHeightEntry>> => {
   const requestTime = new Date().toISOString();
   try {
     const result = await promiseWithTimeout(
       withRetry(
         () =>
           wrapAndLogBonsaiError(
-            () => indexerClient.utility.getHeight(),
+            () => indexerClient.utility.getHeightWithHeaders(),
             SharedLogIds.INDEXER_HEIGHT_INNER
           )(),
         manualHeightRetryConfig
       ),
       requestTimeout
     );
+
     return loadableLoaded({
       requestTime,
       receivedTime: new Date().toISOString(),
-      response: { time: result.time, height: MustBigNumber(result.height).toNumber() },
+      response: { time: result.data.time, height: MustBigNumber(result.data.height).toNumber() },
+      geo: {
+        status: result.headers['geo-origin-status'],
+        region: result.headers['geo-origin-region'],
+        country: result.headers['geo-origin-country'],
+      },
     });
   } catch (e) {
     return loadableError(
-      { requestTime, receivedTime: new Date().toISOString(), response: undefined },
+      {
+        requestTime,
+        receivedTime: new Date().toISOString(),
+        response: undefined,
+        geo: undefined,
+      },
       e
     );
   }
@@ -99,8 +122,25 @@ export function setUpIndexerHeightQuery(store: RootStore) {
       return () => doIndexerHeightQuery(indexerClient);
     },
     onNoQuery: () => store.dispatch(setIndexerHeightRaw(loadableIdle())),
-    onResult: (result) =>
-      store.dispatch(setIndexerHeightRaw(collapseLoadables(queryResultToLoadable(result)))),
+    onResult: (result) => {
+      const collapsed = collapseLoadables(queryResultToLoadable(result));
+
+      if (collapsed.status === 'success' && collapsed.data.geo) {
+        store.dispatch(setComplianceGeoHeadersRaw(loadableLoaded(collapsed.data.geo)));
+
+        // Remove geo from the height entry before storing
+        const heightWithoutGeo = omit(collapsed.data, ['geo']);
+        store.dispatch(
+          setIndexerHeightRaw({
+            ...collapsed,
+            data: heightWithoutGeo,
+          })
+        );
+      } else {
+        // Dispatch as-is if no geo data (error case)
+        store.dispatch(setIndexerHeightRaw(collapsed));
+      }
+    },
     getQueryKey: () => ['indexerHeight'],
     ...heightPollingOptions,
   });

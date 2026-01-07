@@ -77,7 +77,8 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
 
   // 2. Derive keys from EVM account using OnboardingSupervisor
   const { getWalletFromSignature } = useDydxClient();
-  const { getSubaccounts, setLocalDydxWallet, setLocalNobleWallet, setHdKey } = useAccounts();
+
+  const { getSubaccounts, handleWalletConnectionResult } = useAccounts();
 
   const isDeriving = ![
     EvmDerivedAccountStatus.NotDerived,
@@ -123,6 +124,7 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
         signMessageAsync: wrappedSignMessage,
         getWalletFromSignature,
         checkPreviousTransactions,
+        handleWalletConnectionResult,
       });
 
       if (!result.success) {
@@ -135,11 +137,6 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
         setError(result.error);
         return;
       }
-
-      // Set wallet in useAccounts state
-      setLocalDydxWallet(result.wallet);
-      setLocalNobleWallet(result.nobleWallet);
-      setHdKey(result.hdKey);
 
       // Done - wallet is already persisted to SecureStorage by OnboardingSupervisor
       setDerivationStatus(EvmDerivedAccountStatus.Derived);

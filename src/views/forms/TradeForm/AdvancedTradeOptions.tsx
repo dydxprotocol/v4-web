@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 
-import { ExecutionType, TimeInForce, TimeUnit } from '@/bonsai/forms/trade/types';
+import { ExecutionType, TimeInForce, TimeUnit, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
@@ -12,7 +13,7 @@ import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -37,7 +38,7 @@ export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
 
   const currentTradeFormSummary = useAppSelector(getTradeFormSummary).summary;
   const currentTradeFormConfig = currentTradeFormSummary.options;
@@ -46,8 +47,16 @@ export const AdvancedTradeOptions = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce, stopLossOrder, takeProfitOrder } =
-    inputTradeData;
+  const {
+    execution,
+    goodTil,
+    postOnly,
+    reduceOnly,
+    timeInForce,
+    stopLossOrder,
+    takeProfitOrder,
+    type,
+  } = inputTradeData;
   const { stopLossOrder: stopLossSummary, takeProfitOrder: takeProfitSummary } = orEmptyObj(
     currentTradeFormSummary.triggersSummary
   );
@@ -90,6 +99,181 @@ export const AdvancedTradeOptions = () => {
     return undefined;
   }
 
+  const fullContents = (
+    <div tw="grid gap-[--form-input-gap]">
+      {needsTimeRow && (
+        <$AdvancedInputsRow>
+          {hasTimeInForce && timeInForce != null && (
+            <$SelectMenu
+              value={timeInForce}
+              onValueChange={(selectedTimeInForceOption: string) => {
+                if (!selectedTimeInForceOption) {
+                  return;
+                }
+                dispatch(tradeFormActions.setTimeInForce(selectedTimeInForceOption as TimeInForce));
+              }}
+              label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
+            >
+              {timeInForceOptions.map(({ value, stringKey }) => (
+                <$SelectItem
+                  key={value}
+                  value={value}
+                  label={stringGetter({ key: stringKey as StringKey })}
+                />
+              ))}
+            </$SelectMenu>
+          )}
+          {showGoodTil && (
+            <$FormInput
+              id="trade-good-til-time"
+              type={InputType.Number}
+              decimals={INTEGER_DECIMALS}
+              label={stringGetter({
+                key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
+              })}
+              onChange={({ value }: NumberFormatValues) => {
+                dispatch(
+                  tradeFormActions.setGoodTilTime({ duration: value, unit: unit ?? TimeUnit.DAY })
+                );
+              }}
+              value={duration ?? ''}
+              slotRight={
+                unit != null && (
+                  <$InnerSelectMenu
+                    value={unit}
+                    onValueChange={(goodTilTimeTimescale: string) => {
+                      if (!goodTilTimeTimescale) {
+                        return;
+                      }
+                      dispatch(
+                        tradeFormActions.setGoodTilTime({
+                          duration: duration ?? '',
+                          unit: goodTilTimeTimescale as TimeUnit,
+                        })
+                      );
+                    }}
+                  >
+                    {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
+                      <$InnerSelectItem
+                        key={goodTilTimeTimescale}
+                        value={goodTilTimeTimescale}
+                        label={stringGetter({
+                          key: GOOD_TIL_TIME_TIMESCALE_STRINGS[goodTilTimeTimescale],
+                        })}
+                      />
+                    ))}
+                  </$InnerSelectMenu>
+                )
+              }
+            />
+          )}
+        </$AdvancedInputsRow>
+      )}
+      {needsExecution && (
+        <>
+          {executionOptions.length > 0 && execution != null && (
+            <$SelectMenu
+              value={execution}
+              label={stringGetter({ key: STRING_KEYS.EXECUTION })}
+              onValueChange={(selectedExecution: string) => {
+                if (!selectedExecution) {
+                  return;
+                }
+                dispatch(tradeFormActions.setExecution(selectedExecution as ExecutionType));
+              }}
+            >
+              {executionOptions.map(({ value, stringKey }) => (
+                <$SelectItem
+                  key={value}
+                  value={value}
+                  label={stringGetter({ key: stringKey as StringKey })}
+                />
+              ))}
+            </$SelectMenu>
+          )}
+          {shouldShowReduceOnly && (
+            <Checkbox
+              checked={!!reduceOnly}
+              disabled={showReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
+              onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
+              id="reduce-only"
+              label={
+                <WithTooltip
+                  tooltip={showReduceOnly ? 'reduce-only' : 'reduce-only-timeinforce-ioc'}
+                  side="right"
+                >
+                  <span css={!reduceOnly ? tw`text-color-text-0` : tw`text-color-text-1`}>
+                    {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
+                  </span>
+                </WithTooltip>
+              }
+            />
+          )}
+          {shouldShowPostOnly && (
+            <Checkbox
+              checked={!!postOnly}
+              disabled={showPostOnlyTooltip}
+              onCheckedChange={(checked) => dispatch(tradeFormActions.setPostOnly(checked))}
+              id="post-only"
+              label={
+                <WithTooltip
+                  tooltip={showPostOnly ? 'post-only' : 'post-only-timeinforce-gtt'}
+                  side="right"
+                >
+                  {stringGetter({ key: STRING_KEYS.POST_ONLY })}
+                </WithTooltip>
+              }
+            />
+          )}
+        </>
+      )}
+      {needsTriggers && (
+        <div tw="column gap-0.5">
+          <Checkbox
+            checked={!!triggerOrdersChecked}
+            disabled={false}
+            onCheckedChange={(checked) =>
+              dispatch(checked ? tradeFormActions.showTriggers() : tradeFormActions.hideTriggers())
+            }
+            id="show-trigger-orders"
+            label={stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS })}
+          />
+          {triggerOrdersChecked && (
+            <div tw="column gap-0.5">
+              <TradeTriggerOrderInputs
+                stringKeys={{
+                  header: STRING_KEYS.TAKE_PROFIT,
+                  headerDiff: STRING_KEYS.PROFIT_COLON,
+                  price: STRING_KEYS.TP_PRICE,
+                  output: STRING_KEYS.GAIN,
+                }}
+                inputState={takeProfitOrder ?? {}}
+                summaryState={takeProfitSummary ?? {}}
+                isStopLoss={false}
+                tickSizeDecimals={tickSizeDecimals}
+              />
+              <TradeTriggerOrderInputs
+                stringKeys={{
+                  header: STRING_KEYS.STOP_LOSS,
+                  headerDiff: STRING_KEYS.LOSS_COLON,
+                  price: STRING_KEYS.SL_PRICE,
+                  output: STRING_KEYS.LOSS,
+                }}
+                inputState={stopLossOrder ?? {}}
+                summaryState={stopLossSummary ?? {}}
+                isStopLoss
+                tickSizeDecimals={tickSizeDecimals}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  if (type === TradeFormType.MARKET) {
+    return <div>{fullContents}</div>;
+  }
   return (
     <$Collapsible
       defaultOpen={!isTablet}
@@ -97,177 +281,7 @@ export const AdvancedTradeOptions = () => {
       triggerIconSide="right"
       fullWidth
     >
-      <div tw="grid gap-[--form-input-gap]">
-        {needsTimeRow && (
-          <$AdvancedInputsRow>
-            {hasTimeInForce && timeInForce != null && (
-              <$SelectMenu
-                value={timeInForce}
-                onValueChange={(selectedTimeInForceOption: string) => {
-                  if (!selectedTimeInForceOption) {
-                    return;
-                  }
-                  dispatch(
-                    tradeFormActions.setTimeInForce(selectedTimeInForceOption as TimeInForce)
-                  );
-                }}
-                label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
-              >
-                {timeInForceOptions.map(({ value, stringKey }) => (
-                  <$SelectItem
-                    key={value}
-                    value={value}
-                    label={stringGetter({ key: stringKey as StringKey })}
-                  />
-                ))}
-              </$SelectMenu>
-            )}
-            {showGoodTil && (
-              <$FormInput
-                id="trade-good-til-time"
-                type={InputType.Number}
-                decimals={INTEGER_DECIMALS}
-                label={stringGetter({
-                  key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
-                })}
-                onChange={({ value }: NumberFormatValues) => {
-                  dispatch(
-                    tradeFormActions.setGoodTilTime({ duration: value, unit: unit ?? TimeUnit.DAY })
-                  );
-                }}
-                value={duration ?? ''}
-                slotRight={
-                  unit != null && (
-                    <$InnerSelectMenu
-                      value={unit}
-                      onValueChange={(goodTilTimeTimescale: string) => {
-                        if (!goodTilTimeTimescale) {
-                          return;
-                        }
-                        dispatch(
-                          tradeFormActions.setGoodTilTime({
-                            duration: duration ?? '',
-                            unit: goodTilTimeTimescale as TimeUnit,
-                          })
-                        );
-                      }}
-                    >
-                      {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
-                        <$InnerSelectItem
-                          key={goodTilTimeTimescale}
-                          value={goodTilTimeTimescale}
-                          label={stringGetter({
-                            key: GOOD_TIL_TIME_TIMESCALE_STRINGS[goodTilTimeTimescale],
-                          })}
-                        />
-                      ))}
-                    </$InnerSelectMenu>
-                  )
-                }
-              />
-            )}
-          </$AdvancedInputsRow>
-        )}
-        {needsExecution && (
-          <>
-            {executionOptions.length > 0 && execution != null && (
-              <$SelectMenu
-                value={execution}
-                label={stringGetter({ key: STRING_KEYS.EXECUTION })}
-                onValueChange={(selectedExecution: string) => {
-                  if (!selectedExecution) {
-                    return;
-                  }
-                  dispatch(tradeFormActions.setExecution(selectedExecution as ExecutionType));
-                }}
-              >
-                {executionOptions.map(({ value, stringKey }) => (
-                  <$SelectItem
-                    key={value}
-                    value={value}
-                    label={stringGetter({ key: stringKey as StringKey })}
-                  />
-                ))}
-              </$SelectMenu>
-            )}
-            {shouldShowReduceOnly && (
-              <Checkbox
-                checked={!!reduceOnly}
-                disabled={showReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
-                onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
-                id="reduce-only"
-                label={
-                  <WithTooltip
-                    tooltip={showReduceOnly ? 'reduce-only' : 'reduce-only-timeinforce-ioc'}
-                    side="right"
-                  >
-                    {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
-                  </WithTooltip>
-                }
-              />
-            )}
-            {shouldShowPostOnly && (
-              <Checkbox
-                checked={!!postOnly}
-                disabled={showPostOnlyTooltip}
-                onCheckedChange={(checked) => dispatch(tradeFormActions.setPostOnly(checked))}
-                id="post-only"
-                label={
-                  <WithTooltip
-                    tooltip={showPostOnly ? 'post-only' : 'post-only-timeinforce-gtt'}
-                    side="right"
-                  >
-                    {stringGetter({ key: STRING_KEYS.POST_ONLY })}
-                  </WithTooltip>
-                }
-              />
-            )}
-          </>
-        )}
-        {needsTriggers && (
-          <div tw="column gap-0.5">
-            <Checkbox
-              checked={!!triggerOrdersChecked}
-              disabled={false}
-              onCheckedChange={(checked) =>
-                dispatch(
-                  checked ? tradeFormActions.showTriggers() : tradeFormActions.hideTriggers()
-                )
-              }
-              id="show-trigger-orders"
-              label={stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS })}
-            />
-            {triggerOrdersChecked && (
-              <div tw="column gap-0.5">
-                <TradeTriggerOrderInputs
-                  stringKeys={{
-                    header: STRING_KEYS.TAKE_PROFIT,
-                    headerDiff: STRING_KEYS.PROFIT_COLON,
-                    price: STRING_KEYS.TP_PRICE,
-                    output: STRING_KEYS.GAIN,
-                  }}
-                  inputState={takeProfitOrder ?? {}}
-                  summaryState={takeProfitSummary ?? {}}
-                  isStopLoss={false}
-                  tickSizeDecimals={tickSizeDecimals}
-                />
-                <TradeTriggerOrderInputs
-                  stringKeys={{
-                    header: STRING_KEYS.STOP_LOSS,
-                    headerDiff: STRING_KEYS.LOSS_COLON,
-                    price: STRING_KEYS.SL_PRICE,
-                    output: STRING_KEYS.LOSS,
-                  }}
-                  inputState={stopLossOrder ?? {}}
-                  summaryState={stopLossSummary ?? {}}
-                  isStopLoss
-                  tickSizeDecimals={tickSizeDecimals}
-                />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {fullContents}
     </$Collapsible>
   );
 };
@@ -280,8 +294,6 @@ const $Collapsible = styled(Collapsible)`
 
   font: var(--font-small-book);
   outline: none;
-
-  margin: -0.5rem 0;
 `;
 const $SelectMenu = styled(SelectMenu)`
   ${formMixins.inputSelectMenu}

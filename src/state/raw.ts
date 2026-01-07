@@ -24,6 +24,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer';
 
 import { DydxNetwork } from '@/constants/networks';
+import { timeUnits } from '@/constants/time';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
@@ -33,7 +34,13 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
+import {
+  SpotApiPortfolioTradesResponse,
+  SpotApiTokenMetadataResponse,
+  SpotApiTokenPriceResponse,
+} from '@/clients/spotApi';
 import { calc } from '@/lib/do';
+import { SpotApiWsWalletPositionsUpdate } from '@/lib/streaming/walletPositionsStreaming';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
@@ -44,6 +51,13 @@ interface NetworkState {
   nobleClientReady: boolean;
   errorInitializing: boolean;
 }
+
+export type GeoHeaders = {
+  status: string | 'restricted' | undefined;
+  region: string | undefined;
+  country: string | undefined;
+  lastUpdated: string; // ISO timestamp of when this was stored
+};
 
 export type HeightEntry = {
   requestTime: string;
@@ -63,6 +77,7 @@ export type ComplianceErrors = {
 };
 
 export type ComplianceState = {
+  geoHeaders: Loadable<GeoHeaders | undefined>;
   geo: Loadable<GeoState | undefined>;
   sourceAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
   localAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
@@ -77,6 +92,7 @@ export interface RawDataState {
     sparklines: Loadable<{
       [period: string]: IndexerSparklineResponseObject | undefined;
     }>;
+    selectedMarketLeverages: Loadable<{ [marketId: string]: number }>;
   };
   account: {
     balances: Loadable<Coin[]>;
@@ -103,6 +119,13 @@ export interface RawDataState {
     data: Loadable<RewardsParams | undefined>;
     price: Loadable<TokenPriceResponse | undefined>;
   };
+  spot: {
+    solPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenMetadata: Loadable<SpotApiTokenMetadataResponse | undefined>;
+    walletPositions: Loadable<SpotApiWsWalletPositionsUpdate | undefined>;
+    portfolioTrades: Loadable<SpotApiPortfolioTradesResponse | undefined>;
+  };
 }
 
 const initialState: RawDataState = {
@@ -112,6 +135,8 @@ const initialState: RawDataState = {
     assets: loadableIdle(),
     orderbooks: {},
     sparklines: loadableIdle(),
+    // TODO: this should actually be idle eventually, not success with empty data
+    selectedMarketLeverages: { status: 'success', data: {} },
   },
   account: {
     parentSubaccount: loadableIdle(),
@@ -132,6 +157,7 @@ const initialState: RawDataState = {
   },
   configs: loadableIdle(),
   compliance: {
+    geoHeaders: loadableIdle(),
     geo: loadableIdle(),
     localAddressScreenV2: loadableIdle(),
     sourceAddressScreenV2: loadableIdle(),
@@ -139,6 +165,13 @@ const initialState: RawDataState = {
   rewards: {
     data: loadableIdle(),
     price: loadableIdle(),
+  },
+  spot: {
+    solPrice: loadableIdle(),
+    tokenMetadata: loadableIdle(),
+    tokenPrice: loadableIdle(),
+    walletPositions: loadableIdle(),
+    portfolioTrades: loadableIdle(),
   },
 };
 
@@ -214,6 +247,31 @@ export const rawSlice = createSlice({
       setComplianceGeoRaw: (state, action: PayloadAction<Loadable<GeoState | undefined>>) => {
         state.compliance.geo = action.payload;
       },
+      setComplianceGeoHeadersRaw: (
+        state,
+        action: PayloadAction<Loadable<Omit<GeoHeaders, 'lastUpdated'> | undefined>>
+      ) => {
+        const now = Date.now();
+        const lastUpdated = state.compliance.geoHeaders.data?.lastUpdated;
+
+        // Update if no data exists or if it's been more than an hour since last update
+        const shouldUpdate =
+          !state.compliance.geoHeaders.data ||
+          !lastUpdated ||
+          now - new Date(lastUpdated).getTime() > timeUnits.hour;
+
+        if (shouldUpdate && action.payload.status === 'success') {
+          state.compliance.geoHeaders = {
+            ...action.payload,
+            data: action.payload.data
+              ? {
+                  ...action.payload.data,
+                  lastUpdated: new Date().toISOString(),
+                }
+              : undefined,
+          };
+        }
+      },
       setLocalAddressScreenV2Raw: (
         state,
         action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
@@ -234,6 +292,51 @@ export const rawSlice = createSlice({
         action: PayloadAction<Loadable<TokenPriceResponse | undefined>>
       ) => {
         state.rewards.price = action.payload;
+      },
+      setSelectedMarketLeverage: (
+        state,
+        action: PayloadAction<{ marketId: string; leverage: number }>
+      ) => {
+        const { marketId, leverage } = action.payload;
+        if (state.markets.selectedMarketLeverages.status === 'success') {
+          state.markets.selectedMarketLeverages.data[marketId] = leverage;
+        }
+      },
+      setSelectedMarketLeverages: (
+        state,
+        action: PayloadAction<Loadable<{ [marketId: string]: number }>>
+      ) => {
+        state.markets.selectedMarketLeverages = action.payload;
+      },
+      setSpotSolPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.solPrice = action.payload;
+      },
+      setSpotTokenPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.tokenPrice = action.payload;
+      },
+      setSpotTokenMetadata: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenMetadataResponse | undefined>>
+      ) => {
+        state.spot.tokenMetadata = action.payload;
+      },
+      setSpotWalletPositions: (
+        state,
+        action: PayloadAction<Loadable<SpotApiWsWalletPositionsUpdate | undefined>>
+      ) => {
+        state.spot.walletPositions = action.payload;
+      },
+      setSpotPortfolioTrades: (
+        state,
+        action: PayloadAction<Loadable<SpotApiPortfolioTradesResponse | undefined>>
+      ) => {
+        state.spot.portfolioTrades = action.payload;
       },
     }),
     // orderbook is throttled separately for fine-grained control
@@ -316,8 +419,16 @@ export const {
   setMarketsFeeDiscountsRaw,
   setConfigTiers,
   setComplianceGeoRaw,
+  setComplianceGeoHeadersRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
   setRewardsParams,
   setRewardsTokenPrice,
+  setSelectedMarketLeverage,
+  setSelectedMarketLeverages,
+  setSpotSolPrice,
+  setSpotTokenPrice,
+  setSpotTokenMetadata,
+  setSpotWalletPositions,
+  setSpotPortfolioTrades,
 } = rawSlice.actions;

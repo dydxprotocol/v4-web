@@ -53,8 +53,8 @@ export function useWithdrawStep({
   const {
     dydxAddress,
     localDydxWallet,
-    getNobleWallet,
-    getNobleAddress,
+    nobleAddress,
+    localNobleWallet,
     getOsmosisAddress,
     getNeutronAddress,
     sourceAccount,
@@ -75,8 +75,7 @@ export function useWithdrawStep({
       return undefined;
     }
 
-    const [nobleAddress, osmosisAddress, neutronAddress] = await Promise.all([
-      getNobleAddress(),
+    const [osmosisAddress, neutronAddress] = await Promise.all([
       getOsmosisAddress(),
       getNeutronAddress(),
     ]);
@@ -96,7 +95,6 @@ export function useWithdrawStep({
     );
   }, [
     dydxAddress,
-    getNobleAddress,
     getOsmosisAddress,
     getNeutronAddress,
     sourceAccount,
@@ -107,7 +105,6 @@ export function useWithdrawStep({
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
       if (chainID === CosmosChainId.Noble) {
-        const localNobleWallet = await getNobleWallet();
         if (!localNobleWallet?.offlineSigner) {
           throw new Error('No local noblewallet offline signer. Cannot submit tx');
         }
@@ -119,7 +116,7 @@ export function useWithdrawStep({
 
       return localDydxWallet.offlineSigner;
     },
-    [localDydxWallet, getNobleWallet]
+    [localDydxWallet, localNobleWallet]
   );
 
   const executeWithdraw = async () => {
@@ -128,10 +125,7 @@ export function useWithdrawStep({
       if (!withdrawRoute) throw new Error('No route found');
 
       // Derive user addresses and Noble wallet on-demand
-      const [userAddresses, localNobleWallet] = await Promise.all([
-        getUserAddresses(),
-        getNobleWallet(),
-      ]);
+      const userAddresses = await getUserAddresses();
 
       if (!userAddresses) throw new Error('No user addresses found');
       if (!localDydxWallet || !localNobleWallet || !dydxAddress) {

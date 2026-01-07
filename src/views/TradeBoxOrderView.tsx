@@ -36,25 +36,27 @@ export const TradeBoxOrderView = () => {
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
   return (
-    <TradeSideTabs
-      sharedContent={
-        <div tw="flex min-h-full flex-col">
-          <$MarginAndLeverageButtons />
-          <$OrderTypeTabs
-            value={selectedTradeType}
-            items={tradeTypeItems}
-            onValueChange={onTradeTypeChange}
-            dividerStyle="underline"
-            disabled={!allowChangingOrderType}
-            sharedContent={
-              <$Container>
-                <TradeForm />
-              </$Container>
-            }
-          />
-        </div>
-      }
-    />
+    <div tw="flex flex-col gap-0">
+      <$MarginAndLeverageButtons />
+      <TradeSideTabs
+        sharedContent={
+          <div tw="flex min-h-full flex-col">
+            <$OrderTypeTabs
+              value={selectedTradeType}
+              items={tradeTypeItems}
+              onValueChange={onTradeTypeChange}
+              dividerStyle="underline"
+              disabled={!allowChangingOrderType}
+              sharedContent={
+                <$Container>
+                  <TradeForm />
+                </$Container>
+              }
+            />
+          </div>
+        }
+      />
+    </div>
   );
 };
 
@@ -63,12 +65,12 @@ const $Container = styled.div`
 `;
 
 const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
-  padding: 0 1rem;
+  padding: 0.25rem 1rem;
   box-shadow: inset 0 calc(-1 * var(--border-width)) var(--border-color);
 `;
 
 const $OrderTypeTabs = styled(Tabs)`
-  --tabs-height: 2.125rem;
+  --tabs-height: 2.625rem;
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
 
   > * > header > div {

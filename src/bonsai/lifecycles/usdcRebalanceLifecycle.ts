@@ -16,7 +16,7 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
-  selectTxAuthorizedAccount,
+  selectTxAuthorizedCloseOnlyAccount,
   selectUserHasUsdcGasForTransaction,
 } from '../selectors/accountTransaction';
 
@@ -30,7 +30,7 @@ const INVALIDATION_SLEEP_TIME = timeUnits.second * 10;
 export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const balanceAndTransfersSelector = createAppSelector(
     [
-      selectTxAuthorizedAccount,
+      selectTxAuthorizedCloseOnlyAccount,
       selectUserHasUsdcGasForTransaction,
       selectShouldAccountRebalanceUsdc,
     ],
@@ -64,7 +64,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         const { localDydxWallet, parentSubaccountInfo, sourceAccount, rebalanceAction } = data!;
 
         // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
-        if (rebalanceAction == null || sourceAccount.chain === WalletNetworkType.Cosmos) {
+        if (
+          rebalanceAction == null ||
+          sourceAccount.chain === WalletNetworkType.Cosmos ||
+          sourceAccount.chain == null
+        ) {
           return;
         }
 

@@ -2,6 +2,7 @@ import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
 import { BECH32_PREFIX, NOBLE_BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { OfflineAminoSigner, OfflineDirectSigner } from '@keplr-wallet/types';
+import { Keypair } from '@solana/web3.js';
 
 import { OnboardingState } from '@/constants/account';
 import { getNobleChainId } from '@/constants/graz';
@@ -17,6 +18,7 @@ import { convertBech32Address } from '@/lib/addressUtils';
 import { hdKeyManager } from '@/lib/hdKeyManager';
 import { sleep } from '@/lib/timeUtils';
 
+import { deriveSolanaKeypairFromPrivateKey } from '../solanaWallet';
 import { dydxPersistedWalletService } from '../wallet/dydxPersistedWalletService';
 
 export interface SourceAccount {
@@ -28,7 +30,6 @@ export interface SourceAccount {
 export interface OnboardingContext {
   sourceAccount: SourceAccount;
   hasLocalDydxWallet: boolean;
-  blockedGeo: boolean;
   isConnectedGraz?: boolean;
   authenticated?: boolean;
   ready?: boolean;
@@ -38,6 +39,7 @@ export type WalletDerivationResult =
   | {
       wallet?: undefined;
       nobleWallet?: undefined;
+      solanaKeypair?: undefined;
       hdKey?: PrivateInformation;
       onboardingState: OnboardingState;
       error?: string;
@@ -45,6 +47,7 @@ export type WalletDerivationResult =
   | {
       wallet: LocalWallet;
       nobleWallet: LocalWallet;
+      solanaKeypair: Keypair | undefined;
       hdKey?: PrivateInformation;
       onboardingState: OnboardingState;
       error?: string;
@@ -55,9 +58,13 @@ class OnboardingSupervisor {
    * Import wallet from private key
    * Called directly from ImportPrivateKey component
    */
-  async handleWalletImport(
-    privateKey: string
-  ): Promise<
+  async handleWalletImport({
+    privateKey,
+    handleWalletConnectionResult,
+  }: {
+    privateKey: string;
+    handleWalletConnectionResult: (result: WalletDerivationResult) => void;
+  }): Promise<
     | { success: true; wallet: LocalWallet; nobleWallet: LocalWallet }
     | { success: false; error: string }
   > {
@@ -67,6 +74,8 @@ class OnboardingSupervisor {
       // Create wallets from private key
       const wallet = await LocalWallet.fromPrivateKey(privateKey, BECH32_PREFIX);
       const nobleWallet = await LocalWallet.fromPrivateKey(privateKey, NOBLE_BECH32_PREFIX);
+      const pk = Buffer.from(privateKey, 'hex');
+      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(pk);
 
       if (!wallet.address) {
         return {
@@ -75,13 +84,20 @@ class OnboardingSupervisor {
         };
       }
 
+      const walletConnectionResult: WalletDerivationResult = {
+        wallet,
+        nobleWallet,
+        solanaKeypair,
+        onboardingState: OnboardingState.AccountConnected,
+      };
+
+      handleWalletConnectionResult(walletConnectionResult);
+
       // Store the private key in SecureStorage
       await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
 
       return {
         success: true,
-        wallet,
-        nobleWallet,
       };
     } catch (error) {
       logBonsaiError('OnboardingSupervisor', 'handleWalletImport failed', { error });
@@ -105,7 +121,12 @@ class OnboardingSupervisor {
       privateKey: Uint8Array | null;
       publicKey: Uint8Array | null;
     }>
-  ): Promise<{ wallet: LocalWallet; nobleWallet: LocalWallet; hdKey: PrivateInformation }> {
+  ): Promise<{
+    wallet: LocalWallet;
+    nobleWallet: LocalWallet;
+    solanaKeypair: Keypair;
+    hdKey: PrivateInformation;
+  }> {
     const { wallet, nobleWallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
       signature,
     });
@@ -120,10 +141,11 @@ class OnboardingSupervisor {
       publicKey,
     };
 
+    const solanaKeypair = deriveSolanaKeypairFromPrivateKey(privateKey);
     hdKeyManager.setHdkey(wallet.address, hdKey);
     await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
 
-    return { wallet, nobleWallet, hdKey };
+    return { wallet, nobleWallet, solanaKeypair, hdKey };
   }
 
   /**
@@ -145,17 +167,19 @@ class OnboardingSupervisor {
       publicKey: Uint8Array | null;
     }>;
     checkPreviousTransactions: (dydxAddress: DydxAddress) => Promise<boolean>;
+    handleWalletConnectionResult: (result: WalletDerivationResult) => void;
   }): Promise<
     | {
         success: true;
-        wallet: LocalWallet;
-        nobleWallet: LocalWallet;
-        hdKey: PrivateInformation;
-        isNewUser: boolean;
       }
     | { success: false; error: string; isDeterminismError?: boolean }
   > {
-    const { signMessageAsync, getWalletFromSignature, checkPreviousTransactions } = params;
+    const {
+      signMessageAsync,
+      getWalletFromSignature,
+      checkPreviousTransactions,
+      handleWalletConnectionResult,
+    } = params;
 
     try {
       // Step 1: Get first signature and derive wallet
@@ -204,12 +228,21 @@ class OnboardingSupervisor {
 
       hdKeyManager.setHdkey(wallet.address, hdKey);
 
-      return {
-        success: true,
+      // Step 6: Derive Solana keypair
+      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(privateKey);
+
+      const walletDerivationResult: WalletDerivationResult = {
         wallet,
         nobleWallet,
+        solanaKeypair,
         hdKey,
-        isNewUser: !hasPreviousTransactions,
+        onboardingState: OnboardingState.AccountConnected,
+      };
+
+      handleWalletConnectionResult(walletDerivationResult);
+
+      return {
+        success: true,
       };
     } catch (error) {
       logBonsaiError('OnboardingSupervisor', 'deriveKeysWithDeterminismCheck failed', { error });
@@ -234,16 +267,19 @@ class OnboardingSupervisor {
       const LocalWallet = await getLazyLocalWallet();
       const wallet = await LocalWallet.fromPrivateKey(storedPrivateKey, BECH32_PREFIX);
       const nobleWallet = await LocalWallet.fromPrivateKey(storedPrivateKey, NOBLE_BECH32_PREFIX);
+      const pk = Buffer.from(storedPrivateKey, 'hex');
+      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(pk);
 
       const hdKey: PrivateInformation = {
         mnemonic: '',
-        privateKey: Buffer.from(storedPrivateKey, 'hex'),
+        privateKey: pk,
         publicKey: null,
       };
 
       return {
         wallet,
         nobleWallet,
+        solanaKeypair,
         hdKey,
         onboardingState: OnboardingState.AccountConnected,
       };
@@ -265,7 +301,7 @@ class OnboardingSupervisor {
       privateKey: Uint8Array | null;
       publicKey: Uint8Array | null;
     }>;
-    signMessageAsync?: () => Promise<string>;
+    signMessageAsync: () => Promise<string>;
     getCosmosOfflineSigner?: (
       chainId: string
     ) => Promise<(OfflineAminoSigner & OfflineDirectSigner) | undefined>;
@@ -278,13 +314,12 @@ class OnboardingSupervisor {
       getCosmosOfflineSigner,
       selectedDydxChainId,
     } = params;
-    const { sourceAccount, hasLocalDydxWallet, blockedGeo, isConnectedGraz, authenticated, ready } =
-      context;
+    const { sourceAccount, hasLocalDydxWallet, isConnectedGraz, authenticated, ready } = context;
 
     try {
       // ------ Restore from SecureStorage ------ //
       // Check for persisted session before processing wallet connections
-      if (dydxPersistedWalletService.hasStoredWallet() && !blockedGeo) {
+      if (dydxPersistedWalletService.hasStoredWallet()) {
         const restored = await this.restoreFromSecureStorage();
 
         if (restored) {
@@ -302,7 +337,6 @@ class OnboardingSupervisor {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
         return await this.handleTurnkeyFlow({
           hasLocalDydxWallet,
-          blockedGeo,
         });
       }
 
@@ -316,6 +350,7 @@ class OnboardingSupervisor {
         return await this.handleCosmosFlow({
           getCosmosOfflineSigner,
           selectedDydxChainId,
+          signMessageAsync,
         });
       }
 
@@ -324,7 +359,6 @@ class OnboardingSupervisor {
         return await this.handleEvmFlow({
           sourceAccount,
           hasLocalDydxWallet,
-          blockedGeo,
           authenticated,
           ready,
           signMessageAsync,
@@ -337,7 +371,6 @@ class OnboardingSupervisor {
         return await this.handleSolanaFlow({
           sourceAccount,
           hasLocalDydxWallet,
-          blockedGeo,
           getWalletFromSignature,
           signMessageAsync,
         });
@@ -363,21 +396,13 @@ class OnboardingSupervisor {
    */
   private async handleTurnkeyFlow(params: {
     hasLocalDydxWallet: boolean;
-    blockedGeo: boolean;
   }): Promise<WalletDerivationResult> {
-    const { hasLocalDydxWallet, blockedGeo } = params;
+    const { hasLocalDydxWallet } = params;
 
     // If wallet already exists (restored from SecureStorage or set by TurnkeyAuthProvider)
     if (hasLocalDydxWallet) {
       return {
         onboardingState: OnboardingState.AccountConnected,
-      };
-    }
-
-    // If geo-blocked, user cannot proceed
-    if (blockedGeo) {
-      return {
-        onboardingState: OnboardingState.Disconnected,
       };
     }
 
@@ -410,6 +435,7 @@ class OnboardingSupervisor {
     return {
       wallet,
       nobleWallet,
+      solanaKeypair: undefined,
       // Test wallets don't have hdKey material
       onboardingState: OnboardingState.AccountConnected,
     };
@@ -423,6 +449,7 @@ class OnboardingSupervisor {
       chainId: string
     ) => Promise<(OfflineAminoSigner & OfflineDirectSigner) | undefined>;
     selectedDydxChainId?: string;
+    signMessageAsync: () => Promise<string>;
   }): Promise<WalletDerivationResult> {
     const { getCosmosOfflineSigner, selectedDydxChainId } = params;
 
@@ -446,6 +473,7 @@ class OnboardingSupervisor {
         return {
           wallet,
           nobleWallet,
+          solanaKeypair: undefined,
           // Cosmos wallets from offline signer don't expose hdKey material
           onboardingState: OnboardingState.AccountConnected,
         };
@@ -466,16 +494,20 @@ class OnboardingSupervisor {
   private async handleEvmFlow(params: {
     sourceAccount: SourceAccount;
     hasLocalDydxWallet: boolean;
-    blockedGeo: boolean;
     authenticated?: boolean;
     ready?: boolean;
-    signMessageAsync?: () => Promise<string>;
-    getWalletFromSignature: any;
+    signMessageAsync: () => Promise<string>;
+    getWalletFromSignature: (params: { signature: string }) => Promise<{
+      wallet: LocalWallet;
+      nobleWallet: LocalWallet;
+      mnemonic: string;
+      privateKey: Uint8Array | null;
+      publicKey: Uint8Array | null;
+    }>;
   }): Promise<WalletDerivationResult> {
     const {
       sourceAccount,
       hasLocalDydxWallet,
-      blockedGeo,
       authenticated,
       ready,
       signMessageAsync,
@@ -489,20 +521,13 @@ class OnboardingSupervisor {
       };
     }
 
-    // If geo-blocked, stay in WalletConnected state
-    if (blockedGeo) {
-      return {
-        onboardingState: OnboardingState.WalletConnected,
-      };
-    }
-
     // Privy flow - needs authentication
     if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy && authenticated && ready) {
       try {
         // Give Privy time to finish auth flow
         await sleep();
-        const signature = await signMessageAsync!();
-        const { wallet, nobleWallet, hdKey } = await this.deriveWalletFromSignature(
+        const signature = await signMessageAsync();
+        const { wallet, nobleWallet, solanaKeypair, hdKey } = await this.deriveWalletFromSignature(
           signature,
           getWalletFromSignature
         );
@@ -510,6 +535,7 @@ class OnboardingSupervisor {
         return {
           wallet,
           nobleWallet,
+          solanaKeypair,
           hdKey,
           onboardingState: OnboardingState.AccountConnected,
         };
@@ -536,23 +562,15 @@ class OnboardingSupervisor {
   private async handleSolanaFlow(params: {
     sourceAccount: SourceAccount;
     hasLocalDydxWallet: boolean;
-    blockedGeo: boolean;
     getWalletFromSignature: any;
     signMessageAsync?: () => Promise<string>;
   }): Promise<WalletDerivationResult> {
-    const { hasLocalDydxWallet, blockedGeo } = params;
+    const { hasLocalDydxWallet } = params;
 
     // If wallet already exists (restored from SecureStorage), just set state
     if (hasLocalDydxWallet) {
       return {
         onboardingState: OnboardingState.AccountConnected,
-      };
-    }
-
-    // If geo-blocked, stay in WalletConnected state
-    if (blockedGeo) {
-      return {
-        onboardingState: OnboardingState.WalletConnected,
       };
     }
 

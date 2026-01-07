@@ -10,7 +10,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
 import { usePortfolioValues } from '@/hooks/PortfolioValues/usePortfolioValues';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -31,7 +31,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
 

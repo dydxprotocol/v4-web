@@ -4,15 +4,15 @@ import styled from 'styled-components';
 
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { ChaosLabsCompetitionItem, useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { IncentiveCompetitionItem, useClcPnlDistribution } from '@/hooks/rewards/hooks';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { TrophyIcon } from '@/icons';
 
+import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
@@ -25,15 +25,15 @@ export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
   PNL = 'PNL',
-  Rewards = 'Rewards',
+  EstimatedPrize = 'EstimatedPrize',
 }
 
 export const CompetitionLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
-  const { data: topPnls, isLoading } = useChaosLabsPnlDistribution();
+  const { data: topPnls, isLoading } = useClcPnlDistribution();
   const { dydxAddress } = useAccounts();
 
-  const getRowKey = useCallback((row: ChaosLabsCompetitionItem) => row.rank, []);
+  const getRowKey = useCallback((row: IncentiveCompetitionItem) => row.rank, []);
 
   const columns = Object.values(RewardsLeaderboardTableColumns).map(
     (key: RewardsLeaderboardTableColumns) =>
@@ -54,7 +54,7 @@ export const CompetitionLeaderboardPanel = () => {
         pnl: +entry.pnl,
       },
     ];
-  }, [] as ChaosLabsCompetitionItem[]);
+  }, [] as IncentiveCompetitionItem[]);
 
   const onDownload = () => {
     if (data.length === 0) return;
@@ -67,7 +67,7 @@ export const CompetitionLeaderboardPanel = () => {
     }));
 
     exportCSV(csvRows, {
-      filename: `rewards-leaderboard-season-${OCT_2025_REWARDS_DETAILS.season}`,
+      filename: `rewards-leaderboard-season-${CURRENT_SURGE_REWARDS_DETAILS.season}`,
       columnHeaders: [
         {
           key: 'rank',
@@ -80,10 +80,6 @@ export const CompetitionLeaderboardPanel = () => {
         {
           key: 'pnl',
           displayLabel: stringGetter({ key: STRING_KEYS.PNL }),
-        },
-        {
-          key: 'dollarReward',
-          displayLabel: stringGetter({ key: STRING_KEYS.REWARDS }),
         },
       ],
     });
@@ -190,10 +186,6 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const getTraderLink = (address: string) => {
-  return `https://community.chaoslabs.xyz/dydx-v4/risk/accounts/${address}/subAccount/0/overview`;
-};
-
 const getRewardsLeaderboardTableColumnDef = ({
   key,
   stringGetter,
@@ -202,7 +194,7 @@ const getRewardsLeaderboardTableColumnDef = ({
   key: RewardsLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<ChaosLabsCompetitionItem> => ({
+}): ColumnDef<IncentiveCompetitionItem> => ({
   ...(
     {
       [RewardsLeaderboardTableColumns.Rank]: {
@@ -242,21 +234,14 @@ const getRewardsLeaderboardTableColumnDef = ({
           </div>
         ),
         renderCell: ({ account }) => (
-          <div
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+          <CopyButton
+            value={account}
             tw="flex items-center gap-0.5 text-small font-medium"
+            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+            buttonType="text"
           >
             {truncateAddress(account)}
-            <Link
-              css={{
-                color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-0)',
-              }}
-              href={getTraderLink(account)}
-              iconSize="1rem"
-              isNewPage
-              withIcon
-            />
-          </div>
+          </CopyButton>
         ),
       },
       [RewardsLeaderboardTableColumns.PNL]: {
@@ -276,23 +261,18 @@ const getRewardsLeaderboardTableColumnDef = ({
           />
         ),
       },
-      [RewardsLeaderboardTableColumns.Rewards]: {
-        columnKey: RewardsLeaderboardTableColumns.Rewards,
+      [RewardsLeaderboardTableColumns.EstimatedPrize]: {
+        columnKey: RewardsLeaderboardTableColumns.EstimatedPrize,
         getCellValue: (row) => row.dollarReward,
         label: (
           <div tw="py-0.375 text-base font-medium text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.PRIZE })}
+            {stringGetter({ key: STRING_KEYS.ESTIMATED_PRIZE })}
           </div>
         ),
-        renderCell: ({ dollarReward, account }) => (
-          <Output
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
-            tw="text-small font-medium"
-            type={OutputType.Fiat}
-            value={dollarReward}
-          />
+        renderCell: ({ dollarReward }) => (
+          <Output tw="text-small font-medium" type={OutputType.Fiat} value={dollarReward} />
         ),
       },
-    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsCompetitionItem>>
+    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<IncentiveCompetitionItem>>
   )[key],
 });

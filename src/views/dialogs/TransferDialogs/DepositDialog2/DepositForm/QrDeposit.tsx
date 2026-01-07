@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -17,20 +16,12 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { QrCode } from '@/components/QrCode';
 
-import { convertBech32Address } from '@/lib/addressUtils';
 import { truncateAddress } from '@/lib/wallet';
 
 export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
   const stringGetter = useStringGetter();
-  const { dydxAddress } = useAccounts();
+  const { nobleAddress } = useAccounts();
   const [isCopied, setIsCopied] = useState(false);
-
-  const nobleAddress =
-    dydxAddress &&
-    convertBech32Address({
-      address: dydxAddress as string,
-      bech32Prefix: NOBLE_BECH32_PREFIX,
-    });
 
   const onCopy = () => {
     if (!nobleAddress || nobleAddress.trim() === '') return;

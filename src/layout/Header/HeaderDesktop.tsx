@@ -10,7 +10,8 @@ import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -39,16 +40,17 @@ import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
-  const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
+  const { documentation, community, mintscanBase, exchangeStats, fundingComparison } =
+    useURLConfigs();
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
+  const isSpotEnabled = useEnableSpot();
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
@@ -62,11 +64,10 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
-        // TODO(spot): Localize
-        testFlags.spot && {
+        isSpotEnabled && {
           value: 'SPOT',
           label: stringGetter({ key: STRING_KEYS.SPOT }),
-          href: `${AppRoute.Spot}/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn`,
+          href: AppRoute.Spot,
         },
         {
           value: 'MARKETS',
@@ -125,6 +126,12 @@ export const HeaderDesktop = () => {
               slotBefore: <Icon iconName={IconName.Mintscan} />,
               label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
               href: mintscanBase,
+            },
+            {
+              value: 'FUNDING_COMPARISON',
+              slotBefore: <Icon iconName={IconName.FundingChart} />,
+              label: stringGetter({ key: STRING_KEYS.FUNDING_COMPARISON }),
+              href: fundingComparison,
             },
             {
               value: 'COMMUNITY',

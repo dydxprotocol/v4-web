@@ -1,37 +1,33 @@
 import { useMemo } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
+import { useMatch } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
-import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import { Link } from '@/components/Link';
-import { OutputType, formatDateOutput } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-import {
-  getComplianceStatus,
-  getComplianceUpdatedAt,
-  getGeo,
-  getOnboardingState,
-} from '@/state/accountSelectors';
+import { getComplianceStatus, getGeo, getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { useEnableSpot } from './useEnableSpot';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
 
-export const useComplianceState = () => {
+export const usePerpetualsComplianceState = () => {
   const stringGetter = useStringGetter();
   const { help } = useURLConfigs();
   const complianceStatus = useAppSelector(getComplianceStatus);
-  const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
+  const isSpotPage = useMatch(`${AppRoute.Spot}/*`) != null;
+  const isSpotEnabled = useEnableSpot();
 
   const complianceState = useMemo(() => {
     if (
@@ -51,26 +47,18 @@ export const useComplianceState = () => {
   const complianceMessage = useMemo(() => {
     let message;
 
-    const updatedAtDate = complianceUpdatedAt ? new Date(complianceUpdatedAt) : undefined;
-    updatedAtDate?.setDate(updatedAtDate.getDate() + CLOSE_ONLY_GRACE_PERIOD);
+    const firstStrikeStatuses = [
+      ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
+      ComplianceStatus.CLOSE_ONLY,
+    ];
 
-    if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
-      message = `${stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })}`;
-    } else if (complianceStatus === ComplianceStatus.CLOSE_ONLY) {
+    const isGeoBlocked = geo.currentlyGeoBlocked && checkForGeo;
+
+    if (firstStrikeStatuses.includes(complianceStatus) || isGeoBlocked) {
       message = stringGetter({
-        key: STRING_KEYS.CLOSE_ONLY_MESSAGE_WITH_HELP,
+        key: STRING_KEYS.PERPETUALS_UNAVAILABLE_MESSAGE,
         params: {
-          DATE: updatedAtDate
-            ? formatDateOutput(updatedAtDate.getTime(), OutputType.DateTime, {
-                dateFormat: 'medium',
-                selectedLocale,
-              })
-            : undefined,
-          HELP_LINK: (
-            <Link href={help} isInline>
-              {stringGetter({ key: STRING_KEYS.HELP_CENTER })}
-            </Link>
-          ),
+          TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
         },
       });
     } else if (complianceStatus === ComplianceStatus.BLOCKED) {
@@ -84,29 +72,23 @@ export const useComplianceState = () => {
           ),
         },
       });
-    } else if (geo.currentlyGeoBlocked && checkForGeo) {
-      message = stringGetter({
-        key: STRING_KEYS.BLOCKED_MESSAGE,
-        params: {
-          TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
-        },
-      });
     }
 
     return message;
-  }, [checkForGeo, complianceStatus, complianceUpdatedAt, geo, help, selectedLocale, stringGetter]);
+  }, [checkForGeo, complianceStatus, geo, help, stringGetter]);
 
   const disableConnectButton =
     complianceState === ComplianceStates.READ_ONLY &&
-    onboardingState === OnboardingState.Disconnected;
+    onboardingState === OnboardingState.Disconnected &&
+    !isSpotEnabled;
 
   return {
     complianceStatus,
     complianceState,
     complianceMessage,
     disableConnectButton,
-    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY,
+    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY && !isSpotPage,
     showComplianceBanner:
-      complianceMessage != null || complianceState === ComplianceStates.READ_ONLY,
+      (complianceMessage != null || complianceState === ComplianceStates.READ_ONLY) && !isSpotPage,
   };
 };
