@@ -10,7 +10,7 @@ export const button = style({
   cursor: 'pointer',
   transition: 'all 0.2s',
   marginTop: '0.5rem',
-  textTransform: 'none',
+  textTransform: 'capitalize',
   letterSpacing: '0.01em',
 });
 

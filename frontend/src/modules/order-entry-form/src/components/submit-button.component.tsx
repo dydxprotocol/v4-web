@@ -8,7 +8,6 @@ export function SubmitButton() {
   const orderSide = useWatch({ control, name: 'orderSide' });
 
   const formState = useFormState({ control });
-  const buttonText = `${orderSide === 'buy' ? 'Buy' : 'Sell'} Starboard Token`;
 
   return (
     <button
@@ -20,7 +19,7 @@ export function SubmitButton() {
       ]}
       onClick={submitHandler}
     >
-      {buttonText}
+      {orderSide} starboard token
     </button>
   );
 }
