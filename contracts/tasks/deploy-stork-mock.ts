@@ -17,7 +17,7 @@ export { deployStorkMock }
 
 async function deployStorkMock(taskArgs: any) {
     const salt = taskArgs.salt || getRandomSalt()
-    // eslint-disable-next-line no-console
+
     console.log("Deploy a stork mock")
 
     const provider = new Provider(taskArgs.url)

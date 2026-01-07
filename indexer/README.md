@@ -118,7 +118,7 @@ In case the schema is changed, views may need to be updated as well - it must be
 
 ## Model Generation - Codegen
 
-**NTICE.** Important when schemas are changed.
+**NOTICE.** Important when schemas are changed.
 
 There are two schema files: `schema.graphql` and `schema.derivatives.graphql`.
 Codegen tool generates ts source files from the schemas.

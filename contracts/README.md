@@ -10,11 +10,11 @@ The main components of the protocol are:
 
 `Vault` is the core contract that handles all trading and liquidity operations. It acts as a peer-to-pool system where users trade against a pool of assets rather than directly with other users. The contract manages:
 
-- Pooled assets from liquidity providers
-- Opening/closing of leveraged long/short positions
-- Minting/burning of the RUSD stablecoin
-- Liquidations and funding rates
-- Swap functionality between supported assets
+-   Pooled assets from liquidity providers
+-   Opening/closing of leveraged long/short positions
+-   Minting/burning of the RUSD stablecoin
+-   Liquidations and funding rates
+-   Swap functionality between supported assets
 
 The Vault maintains solvency by ensuring the value of all assets in the pool exceeds the sum of all user deposits and profits. Position collateral is held in the Vault, and liquidations occur automatically when positions become undercollateralized.
 

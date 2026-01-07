@@ -69,7 +69,6 @@ export async function deployStarboard(taskArgs: any) {
 
     await call(vault.functions.set_liquidator(deployerIdentity, true).addContracts([vaultImpl]))
 
-    // eslint-disable-next-line no-console
     console.log("Deployment done")
 
     return [vault.id.toString(), vaultImpl.id.toString(), pricefeedWrapper.id.toString()]

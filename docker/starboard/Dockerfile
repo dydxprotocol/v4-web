@@ -49,7 +49,6 @@ COPY contracts/package.json ./contracts/
 COPY frontend/scripts ./frontend/scripts
 COPY packages/tradingview.tgz ./packages/
 COPY indexer/schema.graphql ./indexer/
-COPY frontend/scripts/generate-env.js ./frontend/scripts/
 
 # Install dependencies (cached if package files haven't changed)
 RUN export PNPM_HOME="/root/.local/share/pnpm" && \
