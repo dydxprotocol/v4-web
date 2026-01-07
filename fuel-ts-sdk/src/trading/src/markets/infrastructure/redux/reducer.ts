@@ -1,5 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import * as assetPrices from './asset-prices';
+import * as assets from './assets';
 import * as candles from './candles';
 import * as marketConfigs from './market-configs';
 
@@ -7,6 +8,7 @@ export const marketsReducer = {
   markets: combineReducers({
     assetPrices: assetPrices.slice.assetPricesReducer,
     marketConfigs: marketConfigs.slice.marketConfigsReducer,
+    assets: assets.slice.assetsReducer,
   }),
   [candles.api.candlesApi.reducerPath]: candles.api.candlesApi.reducer,
 };
@@ -17,4 +19,4 @@ export type MarketsThunkExtra = assetPrices.thunks.AssetPricesThunkExtra &
   marketConfigs.thunks.MarketsConfigThunkExtra &
   candles.api.CandlesThunkExtra;
 
-export { assetPrices, candles, marketConfigs };
+export { assetPrices, assets, candles, marketConfigs };
