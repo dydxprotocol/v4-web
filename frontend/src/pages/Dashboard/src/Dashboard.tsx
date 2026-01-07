@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { AssetId } from 'fuel-ts-sdk';
 import type { Candle, CandleInterval } from 'fuel-ts-sdk/trading';
 import type { FieldErrors } from 'react-hook-form';
@@ -6,7 +6,6 @@ import { TradingChart } from '@/components/TradingChart';
 import { useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { OrderEntryForm } from '@/modules/order-entry-form';
 import type { OrderEntryFormModel } from '@/modules/order-entry-form/src/models';
-import { PublicSales } from './components';
 import * as styles from './Dashboard.css';
 
 const DEFAULT_ASSET = '0xa3ed2e58076f53e8dd15c8463ee49e6ce547355c34c639777c5dace3728e2ded';
@@ -46,11 +45,8 @@ export function Dashboard() {
           <TradingChart symbol="XHT/USDT" candlesGetter={getOrFetchCandles} />
         </div>
 
-        {/* Right side - Public Sales and Order Entry */}
+        {/* Right side - Order Entry (stacks under chart on small screens) */}
         <div css={styles.rightSection}>
-          <div css={styles.publicSalesContainer}>
-            <PublicSales />
-          </div>
           <div css={styles.orderEntryContainer}>
             <h2 css={styles.orderEntryTitle}>Order Entry</h2>
             <div css={styles.orderEntryFormWrapper}>

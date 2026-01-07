@@ -44,6 +44,7 @@ export const selectContent = style({
   borderRadius: '4px',
   overflow: 'hidden',
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+  zIndex: 100, // Higher than sheet z-index (50) to appear above it
 });
 
 export const selectItem = style({
