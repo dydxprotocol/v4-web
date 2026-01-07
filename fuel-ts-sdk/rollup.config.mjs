@@ -1,4 +1,5 @@
 import alias from '@rollup/plugin-alias';
+import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import path from 'path';
 import dts from 'rollup-plugin-dts';
@@ -7,7 +8,15 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const external = ['graphql', 'graphql-request', 'zod', '@reduxjs/toolkit', 'immer', 'lodash'];
+const external = [
+  'graphql',
+  'graphql-request',
+  'zod',
+  '@reduxjs/toolkit',
+  'immer',
+  'lodash',
+  'fuels',
+];
 
 export default [
   // JS build
@@ -28,7 +37,8 @@ export default [
       alias({
         entries: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
       }),
-      resolve({ extensions: ['.ts', '.js'] }),
+      json(),
+      resolve({ extensions: ['.ts', '.js', '.json'] }),
       esbuild({
         target: 'esnext',
         tsconfig: './tsconfig.build.json',
