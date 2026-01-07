@@ -32,6 +32,11 @@ export const FundingRateField = propify(PositionField, {
   precision: 6,
 });
 
+export const LeverageField = propify(PositionField, {
+  label: 'Leverage',
+  precision: 2,
+});
+
 type PositionFieldProps = {
   label: string;
   value: DecimalValue;

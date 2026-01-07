@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import type { Position } from 'fuel-ts-sdk/trading';
+import { type Position, calculateTotalCollateral } from 'fuel-ts-sdk/trading';
 import * as styles from '../Home.css';
 import { PositionCard } from './position-card.component';
 
@@ -12,8 +12,13 @@ export const PositionsList: FC<PositionsListProps> = ({ positions }) => {
     return null;
   }
 
+  const totalCollateral = calculateTotalCollateral(positions);
+
   return (
     <div css={styles.positionsContainer}>
+      <div css={styles.totalCollateral}>
+        Total Collateral: ${totalCollateral.toFloat().toFixed(2)}
+      </div>
       {positions.map((position) => (
         <PositionCard key={position.revisionId} position={position} />
       ))}

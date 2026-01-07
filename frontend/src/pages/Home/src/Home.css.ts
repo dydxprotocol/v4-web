@@ -193,6 +193,17 @@ export const positionsContainer = style({
   marginTop: '1.5rem',
 });
 
+export const totalCollateral = style({
+  fontSize: '1.25rem',
+  fontWeight: '600',
+  color: '#e2e8f0',
+  padding: '1rem',
+  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  borderRadius: '0.5rem',
+  border: '1px solid rgba(59, 130, 246, 0.2)',
+  marginBottom: '1rem',
+});
+
 export const positionCard = style({
   backgroundColor: 'rgba(255, 255, 255, 0.05)',
   borderRadius: '0.75rem',
