@@ -64,10 +64,7 @@ class OnboardingSupervisor {
   }: {
     privateKey: string;
     handleWalletConnectionResult: (result: WalletDerivationResult) => void;
-  }): Promise<
-    | { success: true; wallet: LocalWallet; nobleWallet: LocalWallet }
-    | { success: false; error: string }
-  > {
+  }): Promise<{ success: true } | { success: false; error: string }> {
     try {
       const LocalWallet = await getLazyLocalWallet();
 
