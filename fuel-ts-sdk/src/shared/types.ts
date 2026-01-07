@@ -29,10 +29,10 @@ export const ContractIdSchema = z
   .string()
   .min(1, 'Contract ID cannot be empty')
   .brand<'ContractId'>();
-export type ContractId = z.infer<typeof AssetIdSchema>;
-export const contractId = (str?: string): AssetId => AssetIdSchema.parse(str);
-export const safeContractId = (str?: string): AssetId | undefined => {
-  const result = AssetIdSchema.safeParse(str);
+export type ContractId = z.infer<typeof ContractIdSchema>;
+export const contractId = (str?: string): ContractId => ContractIdSchema.parse(str);
+export const safeContractId = (str?: string): ContractId | undefined => {
+  const result = ContractIdSchema.safeParse(str);
   return result.success ? result.data : undefined;
 };
 
