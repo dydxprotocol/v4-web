@@ -5,24 +5,23 @@ import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 import App from './App.tsx';
 import { NetworkSwitchContextProvider } from './contexts/network-switch';
-import { getIndexerUrl } from './lib/env';
+import { WalletContextProvider } from './contexts/wallet/wallet.provider';
 import { FuelTsSdkProvider } from './lib/fuel-ts-sdk';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <NetworkSwitchContextProvider>
-      {(networkSwitch) => (
-        <FuelTsSdkProvider
-          indexerUrl={getIndexerUrl(networkSwitch.getCurrentNetwork())}
-          key={networkSwitch.getCurrentNetwork()}
-        >
-          <Theme appearance="dark">
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </Theme>
-        </FuelTsSdkProvider>
-      )}
-    </NetworkSwitchContextProvider>
+    <WalletContextProvider>
+      <NetworkSwitchContextProvider>
+        {(networkSwitch) => (
+          <FuelTsSdkProvider key={networkSwitch.getCurrentNetwork()}>
+            <Theme appearance="dark">
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </Theme>
+          </FuelTsSdkProvider>
+        )}
+      </NetworkSwitchContextProvider>
+    </WalletContextProvider>
   </StrictMode>
 );

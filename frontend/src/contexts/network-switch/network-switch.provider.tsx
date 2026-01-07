@@ -1,7 +1,10 @@
 import type { FC, ReactNode } from 'react';
-import { useMemo, useState } from 'react';
-import { getDefaultNetwork } from '@/lib/env';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { Network as FuelNetwork } from 'fuels';
+import { getEnv, getDefaultNetwork as getFallbackNetwork } from '@/lib/env';
+import { useRequiredContext } from '@/lib/use-required-context.hook';
 import type { Network } from '@/models/network';
+import { WalletContext } from '../wallet/wallet.context';
 import type { NetworkSwitchContextType } from './network-switch.context';
 import { NetworkSwitchContext } from './network-switch.context';
 
@@ -12,14 +15,49 @@ type NetworkSwitchContextProviderProps = {
 export const NetworkSwitchContextProvider: FC<NetworkSwitchContextProviderProps> = ({
   children,
 }) => {
-  const [currentNetwork, setCurrentNetwork] = useState<Network>(getDefaultNetwork());
+  const wallet = useRequiredContext(WalletContext);
+
+  const [currentNetwork, setCurrentNetwork] = useState<Network>();
+
+  const changeNetwork = useCallback(
+    (network: Network) => {
+      const networkRpcInfo = getNetworkRpcInfo(network);
+      wallet.changeNetwork(networkRpcInfo);
+    },
+    [wallet]
+  );
+
+  const getCurrentNetwork = useCallback(
+    () => currentNetwork ?? getFallbackNetwork(),
+    [currentNetwork]
+  );
+
+  useEffect(
+    function initializeNetwork() {
+      if (!currentNetwork) {
+        wallet.getCurrentNetwork().then((n) => setCurrentNetwork(getNetworkByRpcUrl(n.url)));
+      }
+    },
+    [currentNetwork, wallet]
+  );
+
+  useEffect(
+    function setupWalletNetworkChangeListener() {
+      const listener = (network: FuelNetwork) => {
+        setCurrentNetwork(getNetworkByRpcUrl(network.url));
+      };
+      wallet.registerNetworkChangeObserver(listener);
+      return () => wallet.unregisterNetworkChangeObserver(listener);
+    },
+    [currentNetwork, wallet]
+  );
 
   const contextValue = useMemo<NetworkSwitchContextType>(
     () => ({
-      changeNetwork: setCurrentNetwork,
-      getCurrentNetwork: () => currentNetwork,
+      changeNetwork,
+      getCurrentNetwork,
     }),
-    [currentNetwork]
+    [changeNetwork, getCurrentNetwork]
   );
 
   const childrenMemoized = useMemo(() => children(contextValue), [children, contextValue]);
@@ -30,3 +68,26 @@ export const NetworkSwitchContextProvider: FC<NetworkSwitchContextProviderProps>
     </NetworkSwitchContext.Provider>
   );
 };
+
+function getNetworkByRpcUrl(url: string) {
+  const network = Object.entries(RPC_URLS)
+    .flatMap(([network, networkUrl]) => {
+      if (networkUrl !== url) return [];
+      return network;
+    })
+    .at(0);
+
+  if (!network) throw new Error(`Unknown network: ${url}.`);
+
+  return network as Network;
+}
+
+function getNetworkRpcInfo(network: Network): FuelNetwork {
+  return {
+    chainId: +CHAIN_IDS[network],
+    url: RPC_URLS[network],
+  };
+}
+
+const CHAIN_IDS = JSON.parse(getEnv('VITE_CHAIN_IDS')) as Record<Network, string>;
+const RPC_URLS = JSON.parse(getEnv('VITE_RPC_URLS')) as Record<Network, string>;
