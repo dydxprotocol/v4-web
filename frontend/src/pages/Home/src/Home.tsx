@@ -15,6 +15,7 @@ import { OrderSubmitFailureModal } from './components/order-submit-failure-modal
 import { OrderSubmitSuccessModal } from './components/order-submit-success-modal.component';
 
 export function Home() {
+  const [queriedAddress, setQueriedAddress] = useState<Address>();
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [submittedFormData, setSubmittedFormData] = useState<OrderEntryFormModel | null>(null);
@@ -90,6 +91,25 @@ export function Home() {
     if (!(assetId in userBalances)) return 0;
     const bigintBalance = userBalances[assetId];
     return new HeadlessDecimalValue(bigintBalance, BigInt(asset.decimals)).toFloat();
+  }
+
+  function handleOrderSubmitSuccess(formData: OrderEntryFormModel) {
+    setSubmittedFormData(formData);
+    setIsSuccessDialogOpen(true);
+  }
+
+  function handleOrderSubmitFailure(errors: FieldErrors<OrderEntryFormModel>) {
+    const errorMessages = Object.entries(errors).map(([field, error]) => {
+      const fieldName = field
+        .replace(/([A-Z])/g, ' $1')
+        .toLowerCase()
+        .trim()
+        .replace(/^./, (str) => str.toUpperCase());
+      return `${fieldName}: ${error?.message || 'Invalid value'}`;
+    });
+
+    setValidationErrors(errorMessages);
+    setIsErrorDialogOpen(true);
   }
 
   return (
