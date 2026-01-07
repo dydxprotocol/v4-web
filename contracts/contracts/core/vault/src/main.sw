@@ -434,6 +434,11 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
+    fn get_total_liquidity() -> u256 {
+        storage::vault.total_liquidity.read()
+    }
+
+    #[storage(read)]
     fn get_fee_reserve() -> u256 {
         storage::vault.fee_reserve.try_read().unwrap_or(0)
     }
@@ -517,10 +522,14 @@ impl Vault for Contract {
         _validate_liquidation(account, index_asset, is_long, should_raise)
     }
 
+    /// simulates the add liquidity operation
+    /// it does not take into account the total reserves
+    /// returns the amount of lp assets to mint, the amount of collateral to be received by the receiver, and the fee rate
     #[storage(read)]
-    fn get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64) {
+    fn get_add_liquidity_amount(base_asset_amount: u64) -> (u64, u64, u64) {
         _only_initialized();
-        _get_add_liquidity_amount(asset_amount)
+        require(base_asset_amount > 0, Error::VaultInvalidBaseAssetAmount);
+        _get_add_liquidity_amount(base_asset_amount)
     }
 
     #[storage(read)]
@@ -1075,6 +1084,9 @@ fn _increase_position(
 
     let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
 
+    let liquidity_fee = position_fee / 2;
+    let protocol_fee = position_fee - liquidity_fee;
+
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
         position
@@ -1086,7 +1098,7 @@ fn _increase_position(
 
     let (
         out_protocol_fee,
-        _,
+        out_liquidity_fee,
         _,
         out_funding_rate,
         _,
@@ -1094,8 +1106,8 @@ fn _increase_position(
         out_total_reserves,
         status,
     ) = _calculate_settlement(
-        position_fee,
-        0,
+        protocol_fee,
+        liquidity_fee,
         0,
         funding_rate,
         funding_rate_has_profit,
@@ -1112,6 +1124,8 @@ fn _increase_position(
         }
         _ => {}
     }
+
+    let out_position_fee = out_protocol_fee + out_liquidity_fee;
 
     // TODO one price
     let price = if is_long {
@@ -1143,6 +1157,9 @@ fn _increase_position(
     storage::vault
         .total_collateral
         .write(storage::vault.total_collateral.read() + out_collateral - position.collateral);
+    storage::vault
+        .total_liquidity
+        .write(storage::vault.total_liquidity.read() + out_liquidity_fee);
     // total_reserves must be written before _validate_liquidation is called
     storage::vault.total_reserves.write(out_total_reserves);
     _write_fee_reserve(_get_fee_reserve() + out_protocol_fee);
@@ -1178,8 +1195,8 @@ fn _increase_position(
         size_delta,
         price,
         average_price: position.average_price,
-        position_fee,
-        funding_rate,
+        position_fee: out_position_fee,
+        funding_rate: out_funding_rate,
         funding_rate_has_profit,
         cumulative_funding_rate: new_cumulative_funding_rate,
     });
@@ -1213,6 +1230,9 @@ fn _decrease_position(
 
     let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
 
+    let liquidity_fee = position_fee / 2;
+    let protocol_fee = position_fee - liquidity_fee;
+
     let (has_profit, pnl_delta) = _get_pnl(index_asset, size_delta, position.average_price, is_long);
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
@@ -1225,7 +1245,7 @@ fn _decrease_position(
     );
     let (
         out_protocol_fee,
-        _,
+        out_liquidity_fee,
         _,
         out_funding_rate,
         out_pnl_delta,
@@ -1233,8 +1253,8 @@ fn _decrease_position(
         out_total_reserves,
         status,
     ) = _calculate_settlement(
-        position_fee,
-        0,
+        protocol_fee,
+        liquidity_fee,
         0,
         funding_rate,
         funding_rate_has_profit,
@@ -1251,6 +1271,8 @@ fn _decrease_position(
         }
         _ => {}
     }
+
+    let out_position_fee = out_protocol_fee + out_liquidity_fee;
 
     if pnl_delta > 0 {
         if has_profit {
@@ -1279,6 +1301,9 @@ fn _decrease_position(
     storage::vault
         .total_collateral
         .write(storage::vault.total_collateral.read() + out_collateral - position.collateral);
+    storage::vault
+        .total_liquidity
+        .write(storage::vault.total_liquidity.read() + out_liquidity_fee);
     // total_reserves must be written before _validate_liquidation is called
     storage::vault.total_reserves.write(out_total_reserves);
     _write_fee_reserve(_get_fee_reserve() + out_protocol_fee);
@@ -1325,7 +1350,7 @@ fn _decrease_position(
             size_delta,
             price,
             average_price: position.average_price,
-            position_fee,
+            position_fee: out_position_fee,
             funding_rate: out_funding_rate,
             funding_rate_has_profit,
             pnl_delta_has_profit: has_profit,
@@ -1349,7 +1374,7 @@ fn _decrease_position(
             size_delta,
             price,
             average_price: position.average_price,
-            position_fee,
+            position_fee: out_position_fee,
             funding_rate: out_funding_rate,
             funding_rate_has_profit,
             pnl_delta_has_profit: has_profit,
@@ -1400,6 +1425,9 @@ fn _liquidate_position(
 
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
+    let liquidity_fee = position_fee / 2;
+    let protocol_fee = position_fee - liquidity_fee;
+
     let (has_profit, pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
@@ -1415,7 +1443,7 @@ fn _liquidate_position(
 
     let (
         out_protocol_fee,
-        _,
+        out_liquidity_fee,
         out_liquidation_fee,
         out_funding_rate,
         out_pnl_delta,
@@ -1423,8 +1451,8 @@ fn _liquidate_position(
         out_total_reserves,
         _,
     ) = _calculate_settlement(
-        position_fee,
-        0,
+        protocol_fee,
+        liquidity_fee,
         liquidation_fee,
         funding_rate,
         funding_rate_has_profit,
@@ -1435,9 +1463,14 @@ fn _liquidate_position(
         total_reserves,
     );
 
+    let out_position_fee = out_protocol_fee + out_liquidity_fee;
+
     storage::vault
         .total_collateral
         .write(storage::vault.total_collateral.read() - position.collateral);
+    storage::vault
+        .total_liquidity
+        .write(storage::vault.total_liquidity.read() + out_liquidity_fee);
     // remaining collateral is moved to the reserves
     storage::vault
         .total_reserves
@@ -1466,7 +1499,7 @@ fn _liquidate_position(
         collateral: position.collateral,
         size: position.size,
         mark_price,
-        position_fee: out_protocol_fee,
+        position_fee: out_position_fee,
         funding_rate: out_funding_rate,
         funding_rate_has_profit,
         liquidation_fee: out_liquidation_fee,

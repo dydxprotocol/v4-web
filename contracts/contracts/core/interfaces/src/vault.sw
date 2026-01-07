@@ -91,6 +91,8 @@ abi Vault {
     #[storage(read)]
     fn get_total_reserves() -> u256;
     #[storage(read)]
+    fn get_total_liquidity() -> u256;
+    #[storage(read)]
     fn get_fee_reserve() -> u256;
     #[storage(read)]
     fn is_asset_whitelisted(asset: b256) -> bool;
@@ -125,7 +127,7 @@ abi Vault {
         should_raise: bool,
     ) -> (u256, u256);
     #[storage(read)]
-    fn get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64);
+    fn get_add_liquidity_amount(base_asset_amount: u64) -> (u64, u64, u64);
     #[storage(read)]
     fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64, u64);
     #[storage(read)]

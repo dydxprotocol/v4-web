@@ -27,7 +27,7 @@ import {
     SimpleProxyFactory,
 } from "../types/index.js"
 
-describe("Vault.funding_rate", () => {
+describe("Vault.liquidation", () => {
     let attachedContracts: AbstractContract[]
     let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked

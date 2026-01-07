@@ -37,6 +37,7 @@ describe("Vault.calculate_settlement", () => {
     let pricefeedWrapper: PricefeedWrapper
     let vaultExpose: VaultExpose
 
+    // the tests do not modify the state, so beforeAll is more effective
     beforeAll(async () => {
         launchedNode = await launchNode()
         ;[deployer, , , , liquidator] = getNodeWallets(launchedNode)
