@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { OrderEntryFormApiContextProvider, OrderEntryFormMetaContext } from '../src/contexts';
 import type { OrderEntryFormMetaContextType } from '../src/contexts';
+import { OrderEntryFormApiContextProvider, OrderEntryFormMetaContext } from '../src/contexts';
 
-export const defaultMockContext: OrderEntryFormMetaContextType = {
+const defaultMockContext: OrderEntryFormMetaContextType = {
   baseAssetName: 'BTC',
   quoteAssetName: 'USD',
   userBalanceInQuoteAsset: 10000,

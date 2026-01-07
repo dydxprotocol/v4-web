@@ -84,25 +84,19 @@
       "type": "enum std::option::Option<struct std::string::String>",
       "concreteTypeId": "7c06d929390a9aeeb8ffccf8173ac0d101a9976d99dda01cce74541a81e75ac0",
       "metadataTypeId": 13,
-      "typeArguments": [
-        "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"
-      ]
+      "typeArguments": ["9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"]
     },
     {
       "type": "enum std::option::Option<u64>",
       "concreteTypeId": "d852149004cc9ec0bbe7dc4e37bffea1d41469b759512b6136f2e865a4c06e7d",
       "metadataTypeId": 13,
-      "typeArguments": [
-        "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
-      ]
+      "typeArguments": ["1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"]
     },
     {
       "type": "enum std::option::Option<u8>",
       "concreteTypeId": "2da102c46c7263beeed95818cd7bee801716ba8303dddafdcd0f6c9efda4a0f1",
       "metadataTypeId": 13,
-      "typeArguments": [
-        "c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"
-      ]
+      "typeArguments": ["c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"]
     },
     {
       "type": "struct core_interfaces::vault::FundingInfo",
@@ -569,9 +563,7 @@
           "typeId": 14
         }
       ],
-      "typeParameters": [
-        14
-      ]
+      "typeParameters": [14]
     },
     {
       "type": "generic T",
@@ -1243,9 +1235,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1261,9 +1251,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1279,9 +1267,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1292,9 +1278,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1310,9 +1294,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1323,9 +1305,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1336,9 +1316,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "write"
-          ]
+          "arguments": ["write"]
         }
       ]
     },
@@ -1349,9 +1327,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "write"
-          ]
+          "arguments": ["write"]
         }
       ]
     },
@@ -1362,9 +1338,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1384,10 +1358,7 @@
         },
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -1403,10 +1374,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -1442,10 +1410,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -1461,9 +1426,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1474,9 +1437,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1504,9 +1465,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1517,9 +1476,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1535,9 +1492,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1548,9 +1503,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1561,9 +1514,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1585,9 +1536,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1603,9 +1552,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1633,9 +1580,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1651,9 +1596,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1681,9 +1624,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1694,9 +1635,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1720,9 +1659,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1765,9 +1702,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1791,9 +1726,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1809,9 +1742,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1822,9 +1753,7 @@
       "attributes": [
         {
           "name": "doc-comment",
-          "arguments": [
-            " Get the revision of the contract"
-          ]
+          "arguments": [" Get the revision of the contract"]
         }
       ]
     },
@@ -1835,9 +1764,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1869,10 +1796,7 @@
         },
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -1888,10 +1812,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -1907,9 +1828,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1925,9 +1844,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -1955,10 +1872,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -1978,10 +1892,7 @@
         },
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -2001,9 +1912,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "write"
-          ]
+          "arguments": ["write"]
         }
       ]
     },
@@ -2023,28 +1932,19 @@
       "attributes": [
         {
           "name": "doc-comment",
-          "arguments": [
-            " the asset is whitelisted and max leverage is set"
-          ]
+          "arguments": [" the asset is whitelisted and max leverage is set"]
         },
         {
           "name": "doc-comment",
-          "arguments": [
-            " max leverage must be multiplied by 10_000 to get actual leverage"
-          ]
+          "arguments": [" max leverage must be multiplied by 10_000 to get actual leverage"]
         },
         {
           "name": "doc-comment",
-          "arguments": [
-            " e.g: 50 * 10_000 = 50%"
-          ]
+          "arguments": [" e.g: 50 * 10_000 = 50%"]
         },
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -2068,10 +1968,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -2091,9 +1988,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "write"
-          ]
+          "arguments": ["write"]
         }
       ]
     },
@@ -2121,9 +2016,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -2139,10 +2032,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     }
