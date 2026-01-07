@@ -1,0 +1,48 @@
+import type { FC } from 'react';
+import { CheckIcon, ChevronDownIcon } from '@radix-ui/react-icons';
+import * as Select from '@radix-ui/react-select';
+import type { AssetId } from 'fuel-ts-sdk';
+import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
+import * as styles from './asset-select.css';
+
+export const AssetSelect: FC = () => {
+  const tradingSdk = useTradingSdk();
+
+  const assets = useSdkQuery(tradingSdk.getAllAssets);
+  const watchedAsset = useSdkQuery(tradingSdk.getWatchedAsset);
+
+  const watchAsset = (assetId: AssetId) => {
+    tradingSdk.watchAsset(assetId);
+  };
+
+  return (
+    <div>
+      <Select.Root value={watchedAsset?.assetId ?? ''} onValueChange={watchAsset}>
+        <Select.Trigger className={styles.selectTrigger()}>
+          <Select.Value>{watchedAsset?.name}</Select.Value>
+          <Select.Icon>
+            <ChevronDownIcon />
+          </Select.Icon>
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Content className={styles.selectContent} position="popper">
+            <Select.Viewport>
+              {assets.map((asset) => (
+                <Select.Item
+                  key={asset.assetId}
+                  value={asset.assetId}
+                  className={styles.selectItem()}
+                >
+                  <Select.ItemText>{asset.name}</Select.ItemText>
+                  <Select.ItemIndicator className={styles.selectItemIndicator}>
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+              ))}
+            </Select.Viewport>
+          </Select.Content>
+        </Select.Portal>
+      </Select.Root>
+    </div>
+  );
+};

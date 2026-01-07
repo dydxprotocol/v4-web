@@ -57,6 +57,12 @@ export const navLinkActive = style({
   backgroundColor: '#1f2937',
 });
 
+export const headerRight = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '1rem',
+});
+
 export const networkSection = style({
   display: 'flex',
   alignItems: 'center',
@@ -77,23 +83,6 @@ export const networkSelector = style({
   backgroundColor: '#1f2937',
   padding: '0.25rem',
   borderRadius: '0.375rem',
-});
-
-export const button = style({
-  padding: '0.375rem 0.875rem',
-  backgroundColor: 'transparent',
-  color: '#9ca3af',
-  borderRadius: '0.25rem',
-  border: 'none',
-  fontSize: '0.875rem',
-  fontWeight: '500',
-  cursor: 'pointer',
-  transition: 'all 0.15s',
-  minWidth: '6rem',
-  ':hover': {
-    color: 'white',
-    backgroundColor: '#374151',
-  },
 });
 
 export const buttonActive = style({
@@ -119,6 +108,35 @@ export const buttonSecondary = style({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
+});
+
+export const walletButton = style({
+  padding: '0.5rem 1.25rem',
+  backgroundColor: '#3b82f6',
+  color: 'white',
+  borderRadius: '0.375rem',
+  border: 'none',
+  fontSize: '0.875rem',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'all 0.15s',
+  whiteSpace: 'nowrap',
+  ':hover': {
+    backgroundColor: '#2563eb',
+  },
+});
+
+export const walletConnected = style({
+  padding: '0.5rem 1.25rem',
+  backgroundColor: '#10b981',
+  color: 'white',
+  borderRadius: '0.375rem',
+  border: 'none',
+  fontSize: '0.875rem',
+  fontWeight: '600',
+  cursor: 'not-allowed',
+  whiteSpace: 'nowrap',
+  opacity: 0.8,
 });
 
 export const container = style({

@@ -1,2 +1,2 @@
-export { DashboardLayout } from './dashboard-layout.component';
+export { DashboardLayout } from './dasboard-layout';
 export * as sharedStyles from './shared-styles.css';
