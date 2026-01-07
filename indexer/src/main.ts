@@ -153,7 +153,7 @@ async function handleAddLiquidity(
   const log = logs[0];
   const provider = log.account.Address.bits;
   // the user transfers in
-  const stableDetla = BigInt(log.stable_asset_amount.toString());
+  const stableDetla = BigInt(log.base_asset_amount.toString());
   const lpAmountDelta = BigInt(log.lp_asset_amount.toString());
   const fee = BigInt(log.fee.toString());
 
@@ -206,7 +206,7 @@ async function handleRemoveLiquidity(
   const log = logs[0];
   const provider = log.account.Address.bits;
   // the amount transferred out to the user
-  const stableDetla = BigInt(log.stable_asset_amount.toString());
+  const stableDetla = BigInt(log.base_asset_amount.toString());
   const lpAmountDelta = BigInt(log.lp_asset_amount.toString());
   const fee = BigInt(log.fee.toString());
 
@@ -219,7 +219,7 @@ async function handleRemoveLiquidity(
   currentLiquidity.latest = false;
   await ctx.store.upsert(currentLiquidity);
   // the amount substracted from the liquidity pool
-  // For remove, store the amount removed (stable_asset_amount + fee) and lp_asset_amount
+  // For remove, store the amount removed (base_asset_amount + fee) and lp_asset_amount
   const stable = stableDetla + fee;
   const lpAmount = lpAmountDelta;
   const liquidity: Liquidity = new Liquidity({

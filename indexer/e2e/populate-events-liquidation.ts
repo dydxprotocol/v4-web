@@ -2,20 +2,15 @@ import { Provider, Wallet, createAssetId } from 'fuels';
 import { StorkMock, TestnetToken, Vault } from '../../contracts/types/index.js';
 import {
   BTC_ASSET,
-  BTC_MAX_LEVERAGE,
   DEFAULT_SUB_ID,
   DEPLOYER_PK,
   ETH_ASSET,
-  ETH_MAX_LEVERAGE,
   LIQUIDATOR_PK,
   USDC_ASSET,
   USER_0_PK,
   USER_1_PK,
   call,
   expandDecimals,
-  getBtcConfig,
-  getEthConfig,
-  getUsdcConfig,
   moveBlockchainTime,
   toPrice,
   walletToAddressIdentity,
@@ -74,16 +69,11 @@ async function populateEvents() {
   await call(vaultDeployer.functions.set_liquidator(liquidatorIdentity, true));
   await call(
     vaultDeployer.functions.set_fees(
-      30, // mint_burn_fee_basis_points
-      10, // margin_fee_basis_points
-      expandDecimals(5) // liquidation_fee_usd
+      30, // liquidity_fee_basis_points
+      10, // position_fee_basis_points
+      expandDecimals(5) // liquidation_fee
     )
   );
-  await call(vaultDeployer.functions.set_asset_config(...getUsdcConfig()));
-  await call(vaultDeployer.functions.set_asset_config(...getBtcConfig()));
-  await call(vaultDeployer.functions.set_asset_config(...getEthConfig()));
-  await call(vaultDeployer.functions.set_max_leverage(BTC_ASSET, BTC_MAX_LEVERAGE));
-  await call(vaultDeployer.functions.set_max_leverage(ETH_ASSET, ETH_MAX_LEVERAGE));
 
   // Mint USDC tokens for users
   await call(usdcUser0.functions.faucet());

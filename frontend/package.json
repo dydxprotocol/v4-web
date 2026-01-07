@@ -13,7 +13,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "postinstall": "npm run generate-env && ([ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true)",
+    "postinstall": "pnpm run generate-env && ([ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true)",
     "generate-env": "node scripts/generate-env.js"
   },
   "dependencies": {

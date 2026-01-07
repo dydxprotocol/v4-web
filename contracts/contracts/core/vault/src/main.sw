@@ -108,11 +108,13 @@ storage {
         // tracks amount of fees (in collateral asset)
         fee_reserve: u256 = 0,
         // track amount of collateral in the pool
+        // these are guaranteed funds, paid profits and funding rates do not use them
         total_collateral: u256 = 0,
         // tracks the total amount of reserves for profits and funding rates
         total_reserves: u256 = 0,
         // tracks the total amount of liquidity in the reserves
         // may be greater than total_reserves
+        // e.g. paid fees, profits, and funding rates exceed received losses and funding rates
         total_liquidity: u256 = 0,
     },
     fund {
@@ -221,14 +223,29 @@ impl Vault for Contract {
         storage::vault.is_initialized.write(true);
         initialize_ownership(gov);
 
-        // TODO do not overwrite the fees if they are already set by set_fees()
         // set the default fees
         // the liquidation fee cannot be initialized in the storage section because of the configurable
-        storage::vault
-            .liquidation_fee
-            .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(BASE_ASSET_DECIMALS)));
-        storage::vault.liquidity_fee_basis_points.write(30);
-        storage::vault.position_fee_basis_points.write(10);
+        // skip initialization if set_fees() has been called
+        match storage::vault.liquidation_fee.try_read() {
+            None => {
+                storage::vault
+                    .liquidation_fee
+                    .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(BASE_ASSET_DECIMALS)));
+            }
+            _ => {}
+        }
+        match storage::vault.liquidity_fee_basis_points.try_read() {
+            None => {
+                storage::vault.liquidity_fee_basis_points.write(30);
+            }
+            _ => {}
+        }
+        match storage::vault.position_fee_basis_points.try_read() {
+            None => {
+                storage::vault.position_fee_basis_points.write(10);
+            }
+            _ => {}
+        }
 
         storage::vault.fee_reserve.write(0);
         storage::vault.total_collateral.write(0);
@@ -1346,7 +1363,7 @@ fn _decrease_position(
     }
 
     if amount_out > 0 {
-        // @TODO: potential revert here
+        // safe to cast to u64
         _transfer_out(BASE_ASSET_ID, u64::try_from(amount_out).unwrap(), receiver);
     }
     (position.collateral, price, amount_out)
@@ -1462,7 +1479,7 @@ fn _liquidate_position(
     if out_liquidation_fee > 0 {
         _transfer_out(
             BASE_ASSET_ID,
-            // @TODO: potential revert here
+            // safe to cast to u64
             u64::try_from(out_liquidation_fee)
                 .unwrap(),
             fee_receiver,
