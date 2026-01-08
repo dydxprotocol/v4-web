@@ -25,17 +25,16 @@ export class DydxPersistedWalletService {
   }
 
   /**
-   * Store private key in secure storage
-   * @param privateKey - Private key to store
+   * @param mnemonic - Mnemonic to store
    */
-  async secureStorePrivateKey(privateKey?: Uint8Array<ArrayBufferLike> | null): Promise<void> {
+  async secureStorePhrase(mnemonic?: string | null): Promise<void> {
     try {
-      if (!privateKey) {
+      if (!mnemonic) {
         this.clearStoredWallet();
         throw new Error('PrivateKey was not derived from Signature');
       }
 
-      await secureStorage.store(STORAGE_KEY, Buffer.from(privateKey).toString('hex'));
+      await secureStorage.store(STORAGE_KEY, mnemonic);
     } catch (error) {
       logBonsaiError('DydxWalletService', `Failed to secure store ${STORAGE_KEY}`, { error });
     }
@@ -44,7 +43,7 @@ export class DydxPersistedWalletService {
   /**
    * @returns Decrypted trading key or null if not found
    */
-  async exportPrivateKey(): Promise<string | null> {
+  async exportPhrase(): Promise<string | null> {
     try {
       return await secureStorage.retrieve(STORAGE_KEY);
     } catch (error) {

@@ -23,7 +23,7 @@ import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { onboardingManager, WalletDerivationResult } from '@/lib/onboarding/OnboardingSupervisor';
-import { deriveSolanaKeypairFromPrivateKey } from '@/lib/solanaWallet';
+import { deriveSolanaKeypairFromMnemonic } from '@/lib/solanaWallet';
 import { dydxPersistedWalletService } from '@/lib/wallet/dydxPersistedWalletService';
 
 import { useCosmosWallets } from './useCosmosWallets';
@@ -127,13 +127,13 @@ const useAccountsContext = () => {
       hdKeyManager.setHdkey(wallet.address, key);
 
       // Persist to SecureStorage for session restoration
-      await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
+      await dydxPersistedWalletService.secureStorePhrase(mnemonic);
 
-      if (!privateKey) {
+      if (!mnemonic) {
         throw new Error('Could not derive keys from Turnkey signature');
       }
 
-      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(privateKey);
+      const solanaKeypair = deriveSolanaKeypairFromMnemonic(mnemonic);
 
       setLocalDydxWallet(wallet);
       setLocalNobleWallet(nobleWallet);
