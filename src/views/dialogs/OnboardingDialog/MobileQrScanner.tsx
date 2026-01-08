@@ -50,8 +50,8 @@ export const MobileQrScanner = () => {
       const decryptedPayload = AES.decrypt(encryptedPayload, encryptionKey).toString(enc.Utf8);
       const payload = JSON.parse(decryptedPayload);
 
-      if (payload.privkeyHex) {
-        const result = await importWallet(payload.privkeyHex);
+      if (payload && typeof payload.mnemonic === 'string' && payload.mnemonic.length > 0) {
+        const result = await importWallet(payload.mnemonic);
 
         if (result.error) {
           // TODO: Map to localized error message
