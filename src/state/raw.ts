@@ -249,13 +249,16 @@ export const rawSlice = createSlice({
       },
       setComplianceGeoHeadersRaw: (
         state,
-        action: PayloadAction<Loadable<Omit<GeoHeaders, 'lastUpdated'> | undefined>>
+        action: PayloadAction<
+          Loadable<Omit<GeoHeaders, 'lastUpdated'> | undefined> & { force?: boolean }
+        >
       ) => {
         const now = Date.now();
         const lastUpdated = state.compliance.geoHeaders.data?.lastUpdated;
 
-        // Update if no data exists or if it's been more than an hour since last update
+        // Update if forced, no data exists, or if it's been more than an hour since last update
         const shouldUpdate =
+          action.payload.force === true ||
           !state.compliance.geoHeaders.data ||
           !lastUpdated ||
           now - new Date(lastUpdated).getTime() > timeUnits.hour;

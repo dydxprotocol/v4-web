@@ -9,7 +9,7 @@ export function calculateCompliance({
   sourceAddressScreenV2,
 }: ComplianceState): Compliance {
   const geo = {
-    currentlyGeoBlocked: geoBase.data?.whitelisted
+    isPerpetualsGeoBlocked: geoBase.data?.whitelisted
       ? false
       : geoHeaders.data?.status === 'restricted',
     currentCountry: geoHeaders.data?.country,

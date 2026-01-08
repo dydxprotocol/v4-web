@@ -31,7 +31,7 @@ export const selectComplianceLoading = createAppSelector(
     mergeLoadableStatus(geo, geoHeaders, localAddressScreenV2, sourceAddressScreenV2)
 );
 
-export const selectIsGeoRestricted = createAppSelector(
+export const selectIsPerpsGeoRestricted = createAppSelector(
   [selectRawGeoHeaders],
   (geoHeaders) => geoHeaders.data?.status === 'restricted'
 );
