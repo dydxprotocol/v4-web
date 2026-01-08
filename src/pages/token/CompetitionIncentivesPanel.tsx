@@ -6,7 +6,7 @@ import tw from 'twin.macro';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
+import { useClcPnlDistribution } from '@/hooks/rewards/hooks';
 import { DEC_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useNow } from '@/hooks/useNow';
@@ -108,7 +108,7 @@ const September2025RewardsPanel = () => {
 const Sept2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { data: topPnls, isLoading } = useChaosLabsPnlDistribution();
+  const { data: topPnls, isLoading } = useClcPnlDistribution();
 
   const userReward = topPnls?.find((entry) => entry.address === dydxAddress)?.dollarReward ?? 0;
 

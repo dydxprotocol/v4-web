@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { ChaosLabsCompetitionItem, useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
+import { IncentiveCompetitionItem, useClcPnlDistribution } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -30,10 +30,10 @@ export enum RewardsLeaderboardTableColumns {
 
 export const CompetitionLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
-  const { data: topPnls, isLoading } = useChaosLabsPnlDistribution();
+  const { data: topPnls, isLoading } = useClcPnlDistribution();
   const { dydxAddress } = useAccounts();
 
-  const getRowKey = useCallback((row: ChaosLabsCompetitionItem) => row.rank, []);
+  const getRowKey = useCallback((row: IncentiveCompetitionItem) => row.rank, []);
 
   const columns = Object.values(RewardsLeaderboardTableColumns).map(
     (key: RewardsLeaderboardTableColumns) =>
@@ -54,7 +54,7 @@ export const CompetitionLeaderboardPanel = () => {
         pnl: +entry.pnl,
       },
     ];
-  }, [] as ChaosLabsCompetitionItem[]);
+  }, [] as IncentiveCompetitionItem[]);
 
   const onDownload = () => {
     if (data.length === 0) return;
@@ -194,7 +194,7 @@ const getRewardsLeaderboardTableColumnDef = ({
   key: RewardsLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<ChaosLabsCompetitionItem> => ({
+}): ColumnDef<IncentiveCompetitionItem> => ({
   ...(
     {
       [RewardsLeaderboardTableColumns.Rank]: {
@@ -273,6 +273,6 @@ const getRewardsLeaderboardTableColumnDef = ({
           <Output tw="text-small font-medium" type={OutputType.Fiat} value={dollarReward} />
         ),
       },
-    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsCompetitionItem>>
+    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<IncentiveCompetitionItem>>
   )[key],
 });

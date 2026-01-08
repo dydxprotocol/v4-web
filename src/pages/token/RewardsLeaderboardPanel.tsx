@@ -7,9 +7,9 @@ import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import {
   addRewardsToLeaderboardEntry,
-  ChaosLabsFeeLeaderboardItem,
-  ChaosLabsFeeLeaderboardItemWithRewards,
-  useChaosLabsFeeLeaderboard,
+  DydxFeeLeaderboardItem,
+  DydxFeeLeaderboardItemWithRewards,
+  useFeeLeaderboard,
 } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -39,7 +39,7 @@ export const RewardsLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
   const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
-  const { data: feeLeaderboardWithoutRewards, isLoading } = useChaosLabsFeeLeaderboard({
+  const { data: feeLeaderboardWithoutRewards, isLoading } = useFeeLeaderboard({
     address: dydxAddress,
   });
   const feeLeaderboard = useMemo(
@@ -50,7 +50,7 @@ export const RewardsLeaderboardPanel = () => {
     [feeLeaderboardWithoutRewards?.leaderboard, dydxPrice]
   );
 
-  const getRowKey = useCallback((row: ChaosLabsFeeLeaderboardItem) => row.rank, []);
+  const getRowKey = useCallback((row: DydxFeeLeaderboardItem) => row.rank, []);
 
   const columns = Object.values(RewardsLeaderboardTableColumns).map(
     (key: RewardsLeaderboardTableColumns) =>
@@ -199,7 +199,7 @@ const getRewardsLeaderboardTableColumnDef = ({
   key: RewardsLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<ChaosLabsFeeLeaderboardItemWithRewards> => ({
+}): ColumnDef<DydxFeeLeaderboardItemWithRewards> => ({
   ...(
     {
       [RewardsLeaderboardTableColumns.Rank]: {
@@ -269,9 +269,6 @@ const getRewardsLeaderboardTableColumnDef = ({
           />
         ),
       },
-    } satisfies Record<
-      RewardsLeaderboardTableColumns,
-      ColumnDef<ChaosLabsFeeLeaderboardItemWithRewards>
-    >
+    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<DydxFeeLeaderboardItemWithRewards>>
   )[key],
 });
