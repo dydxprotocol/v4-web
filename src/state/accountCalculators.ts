@@ -5,7 +5,6 @@ import { OnboardingState, OnboardingSteps, SpotWalletStatus } from '@/constants/
 import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import {
-  getDisplayChooseWallet,
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountOpenOrders,
@@ -19,28 +18,10 @@ import { getCurrentMarketId } from './currentMarketSelectors';
 import { getSourceAccount } from './walletSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
-  [
-    getOnboardingState,
-    getDisplayChooseWallet,
-    (s, isTurnkeyEnabled: boolean) => isTurnkeyEnabled,
-    (s, _isTurnkeyEnabled: boolean, showImportPrivateKey: boolean) => showImportPrivateKey,
-  ],
-  (
-    onboardingState: OnboardingState,
-    displayChooseWallet: boolean,
-    isTurnkeyEnabled: boolean,
-    showImportPrivateKey: boolean
-  ) => {
-    // Show ImportPrivateKey step if requested
-    if (showImportPrivateKey) {
-      return OnboardingSteps.ImportPrivateKey;
-    }
-
+  [getOnboardingState],
+  (onboardingState: OnboardingState) => {
     return {
-      [OnboardingState.Disconnected]:
-        displayChooseWallet || !isTurnkeyEnabled
-          ? OnboardingSteps.ChooseWallet
-          : OnboardingSteps.SignIn,
+      [OnboardingState.Disconnected]: OnboardingSteps.SignIn,
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
       [OnboardingState.AccountConnected]: undefined,
     }[onboardingState];

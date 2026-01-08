@@ -28,12 +28,10 @@ export const ChooseWallet = ({
   onSignInWithSocials,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
-  onImportPrivateKey,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
   onSignInWithSocials: () => void;
   onSignInWithPasskey: () => void;
-  onImportPrivateKey: () => void;
 }) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
@@ -82,20 +80,6 @@ export const ChooseWallet = ({
           </AccentTag>
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </div>
-      </$OtherOptionButton>
-
-      <$OtherOptionButton
-        type={ButtonType.Button}
-        action={ButtonAction.Base}
-        size={ButtonSize.BasePlus}
-        onClick={onImportPrivateKey}
-      >
-        <div tw="row gap-0.5">
-          <Icon iconName={IconName.ExportKeys} />
-          Import Permissioned Key{/** TODO: Localize */}
-        </div>
-
-        <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
       </$OtherOptionButton>
     </div>
   );

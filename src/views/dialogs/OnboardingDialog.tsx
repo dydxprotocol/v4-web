@@ -34,18 +34,21 @@ import { Ring } from '@/components/Ring';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
+import { setChooseWalletDisplay, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { useAppDispatch } from '@/state/appTypes';
+import { getChooseWalletDisplay } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { assertNever } from '@/lib/assertNever';
+import { calc } from '@/lib/do';
 import { testFlags } from '@/lib/testFlags';
 
 import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
-import { ImportPrivateKey } from './OnboardingDialog/ImportPrivateKey';
+import { MobileQrScanner } from './OnboardingDialog/MobileQrScanner';
 import { SignIn } from './OnboardingDialog/SignIn';
 
 export const OnboardingDialog = ({
@@ -53,7 +56,6 @@ export const OnboardingDialog = ({
 }: DialogProps<OnboardingDialogProps>) => {
   const dispatch = useAppDispatch();
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
-  const [showImportPrivateKey, setShowImportPrivateKey] = useState(false);
 
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
@@ -62,11 +64,8 @@ export const OnboardingDialog = ({
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
   const isTurnkeyEnabled = useEnableTurnkey();
-  const currentOnboardingStep = useAppSelectorWithArgs(
-    calculateOnboardingStep,
-    isTurnkeyEnabled,
-    showImportPrivateKey
-  );
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep);
+  const chooseWalletDisplay = useAppSelector(getChooseWalletDisplay);
   const isSimpleUi = useSimpleUiEnabled();
   const { dydxAddress } = useAccounts();
   const privyWallet = useDisplayedWallets().find((wallet) => wallet.name === WalletType.Privy);
@@ -83,7 +82,7 @@ export const OnboardingDialog = ({
 
   useEffect(() => {
     return () => {
-      dispatch(setDisplayChooseWallet(false));
+      dispatch(setChooseWalletDisplay('signin'));
     };
   }, [dispatch]);
 
@@ -102,12 +101,17 @@ export const OnboardingDialog = ({
 
   const onDisplayChooseWallet = () => {
     track(AnalyticsEvents.OnboardingSignInWithWalletClick());
-    dispatch(setDisplayChooseWallet(true));
+    dispatch(setChooseWalletDisplay('wallets'));
   };
 
   const onSignInWithSocials = () => {
     track(AnalyticsEvents.OnboardingSignInWithSocialsClick());
-    dispatch(setDisplayChooseWallet(false));
+    dispatch(setChooseWalletDisplay('signin'));
+  };
+
+  const onSyncFromDesktopQrCode = () => {
+    // TODO: Add tracking
+    dispatch(setChooseWalletDisplay('qr'));
   };
 
   const onSignInWithPasskey = () => {
@@ -117,10 +121,6 @@ export const OnboardingDialog = ({
         DialogTypes.SetupPasskey({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
       )
     );
-  };
-
-  const onImportPrivateKey = () => {
-    setShowImportPrivateKey(true);
   };
 
   const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
@@ -156,88 +156,101 @@ export const OnboardingDialog = ({
     </Link>
   );
 
+  const signInContent = calc(() => {
+    switch (chooseWalletDisplay) {
+      case 'signin': {
+        return {
+          title: (
+            <div tw="row justify-between">
+              {stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })}
+              {privyUserOption}
+            </div>
+          ),
+          description: stringGetter({
+            key: STRING_KEYS.SIGN_IN_DESCRIPTION,
+          }),
+          children: (
+            <SignIn
+              onChooseWallet={onChooseWallet}
+              onDisplayChooseWallet={onDisplayChooseWallet}
+              onSignInWithPasskey={onSignInWithPasskey}
+              onSyncFromDesktopQrCode={onSyncFromDesktopQrCode}
+              onSubmitEmail={({ userEmail }: { userEmail: string }) => onSubmitEmail({ userEmail })}
+            />
+          ),
+        };
+      }
+      case 'wallets': {
+        return {
+          title: isTurnkeyEnabled ? (
+            stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })
+          ) : (
+            <div tw="flex items-center gap-0.5">
+              {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
+              <$WithTooltip
+                tw="text-color-text-0"
+                tooltipString={stringGetter({
+                  key: STRING_KEYS.WALLET_DEFINITION,
+                  params: {
+                    ABOUT_WALLETS_LINK: (
+                      <Link href={walletLearnMore} withIcon isInline>
+                        {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
+                      </Link>
+                    ),
+                  },
+                })}
+              >
+                <$QuestionIcon iconName={IconName.QuestionMark} />
+              </$WithTooltip>
+            </div>
+          ),
+          description: isTurnkeyEnabled
+            ? stringGetter({ key: STRING_KEYS.SIGN_IN_DESCRIPTION })
+            : stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
+          children: (
+            <ChooseWallet
+              onChooseWallet={onChooseWallet}
+              onSignInWithSocials={onSignInWithSocials}
+              onSignInWithPasskey={onSignInWithPasskey}
+            />
+          ),
+          hasFooterBorder: true,
+          slotFooter: !isSimpleUi && !isTurnkeyEnabled && (
+            <$Footer>
+              <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
+                <h3 tw="text-color-text-2 font-medium-book">
+                  {stringGetter({ key: STRING_KEYS.SELECT_LANGUAGE })}
+                </h3>
+                {stringGetter({ key: STRING_KEYS.CHOOSE_PREFERRED_LANGUAGE })}
+              </div>
+              <$LanguageSelector />
+            </$Footer>
+          ),
+        };
+      }
+      case 'qr': {
+        return {
+          title: 'Scan QR Code',
+          description:
+            'Scan the QR code shown on your desktop with the camera on your mobile device to sync wallets',
+          children: <MobileQrScanner />,
+        };
+      }
+      default:
+        assertNever(chooseWalletDisplay);
+        return null;
+    }
+  });
+
   return (
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
-      onBack={
-        isTurnkeyEnabled && currentOnboardingStep === OnboardingSteps.ChooseWallet
-          ? onSignInWithSocials
-          : undefined
-      }
+      onBack={['signin', 'qr'].includes(chooseWalletDisplay) ? onSignInWithSocials : undefined}
       setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.SignIn]: {
-            title: (
-              <div tw="row justify-between">
-                {stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })}
-                {privyUserOption}
-              </div>
-            ),
-            description: stringGetter({
-              key: STRING_KEYS.SIGN_IN_DESCRIPTION,
-            }),
-            children: (
-              <$Content>
-                <SignIn
-                  onChooseWallet={onChooseWallet}
-                  onDisplayChooseWallet={onDisplayChooseWallet}
-                  onSignInWithPasskey={onSignInWithPasskey}
-                  onSubmitEmail={({ userEmail }: { userEmail: string }) =>
-                    onSubmitEmail({ userEmail })
-                  }
-                />
-              </$Content>
-            ),
-          },
-          [OnboardingSteps.ChooseWallet]: {
-            title: isTurnkeyEnabled ? (
-              stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })
-            ) : (
-              <div tw="flex items-center gap-0.5">
-                {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
-                <$WithTooltip
-                  tw="text-color-text-0"
-                  tooltipString={stringGetter({
-                    key: STRING_KEYS.WALLET_DEFINITION,
-                    params: {
-                      ABOUT_WALLETS_LINK: (
-                        <Link href={walletLearnMore} withIcon isInline>
-                          {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
-                        </Link>
-                      ),
-                    },
-                  })}
-                >
-                  <$QuestionIcon iconName={IconName.QuestionMark} />
-                </$WithTooltip>
-              </div>
-            ),
-            description: isTurnkeyEnabled
-              ? stringGetter({ key: STRING_KEYS.SIGN_IN_DESCRIPTION })
-              : stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
-            children: (
-              <$Content>
-                <ChooseWallet
-                  onChooseWallet={onChooseWallet}
-                  onSignInWithSocials={onSignInWithSocials}
-                  onSignInWithPasskey={onSignInWithPasskey}
-                  onImportPrivateKey={onImportPrivateKey}
-                />
-              </$Content>
-            ),
-            hasFooterBorder: true,
-            slotFooter: !isSimpleUi && !isTurnkeyEnabled && (
-              <$Footer>
-                <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
-                  <h3 tw="text-color-text-2 font-medium-book">
-                    {stringGetter({ key: STRING_KEYS.SELECT_LANGUAGE })}
-                  </h3>
-                  {stringGetter({ key: STRING_KEYS.CHOOSE_PREFERRED_LANGUAGE })}
-                </div>
-                <$LanguageSelector />
-              </$Footer>
-            ),
+            ...signInContent,
           },
           [OnboardingSteps.KeyDerivation]: {
             slotIcon: isSimpleUi
@@ -275,17 +288,6 @@ export const OnboardingDialog = ({
               </$Content>
             ),
             width: '23rem',
-          },
-          [OnboardingSteps.ImportPrivateKey]: {
-            // TODO: Localize
-            title: 'Import Permissioned Key',
-            description: 'Connect a wallet by importing its private keys',
-            children: (
-              <$Content>
-                <ImportPrivateKey />
-              </$Content>
-            ),
-            onBack: () => setShowImportPrivateKey(false),
           },
         }[currentOnboardingStep])}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}

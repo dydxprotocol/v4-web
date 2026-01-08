@@ -10,6 +10,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useCameraDetection } from '@/hooks/useCameraDetection';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -41,11 +43,13 @@ export const SignIn = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
   onSubmitEmail,
+  onSyncFromDesktopQrCode,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
   onDisplayChooseWallet: () => void;
   onSignInWithPasskey: () => void;
   onSubmitEmail: ({ userEmail }: { userEmail: string }) => void;
+  onSyncFromDesktopQrCode: () => void;
 }) => {
   const stringGetter = useStringGetter();
   const [email, setEmail] = useState('');
@@ -56,6 +60,8 @@ export const SignIn = ({
   const { tos, privacy } = useURLConfigs();
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
+  const { isMobile } = useBreakpoints();
+  const { hasCamera } = useCameraDetection();
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -151,6 +157,23 @@ export const SignIn = ({
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton> */}
 
+        {isMobile && hasCamera && (
+          <$OtherOptionButton
+            type={ButtonType.Button}
+            action={ButtonAction.Base}
+            size={ButtonSize.BasePlus}
+            onClick={onSyncFromDesktopQrCode}
+          >
+            <div tw="row gap-0.5">
+              <Icon iconName={IconName.DevicesStroke} />
+              {/** TODO: Localize */}
+              Link desktop wallet
+            </div>
+
+            <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
+          </$OtherOptionButton>
+        )}
+
         {displayedWallets
           .filter(
             (wallet) =>
@@ -182,7 +205,7 @@ export const SignIn = ({
           onClick={onDisplayChooseWallet}
         >
           <div tw="row gap-0.5">
-            <Icon iconName={IconName.Wallet2} />
+            <Icon iconName={IconName.Wallet3} />
             {stringGetter({ key: STRING_KEYS.VIEW_MORE_WALLETS })}
           </div>
 

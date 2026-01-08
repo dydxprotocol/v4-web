@@ -74,10 +74,10 @@ class OnboardingSupervisor {
       const pk = Buffer.from(privateKey, 'hex');
       const solanaKeypair = deriveSolanaKeypairFromPrivateKey(pk);
 
-      if (!wallet.address) {
+      if (!wallet.address || !nobleWallet.address) {
         return {
           success: false,
-          error: 'Invalid private key - could not derive address',
+          error: 'Invalid private key - could not derive a local wallet',
         };
       }
 
