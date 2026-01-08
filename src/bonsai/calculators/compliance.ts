@@ -7,6 +7,7 @@ export function calculateCompliance({
   geo: geoBase,
   localAddressScreenV2,
   sourceAddressScreenV2,
+  solanaAddressScreen,
 }: ComplianceState): Compliance {
   const geo = {
     isPerpetualsGeoBlocked: geoBase.data?.whitelisted
@@ -20,6 +21,14 @@ export function calculateCompliance({
       geo,
       status: ComplianceStatus.BLOCKED,
       updatedAt: sourceAddressScreenV2.data.updatedAt,
+    };
+  }
+
+  if (solanaAddressScreen.data?.status === ComplianceStatus.BLOCKED) {
+    return {
+      geo,
+      status: ComplianceStatus.BLOCKED,
+      updatedAt: solanaAddressScreen.data.updatedAt,
     };
   }
 

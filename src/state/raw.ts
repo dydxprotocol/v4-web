@@ -81,6 +81,7 @@ export type ComplianceState = {
   geo: Loadable<GeoState | undefined>;
   sourceAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
   localAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
+  solanaAddressScreen: Loadable<ComplianceResponse & ComplianceErrors>;
 };
 
 export interface RawDataState {
@@ -161,6 +162,7 @@ const initialState: RawDataState = {
     geo: loadableIdle(),
     localAddressScreenV2: loadableIdle(),
     sourceAddressScreenV2: loadableIdle(),
+    solanaAddressScreen: loadableIdle(),
   },
   rewards: {
     data: loadableIdle(),
@@ -286,6 +288,12 @@ export const rawSlice = createSlice({
         action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
       ) => {
         state.compliance.sourceAddressScreenV2 = action.payload;
+      },
+      setSolanaAddressScreenRaw: (
+        state,
+        action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
+      ) => {
+        state.compliance.solanaAddressScreen = action.payload;
       },
       setRewardsParams: (state, action: PayloadAction<Loadable<RewardsParams | undefined>>) => {
         state.rewards.data = action.payload;
@@ -425,6 +433,7 @@ export const {
   setComplianceGeoHeadersRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
+  setSolanaAddressScreenRaw,
   setRewardsParams,
   setRewardsTokenPrice,
   setSelectedMarketLeverage,
