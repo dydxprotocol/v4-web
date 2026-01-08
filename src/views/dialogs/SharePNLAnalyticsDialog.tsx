@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
@@ -31,7 +32,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset, isAssetIconMapKey } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -78,8 +79,7 @@ export const SharePNLAnalyticsDialog = ({
       setTimeout(() => setIsCopied(false), 2000);
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error('Failed to copy blob. ', error);
+      logBonsaiError('SharePNLAnalyticsDialog', 'Failed to copy blob. ', { error });
       notify({
         title: stringGetter({ key: STRING_KEYS.ERROR }),
         body: stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
@@ -126,9 +126,7 @@ export const SharePNLAnalyticsDialog = ({
   const [logoBase64, setLogoBase64] = useState<string | null>(null);
 
   const localLogoUrl = useMemo(() => {
-    if (assetId && Object.prototype.hasOwnProperty.call(ASSET_ICON_MAP, assetId)) {
-      return ASSET_ICON_MAP[assetId as keyof typeof ASSET_ICON_MAP];
-    }
+    if (assetId && isAssetIconMapKey(assetId)) return ASSET_ICON_MAP[assetId];
     return logoUrl;
   }, [logoUrl, assetId]);
 
@@ -147,8 +145,7 @@ export const SharePNLAnalyticsDialog = ({
       setLogoBase64(canvas.toDataURL('image/png'));
     };
     img.onerror = () => {
-      // eslint-disable-next-line no-console
-      console.error('Failed to load asset image. ', logoUrl);
+      logBonsaiError('SharePNLAnalyticsDialog', 'Failed to load asset image. ', logoUrl);
       setLogoBase64(null);
     };
   }, [logoUrl]);
