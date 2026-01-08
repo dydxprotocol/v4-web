@@ -57,7 +57,7 @@ export const StakingTierTable = () => {
             renderCell: (row: StakingTier) => (
               <$TextRow tw="gap-0.5">
                 <Output type={OutputType.Text} value={row.feeTierName} tw="text-color-text-0" />
-                {row.feeTierName === userFeeTier && (
+                {row.feeTierName === userFeeTier && currentStakingDiscountLevel != null && (
                   <Tag size={TagSize.Medium} tw="text-color-accent">
                     {stringGetter({ key: STRING_KEYS.YOU })}
                   </Tag>

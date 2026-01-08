@@ -1,5 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
 
+import { NumberFormatValues, NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
+
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -66,14 +69,23 @@ export const SpotAmountInput = ({
             </>
           )}
         </div>
-        <input
-          type="number"
+        <$NumericFormat
+          valueIsNumericString
+          allowNegative={false}
           placeholder="0.00"
-          tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onValueChange={(values: NumberFormatValues) => {
+            setAmount(values.value);
+          }}
         />
       </div>
     </div>
   );
 };
+
+const $NumericFormat = styled(NumericFormat)`
+  font: var(--font-large-medium);
+  background-color: var(--color-layer-4);
+  color: var(--color-text-2);
+  outline: none;
+`;

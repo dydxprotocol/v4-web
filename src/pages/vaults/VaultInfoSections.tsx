@@ -10,7 +10,6 @@ import { AppRoute } from '@/constants/routes';
 import { tooltipStrings } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import {
@@ -102,40 +101,21 @@ const $DetailCard = styled.div`
 `;
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const { vaultOperatorLearnMore, vaultLearnMore } = useURLConfigs();
-  const operatorName = useEnvConfig('megavaultOperatorName');
+
   return (
     <div className={className} tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
       <p>
         {stringGetter({
-          key: STRING_KEYS.VAULT_DESCRIPTION,
-        })}{' '}
-        {vaultLearnMore && (
-          <Link isInline withIcon href={vaultLearnMore}>
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE_ABOUT_MEGAVAULT })}
-          </Link>
-        )}
+          key: STRING_KEYS.MEGAVAULT_DISCLOSURE_TEXT,
+          params: {
+            VOTED_LINK: (
+              <Link isInline withIcon href="https://www.mintscan.io/dydx/proposals/328">
+                {stringGetter({ key: STRING_KEYS.VOTED })}
+              </Link>
+            ),
+          },
+        })}
       </p>
-      {operatorName.length > 0 && (
-        <p>
-          {stringGetter({
-            key: STRING_KEYS.VAULT_OPERATOR_DESCRIPTION,
-            params: {
-              OPERATOR_NAME: operatorName,
-            },
-          })}{' '}
-          {vaultOperatorLearnMore && (
-            <Link isInline withIcon href={vaultOperatorLearnMore}>
-              {stringGetter({
-                key: STRING_KEYS.LEARN_MORE_ABOUT_OPERATOR,
-                params: {
-                  OPERATOR_NAME: operatorName,
-                },
-              })}
-            </Link>
-          )}
-        </p>
-      )}
     </div>
   );
 };
