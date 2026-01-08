@@ -24,12 +24,3 @@ export const deriveSolanaKeypairFromMnemonic = (
   const derivedSeed = derivePath(path, seedHex).key;
   return Keypair.fromSeed(new Uint8Array(derivedSeed));
 };
-
-/**
- *
- * @param privateKey - Private key to derive Solana keypair from
- * @returns Solana Keypair
- */
-export const deriveSolanaKeypairFromPrivateKey = (privateKey: Uint8Array): Keypair => {
-  return Keypair.fromSeed(privateKey);
-};

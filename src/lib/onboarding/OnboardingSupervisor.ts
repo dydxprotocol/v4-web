@@ -1,6 +1,11 @@
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
-import { BECH32_PREFIX, NOBLE_BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
+import {
+  BECH32_PREFIX,
+  NOBLE_BECH32_PREFIX,
+  onboarding as OnboardingHelper,
+  type LocalWallet,
+} from '@dydxprotocol/v4-client-js';
 import { OfflineAminoSigner, OfflineDirectSigner } from '@keplr-wallet/types';
 import { Keypair } from '@solana/web3.js';
 
@@ -18,7 +23,7 @@ import { convertBech32Address } from '@/lib/addressUtils';
 import { hdKeyManager } from '@/lib/hdKeyManager';
 import { sleep } from '@/lib/timeUtils';
 
-import { deriveSolanaKeypairFromPrivateKey } from '../solanaWallet';
+import { deriveSolanaKeypairFromMnemonic } from '../solanaWallet';
 import { dydxPersistedWalletService } from '../wallet/dydxPersistedWalletService';
 
 export interface SourceAccount {
@@ -59,25 +64,24 @@ class OnboardingSupervisor {
    * Called directly from ImportPrivateKey component
    */
   async handleWalletImport({
-    privateKey,
+    mnemonic,
     handleWalletConnectionResult,
   }: {
-    privateKey: string;
+    mnemonic: string;
     handleWalletConnectionResult: (result: WalletDerivationResult) => void;
   }): Promise<{ success: true } | { success: false; error: string }> {
     try {
       const LocalWallet = await getLazyLocalWallet();
 
       // Create wallets from private key
-      const wallet = await LocalWallet.fromPrivateKey(privateKey, BECH32_PREFIX);
-      const nobleWallet = await LocalWallet.fromPrivateKey(privateKey, NOBLE_BECH32_PREFIX);
-      const pk = Buffer.from(privateKey, 'hex');
-      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(pk);
+      const wallet = await LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
+      const nobleWallet = await LocalWallet.fromMnemonic(mnemonic, NOBLE_BECH32_PREFIX);
+      const solanaKeypair = deriveSolanaKeypairFromMnemonic(mnemonic);
 
       if (!wallet.address || !nobleWallet.address) {
         return {
           success: false,
-          error: 'Invalid private key - could not derive a local wallet',
+          error: 'Could not derive a local wallet from imported recovery phrase',
         };
       }
 
@@ -90,8 +94,8 @@ class OnboardingSupervisor {
 
       handleWalletConnectionResult(walletConnectionResult);
 
-      // Store the private key in SecureStorage
-      await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
+      // Store the recovery phrase in SecureStorage
+      await dydxPersistedWalletService.secureStorePhrase(mnemonic);
 
       return {
         success: true,
@@ -138,9 +142,9 @@ class OnboardingSupervisor {
       publicKey,
     };
 
-    const solanaKeypair = deriveSolanaKeypairFromPrivateKey(privateKey);
+    const solanaKeypair = deriveSolanaKeypairFromMnemonic(mnemonic);
     hdKeyManager.setHdkey(wallet.address, hdKey);
-    await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
+    await dydxPersistedWalletService.secureStorePhrase(mnemonic);
 
     return { wallet, nobleWallet, solanaKeypair, hdKey };
   }
@@ -214,7 +218,7 @@ class OnboardingSupervisor {
       }
 
       // Step 4: Persist to SecureStorage
-      await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
+      await dydxPersistedWalletService.secureStorePhrase(mnemonic);
 
       // Step 5: Set up hdKey
       const hdKey: PrivateInformation = {
@@ -226,7 +230,7 @@ class OnboardingSupervisor {
       hdKeyManager.setHdkey(wallet.address, hdKey);
 
       // Step 6: Derive Solana keypair
-      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(privateKey);
+      const solanaKeypair = deriveSolanaKeypairFromMnemonic(mnemonic);
 
       const walletDerivationResult: WalletDerivationResult = {
         wallet,
@@ -256,21 +260,22 @@ class OnboardingSupervisor {
    */
   private async restoreFromSecureStorage(): Promise<WalletDerivationResult | null> {
     try {
-      const storedPrivateKey = await dydxPersistedWalletService.exportPrivateKey();
-      if (!storedPrivateKey) {
+      const storedPhrase = await dydxPersistedWalletService.exportPhrase();
+      if (!storedPhrase) {
         return null;
       }
 
       const LocalWallet = await getLazyLocalWallet();
-      const wallet = await LocalWallet.fromPrivateKey(storedPrivateKey, BECH32_PREFIX);
-      const nobleWallet = await LocalWallet.fromPrivateKey(storedPrivateKey, NOBLE_BECH32_PREFIX);
-      const pk = Buffer.from(storedPrivateKey, 'hex');
-      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(pk);
+      const wallet = await LocalWallet.fromMnemonic(storedPhrase, BECH32_PREFIX);
+      const nobleWallet = await LocalWallet.fromMnemonic(storedPhrase, NOBLE_BECH32_PREFIX);
+      const solanaKeypair = deriveSolanaKeypairFromMnemonic(storedPhrase);
+
+      const { privateKey, publicKey } = OnboardingHelper.deriveHDKeyFromMnemonic(storedPhrase);
 
       const hdKey: PrivateInformation = {
-        mnemonic: '',
-        privateKey: pk,
-        publicKey: null,
+        mnemonic: storedPhrase,
+        privateKey,
+        publicKey,
       };
 
       return {

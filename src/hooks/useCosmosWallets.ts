@@ -33,8 +33,6 @@ export function useCosmosWallets(
         logBonsaiError('useCosmosWallets', 'Failed to derive Osmosis wallet w/ mnemonic', {
           error,
         });
-
-        return null;
       }
     }
 
@@ -48,7 +46,6 @@ export function useCosmosWallets(
         logBonsaiError('useCosmosWallets', 'Failed to derive Osmosis wallet w/ private key', {
           error,
         });
-        return null;
       }
     }
 
