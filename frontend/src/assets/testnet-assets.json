@@ -1,30 +1,20 @@
 [
   {
-    "contractId": "0x5CDc3143D0bC1fFD896D025F0c88fC10593aa768D20416a151F6734430e78ad9",
-    "assetId": "0x02223454885e5de4e0d5dcbc19dc654bb2c5820b12955d716ee314b5cf0281a9",
-    "symbol": "sUSDC",
-    "name": "mckUSDC",
-    "decimals": 6
+    "assetId": "0x7404e3d104ea7841c3d9e6fd20adfe99b4ad586bc08d8f3bd3afef894cf184de",
+    "symbol": "BTCUSD",
+    "name": "BTC/USD",
+    "decimals": 18
   },
   {
-    "contractId": "0xE4c8C10b31D9De5D4333C389A7101E580630D053AF47467A40fb1D1DAd6B399c",
-    "assetId": "0x304c09238b060a56c8e40c52cd6f3caea22e9acb0c465e2f022f7aab468b3aae",
-    "symbol": "sbBTC",
-    "name": "mockBTC",
-    "decimals": 9
+    "assetId": "0x670b7091d54af59331f97a1ce4a321eab14fd257a8b57b75ce4d4a5afc9186f4",
+    "symbol": "FUELUSD",
+    "name": "FUEL/USD",
+    "decimals": 18
   },
   {
-    "contractId": "0xa0A76C0D74cDAd92f1282B8dFbF35C39F7a5434611A076Bb08E239EA4bb2B6E0",
-    "assetId": "0xcddbcaaf6fefe02a2f11d40c65e1939313211a4b821b11f80bc8994dc2930212",
-    "symbol": "sbBNB",
-    "name": "mockBNB",
-    "decimals": 9
-  },
-  {
-    "contractId": "0x5B6712bF3A0E877E3A97A5B903B97c34FDefE8526E40fD4F0f8A2FdB8b03E6eA",
-    "assetId": "0xa3ed2e58076f53e8dd15c8463ee49e6ce547355c34c639777c5dace3728e2ded",
-    "symbol": "sbETH",
-    "name": "mockETH",
-    "decimals": 9
+    "assetId": "0x59102b37de83bdda9f38ac8254e596f0d9ac61d2035c07936675e87342817160",
+    "symbol": "ETHUSD",
+    "name": "ETH/USD",
+    "decimals": 18
   }
 ]

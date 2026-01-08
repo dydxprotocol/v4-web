@@ -5,5 +5,5 @@ export interface Asset {
   symbol: string;
   decimals: number;
   assetId: AssetId;
-  contractId: ContractId;
+  contractId?: ContractId;
 }
