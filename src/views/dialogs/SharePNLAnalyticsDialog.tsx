@@ -1,16 +1,19 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { AnalyticsEvents } from '@/constants/analytics';
+import { ASSET_ICON_MAP } from '@/constants/assets';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -29,7 +32,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset, isAssetIconMapKey } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -38,8 +41,14 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
     return;
   }
 
-  const item = new ClipboardItem({ 'image/png': blob });
-  await navigator.clipboard.write([item]);
+  try {
+    const item = new ClipboardItem({ 'image/png': blob });
+    await navigator.clipboard.write([item]);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to copy blob. ', error);
+    throw error;
+  }
 };
 
 export const SharePNLAnalyticsDialog = ({
@@ -59,9 +68,25 @@ export const SharePNLAnalyticsDialog = ({
 
   const symbol = getDisplayableAssetFromBaseAsset(assetId);
 
+  const notify = useCustomNotification();
+  const [isCopied, setIsCopied] = useState(false);
+
   const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
-    onSuccess: copyBlobToClipboard,
+    onSuccess: async (blob) => {
+      await copyBlobToClipboard(blob);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    },
+    onError: (error) => {
+      logBonsaiError('SharePNLAnalyticsDialog', 'Failed to copy blob. ', { error });
+      notify({
+        title: stringGetter({ key: STRING_KEYS.ERROR }),
+        body: stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
+        slotTitleLeft: <Icon iconName={IconName.Warning} tw="text-color-warning" />,
+        toastDuration: 5000,
+      });
+    },
   });
 
   const [{ isLoading: isSharing }, convertShare, refShare] = useToBlob<HTMLDivElement>({
@@ -98,6 +123,33 @@ export const SharePNLAnalyticsDialog = ({
 
   const [assetLeft, assetRight] = marketId.split('-');
 
+  const [logoBase64, setLogoBase64] = useState<string | null>(null);
+
+  const localLogoUrl = useMemo(() => {
+    if (assetId && isAssetIconMapKey(assetId)) return ASSET_ICON_MAP[assetId];
+    return logoUrl;
+  }, [logoUrl, assetId]);
+
+  useEffect(() => {
+    if (!logoUrl) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = logoUrl;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width || 26;
+      canvas.height = img.height || 26;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      setLogoBase64(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => {
+      logBonsaiError('SharePNLAnalyticsDialog', 'Failed to load asset image. ', logoUrl);
+      setLogoBase64(null);
+    };
+  }, [logoUrl]);
+
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.SHARE_ACTIVITY })}>
       <$ShareableCard
@@ -110,7 +162,11 @@ export const SharePNLAnalyticsDialog = ({
       >
         <div tw="flexColumn h-full">
           <div tw="row mb-0.75 gap-0.5">
-            <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="[--asset-icon-size:1.625rem]" />
+            <AssetIcon
+              logoUrl={logoBase64 ?? localLogoUrl}
+              symbol={assetId}
+              tw="[--asset-icon-size:1.625rem]"
+            />
 
             <span>
               <span tw="text-color-text-2 font-base-bold">{assetLeft}</span>/{assetRight}
@@ -152,30 +208,32 @@ export const SharePNLAnalyticsDialog = ({
             />
           </div>
 
-          {import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ? (
-            <$QrCode
-              tw="rounded-0.25 bg-color-layer-3"
-              size={68}
-              value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
-              options={{
-                cells: {
-                  fill: 'var(--color-text-2)',
-                },
-                finder: {
-                  fill: 'var(--color-text-2)',
-                },
-              }}
-            />
-          ) : (
-            <div tw="mt-1 size-[68px]" />
-          )}
+          <div tw="w-full text-right">
+            {import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ? (
+              <$QrCode
+                tw="rounded-0.25 bg-color-layer-3"
+                size={68}
+                value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
+                options={{
+                  cells: {
+                    fill: 'var(--color-text-2)',
+                  },
+                  finder: {
+                    fill: 'var(--color-text-2)',
+                  },
+                }}
+              />
+            ) : (
+              <div tw="mt-1 size-[68px]" />
+            )}
+          </div>
         </div>
       </$ShareableCard>
 
       <div tw="flex gap-1">
         <$Action
           action={ButtonAction.Secondary}
-          slotLeft={<Icon iconName={IconName.Copy} />}
+          slotLeft={<Icon iconName={isCopied ? IconName.Check : IconName.Copy} />}
           onClick={() => {
             track(AnalyticsEvents.SharePnlCopied({ asset: assetId }));
             convert();
@@ -184,7 +242,7 @@ export const SharePNLAnalyticsDialog = ({
             isLoading: isCopying,
           }}
         >
-          {stringGetter({ key: STRING_KEYS.COPY })}
+          {stringGetter({ key: isCopied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
         </$Action>
         <$Action
           action={ButtonAction.Primary}
