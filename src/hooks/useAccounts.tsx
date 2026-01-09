@@ -288,16 +288,16 @@ const useAccountsContext = () => {
     [dispatch, disconnectLocalWallets]
   );
 
-  // Import wallet from private key
+  // Import wallet from phrase
   const importWallet = useCallback(
-    async (privateKey: string): Promise<{ success: boolean; error?: string }> => {
+    async (mnemonic: string): Promise<{ success: boolean; error?: string }> => {
       selectWallet({
         connectorType: ConnectorType.Import,
         name: 'Import',
       });
 
       const result = await onboardingManager.handleWalletImport({
-        privateKey,
+        mnemonic,
         handleWalletConnectionResult,
       });
 
