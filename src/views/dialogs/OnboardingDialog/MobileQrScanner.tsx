@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import { AES, enc } from 'crypto-js';
 import styled from 'styled-components';
@@ -28,20 +29,20 @@ export const MobileQrScanner = ({
 
   const { importWallet } = useAccounts();
 
-  const onScan = useCallback(
-    (detectedCodes: IDetectedBarcode[]) => {
-      if (locked.current) return;
-      locked.current = true;
-      setEncryptedPayload(detectedCodes[0]?.rawValue ?? '');
-    },
-    [setHasScannedQrCode]
-  );
+  const onScan = useCallback((detectedCodes: IDetectedBarcode[]) => {
+    if (locked.current) return;
+    locked.current = true;
+    setEncryptedPayload(detectedCodes[0]?.rawValue ?? '');
+  }, []);
 
   const handleError = useCallback(
     (err?: unknown) => {
-      if (!encryptedPayload) setError(String(err ?? 'Scan error'));
+      logBonsaiError('MobileQrScanner', 'scan error', { error: err });
+      if (!encryptedPayload) {
+        setError(stringGetter({ key: STRING_KEYS.QR_SCAN_ERROR }));
+      }
     },
-    [encryptedPayload]
+    [encryptedPayload, stringGetter]
   );
 
   const reset = () => {
@@ -64,17 +65,14 @@ export const MobileQrScanner = ({
         const result = await importWallet(payload.mnemonic);
 
         if (result.error) {
-          // TODO: Map to localized error message
-          setError(result.error);
+          setError(stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }));
         }
       } else {
         throw new Error('QR code could not be decrypted');
       }
     } catch (err) {
-      // TODO: Map to localized error message
-      setError(
-        err instanceof Error ? err.message : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
-      );
+      logBonsaiError('MobileQrScanner', 'onSubmit failed', { error: err });
+      setError(stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }));
     }
   };
 

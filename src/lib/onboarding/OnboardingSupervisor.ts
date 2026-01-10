@@ -79,6 +79,9 @@ class OnboardingSupervisor {
       const solanaKeypair = deriveSolanaKeypairFromMnemonic(mnemonic);
 
       if (!wallet.address || !nobleWallet.address) {
+        logBonsaiError('OnboardingSupervisor', 'local wallet is missing address', {
+          error: new Error('Could not derive a local wallet from imported recovery phrase'),
+        });
         return {
           success: false,
           error: 'Could not derive a local wallet from imported recovery phrase',

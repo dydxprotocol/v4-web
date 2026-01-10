@@ -232,14 +232,19 @@ export const OnboardingDialog = ({
       }
       case 'qr': {
         return {
-          title: hasScannedQrCode ? 'Verify Encryption Key' : 'Scan QR Code',
+          title: hasScannedQrCode
+            ? stringGetter({ key: STRING_KEYS.VERIFY_ENCRYPTION_KEY })
+            : stringGetter({ key: STRING_KEYS.SCAN_QR_CODE }),
           description: hasScannedQrCode ? (
-            'Enter the encryption key shown above the QR code.'
+            stringGetter({ key: STRING_KEYS.VERIFY_ENCRYPTION_KEY_DIRECTIONS })
           ) : (
             <span>
-              To login and sync accounts from your desktop, click the{' '}
-              <Icon tw="mb-[-2px] text-color-text-2" iconName={IconName.DevicesStroke} /> icon in
-              the top right corner of the desktop app and scan the QR code
+              {stringGetter({
+                key: STRING_KEYS.SCAN_QR_CODE_DIRECTIONS,
+                params: {
+                  ICON: <Icon tw="mb-[-2px] text-color-text-2" iconName={IconName.DevicesStroke} />,
+                },
+              })}
             </span>
           ),
           children: (

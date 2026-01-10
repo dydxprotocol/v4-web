@@ -166,8 +166,7 @@ export const SignIn = ({
           >
             <div tw="row gap-0.5">
               <Icon iconName={IconName.DevicesStroke} />
-              {/** TODO: Localize */}
-              Link desktop wallet
+              {stringGetter({ key: STRING_KEYS.LINK_DESKTOP_WALLET })}
             </div>
 
             <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
