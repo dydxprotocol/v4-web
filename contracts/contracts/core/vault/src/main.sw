@@ -400,7 +400,14 @@ impl Vault for Contract {
         average_price: u256,
         is_long: bool,
     ) -> (bool, u256) {
-        _get_pnl(index_asset, size, average_price, is_long)
+        // TODO one price
+        let price = if is_long {
+            _get_min_price(index_asset)
+        } else {
+            _get_max_price(index_asset)
+        };
+
+        _get_pnl(index_asset, size, price, average_price, is_long)
     }
 
     #[storage(read)]
@@ -737,11 +744,27 @@ fn _validate_liquidation(
 
     require(position.size > 0, Error::VaultEmptyPosition);
 
+    // TODO one price
+    // TODO move this to the caller to avoid repeated external calls
+    let price = if is_long {
+        _get_min_price(index_asset)
+    } else {
+        _get_max_price(index_asset)
+    };
+
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
     let liquidation_fee = storage::vault.liquidation_fee.read();
 
-    let (has_profit, pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
+    let (has_profit, pnl_delta) = _get_pnl(
+        index_asset,
+        position
+            .size,
+        price,
+        position
+            .average_price,
+        is_long,
+    );
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
@@ -788,20 +811,22 @@ fn _validate_liquidation(
     return (0, remaining_collateral);
 }
 
-#[storage(read)]
+/// calculates the pnl of a position
+/// price is the current price of the index asset
+/// the price is not validated, so it must be provided by the caller
+/// average_price is the average price of the position
+/// is_long is true if the position is long, false if short
+/// returns a tuple of (has_profit, pnl_delta)
+/// has_profit is true if the position has profit, false if it has loss
+/// pnl_delta is the pnl of the position (in the collateral asset)
 fn _get_pnl(
     index_asset: b256,
     size: u256,
+    price: u256,
     average_price: u256,
     is_long: bool,
 ) -> (bool, u256) {
     require(average_price > 0, Error::VaultInvalidAveragePrice);
-
-    let price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
 
     let (has_profit, price_delta) = if price > average_price {
         (is_long, price - average_price)
@@ -837,7 +862,22 @@ fn _get_position_pnl(account: Identity, index_asset: b256, is_long: bool) -> (bo
 
     let position = _get_position_by_key(position_key);
 
-    _get_pnl(index_asset, position.size, position.average_price, is_long)
+    // TODO one price
+    let price = if is_long {
+        _get_min_price(index_asset)
+    } else {
+        _get_max_price(index_asset)
+    };
+
+    _get_pnl(
+        index_asset,
+        position
+            .size,
+        price,
+        position
+            .average_price,
+        is_long,
+    )
 }
 
 #[storage(read)]
@@ -859,12 +899,10 @@ fn _validate_router(account: Identity) {
     );
 }
 
-// calculates the next average price for a position
-// that is the weighted average of prices at the time of position increase with size coefficient
-// in other words this is the average price that assets are bought or sold at
-// for longs:  next_average_price = (next_price * next_size) / (next_size + delta)
-// for shorts: next_average_price = (next_price * next_size) / (next_size - delta)
-#[storage(read)]
+/// calculates the next average price for a position
+/// that is the weighted harmonic average of prices at the time of position increase with size coefficient
+/// in other words this is the average price that assets are bought or sold at
+/// it is required that size > 0, average_price > 0, next_price > 0
 fn _get_next_average_price(
     index_asset: b256,
     size: u256,
@@ -873,24 +911,10 @@ fn _get_next_average_price(
     next_price: u256,
     size_delta: u256,
 ) -> u256 {
-    let (has_profit, delta) = _get_pnl(index_asset, size, average_price, is_long);
-
-    let next_size = size + size_delta;
-    let divisor = if is_long {
-        if has_profit {
-            next_size + delta
-        } else {
-            next_size - delta
-        }
-    } else {
-        if has_profit {
-            next_size - delta
-        } else {
-            next_size + delta
-        }
-    };
-
-    next_price * next_size / divisor
+    // tokens are multiplied by very high constant numbers to ensure precision
+    let tokens = size * MAX_LEVERAGE * PRICE_PRECISION * PRICE_PRECISION / average_price;
+    let tokens_delta = size_delta * MAX_LEVERAGE * PRICE_PRECISION * PRICE_PRECISION / next_price;
+    (size + size_delta) * MAX_LEVERAGE * PRICE_PRECISION * PRICE_PRECISION / (tokens + tokens_delta)
 }
 
 #[storage(read, write)]
@@ -1228,12 +1252,26 @@ fn _decrease_position(
 
     let total_reserves = storage::vault.total_reserves.read();
 
+    // TODO one price
+    let price = if is_long {
+        _get_min_price(index_asset)
+    } else {
+        _get_max_price(index_asset)
+    };
+
     let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
 
     let liquidity_fee = position_fee / 2;
     let protocol_fee = position_fee - liquidity_fee;
 
-    let (has_profit, pnl_delta) = _get_pnl(index_asset, size_delta, position.average_price, is_long);
+    let (has_profit, pnl_delta) = _get_pnl(
+        index_asset,
+        size_delta,
+        price,
+        position
+            .average_price,
+        is_long,
+    );
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
@@ -1309,13 +1347,6 @@ fn _decrease_position(
     _write_fee_reserve(_get_fee_reserve() + out_protocol_fee);
 
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, size_delta, is_long);
-
-    // TODO one price
-    let price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
 
     if position.size != size_delta {
         position.collateral = out_collateral;
@@ -1423,12 +1454,27 @@ fn _liquidate_position(
 
     let total_reserves = storage::vault.total_reserves.read();
 
+    // TODO one price
+    let price = if is_long {
+        _get_min_price(index_asset)
+    } else {
+        _get_max_price(index_asset)
+    };
+
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
     let liquidity_fee = position_fee / 2;
     let protocol_fee = position_fee - liquidity_fee;
 
-    let (has_profit, pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
+    let (has_profit, pnl_delta) = _get_pnl(
+        index_asset,
+        position
+            .size,
+        price,
+        position
+            .average_price,
+        is_long,
+    );
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
@@ -1479,12 +1525,6 @@ fn _liquidate_position(
 
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, position.size, is_long);
 
-    let mark_price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
-
     storage::vault.positions.remove(position_key);
     log(WritePosition {
         position_key,
@@ -1498,7 +1538,7 @@ fn _liquidate_position(
         is_long,
         collateral: position.collateral,
         size: position.size,
-        mark_price,
+        mark_price: price,
         position_fee: out_position_fee,
         funding_rate: out_funding_rate,
         funding_rate_has_profit,

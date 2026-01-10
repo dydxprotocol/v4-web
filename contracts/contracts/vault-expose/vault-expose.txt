@@ -29,6 +29,23 @@ abi VaultExpose {
         collateral: u256,
         total_reserves: u256,
     ) -> (u256, u256, u256, u256, u256, u256, u256, PositionSettlementStatus);
+
+    fn calculate_pnl(
+        index_asset: b256,
+        size: u256,
+        price: u256,
+        average_price: u256,
+        is_long: bool,
+    ) -> (bool, u256);
+
+    fn get_next_average_price(
+        index_asset: b256,
+        size: u256,
+        average_price: u256,
+        is_long: bool,
+        next_price: u256,
+        size_delta: u256,
+    ) -> u256;
 }
 
 impl VaultExpose for Contract {
@@ -87,6 +104,34 @@ impl VaultExpose for Contract {
             pnl_delta_has_profit,
             collateral,
             total_reserves,
+        )
+    }
+
+    fn calculate_pnl(
+        index_asset: b256,
+        size: u256,
+        price: u256,
+        average_price: u256,
+        is_long: bool,
+    ) -> (bool, u256) {
+        _get_pnl(index_asset, size, price, average_price, is_long)
+    }
+
+    fn get_next_average_price(
+        index_asset: b256,
+        size: u256,
+        average_price: u256,
+        is_long: bool,
+        next_price: u256,
+        size_delta: u256,
+    ) -> u256 {
+        _get_next_average_price(
+            index_asset,
+            size,
+            average_price,
+            is_long,
+            next_price,
+            size_delta,
         )
     }
 }
