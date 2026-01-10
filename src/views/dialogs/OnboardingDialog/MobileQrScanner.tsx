@@ -1,10 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import { AES, enc } from 'crypto-js';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -13,9 +14,12 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/InputOtp';
-import { WithLabel } from '@/components/WithLabel';
 
-export const MobileQrScanner = () => {
+export const MobileQrScanner = ({
+  setHasScannedQrCode,
+}: {
+  setHasScannedQrCode: (hasScannedQrCode: boolean) => void;
+}) => {
   const stringGetter = useStringGetter();
   const [encryptedPayload, setEncryptedPayload] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -24,11 +28,14 @@ export const MobileQrScanner = () => {
 
   const { importWallet } = useAccounts();
 
-  const onScan = useCallback((detectedCodes: IDetectedBarcode[]) => {
-    if (locked.current) return;
-    locked.current = true;
-    setEncryptedPayload(detectedCodes[0]?.rawValue ?? '');
-  }, []);
+  const onScan = useCallback(
+    (detectedCodes: IDetectedBarcode[]) => {
+      if (locked.current) return;
+      locked.current = true;
+      setEncryptedPayload(detectedCodes[0]?.rawValue ?? '');
+    },
+    [setHasScannedQrCode]
+  );
 
   const handleError = useCallback(
     (err?: unknown) => {
@@ -44,8 +51,11 @@ export const MobileQrScanner = () => {
     setEncryptionKey('');
   };
 
+  useLayoutEffect(() => {
+    setHasScannedQrCode(encryptedPayload.trim().length > 0);
+  }, [encryptedPayload, setHasScannedQrCode]);
+
   const onSubmit = async () => {
-    // TODO: Add tracking
     try {
       const decryptedPayload = AES.decrypt(encryptedPayload, encryptionKey).toString(enc.Utf8);
       const payload = JSON.parse(decryptedPayload);
@@ -68,10 +78,10 @@ export const MobileQrScanner = () => {
     }
   };
 
-  const displayResetButton = error || !encryptedPayload;
+  const displayResetButton = error && encryptedPayload;
 
   return (
-    <div tw="flexColumn gap-1">
+    <div tw="flexColumn h-full gap-1">
       {!encryptedPayload ? (
         <div tw="relative">
           <Scanner
@@ -90,39 +100,42 @@ export const MobileQrScanner = () => {
           <Finder />
         </div>
       ) : (
-        <WithLabel label="Encryption Key:">
-          <div tw="row gap-0.5">
-            <InputOTP
-              containerClassName="w-full"
-              value={encryptionKey}
-              onChange={(value) => setEncryptionKey(value)}
-              maxLength={6}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
+        <div tw="row mt-1.5 gap-0.5">
+          <InputOTP
+            value={encryptionKey}
+            onChange={(value: string) => setEncryptionKey(value)}
+            maxLength={6}
+          >
+            {[0, 1, 2, 3, 4, 5].map((index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <InputOTPGroup key={`group-${index}`}>
+                <InputOTPSlot index={index} />
               </InputOTPGroup>
-            </InputOTP>
-
-            {!error && (
-              <Button
-                tw="w-fit"
-                state={{ isDisabled: encryptionKey.length !== 6 }}
-                onClick={onSubmit}
-              >
-                {stringGetter({ key: STRING_KEYS.SUBMIT })}
-              </Button>
-            )}
-          </div>
-        </WithLabel>
+            ))}
+          </InputOTP>
+        </div>
       )}
 
       {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
-      {displayResetButton && <Button onClick={reset}>Rescan QR code</Button>}
+
+      <div tw="flexColumn mt-auto gap-1">
+        {displayResetButton && (
+          <Button tw="w-full font-base-book" onClick={reset} size={ButtonSize.Large}>
+            {stringGetter({ key: STRING_KEYS.TRY_AGAIN })}
+          </Button>
+        )}
+        {!error && encryptedPayload && (
+          <Button
+            tw="w-full font-base-book"
+            size={ButtonSize.Large}
+            state={{ isDisabled: encryptionKey.length !== 6 }}
+            action={ButtonAction.SimplePrimary}
+            onClick={onSubmit}
+          >
+            {stringGetter({ key: STRING_KEYS.SUBMIT })}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

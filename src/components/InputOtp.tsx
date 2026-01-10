@@ -1,24 +1,26 @@
 import * as React from 'react';
 
 import { OTPInput, OTPInputContext, REGEXP_ONLY_DIGITS } from 'input-otp';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 const InputOTP = ({
   className,
-  containerClassName,
   ...props
 }: React.ComponentProps<typeof OTPInput> & {
   containerClassName?: string;
 }) => {
   return (
-    <OTPInput
-      data-slot="input-otp"
-      containerClassName={`${ContainerClassName} ${containerClassName ?? ''}`}
-      tw="disabled:cursor-not-allowed"
-      className={className}
-      pattern={REGEXP_ONLY_DIGITS}
-      {...props}
-    />
+    <React.Fragment>
+      <InputOtpContainerStyle />
+      <OTPInput
+        data-slot="input-otp"
+        containerClassName="input-otp-container"
+        tw="disabled:cursor-not-allowed"
+        className={className}
+        pattern={REGEXP_ONLY_DIGITS}
+        {...props}
+      />
+    </React.Fragment>
   );
 };
 
@@ -62,38 +64,47 @@ const InputOTPSeparator = ({ ...props }: React.ComponentProps<'div'>) => {
   );
 };
 
-const ContainerClassName = css`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  &:has(input:disabled) {
-    opacity: 0.5;
-  }
+/**
+ * This is necessary to access containerClassName.
+ * Our twin.macro tailwind classes do not work in this case so we fall back on good ole CSS.
+ */
+const InputOtpContainerStyle = createGlobalStyle`
+  .input-otp-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+
+    &:has(input:disabled) {
+        opacity: 0.5;
+      }
+    }
 `;
 
 const $InputOTPSlot = styled.div`
   position: relative;
   display: flex;
-  height: 2.125rem;
-  width: 2.125rem;
+  height: 3rem;
+  width: 2.625rem;
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  border: var(--default-border-width) solid var(--color-border);
+  border: var(--default-border-width) solid var(--input-otp-slot-border-color, var(--color-border));
   outline: none;
   transition: all 0.15s ease-in-out;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
   &:first-child {
-    border-left: 1px solid var(--color-border);
-    border-top-left-radius: 0.375rem;
-    border-bottom-left-radius: 0.375rem;
+    border-left: 1px solid var(--input-otp-slot-border-color, var(--color-border));
+    border-top-left-radius: var(--input-otp-slot-border-radius, 0.75rem);
+    border-bottom-left-radius: var(--input-otp-slot-border-radius, 0.75rem);
   }
 
   &:last-child {
-    border-top-right-radius: 0.375rem;
-    border-bottom-right-radius: 0.375rem;
+    border-top-right-radius: var(--input-otp-slot-border-radius, 0.75rem);
+    border-bottom-right-radius: var(--input-otp-slot-border-radius, 0.75rem);
   }
 
   &[data-active='true'] {

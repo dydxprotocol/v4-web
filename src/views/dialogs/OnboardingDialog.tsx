@@ -69,6 +69,7 @@ export const OnboardingDialog = ({
   const isSimpleUi = useSimpleUiEnabled();
   const { dydxAddress } = useAccounts();
   const privyWallet = useDisplayedWallets().find((wallet) => wallet.name === WalletType.Privy);
+  const [hasScannedQrCode, setHasScannedQrCode] = useState(false);
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -111,6 +112,7 @@ export const OnboardingDialog = ({
 
   const onSyncFromDesktopQrCode = () => {
     // TODO: Add tracking
+    setHasScannedQrCode(false);
     dispatch(setChooseWalletDisplay('qr'));
   };
 
@@ -230,10 +232,21 @@ export const OnboardingDialog = ({
       }
       case 'qr': {
         return {
-          title: 'Scan QR Code',
-          description:
-            'Scan the QR code shown on your desktop with the camera on your mobile device to sync wallets',
-          children: <MobileQrScanner />,
+          title: hasScannedQrCode ? 'Verify Encryption Key' : 'Scan QR Code',
+          description: hasScannedQrCode ? (
+            'Enter the encryption key shown above the QR code.'
+          ) : (
+            <span>
+              To login and sync accounts from your desktop, click the{' '}
+              <Icon tw="mb-[-2px] text-color-text-2" iconName={IconName.DevicesStroke} /> icon in
+              the top right corner of the desktop app and scan the QR code
+            </span>
+          ),
+          children: (
+            <div tw="flexColumn gap-1">
+              <MobileQrScanner setHasScannedQrCode={setHasScannedQrCode} />
+            </div>
+          ),
         };
       }
       default:
