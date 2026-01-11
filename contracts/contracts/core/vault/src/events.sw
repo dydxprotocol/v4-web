@@ -24,7 +24,7 @@ pub struct ClearAssetConfig {
 pub struct SetFees {
     pub liquidity_fee_basis_points: u64,
     pub position_fee_basis_points: u64,
-    pub liquidation_fee: u256,
+    pub liquidation_fee_basis_points: u64,
 }
 pub struct WritePosition {
     pub position_key: b256,

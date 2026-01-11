@@ -68,8 +68,6 @@ const PRICE_PRECISION: u256 = 1000000000000000000u256; // 10 ** 18;
 const MIN_LEVERAGE: u64 = 10_000; // 1x
 const MAX_LEVERAGE: u256 = 1_000_000_000; // 100_000x
 const MAX_FEE_BASIS_POINTS: u64 = 500; // 5%
-const DEFAULT_LIQUIDATION_FEE: u256 = 5; // 5 USDC (without decimals)
-const MAX_LIQUIDATION_FEE: u256 = 100; // 100 USDC (without decimals)
 const LP_ASSET_NAME: str[11] = __to_str_array("StarBoardLP");
 const LP_ASSET_SYMBOL: str[3] = __to_str_array("SLP");
 
@@ -90,8 +88,8 @@ storage {
         is_initialized: bool = false,
         /// ---------------------  Fees  ---------------------
         /// charged when liquidating a position
-        /// denominated in collateral asset
-        liquidation_fee: u256 = 0u256,
+        /// 0.1% by default
+        liquidation_fee_basis_points: u64 = 10,
         /// charged when adding/removing liquidity
         /// 0.3% by default
         liquidity_fee_basis_points: u64 = 30,
@@ -224,13 +222,10 @@ impl Vault for Contract {
         initialize_ownership(gov);
 
         // set the default fees
-        // the liquidation fee cannot be initialized in the storage section because of the configurable
         // skip initialization if set_fees() has been called
-        match storage::vault.liquidation_fee.try_read() {
+        match storage::vault.liquidation_fee_basis_points.try_read() {
             None => {
-                storage::vault
-                    .liquidation_fee
-                    .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(BASE_ASSET_DECIMALS)));
+                storage::vault.liquidation_fee_basis_points.write(10);
             }
             _ => {}
         }
@@ -295,18 +290,13 @@ impl Vault for Contract {
     fn set_fees(
         liquidity_fee_basis_points: u64,
         position_fee_basis_points: u64,
-        liquidation_fee: u256,
+        liquidation_fee_basis_points: u64,
     ) {
         only_owner();
 
         require(
-            liquidity_fee_basis_points <= MAX_FEE_BASIS_POINTS && position_fee_basis_points <= MAX_FEE_BASIS_POINTS,
+            liquidity_fee_basis_points <= MAX_FEE_BASIS_POINTS && position_fee_basis_points <= MAX_FEE_BASIS_POINTS && liquidation_fee_basis_points <= MAX_FEE_BASIS_POINTS,
             Error::VaultInvalidFeeBasisPoints,
-        );
-        require(
-            liquidation_fee <= MAX_LIQUIDATION_FEE * (10u256
-                    .pow(BASE_ASSET_DECIMALS)),
-            Error::VaultInvalidLiquidationFee,
         );
 
         storage::vault
@@ -315,12 +305,14 @@ impl Vault for Contract {
         storage::vault
             .position_fee_basis_points
             .write(position_fee_basis_points);
-        storage::vault.liquidation_fee.write(liquidation_fee);
+        storage::vault
+            .liquidation_fee_basis_points
+            .write(liquidation_fee_basis_points);
 
         log(SetFees {
             liquidity_fee_basis_points,
             position_fee_basis_points,
-            liquidation_fee,
+            liquidation_fee_basis_points,
         });
     }
 
@@ -416,16 +408,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_position_fee(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-        size_delta: u256,
-    ) -> u256 {
-        _get_position_fee(account, index_asset, is_long, size_delta)
-    }
-
-    #[storage(read)]
     fn get_max_price(asset: b256) -> u256 {
         _get_max_price(asset)
     }
@@ -490,18 +472,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_fee_basis_points(
-        asset: b256,
-        lp_asset_delta: u256,
-        fee_basis_points: u256,
-        increment: bool,
-    ) -> u256 {
-        fee_basis_points
-    }
-
-    #[storage(read)]
-    fn get_liquidation_fee() -> u256 {
-        storage::vault.liquidation_fee.try_read().unwrap_or(0)
+    fn get_liquidation_fee_basis_points() -> u64 {
+        storage::vault.liquidation_fee_basis_points.try_read().unwrap_or(0)
     }
 
     #[storage(read)]
@@ -526,6 +498,7 @@ impl Vault for Contract {
         is_long: bool,
         should_raise: bool,
     ) -> (u256, u256) {
+        _only_initialized();
         _validate_liquidation(account, index_asset, is_long, should_raise)
     }
 
@@ -663,6 +636,7 @@ fn _transfer_out(asset: AssetId, amount: u64, receiver: Identity) {
 #[storage(write)]
 fn _write_position(position_key: b256, position: Position) {
     storage::vault.positions.insert(position_key, position);
+    // TODO remove this event?
     log(WritePosition {
         position_key,
         position,
@@ -754,7 +728,7 @@ fn _validate_liquidation(
 
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
-    let liquidation_fee = storage::vault.liquidation_fee.read();
+    let liquidation_fee = _get_liquidation_fee(account, index_asset, is_long, position.size);
 
     let (has_profit, pnl_delta) = _get_pnl(
         index_asset,
@@ -834,7 +808,7 @@ fn _get_pnl(
         (!is_long, average_price - price)
     };
 
-    // TODO overflow check
+    // overflow safe
     let delta = size * price_delta / average_price;
     (has_profit, delta)
 }
@@ -850,10 +824,25 @@ fn _get_position_fee(
         return 0;
     }
 
-    // TODO remove try_read?
-    let position_fee_basis_points = storage::vault.position_fee_basis_points.try_read().unwrap_or(0).as_u256();
+    let position_fee_basis_points = storage::vault.position_fee_basis_points.read();
 
-    size_delta * position_fee_basis_points / BASIS_POINTS_DIVISOR.as_u256()
+    size_delta * position_fee_basis_points.as_u256() / BASIS_POINTS_DIVISOR.as_u256()
+}
+
+#[storage(read)]
+fn _get_liquidation_fee(
+    _account: Identity,
+    _index_asset: b256,
+    _is_long: bool,
+    size_delta: u256,
+) -> u256 {
+    if size_delta == 0 {
+        return 0;
+    }
+
+    let liquidation_fee_basis_points = storage::vault.liquidation_fee_basis_points.read();
+
+    size_delta * liquidation_fee_basis_points.as_u256() / BASIS_POINTS_DIVISOR.as_u256()
 }
 
 #[storage(read)]
@@ -1485,7 +1474,7 @@ fn _liquidate_position(
             .cumulative_funding_rate,
     );
 
-    let liquidation_fee = storage::vault.liquidation_fee.try_read().unwrap_or(0);
+    let liquidation_fee = _get_liquidation_fee(account, index_asset, is_long, position.size);
 
     let (
         out_protocol_fee,

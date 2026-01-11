@@ -48,7 +48,7 @@ abi Vault {
     fn set_fees(
         liquidity_fee_basis_points: u64,
         position_fee_basis_points: u64,
-        liquidation_fee: u256,
+        liquidation_fee_basis_points: u64,
     );
     #[storage(read, write)]
     fn withdraw_fees(receiver: Identity) -> u64;
@@ -78,13 +78,6 @@ abi Vault {
     #[storage(read)]
     fn get_position_by_key(position_key: b256) -> Position;
     #[storage(read)]
-    fn get_position_fee(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-        size_delta: u256,
-    ) -> u256;
-    #[storage(read)]
     fn get_max_price(asset: b256) -> u256;
     #[storage(read)]
     fn get_min_price(asset: b256) -> u256;
@@ -105,14 +98,7 @@ abi Vault {
     fn get_position_funding_rate(account: Identity, index_asset: b256, is_long: bool) -> (u256, bool);
 
     #[storage(read)]
-    fn get_fee_basis_points(
-        asset: b256,
-        lp_asset_delta: u256,
-        fee_basis_points: u256,
-        increment: bool,
-    ) -> u256;
-    #[storage(read)]
-    fn get_liquidation_fee() -> u256;
+    fn get_liquidation_fee_basis_points() -> u64;
     #[storage(read)]
     fn get_liquidity_fee_basis_points() -> u64;
     #[storage(read)]

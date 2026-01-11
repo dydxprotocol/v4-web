@@ -1,6 +1,6 @@
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { BTC_ASSET, ETH_ASSET, USER_0_ADDRESS, USER_1_ADDRESS, expandDecimals } from './utils';
+import { BTC_ASSET, ETH_ASSET, USER_0_ADDRESS, USER_1_ADDRESS } from './utils';
 
 const { Client } = pg;
 
@@ -201,17 +201,33 @@ describe('Verify Liquidation', () => {
 
   it('should store liquidation fees correctly', async () => {
     const liquidations = await client.query(
-      'SELECT collateral_transferred, position_fee FROM position WHERE change = $1',
+      'SELECT id, position_key_id, collateral_transferred, position_fee FROM position WHERE change = $1',
       ['LIQUIDATE']
     );
     expect(liquidations.rows.length).toBe(3);
 
-    liquidations.rows.forEach((row: any) => {
-      // collateral_transferred should be the liquidation fee (at least 5 USDC)
-      expect(BigInt(row.collateral_transferred)).toBeGreaterThanOrEqual(BigInt(expandDecimals(5)));
+    for (const liquidation of liquidations.rows) {
+      // Get the position before liquidation (the last position that was not a liquidation)
+      const previousPosition = await client.query(
+        'SELECT size FROM position WHERE position_key_id = $1 AND change != $2 ORDER BY timestamp DESC LIMIT 1',
+        [liquidation.position_key_id, 'LIQUIDATE']
+      );
+
+      expect(previousPosition.rows.length).toBe(1);
+      const previousSize = BigInt(previousPosition.rows[0].size);
+
+      // Liquidation fee is 0.1% of the position size before liquidation (0.1% = 1/1000)
+      const expectedFee = previousSize / BigInt(1000);
+
+      // Check that collateral_transferred is approximately the liquidation fee (0.1% of size)
+      // Allow a small tolerance for rounding differences
+      const fee = BigInt(liquidation.collateral_transferred);
+      expect(fee).toBeGreaterThanOrEqual((expectedFee * BigInt(99)) / BigInt(100)); // Allow 1% tolerance
+      expect(fee).toBeLessThanOrEqual((expectedFee * BigInt(101)) / BigInt(100)); // Allow 1% tolerance
+
       // position_fee should be non-negative
-      expect(BigInt(row.position_fee)).toBeGreaterThanOrEqual(0);
-    });
+      expect(BigInt(liquidation.position_fee)).toBeGreaterThanOrEqual(0);
+    }
   });
 
   it('should store PnL and funding rate for liquidations', async () => {
@@ -481,18 +497,42 @@ describe('Verify Liquidation', () => {
 
     it('should store liquidation fees correctly', async () => {
       const liquidationsData = await graphQLPost(
-        `positions(condition:{change:"LIQUIDATE"}){nodes{collateralTransferred,positionFee}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{id,positionKeyId,collateralTransferred,positionFee}}`
       );
       expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
-      liquidationsData.data.positions.nodes.forEach((position: any) => {
-        // collateralTransferred should be the liquidation fee (at least 5 USDC)
-        expect(BigInt(position.collateralTransferred)).toBeGreaterThanOrEqual(
-          BigInt(expandDecimals(5))
+      for (const liquidation of liquidationsData.data.positions.nodes) {
+        // Get the position before liquidation (the last position that was not a liquidation)
+        const positionKeyId = liquidation.positionKeyId;
+        const positionsData = await graphQLPost(
+          `positions(condition:{positionKeyId:"${positionKeyId}"}){nodes{change,size,timestamp}}`
         );
+
+        // Sort by timestamp to find the position before liquidation
+        const sortedPositions = positionsData.data.positions.nodes.sort(
+          (a: { timestamp: number }, b: { timestamp: number }) => a.timestamp - b.timestamp
+        );
+
+        // Find the last position before liquidation
+        const liquidationIndex = sortedPositions.findIndex(
+          (p: { change: string }) => p.change === 'LIQUIDATE'
+        );
+        expect(liquidationIndex).toBeGreaterThan(0);
+        const previousPosition = sortedPositions[liquidationIndex - 1];
+        const previousSize = BigInt(previousPosition.size);
+
+        // Liquidation fee is 0.1% of the position size before liquidation (0.1% = 1/1000)
+        const expectedFee = previousSize / BigInt(1000);
+
+        // Check that collateralTransferred is approximately the liquidation fee (0.1% of size)
+        // Allow a small tolerance for rounding differences
+        const fee = BigInt(liquidation.collateralTransferred);
+        expect(fee).toBeGreaterThanOrEqual((expectedFee * BigInt(99)) / BigInt(100)); // Allow 1% tolerance
+        expect(fee).toBeLessThanOrEqual((expectedFee * BigInt(101)) / BigInt(100)); // Allow 1% tolerance
+
         // positionFee should be non-negative
-        expect(BigInt(position.positionFee)).toBeGreaterThanOrEqual(0);
-      });
+        expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
+      }
     });
 
     it('should store PnL and funding rate for liquidations', async () => {

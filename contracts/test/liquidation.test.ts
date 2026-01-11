@@ -109,7 +109,7 @@ describe("Vault.liquidation", () => {
                 .set_fees(
                     30, // liquidity_fee_basis_points
                     10, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 )
                 .addContracts([vaultImpl]),
         )
@@ -191,7 +191,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // create a short position just to balance the long position below so that the funding rate is zero
@@ -260,7 +260,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -295,7 +295,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -318,7 +318,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     10, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             const liquidationState2 = (
@@ -332,7 +332,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -355,7 +355,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             const liquidationState2 = (
@@ -382,7 +382,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     30, // liquidity_fee_basis_points
                     100, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             const liquidationState2 = (
@@ -450,7 +450,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // create a short position just to balance the long position below so that the funding rate is zero
@@ -521,7 +521,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -556,7 +556,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -579,7 +579,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     10, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             const liquidationState2 = (
@@ -593,7 +593,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -616,7 +616,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             const liquidationState2 = (
@@ -643,7 +643,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     30, // liquidity_fee_basis_points
                     100, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             const liquidationState2 = (
@@ -706,7 +706,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // create a short position just to balance the long position below so that the funding rate is zero
@@ -827,7 +827,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
@@ -888,7 +888,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -918,7 +918,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -937,7 +937,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     10, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
@@ -951,7 +951,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -970,7 +970,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
@@ -997,7 +997,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     30, // liquidity_fee_basis_points
                     100, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
@@ -1060,7 +1060,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // create a long position just to balance the short position below so that the funding rate is zero
@@ -1181,7 +1181,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
@@ -1242,7 +1242,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -1272,7 +1272,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -1291,7 +1291,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     10, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))
@@ -1305,7 +1305,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    0, // liquidation_fee
+                    0, // liquidation_fee_basis_points
                 ),
             )
             // the actual long position
@@ -1324,7 +1324,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     0, // liquidity_fee_basis_points
                     0, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))
@@ -1351,7 +1351,7 @@ describe("Vault.liquidation", () => {
                 vault.functions.set_fees(
                     30, // liquidity_fee_basis_points
                     100, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 ),
             )
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))

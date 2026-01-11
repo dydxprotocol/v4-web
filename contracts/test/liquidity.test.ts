@@ -109,7 +109,7 @@ describe("Vault.liquidity", () => {
                 .set_fees(
                     30, // liquidity_fee_basis_points
                     10, // position_fee_basis_points
-                    expandDecimals(5), // liquidation_fee
+                    10, // liquidation_fee_basis_points
                 )
                 .addContracts([vaultImpl]),
         )

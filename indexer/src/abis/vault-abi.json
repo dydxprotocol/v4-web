@@ -84,19 +84,25 @@
       "type": "enum std::option::Option<struct std::string::String>",
       "concreteTypeId": "7c06d929390a9aeeb8ffccf8173ac0d101a9976d99dda01cce74541a81e75ac0",
       "metadataTypeId": 13,
-      "typeArguments": ["9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"]
+      "typeArguments": [
+        "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"
+      ]
     },
     {
       "type": "enum std::option::Option<u64>",
       "concreteTypeId": "d852149004cc9ec0bbe7dc4e37bffea1d41469b759512b6136f2e865a4c06e7d",
       "metadataTypeId": 13,
-      "typeArguments": ["1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"]
+      "typeArguments": [
+        "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+      ]
     },
     {
       "type": "enum std::option::Option<u8>",
       "concreteTypeId": "2da102c46c7263beeed95818cd7bee801716ba8303dddafdcd0f6c9efda4a0f1",
       "metadataTypeId": 13,
-      "typeArguments": ["c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"]
+      "typeArguments": [
+        "c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"
+      ]
     },
     {
       "type": "struct core_interfaces::vault::FundingInfo",
@@ -563,7 +569,9 @@
           "typeId": 14
         }
       ],
-      "typeParameters": [14]
+      "typeParameters": [
+        14
+      ]
     },
     {
       "type": "generic T",
@@ -946,8 +954,8 @@
           "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         },
         {
-          "name": "liquidation_fee",
-          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+          "name": "liquidation_fee_basis_points",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         }
       ]
     },
@@ -1235,7 +1243,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1251,7 +1261,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1267,7 +1279,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1278,7 +1292,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1294,7 +1310,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1305,7 +1323,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1316,7 +1336,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["write"]
+          "arguments": [
+            "write"
+          ]
         }
       ]
     },
@@ -1327,7 +1349,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["write"]
+          "arguments": [
+            "write"
+          ]
         }
       ]
     },
@@ -1338,7 +1362,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1358,7 +1384,10 @@
         },
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1374,7 +1403,10 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1410,7 +1442,10 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1418,15 +1453,35 @@
       "name": "get_add_liquidity_amount",
       "inputs": [
         {
-          "name": "asset_amount",
+          "name": "base_asset_amount",
           "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         }
       ],
       "output": "9d715771850ece467c8bde9a83e15ee2d05965af9773c9d8a9cbd4572e85565b",
       "attributes": [
         {
+          "name": "doc-comment",
+          "arguments": [
+            " simulates the add liquidity operation"
+          ]
+        },
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " it does not take into account the total reserves"
+          ]
+        },
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " returns the amount of lp assets to mint, the amount of collateral to be received by the receiver, and the fee rate"
+          ]
+        },
+        {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1437,35 +1492,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
-        }
-      ]
-    },
-    {
-      "name": "get_fee_basis_points",
-      "inputs": [
-        {
-          "name": "asset",
-          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "lp_asset_delta",
-          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
-        },
-        {
-          "name": "fee_basis_points",
-          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
-        },
-        {
-          "name": "increment",
-          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
-        }
-      ],
-      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1476,7 +1505,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1492,18 +1523,22 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
     {
-      "name": "get_liquidation_fee",
+      "name": "get_liquidation_fee_basis_points",
       "inputs": [],
-      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
+      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1514,7 +1549,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1536,7 +1573,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1552,7 +1591,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1580,7 +1621,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1596,35 +1639,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
-        }
-      ]
-    },
-    {
-      "name": "get_position_fee",
-      "inputs": [
-        {
-          "name": "account",
-          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
-        },
-        {
-          "name": "index_asset",
-          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "is_long",
-          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
-        },
-        {
-          "name": "size_delta",
-          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
-        }
-      ],
-      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1635,7 +1652,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1659,7 +1678,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1702,7 +1723,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1726,7 +1749,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1742,7 +1767,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1753,7 +1780,22 @@
       "attributes": [
         {
           "name": "doc-comment",
-          "arguments": [" Get the revision of the contract"]
+          "arguments": [
+            " Get the revision of the contract"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_total_liquidity",
+      "inputs": [],
+      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1764,7 +1806,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1796,7 +1840,10 @@
         },
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1812,7 +1859,10 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1828,7 +1878,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1844,7 +1896,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -1872,7 +1926,10 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1892,7 +1949,10 @@
         },
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1912,7 +1972,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["write"]
+          "arguments": [
+            "write"
+          ]
         }
       ]
     },
@@ -1932,19 +1994,28 @@
       "attributes": [
         {
           "name": "doc-comment",
-          "arguments": [" the asset is whitelisted and max leverage is set"]
+          "arguments": [
+            " the asset is whitelisted and max leverage is set"
+          ]
         },
         {
           "name": "doc-comment",
-          "arguments": [" max leverage must be multiplied by 10_000 to get actual leverage"]
+          "arguments": [
+            " max leverage must be multiplied by 10_000 to get actual leverage"
+          ]
         },
         {
           "name": "doc-comment",
-          "arguments": [" e.g: 50 * 10_000 = 50%"]
+          "arguments": [
+            " e.g: 50 * 10_000 = 50%"
+          ]
         },
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1960,15 +2031,18 @@
           "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         },
         {
-          "name": "liquidation_fee",
-          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+          "name": "liquidation_fee_basis_points",
+          "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         }
       ],
       "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     },
@@ -1988,7 +2062,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["write"]
+          "arguments": [
+            "write"
+          ]
         }
       ]
     },
@@ -2016,7 +2092,9 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read"]
+          "arguments": [
+            "read"
+          ]
         }
       ]
     },
@@ -2032,7 +2110,10 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": ["read", "write"]
+          "arguments": [
+            "read",
+            "write"
+          ]
         }
       ]
     }
@@ -2156,25 +2237,25 @@
     {
       "name": "BASE_ASSET_ID",
       "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
-      "offset": 93208,
+      "offset": 93512,
       "indirect": false
     },
     {
       "name": "BASE_ASSET",
       "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b",
-      "offset": 93168,
+      "offset": 93472,
       "indirect": false
     },
     {
       "name": "BASE_ASSET_DECIMALS",
       "concreteTypeId": "d7649d428b9ff33d188ecbf38a7e4d8fd167fa01b2e10fe9a8f9308e52f1d7cc",
-      "offset": 93200,
+      "offset": 93504,
       "indirect": false
     },
     {
       "name": "PRICEFEED_WRAPPER",
       "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
-      "offset": 93240,
+      "offset": 93544,
       "indirect": false
     }
   ],
