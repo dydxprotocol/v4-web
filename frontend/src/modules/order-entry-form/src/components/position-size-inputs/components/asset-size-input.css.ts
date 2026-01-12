@@ -1,26 +1,27 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../../../styles/colors';
 
 export const container = style({
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: 'rgba(255, 255, 255, 0.02)',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
+  backgroundColor: colors.gluonGrey,
+  border: `1px solid ${colors.whiteAlpha[10]}`,
   borderRadius: '6px',
   padding: '10px 14px',
   gap: '2px',
   transition: 'all 0.2s',
   ':focus-within': {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: colors.slateGrey,
+    borderColor: colors.liquidLava,
   },
   ':hover': {
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: colors.whiteAlpha[20],
   },
 });
 
 export const label = style({
   fontSize: '0.688rem',
-  color: 'rgba(255, 255, 255, 0.4)',
+  color: colors.dustyGrey,
   marginBottom: '2px',
   fontWeight: '400',
   letterSpacing: '0.01em',
@@ -38,14 +39,14 @@ export const input = style({
   flex: 1,
   backgroundColor: 'transparent',
   border: 'none',
-  color: '#fff',
+  color: colors.snow,
   fontSize: '1rem',
   fontFamily: 'monospace',
   fontWeight: '400',
   outline: 'none',
   padding: 0,
   '::placeholder': {
-    color: 'rgba(255, 255, 255, 0.15)',
+    color: colors.dustyGreyAlpha[50],
   },
 });
 
@@ -54,9 +55,9 @@ export const assetBadge = style({
   alignItems: 'center',
   gap: '6px',
   padding: '2px 6px',
-  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  backgroundColor: colors.whiteAlpha[5],
   borderRadius: '4px',
-  color: 'rgba(255, 255, 255, 0.9)',
+  color: colors.snow,
   fontSize: '0.813rem',
   fontWeight: '500',
   whiteSpace: 'nowrap',
@@ -67,7 +68,7 @@ export const footer = style({
   justifyContent: 'space-between',
   alignItems: 'center',
   fontSize: '0.688rem',
-  color: 'rgba(255, 255, 255, 0.35)',
+  color: colors.dustyGrey,
   marginTop: '2px',
 });
 

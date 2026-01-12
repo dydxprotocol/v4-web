@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../styles/colors';
 
 export const tabsList = style({
   display: 'flex',
@@ -10,26 +11,26 @@ export const tabsTrigger = style({
   flex: 1,
   padding: '12px 16px',
   backgroundColor: 'transparent',
-  color: '#999',
-  border: '1px solid #333',
+  color: colors.dustyGrey,
+  border: `1px solid ${colors.slateGrey}`,
   borderRadius: '4px',
   cursor: 'pointer',
   fontSize: '0.875rem',
   fontWeight: '600',
   transition: 'all 0.2s',
   ':hover': {
-    borderColor: '#555',
+    borderColor: colors.whiteAlpha[20],
   },
   selectors: {
     '&[data-state="active"][data-side="long"]': {
-      backgroundColor: '#22c55e',
-      color: '#fff',
-      borderColor: '#22c55e',
+      backgroundColor: colors.liquidLava,
+      color: colors.snow,
+      borderColor: colors.liquidLava,
     },
     '&[data-state="active"][data-side="short"]': {
-      backgroundColor: '#ef4444',
-      color: '#fff',
-      borderColor: '#ef4444',
+      backgroundColor: colors.liquidLava,
+      color: colors.snow,
+      borderColor: colors.liquidLava,
     },
   },
 });

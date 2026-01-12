@@ -1,15 +1,16 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../../styles/colors';
 
 export const page = style({
   minHeight: '100vh',
-  background: '#0a0e1a',
+  background: colors.darkVoid,
   display: 'flex',
   flexDirection: 'column',
 });
 
 export const header = style({
-  backgroundColor: '#111827',
-  borderBottom: '1px solid #1f2937',
+  backgroundColor: colors.gluonGrey,
+  borderBottom: `1px solid ${colors.slateGrey}`,
   padding: '0 2rem',
   height: '4rem',
   display: 'flex',
@@ -29,7 +30,7 @@ export const headerLeft = style({
 export const logo = style({
   fontSize: '1.5rem',
   fontWeight: '700',
-  color: 'white',
+  color: colors.snow,
   letterSpacing: '-0.025em',
 });
 
@@ -39,7 +40,7 @@ export const nav = style({
 });
 
 export const navLink = style({
-  color: '#9ca3af',
+  color: colors.dustyGrey,
   fontSize: '0.875rem',
   fontWeight: '500',
   padding: '0.5rem 1rem',
@@ -47,14 +48,14 @@ export const navLink = style({
   textDecoration: 'none',
   transition: 'all 0.15s',
   ':hover': {
-    color: 'white',
-    backgroundColor: '#1f2937',
+    color: colors.snow,
+    backgroundColor: colors.slateGrey,
   },
 });
 
 export const navLinkActive = style({
-  color: 'white',
-  backgroundColor: '#1f2937',
+  color: colors.snow,
+  backgroundColor: colors.slateGrey,
 });
 
 export const headerRight = style({
@@ -71,7 +72,7 @@ export const networkSection = style({
 
 export const networkLabel = style({
   fontSize: '0.75rem',
-  color: '#6b7280',
+  color: colors.dustyGrey,
   textTransform: 'uppercase',
   fontWeight: '600',
   letterSpacing: '0.05em',
@@ -80,40 +81,40 @@ export const networkLabel = style({
 export const networkSelector = style({
   display: 'flex',
   gap: '0.5rem',
-  backgroundColor: '#1f2937',
+  backgroundColor: colors.slateGrey,
   padding: '0.25rem',
   borderRadius: '0.375rem',
 });
 
 export const buttonActive = style({
-  backgroundColor: '#3b82f6',
-  color: 'white',
+  backgroundColor: colors.liquidLava,
+  color: colors.snow,
   minWidth: '6rem',
   ':hover': {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#E05D0A', // Slightly darker Liquid Lava
   },
 });
 
 export const buttonSecondary = style({
   padding: '0.75rem 2rem',
   backgroundColor: 'transparent',
-  color: 'white',
+  color: colors.snow,
   borderRadius: '0.5rem',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
+  border: `1px solid ${colors.whiteAlpha[20]}`,
   fontSize: '1rem',
   fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: colors.whiteAlpha[10],
+    borderColor: colors.whiteAlpha[30],
   },
 });
 
 export const walletButton = style({
   padding: '0.5rem 1.25rem',
-  backgroundColor: '#3b82f6',
-  color: 'white',
+  backgroundColor: colors.liquidLava,
+  color: colors.snow,
   borderRadius: '0.375rem',
   border: 'none',
   fontSize: '0.875rem',
@@ -122,21 +123,26 @@ export const walletButton = style({
   transition: 'all 0.15s',
   whiteSpace: 'nowrap',
   ':hover': {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#E05D0A', // Slightly darker Liquid Lava
   },
 });
 
 export const walletConnected = style({
   padding: '0.5rem 1.25rem',
-  backgroundColor: '#10b981',
-  color: 'white',
+  backgroundColor: colors.liquidLava,
+  color: colors.snow,
   borderRadius: '0.375rem',
-  border: 'none',
+  border: `px solid ${colors.liquidLava}`,
   fontSize: '0.875rem',
   fontWeight: '600',
-  cursor: 'not-allowed',
+  cursor: 'pointer',
   whiteSpace: 'nowrap',
-  opacity: 0.8,
+  position: 'relative',
+  boxShadow: `0 0 0 2px ${colors.liquidLavaAlpha[20]}`,
+  ':hover': {
+    backgroundColor: '#E05D0A', // Slightly darker Liquid Lava
+    borderColor: '#E05D0A',
+  },
 });
 
 export const container = style({
@@ -154,5 +160,5 @@ export const statusTitle = style({
   marginBottom: '1rem',
   fontSize: '1.25rem',
   fontWeight: '600',
-  color: 'white',
+  color: colors.snow,
 });

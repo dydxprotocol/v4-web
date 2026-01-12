@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../styles/colors';
 
 export const button = style({
   width: '100%',
@@ -20,23 +21,23 @@ export const disabledButton = style({
 });
 
 export const buyButton = style({
-  backgroundColor: '#22c55e',
-  color: '#fff',
+  backgroundColor: colors.liquidLava,
+  color: colors.snow,
   ':hover': {
-    backgroundColor: '#16a34a',
+    backgroundColor: '#E05D0A', // Slightly darker Liquid Lava
   },
   ':active': {
-    backgroundColor: '#15803d',
+    backgroundColor: '#CC5209', // Even darker for active state
   },
 });
 
 export const sellButton = style({
-  backgroundColor: '#ef4444',
-  color: '#fff',
+  backgroundColor: colors.liquidLava,
+  color: colors.snow,
   ':hover': {
-    backgroundColor: '#dc2626',
+    backgroundColor: '#E05D0A', // Slightly darker Liquid Lava
   },
   ':active': {
-    backgroundColor: '#b91c1c',
+    backgroundColor: '#CC5209', // Even darker for active state
   },
 });

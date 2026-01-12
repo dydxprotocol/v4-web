@@ -1,9 +1,10 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../styles/colors';
 
 export const page = style({
   width: '100%',
   height: '100vh',
-  backgroundColor: '#0f172a',
+  backgroundColor: colors.darkVoid,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -23,38 +24,38 @@ export const content = style({
 export const errorCode = style({
   fontSize: '8rem',
   fontWeight: 'bold',
-  color: '#60a5fa',
+  color: colors.liquidLava,
   lineHeight: 1,
-  textShadow: '0 0 40px rgba(96, 165, 250, 0.3)',
+  textShadow: `0 0 40px ${colors.liquidLavaAlpha[30]}`,
 });
 
 export const title = style({
   fontSize: '2rem',
   fontWeight: '600',
-  color: '#e2e8f0',
+  color: colors.snow,
   marginTop: '1rem',
 });
 
 export const text = style({
   fontSize: '1.125rem',
-  color: '#94a3b8',
+  color: colors.dustyGrey,
   lineHeight: 1.6,
 });
 
 export const homeLink = style({
   marginTop: '2rem',
   padding: '0.75rem 2rem',
-  backgroundColor: 'rgba(59, 130, 246, 0.2)',
-  border: '1px solid rgba(59, 130, 246, 0.4)',
+  backgroundColor: colors.liquidLavaAlpha[20],
+  border: `1px solid ${colors.liquidLavaAlpha[30]}`,
   borderRadius: '0.5rem',
-  color: '#60a5fa',
+  color: colors.liquidLava,
   fontSize: '1rem',
   fontWeight: '500',
   textDecoration: 'none',
   transition: 'all 0.2s',
   ':hover': {
-    backgroundColor: 'rgba(59, 130, 246, 0.3)',
-    borderColor: 'rgba(59, 130, 246, 0.6)',
+    backgroundColor: colors.liquidLavaAlpha[30],
+    borderColor: colors.liquidLava,
     transform: 'translateY(-2px)',
   },
 });

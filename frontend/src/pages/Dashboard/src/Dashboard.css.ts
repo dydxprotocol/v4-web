@@ -1,9 +1,10 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../styles/colors';
 
 export const page = style({
   width: '100%',
   height: 'calc(100vh - 4rem)', // Account for header height
-  backgroundColor: '#0f172a',
+  backgroundColor: colors.darkVoid,
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -33,7 +34,7 @@ export const container = style({
     background: 'transparent',
   },
   '::-webkit-scrollbar-thumb': {
-    background: 'rgba(255, 255, 255, 0.2)',
+    background: colors.whiteAlpha[20],
     borderRadius: '2px',
   },
   '@media': {
@@ -52,7 +53,7 @@ export const chartSection = style({
   minWidth: 0,
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  backgroundColor: colors.gluonGrey,
   borderRadius: '0.5rem',
   padding: '1rem',
   overflow: 'hidden',
@@ -81,7 +82,7 @@ export const rightSection = style({
     background: 'transparent',
   },
   '::-webkit-scrollbar-thumb': {
-    background: 'rgba(255, 255, 255, 0.2)',
+    background: colors.whiteAlpha[20],
     borderRadius: '2px',
   },
   '@media': {
@@ -95,7 +96,7 @@ export const rightSection = style({
 
 export const orderEntryContainer = style({
   flex: '0 0 auto',
-  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  backgroundColor: colors.gluonGrey,
   borderRadius: '0.5rem',
   padding: '1rem',
   display: 'flex',
@@ -120,7 +121,7 @@ export const orderEntryFormWrapper = style({
 export const orderEntryTitle = style({
   fontSize: '0.875rem',
   fontWeight: 600,
-  color: '#e2e8f0',
+  color: colors.snow,
   marginBottom: '1rem',
   textTransform: 'none',
   letterSpacing: '0.01em',
@@ -133,10 +134,10 @@ export const bottomMenu = style({
   right: 0,
   zIndex: 40,
   display: 'none',
-  backgroundColor: 'rgba(30, 41, 59, 0.95)',
+  backgroundColor: colors.darkVoidAlpha[80],
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
-  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+  borderTop: `1px solid ${colors.whiteAlpha[10]}`,
   padding: 0,
   paddingBottom: 'env(safe-area-inset-bottom)',
   boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.3)',
@@ -156,7 +157,7 @@ export const menuButton = style({
   padding: '0.875rem 1rem',
   backgroundColor: 'transparent',
   border: 'none',
-  color: 'rgba(226, 232, 240, 0.7)',
+  color: colors.dustyGrey,
   fontSize: '0.875rem',
   fontWeight: 500,
   cursor: 'pointer',
@@ -168,16 +169,16 @@ export const menuButton = style({
   gap: '0.25rem',
   position: 'relative',
   ':hover': {
-    color: 'rgba(226, 232, 240, 0.9)',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    color: colors.snow,
+    backgroundColor: colors.whiteAlpha[5],
   },
   ':active': {
     transform: 'scale(0.95)',
   },
   selectors: {
     '&[data-active="true"]': {
-      color: '#60a5fa',
-      backgroundColor: 'rgba(59, 130, 246, 0.15)',
+      color: colors.liquidLava,
+      backgroundColor: colors.liquidLavaAlpha[15],
       fontWeight: 600,
     },
   },
@@ -186,7 +187,7 @@ export const menuButton = style({
 export const menuSeparator = style({
   width: '1px',
   height: '2rem',
-  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  backgroundColor: colors.whiteAlpha[15],
   flexShrink: 0,
   alignSelf: 'center',
 });
@@ -205,7 +206,7 @@ export const sheetMenuSelector = style({
   display: 'flex',
   gap: 0,
   marginBottom: '1rem',
-  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  backgroundColor: colors.gluonGrey,
   borderRadius: '0.5rem',
   padding: '0.25rem',
 });
@@ -217,22 +218,22 @@ export const sheetMenuButton = style({
   backgroundColor: 'transparent',
   border: 'none',
   borderRadius: '0.375rem',
-  color: 'rgba(226, 232, 240, 0.7)',
+  color: colors.dustyGrey,
   fontSize: '0.875rem',
   fontWeight: 500,
   cursor: 'pointer',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   textAlign: 'center',
   ':hover': {
-    color: 'rgba(226, 232, 240, 0.9)',
+    color: colors.snow,
   },
   ':active': {
     transform: 'scale(0.98)',
   },
   selectors: {
     '&[data-active="true"]': {
-      color: '#60a5fa',
-      backgroundColor: 'rgba(59, 130, 246, 0.2)',
+      color: colors.liquidLava,
+      backgroundColor: colors.liquidLavaAlpha[20],
       fontWeight: 600,
     },
   },

@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../styles/colors';
 
 export const formGroup = style({
   display: 'flex',
@@ -10,51 +11,51 @@ export const formGroup = style({
 export const label = style({
   fontSize: '0.875rem',
   fontWeight: '500',
-  color: '#e2e8f0',
+  color: colors.snow,
   marginBottom: '0.5rem',
 });
 
 export const input = style({
   padding: '0.75rem 1rem',
-  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  color: 'white',
+  backgroundColor: colors.gluonGrey,
+  color: colors.snow,
   borderRadius: '0.5rem',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
+  border: `1px solid ${colors.whiteAlpha[10]}`,
   fontSize: '1rem',
   fontFamily: 'monospace',
   transition: 'all 0.2s',
   ':focus': {
     outline: 'none',
-    borderColor: '#3b82f6',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+    borderColor: colors.liquidLava,
+    backgroundColor: colors.slateGrey,
+    boxShadow: `0 0 0 3px ${colors.liquidLavaAlpha[10]}`,
   },
   '::placeholder': {
-    color: '#64748b',
+    color: colors.dustyGrey,
   },
 });
 
 export const button = style({
   padding: '0.75rem 1.5rem',
-  backgroundColor: '#8b5cf6',
-  color: 'white',
+  backgroundColor: colors.liquidLava,
+  color: colors.snow,
   borderRadius: '0.5rem',
   border: 'none',
   fontSize: '1rem',
   fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.2s',
-  boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.39)',
+  boxShadow: `0 4px 14px 0 ${colors.liquidLavaAlpha[30]}`,
   ':hover': {
-    backgroundColor: '#7c3aed',
+    backgroundColor: '#E05D0A', // Slightly darker Liquid Lava
     transform: 'translateY(-2px)',
-    boxShadow: '0 6px 20px rgba(139, 92, 246, 0.5)',
+    boxShadow: `0 6px 20px ${colors.liquidLavaAlpha[30]}`,
   },
   ':active': {
     transform: 'translateY(0)',
   },
   ':disabled': {
-    backgroundColor: '#4b5563',
+    backgroundColor: colors.slateGrey,
     cursor: 'not-allowed',
     boxShadow: 'none',
     transform: 'none',

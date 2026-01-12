@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../styles/colors';
 
 export const header = style({
   textAlign: 'center',
@@ -8,9 +9,9 @@ export const header = style({
 export const title = style({
   fontSize: '3rem',
   fontWeight: 'bold',
-  color: 'white',
+  color: colors.snow,
   marginBottom: '1rem',
-  background: 'linear-gradient(to right, #60a5fa, #a78bfa)',
+  background: `linear-gradient(to right, ${colors.liquidLava}, #FF8C42)`,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   backgroundClip: 'text',
@@ -18,5 +19,5 @@ export const title = style({
 
 export const subtitle = style({
   fontSize: '1.25rem',
-  color: '#94a3b8',
+  color: colors.dustyGrey,
 });

@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../styles/colors';
 
 export const positionField = style({
   display: 'flex',
@@ -8,7 +9,7 @@ export const positionField = style({
 
 export const fieldLabel = style({
   fontSize: '0.625rem',
-  color: '#94a3b8',
+  color: colors.dustyGrey,
   textTransform: 'uppercase',
   letterSpacing: '0.025em',
   lineHeight: 1.2,
@@ -16,16 +17,16 @@ export const fieldLabel = style({
 
 export const fieldValue = style({
   fontSize: '0.6875rem',
-  color: '#e2e8f0',
+  color: colors.snow,
   fontWeight: '500',
   fontFamily: 'monospace',
   lineHeight: 1.2,
 });
 
 export const profitPositive = style({
-  color: '#22c55e',
+  color: colors.success,
 });
 
 export const profitNegative = style({
-  color: '#ef4444',
+  color: colors.error,
 });

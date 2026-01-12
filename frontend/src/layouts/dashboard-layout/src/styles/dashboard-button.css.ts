@@ -1,9 +1,10 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../styles/colors';
 
 export const dashboardButton = style({
   padding: '0.375rem 0.875rem',
   backgroundColor: 'transparent',
-  color: '#9ca3af',
+  color: colors.dustyGrey,
   borderRadius: '0.25rem',
   border: 'none',
   fontSize: '0.875rem',
@@ -12,7 +13,7 @@ export const dashboardButton = style({
   transition: 'all 0.15s',
   minWidth: '6rem',
   ':hover': {
-    color: 'white',
-    backgroundColor: '#374151',
+    color: colors.snow,
+    backgroundColor: colors.slateGrey,
   },
 });

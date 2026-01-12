@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '../../../../../styles/colors';
 
 export const sliderContainer = style({
   marginTop: '0.5rem',
@@ -15,7 +16,7 @@ export const sliderLabel = style({
   marginBottom: '8px',
   fontSize: '0.875rem',
   fontWeight: 500,
-  color: '#fff',
+  color: colors.snow,
 });
 
 export const sliderRoot = style({
@@ -35,14 +36,14 @@ export const sliderTrack = style({
   position: 'relative',
   flexGrow: 1,
   height: '4px',
-  backgroundColor: '#333',
+  backgroundColor: colors.slateGrey,
   borderRadius: '2px',
 });
 
 export const sliderRange = style({
   position: 'absolute',
   height: '100%',
-  backgroundColor: '#8b5cf6',
+  backgroundColor: colors.liquidLava,
   borderRadius: '2px',
 });
 
@@ -50,15 +51,15 @@ export const sliderThumb = style({
   display: 'block',
   width: '16px',
   height: '16px',
-  backgroundColor: '#fff',
+  backgroundColor: colors.snow,
   borderRadius: '50%',
   cursor: 'pointer',
   ':hover': {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.dustyGrey,
   },
   ':focus': {
     outline: 'none',
-    boxShadow: '0 0 0 4px rgba(139, 92, 246, 0.3)',
+    boxShadow: `0 0 0 4px ${colors.liquidLavaAlpha[30]}`,
   },
 });
 
@@ -79,7 +80,7 @@ export const percentageMark = style({
   position: 'absolute',
   padding: 0,
   backgroundColor: 'transparent',
-  color: '#666',
+  color: colors.dustyGrey,
   border: 'none',
   fontSize: '0.625rem',
   cursor: 'pointer',
@@ -87,10 +88,10 @@ export const percentageMark = style({
   whiteSpace: 'nowrap',
   transform: 'translateX(-50%)',
   ':hover': {
-    color: '#999',
+    color: colors.snow,
   },
   ':active': {
-    color: '#ccc',
+    color: colors.liquidLava,
   },
 });
 
