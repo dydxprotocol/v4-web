@@ -132,7 +132,7 @@ export const walletConnected = style({
   backgroundColor: colors.liquidLava,
   color: colors.snow,
   borderRadius: '0.375rem',
-  border: `px solid ${colors.liquidLava}`,
+  border: `1px solid ${colors.liquidLava}`,
   fontSize: '0.875rem',
   fontWeight: '600',
   cursor: 'pointer',
