@@ -10,7 +10,7 @@ import { toDomainPosition } from './mappers';
 
 export const getPositionsByAccount =
   (client: GraphQLClient) =>
-  async (account: Address, latestOnly = true): Promise<Position[]> => {
+  async (account?: Address, latestOnly = true): Promise<Position[]> => {
     const keysData = await client.request<{
       positionKeys: { nodes: Array<{ id: string }> };
     }>(GET_POSITION_KEYS_BY_ACCOUNT_QUERY, {

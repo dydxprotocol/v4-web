@@ -1,4 +1,5 @@
 import { CollateralAmount, OraclePrice, RatioOutput } from '@/shared/models/decimals';
+import type { AssetId } from '@/shared/types';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 import type { Position } from './positions.entity';
 import { PositionChange, PositionSide, PositionStatus } from './positions.entity';
@@ -87,4 +88,22 @@ export function calculateTotalCollateral(positions: Position[]): CollateralAmoun
   }
 
   return totalFormula.calculate(CollateralAmount);
+}
+
+export function calculateTotalExposure(positions: Position[]): OraclePrice {
+  if (positions.length === 0) {
+    return zero(OraclePrice);
+  }
+
+  let totalFormula = DecimalCalculator.value(positions[0].size);
+
+  for (let i = 1; i < positions.length; i++) {
+    totalFormula = totalFormula.add(BigIntMath.abs(positions[i].size));
+  }
+
+  return totalFormula.calculate(OraclePrice);
+}
+
+export function filterPositionsByAsset(positions: Position[], assetId: AssetId): Position[] {
+  return positions.filter((p) => p.positionKey.indexAssetId === assetId);
 }

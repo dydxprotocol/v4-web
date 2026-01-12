@@ -2,7 +2,7 @@ import { DecimalValue } from '@/shared/models/decimalValue';
 
 export class PositionSize extends DecimalValue {
   declare __brand: typeof PositionSize;
-  static decimals = 9n as const;
+  static decimals = 6n as const;
 }
 
 export class PositionFee extends DecimalValue {
