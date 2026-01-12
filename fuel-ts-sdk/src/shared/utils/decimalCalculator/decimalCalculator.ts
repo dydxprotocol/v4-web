@@ -1,5 +1,5 @@
-import type { DecimalValue, DecimalValueCtor } from '../../models/decimalValue';
-import { HeadlessDecimalValue } from '../../models/decimalValue';
+import type { DecimalValueCtor } from '../../models/decimalValue';
+import { DecimalValue, HeadlessDecimalValue } from '../../models/decimalValue';
 import { Formula } from './formula';
 
 export class DecimalCalculator {
@@ -95,7 +95,9 @@ export class DecimalCalculator {
     return calc;
   }
 
-  calculate<T extends DecimalValue>(DecimalValueConstructor: DecimalValueCtor<T>): T {
+  calculate<T extends DecimalValue>(
+    DecimalValueConstructor: DecimalValueCtor<T> = DecimalValue as unknown as DecimalValueCtor<T>
+  ): T {
     const numeratorResult = this.numeratorFormula.calculate();
     if (!this.denominatorFormula) return numeratorResult.adjustTo(DecimalValueConstructor);
 

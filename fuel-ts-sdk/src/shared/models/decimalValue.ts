@@ -7,10 +7,11 @@ export type DecimalValueCtorWithMethods<T extends DecimalValue = DecimalValue> =
   decimals: bigint;
   fromFloat<T>(floatValue: number): T;
   fromBigInt<T>(value: bigint): T;
+  fromDecimalString<T>(str: string): T;
 };
 
-export abstract class DecimalValue {
-  static decimals: bigint;
+export class DecimalValue {
+  static decimals: bigint = 18n;
   protected decimalsOverride?: bigint;
 
   get decimals() {
@@ -33,6 +34,13 @@ export abstract class DecimalValue {
     return new this(value);
   }
 
+  static fromDecimalString<T extends DecimalValue>(this: DecimalValueCtor<T>, str: string): T {
+    const [integerPart = '0', decimalPart = ''] = str.split('.');
+    const paddedDecimal = decimalPart.padEnd(Number(this.decimals), '0');
+    const value = BigInt(integerPart + paddedDecimal);
+    return new this(value);
+  }
+
   adjustTo<T extends DecimalValue>(DecimalValueConstructor: DecimalValueCtor<T>): T {
     const targetDecimals = DecimalValueConstructor.decimals;
     const adjustment = this.decimals - targetDecimals;
@@ -49,6 +57,12 @@ export abstract class DecimalValue {
     }
 
     return new DecimalValueConstructor(newValue);
+  }
+
+  toDecimalString(): string {
+    const str = this.value.toString().padStart(Number(this.decimals) + 1, '0');
+    const dotIndex = str.length - Number(this.decimals);
+    return (str.slice(0, dotIndex) + '.' + str.slice(dotIndex)).replace(/\.?0+$/, '');
   }
 
   toFloat(): number {
