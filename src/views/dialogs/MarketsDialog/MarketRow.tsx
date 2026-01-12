@@ -32,7 +32,7 @@ export const MarketRow = ({ className, market }: { className?: string; market: M
   return (
     <Link
       className={className}
-      tw="row cursor-pointer justify-between gap-0.5 px-1.25 hover:bg-color-layer-4"
+      tw="row cursor-pointer justify-between gap-0.5 hover:bg-color-layer-4"
       to={`${AppRoute.Trade}/${market.id}`}
       onClick={closeMarketsMenu}
     >

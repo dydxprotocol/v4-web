@@ -9,6 +9,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -59,6 +60,7 @@ export const PositionsTriggersCell = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
+  const { isTablet } = useBreakpoints();
 
   const { complianceState } = usePerpetualsComplianceState();
 
@@ -93,7 +95,7 @@ export const PositionsTriggersCell = ({
   };
 
   const viewOrdersButton = (align: 'left' | 'right') => (
-    <$Container $align={align}>
+    <$Container $align={align} $isTablet={isTablet}>
       <$ViewOrdersButton
         action={ButtonAction.Navigation}
         size={ButtonSize.XSmall}
@@ -130,8 +132,12 @@ export const PositionsTriggersCell = ({
   }) => {
     if (orders.length === 0) {
       return (
-        <$Container $align={align} onClick={openTriggersDialog}>
-          <$Output type={OutputType.Fiat} value={null} $withLiquidationWarning={false} />
+        <$Container $align={align} onClick={openTriggersDialog} $isTablet={isTablet}>
+          {isTablet ? (
+            '--'
+          ) : (
+            <$Output type={OutputType.Fiat} value={null} $withLiquidationWarning={false} />
+          )}
         </$Container>
       );
     }
@@ -154,7 +160,7 @@ export const PositionsTriggersCell = ({
       );
 
       return (
-        <$Container $align={align} onClick={openTriggersDialog}>
+        <$Container $align={align} onClick={openTriggersDialog} $isTablet={isTablet}>
           {liquidationWarningSide != null ? (
             <WithHovercard
               align="start"
@@ -217,28 +223,27 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <$TableCell>
-      {renderOutput({ align: 'right', orders: takeProfitOrders })}
-      <$VerticalSeparator />
+    <$TableCell $isTablet={isTablet}>
+      {renderOutput({ align: isTablet ? 'left' : 'right', orders: takeProfitOrders })}
+      {isTablet ? <div>/</div> : <$VerticalSeparator />}
       {renderOutput({ align: 'left', orders: stopLossOrders })}
       {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && editButton}
     </$TableCell>
   );
 };
 
-const $TableCell = styled(TableCell)`
+const $TableCell = styled(TableCell)<{ $isTablet: boolean }>`
   align-items: stretch;
-  gap: 0.75em;
-  justify-content: center;
 
-  --output-width: 70px;
+  ${({ $isTablet }) =>
+    `${$isTablet ? '--output-width: 30px; gap: 0.25em;' : '--output-width: 70px; gap: 0.75em; justify-content: center;'}`}
 `;
 
-const $Container = styled.div<{ $align: 'right' | 'left' }>`
-  display: inline-flex;
+const $Container = styled.div<{ $isTablet: boolean; $align: 'right' | 'left' }>`
   align-items: center;
   gap: 0.25em;
-  width: var(--output-width);
+
+  ${({ $isTablet }) => ($isTablet ? `` : 'width: var(--output-width); display: inline-flex;')}
 
   ${({ $align }) =>
     $align &&

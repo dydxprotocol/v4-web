@@ -54,7 +54,7 @@ export const TradeFormHeaderMobile = ({ launchableMarketId }: { launchableMarket
   );
 };
 
-const $Header = styled.header`
+const $Header = styled.div`
   ${layoutMixins.contentSectionDetachedScrollable}
 
   ${layoutMixins.stickyHeader}
@@ -66,6 +66,12 @@ const $Header = styled.header`
 
   color: var(--color-text-2);
   background-color: var(--color-layer-2);
+  padding-top: 1rem;
+
+  border-bottom: 1px solid var(--color-border);
+
+  width: 100%;
+  padding-bottom: 1rem;
 `;
 
 const $Right = styled.div`

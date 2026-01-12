@@ -31,6 +31,8 @@ import { MidMarketPrice } from './MidMarketPrice';
 
 type ElementProps = {
   showMidMarketPrice?: boolean;
+  horizontal?: boolean;
+  withSubscript?: boolean;
 };
 
 enum MarketStats {
@@ -44,7 +46,11 @@ enum MarketStats {
   MaxLeverage = 'MaxLeverage',
 }
 
-export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
+export const MarketStatsDetails = ({
+  showMidMarketPrice = true,
+  horizontal = false,
+  withSubscript,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
@@ -120,12 +126,14 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               initialMarginFraction={initialMarginFraction}
               effectiveInitialMarginFraction={effectiveInitialMarginFraction}
               useFiatDisplayUnit={displayUnit === DisplayUnit.Fiat}
+              withSubscript={withSubscript}
             />
           ),
         }))}
         isLoading={isLoading}
-        layout={isTablet ? 'grid' : 'rowColumns'}
+        layout={horizontal ? 'rowColumns' : isTablet ? 'grid' : 'rowColumns'}
         withSeparators={!isTablet}
+        $horizontalScroll={horizontal}
       />
     </$MarketDetailsItems>
   );
@@ -145,17 +153,29 @@ const $MarketDetailsItems = styled.div`
   }
 `;
 
-const $Details = styled(Details)`
+const $Details = styled(Details)<{ $horizontalScroll?: boolean }>`
   font: var(--font-mini-book);
 
   @media ${breakpoints.tablet} {
     ${layoutMixins.withOuterAndInnerBorders}
-
     font: var(--font-small-book);
 
     > * {
       padding: 0.625rem 1rem;
     }
+
+    ${({ $horizontalScroll }) =>
+      $horizontalScroll &&
+      css`
+        max-width: 100vw;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        > * {
+          flex-shrink: 0;
+        }
+      `}
   }
 `;
 
@@ -206,6 +226,7 @@ const DetailsItem = ({
   initialMarginFraction,
   effectiveInitialMarginFraction,
   useFiatDisplayUnit,
+  withSubscript = true,
 }: {
   value: string | number | null | undefined;
   stat: MarketStats;
@@ -216,6 +237,7 @@ const DetailsItem = ({
   initialMarginFraction: string | null | undefined;
   effectiveInitialMarginFraction: number | null | undefined;
   useFiatDisplayUnit: boolean;
+  withSubscript?: boolean;
 }) => {
   const valueBN = MustBigNumber(value);
   const stringGetter = useStringGetter();
@@ -226,7 +248,7 @@ const DetailsItem = ({
     case MarketStats.OraclePrice: {
       return (
         <$Output
-          withSubscript
+          withSubscript={withSubscript}
           type={OutputType.Fiat}
           value={value}
           fractionDigits={tickSizeDecimals}

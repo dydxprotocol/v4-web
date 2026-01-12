@@ -41,19 +41,21 @@ export const MobileTradeAssetSelector = ({
       <img
         src={launchableAsset.logo ?? undefined}
         alt={launchableAsset.name}
-        tw="h-[2.5rem] w-[2.5rem] rounded-[50%]"
+        tw="h-[1.75rem] w-[1.75rem] rounded-[50%]"
       />
       <$Name>
-        <h3>{launchableAsset.name}</h3>
+        <h4>{launchableAsset.name}</h4>
         <span>{getDisplayableAssetFromBaseAsset(launchableAsset.assetId)}</span>
       </$Name>
     </div>
   ) : (
     <div tw="inlineRow gap-[1ch]">
-      <AssetIcon tw="[--asset-icon-size:2.5rem]" logoUrl={imageUrl} symbol={id} />
+      <AssetIcon tw="[--asset-icon-size:1.75rem]" logoUrl={imageUrl} symbol={id} />
       <$Name>
-        <h3>{displayableTicker}</h3>
-        <span>{Math.round(leverage)}x</span>
+        <h4>{displayableTicker}</h4>
+        <$Leverage>
+          <span>{Math.round(leverage)}x</span>
+        </$Leverage>
         <Icon iconName={IconName.Caret} size="0.75em" className="text-color-text-0" />
       </$Name>
     </div>
@@ -77,8 +79,14 @@ const $Name = styled.div`
     font: var(--font-large-medium);
   }
 
-  > :nth-child(2) {
-    font: var(--font-mini-book);
-    color: var(--color-text-0);
-  }
+  color: var(--color-text-2);
+`;
+
+const $Leverage = styled.div`
+  border-radius: 8px;
+  padding: 3px 6px;
+  background-color: #7774ff14;
+
+  font: var(--font-mini-medium);
+  color: var(--color-accent);
 `;

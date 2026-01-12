@@ -214,7 +214,7 @@ export const SetMarketLeverageDialog = ({
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.SET_MARKET_LEVERAGE })}
-      tw="[--dialog-header-paddingBottom:1.5rem] [--dialog-width:25rem]"
+      tw="[--dialog-header-paddingBottom:1.5rem]"
     >
       <form onSubmit={onSave} tw="flexColumn gap-1.5">
         <div>

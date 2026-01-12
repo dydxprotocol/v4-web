@@ -216,7 +216,7 @@ export const MarketList = () => {
               placeholder={`${stringGetter({ key: STRING_KEYS.SEARCH })}...`}
               onTextChange={setSearchFilter}
             />
-            <div tw="row gap-0.5">
+            <div tw="row gap-0.5 pl-1">
               <span tw="text-color-text-0 font-small-book">{sortTypeLabel}</span>
               <SimpleUiDropdownMenu
                 align="end"

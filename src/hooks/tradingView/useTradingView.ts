@@ -11,7 +11,7 @@ import {
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
-import { STRING_KEYS, SUPPORTED_LOCALE_MAP } from '@/constants/localization';
+import { SUPPORTED_LOCALE_MAP } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
@@ -140,35 +140,35 @@ export const useTradingView = ({
         // Initialize additional right-click-menu options
         tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 
-        tvChartWidget!.headerReady().then(() => {
-          // Order Lines
-          initializeToggle({
-            toggleRef: orderLineToggleRef,
-            widget: tvChartWidget!,
-            isOn: orderLinesToggleOn,
-            setToggleOn: setOrderLinesToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.ORDER_LINES_TOOLTIP,
-            }),
-          });
+        // tvChartWidget!.headerReady().then(() => {
+        //   // Order Lines
+        //   initializeToggle({
+        //     toggleRef: orderLineToggleRef,
+        //     widget: tvChartWidget!,
+        //     isOn: orderLinesToggleOn,
+        //     setToggleOn: setOrderLinesToggleOn,
+        //     label: stringGetter({
+        //       key: STRING_KEYS.ORDER_LINES,
+        //     }),
+        //     tooltip: stringGetter({
+        //       key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+        //     }),
+        //   });
 
-          // Buy/Sell Marks
-          initializeToggle({
-            toggleRef: buySellMarksToggleRef,
-            widget: tvChartWidget!,
-            isOn: buySellMarksToggleOn,
-            setToggleOn: setBuySellMarksToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-            }),
-          });
-        });
+        //   // Buy/Sell Marks
+        //   initializeToggle({
+        //     toggleRef: buySellMarksToggleRef,
+        //     widget: tvChartWidget!,
+        //     isOn: buySellMarksToggleOn,
+        //     setToggleOn: setBuySellMarksToggleOn,
+        //     label: stringGetter({
+        //       key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+        //     }),
+        //     tooltip: stringGetter({
+        //       key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+        //     }),
+        //   });
+        // });
 
         tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
           tvChartWidget!.save((chartConfig: object) => {

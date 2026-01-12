@@ -120,6 +120,8 @@ export type TradeForm = {
   // additional triggers
   stopLossOrder: TriggerOrderState | undefined;
   takeProfitOrder: TriggerOrderState | undefined;
+
+  isClosingPosition?: boolean;
 };
 
 // Define the FieldState type with conditional properties

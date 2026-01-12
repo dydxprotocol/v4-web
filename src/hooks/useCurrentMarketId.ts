@@ -165,6 +165,7 @@ export const useCurrentMarketId = (route: AppRoute = AppRoute.Trade) => {
   }, []);
 
   return {
+    marketId: validId,
     isViewingUnlaunchedMarket,
     hasLoadedMarkets: hasLoadedLaunchableMarkets && hasMarketIds,
   };

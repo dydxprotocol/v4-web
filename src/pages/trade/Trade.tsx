@@ -30,7 +30,6 @@ import { InnerPanel } from './InnerPanel';
 import LaunchableMarket from './LaunchableMarket';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
 import { MobileBottomPanel } from './MobileBottomPanel';
-import { MobileTopPanel } from './MobileTopPanel';
 import { TradeDialogTrigger } from './TradeDialogTrigger';
 import { VerticalPanel } from './VerticalPanel';
 import { TradeHeaderMobile } from './mobile-web/TradeHeader';
@@ -74,11 +73,7 @@ const TradePage = () => {
 
       <div>
         <DetachedSection>
-          <MobileTopPanel />
-        </DetachedSection>
-
-        <DetachedSection>
-          <HorizontalPanel handleStartResize={handleMouseDown} />
+          <HorizontalPanel />
         </DetachedSection>
 
         <DetachedSection>
