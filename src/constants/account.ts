@@ -1,6 +1,5 @@
 export enum OnboardingSteps {
   SignIn = 'SignIn',
-  ChooseWallet = 'ChooseWallet',
   KeyDerivation = 'KeyDerivation',
 }
 

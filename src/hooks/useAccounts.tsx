@@ -156,37 +156,18 @@ const useAccountsContext = () => {
     }
   }, [localDydxWallet, localNobleWallet, localSolanaKeypair]);
 
-  const handleWalletConnectionResult = (result: WalletDerivationResult) => {
-    if (result.wallet) {
-      setLocalDydxWallet(result.wallet);
-    }
-
-    if (result.nobleWallet) {
-      setLocalNobleWallet(result.nobleWallet);
-    }
-
-    if (result.solanaKeypair) {
-      setLocalSolanaKeypair(result.solanaKeypair);
-    }
-
-    if (result.hdKey) {
-      setHdKey(result.hdKey);
-    }
-
-    // Dispatch onboarding state
-    dispatch(setOnboardingState(result.onboardingState));
-
-    // Handle disconnected state
-    if (result.onboardingState === OnboardingState.Disconnected && !result.wallet) {
-      disconnectLocalWallets();
-    }
-  };
-
   /**
    * Reconnect Side Effect - This is used to handle the reconnection flow when the user returns to the app.
    */
   useEffect(() => {
     (async () => {
+      if (
+        sourceAccount.walletInfo?.connectorType === ConnectorType.Import &&
+        !dydxPersistedWalletService.hasStoredWallet()
+      ) {
+        return;
+      }
+
       const result = await onboardingManager.handleWalletConnection({
         context: {
           sourceAccount,
@@ -251,7 +232,7 @@ const useAccountsContext = () => {
   }, [dispatch, dydxSubaccounts]);
 
   // Disconnect wallet / accounts
-  const disconnectLocalWallets = () => {
+  const disconnectLocalWallets = useCallback(() => {
     // Clear persisted mnemonic from SecureStorage
     dydxPersistedWalletService.clearStoredWallet();
 
@@ -260,9 +241,9 @@ const useAccountsContext = () => {
     setLocalSolanaKeypair(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
-  };
+  }, []);
 
-  const disconnect = async () => {
+  const disconnect = useCallback(async () => {
     // Turnkey Signout
     if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
       await endTurnkeySession();
@@ -271,7 +252,59 @@ const useAccountsContext = () => {
     // Disconnect local wallets
     disconnectLocalWallets();
     selectWallet(undefined);
-  };
+  }, [
+    disconnectLocalWallets,
+    selectWallet,
+    endTurnkeySession,
+    sourceAccount.walletInfo?.connectorType,
+  ]);
+
+  const handleWalletConnectionResult = useCallback(
+    (result: WalletDerivationResult) => {
+      if (result.wallet) {
+        setLocalDydxWallet(result.wallet);
+      }
+
+      if (result.nobleWallet) {
+        setLocalNobleWallet(result.nobleWallet);
+      }
+
+      if (result.solanaKeypair) {
+        setLocalSolanaKeypair(result.solanaKeypair);
+      }
+
+      if (result.hdKey) {
+        setHdKey(result.hdKey);
+      }
+
+      // Dispatch onboarding state
+      dispatch(setOnboardingState(result.onboardingState));
+
+      // Handle disconnected state
+      if (result.onboardingState === OnboardingState.Disconnected && !result.wallet) {
+        disconnectLocalWallets();
+      }
+    },
+    [dispatch, disconnectLocalWallets]
+  );
+
+  // Import wallet from phrase
+  const importWallet = useCallback(
+    async (mnemonic: string): Promise<{ success: boolean; error?: string }> => {
+      selectWallet({
+        connectorType: ConnectorType.Import,
+        name: 'Import',
+      });
+
+      const result = await onboardingManager.handleWalletImport({
+        mnemonic,
+        handleWalletConnectionResult,
+      });
+
+      return result;
+    },
+    [handleWalletConnectionResult, selectWallet]
+  );
 
   return {
     // Wallet connection
@@ -287,6 +320,7 @@ const useAccountsContext = () => {
     publicClientWagmi,
 
     setWalletFromTurnkeySignature,
+    importWallet,
 
     // dYdX accounts
     hdKey,

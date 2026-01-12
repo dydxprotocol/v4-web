@@ -60,6 +60,59 @@ export type WalletDerivationResult =
 
 class OnboardingSupervisor {
   /**
+   * Import wallet from private key
+   * Called directly from ImportPrivateKey component
+   */
+  async handleWalletImport({
+    mnemonic,
+    handleWalletConnectionResult,
+  }: {
+    mnemonic: string;
+    handleWalletConnectionResult: (result: WalletDerivationResult) => void;
+  }): Promise<{ success: true } | { success: false; error: string }> {
+    try {
+      const LocalWallet = await getLazyLocalWallet();
+
+      // Create wallets from private key
+      const wallet = await LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
+      const nobleWallet = await LocalWallet.fromMnemonic(mnemonic, NOBLE_BECH32_PREFIX);
+      const solanaKeypair = deriveSolanaKeypairFromMnemonic(mnemonic);
+
+      if (!wallet.address || !nobleWallet.address) {
+        logBonsaiError('OnboardingSupervisor', 'local wallet is missing address', {
+          error: new Error('Could not derive a local wallet from imported recovery phrase'),
+        });
+        return {
+          success: false,
+          error: 'Could not derive a local wallet from imported recovery phrase',
+        };
+      }
+
+      const walletConnectionResult: WalletDerivationResult = {
+        wallet,
+        nobleWallet,
+        solanaKeypair,
+        onboardingState: OnboardingState.AccountConnected,
+      };
+
+      handleWalletConnectionResult(walletConnectionResult);
+
+      // Store the recovery phrase in SecureStorage
+      await dydxPersistedWalletService.secureStorePhrase(mnemonic);
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      logBonsaiError('OnboardingSupervisor', 'handleWalletImport failed', { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to import private key',
+      };
+    }
+  }
+
+  /**
    * Derive dYdX wallet from signature using DydxWalletService
    * Used for EVM, Solana, and Turnkey wallets
    */
@@ -277,6 +330,12 @@ class OnboardingSupervisor {
         if (restored) {
           return restored;
         }
+      }
+
+      // ------ Import Flow ------ //
+      // Import is handled directly via handleWalletImport(), not through this flow
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Import) {
+        throw new Error('Import flow is handled in useAccounts.tsx');
       }
 
       // ------ Turnkey Flow ------ //
