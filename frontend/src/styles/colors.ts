@@ -7,18 +7,18 @@ export const colors = {
   // Primary colors
   darkVoid: '#151419', // Main dark background
   liquidLava: '#F56E0F', // Primary accent, buttons
-  
+
   // Grey scale
   gluonGrey: '#1B1B1E', // Secondary dark backgrounds
   slateGrey: '#262626', // Tertiary dark backgrounds, hover states
   dustyGrey: '#878787', // Muted text, borders, secondary text
   snow: '#FBFBFB', // Primary text, light backgrounds
-  
+
   // Semantic colors (for buy/sell, etc.)
   // Using Liquid Lava variants for consistency
   success: '#22c55e', // Keep green for long positions
   error: '#ef4444', // Keep red for short positions
-  
+
   // Opacity variants
   darkVoidAlpha: {
     10: 'rgba(21, 20, 25, 0.1)',
@@ -45,4 +45,3 @@ export const colors = {
     50: 'rgba(135, 135, 135, 0.5)',
   },
 } as const;
-

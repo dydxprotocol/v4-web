@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router';
+import logoStarboard from '@/assets/logo-starboard.png';
 import { WalletContext } from '@/contexts/wallet/wallet.context';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
-import logoStarboard from '@/assets/logo-starboard.png';
 import { AssetSelect } from './components/asset-select.component';
 import * as styles from './dashboard-layout.css';
 

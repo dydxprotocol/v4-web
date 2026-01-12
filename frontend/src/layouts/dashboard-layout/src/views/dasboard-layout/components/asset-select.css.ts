@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { dashboardButton } from '../../../styles/dashboard-button.css';
 import { colors } from '../../../../../../styles/colors';
+import { dashboardButton } from '../../../styles/dashboard-button.css';
 
 export const selectTrigger = recipe({
   base: [

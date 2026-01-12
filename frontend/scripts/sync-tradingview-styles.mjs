@@ -18,9 +18,9 @@ function main() {
 
   ensureDir(DEST);
   fs.copyFileSync(SOURCE, DEST);
-  console.log(`[sync-tradingview-styles] Synced ${path.relative(ROOT, SOURCE)} -> ${path.relative(ROOT, DEST)}`);
+  console.log(
+    `[sync-tradingview-styles] Synced ${path.relative(ROOT, SOURCE)} -> ${path.relative(ROOT, DEST)}`
+  );
 }
 
 main();
-
-
