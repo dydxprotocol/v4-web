@@ -29,6 +29,7 @@ The fuel-ts-sdk implements **Domain-Driven Design (DDD)** with **Hexagonal Archi
 ### Why DDD?
 
 DDD helps us:
+
 - **Model complex business logic** clearly and maintainably
 - **Isolate domain logic** from infrastructure concerns (databases, APIs, frameworks)
 - **Create a shared language** between developers and domain experts
@@ -39,6 +40,7 @@ DDD helps us:
 > **"Sophisticated design is often less sophisticated than you think."** - Eric Evans
 
 We follow these principles:
+
 1. **Simplicity over ceremony**: No event buses or command buses (we don't need them)
 2. **Pure domain core**: Business logic has zero infrastructure dependencies
 3. **Explicit dependencies**: All dependencies injected, no hidden coupling
@@ -67,14 +69,17 @@ Bounded Context (Strategic DDD - Largest)
 **Definition**: A linguistic boundary where a particular domain model applies.
 
 **In Our Codebase**: We have one bounded context:
+
 - **Trading Context** ([fuel-ts-sdk/src/trading/](fuel-ts-sdk/src/trading/))
 
 **Characteristics**:
+
 - Has its own ubiquitous language (terms like "Position", "Collateral", "Margin")
 - Can communicate with other contexts (like Indexer) via adapters
 - Contains related aggregates that change together
 
 **When to create a new Bounded Context**:
+
 - ❌ Not for every new feature
 - ❌ Not for technical reasons (different database, different API)
 - ✅ Only when the domain language fundamentally changes
@@ -85,30 +90,33 @@ Bounded Context (Strategic DDD - Largest)
 **Definition**: A cluster of domain objects (entities + value objects) treated as a single unit for data changes. One entity is the **aggregate root**.
 
 **In Our Codebase**:
+
 - **Position Aggregate**: Root entity is `Position`, contains position-specific value objects
 - **MarketConfig Aggregate**: Root entity is `MarketConfig`, contains margin rules
 
 **Characteristics**:
+
 - Enforces business invariants (rules that must always be true)
 - Has a transactional boundary (all changes are atomic)
 - External objects reference aggregates only by ID, not by object reference
 - Keep aggregates small (single entity + value objects is ideal)
 
 **Example - Position Aggregate**:
+
 ```typescript
 // Aggregate Root
 export type Position = {
-  revisionId: PositionRevisionId;        // Identity
-  positionKey: PositionKey;              // Composite identity
-  collateralAmount: CollateralAmount;    // Value Object
-  size: PositionSize;                    // Value Object
+  revisionId: PositionRevisionId; // Identity
+  positionKey: PositionKey; // Composite identity
+  collateralAmount: CollateralAmount; // Value Object
+  size: PositionSize; // Value Object
   // ... other value objects
 };
 
 // Invariant enforcement (in domain calculations)
 export function calculatePositionLeverage(position: Position): RatioOutput {
   if (position.collateralAmount.value <= 0n) {
-    return zero(RatioOutput);  // Invariant: zero collateral = zero leverage
+    return zero(RatioOutput); // Invariant: zero collateral = zero leverage
   }
   // Business rule enforced
   return DecimalCalculator.value(position.size)
@@ -118,6 +126,7 @@ export function calculatePositionLeverage(position: Position): RatioOutput {
 ```
 
 **When to create a new Aggregate**:
+
 - ✅ When you have a new entity with its own lifecycle
 - ✅ When you need to enforce invariants on a cluster of objects
 - ❌ Not for every entity (entities can belong to existing aggregates)
@@ -127,6 +136,7 @@ export function calculatePositionLeverage(position: Position): RatioOutput {
 **Definition**: A code organization unit (folder structure). Not a DDD concept, but important for maintainability.
 
 **In Our Codebase**:
+
 ```
 trading/                          # Bounded Context
 ├── src/
@@ -146,6 +156,7 @@ trading/                          # Bounded Context
 ```
 
 **Module Guidelines**:
+
 - Each module should map to a sub-domain or aggregate
 - Modules expose public API via `index.ts`
 - Modules never import from other modules' internal files
@@ -179,6 +190,7 @@ positions/                        # AGGREGATE MODULE
 ```
 
 **Key characteristics**:
+
 - ✅ Works with **single aggregate** (Position)
 - ✅ Domain layer has **entity + pure calculations**
 - ✅ Application layer has **atomic commands/queries**
@@ -206,6 +218,7 @@ trading/                          # BOUNDED CONTEXT
 ```
 
 **Key characteristics**:
+
 - ✅ Coordinates **multiple aggregates** (Position + MarketConfig)
 - ✅ Domain layer (if exists) has **pure cross-aggregate calculations**
 - ✅ Application layer has **cross-aggregate commands/queries + workflows**
@@ -213,17 +226,18 @@ trading/                          # BOUNDED CONTEXT
 
 ### The Key Differences
 
-| Aspect | Aggregate Level | Bounded Context Level |
-|--------|----------------|----------------------|
-| **Scope** | Single aggregate | Multiple aggregates |
-| **Domain layer** | Entity + calculations | Pure cross-aggregate functions (optional) |
-| **Application layer** | Atomic operations only | Atomics + workflows |
-| **Entities** | Lives here | Never here (always in aggregates) |
-| **Workflows** | Never here | Lives here |
+| Aspect                | Aggregate Level        | Bounded Context Level                     |
+| --------------------- | ---------------------- | ----------------------------------------- |
+| **Scope**             | Single aggregate       | Multiple aggregates                       |
+| **Domain layer**      | Entity + calculations  | Pure cross-aggregate functions (optional) |
+| **Application layer** | Atomic operations only | Atomics + workflows                       |
+| **Entities**          | Lives here             | Never here (always in aggregates)         |
+| **Workflows**         | Never here             | Lives here                                |
 
 ### When to Put Logic Where
 
 **Single-aggregate calculation** → `positions/domain/positions.calculations.ts`:
+
 ```typescript
 export function calculatePositionLeverage(position: Position): RatioOutput {
   // Only uses Position
@@ -231,16 +245,15 @@ export function calculatePositionLeverage(position: Position): RatioOutput {
 ```
 
 **Cross-aggregate calculation** → `trading/src/domain/risk-calculator.ts`:
+
 ```typescript
-export function calculateLiquidationPrice(
-  position: Position,
-  config: MarketConfig
-): OraclePrice {
+export function calculateLiquidationPrice(position: Position, config: MarketConfig): OraclePrice {
   // Uses Position AND MarketConfig
 }
 ```
 
 **Single-aggregate command** → `positions/application/commands/`:
+
 ```typescript
 export const createFetchPositions = (store) => async (address: Address) => {
   // Only fetches positions
@@ -248,9 +261,10 @@ export const createFetchPositions = (store) => async (address: Address) => {
 ```
 
 **Cross-aggregate workflow** → `trading/src/application/workflows/`:
+
 ```typescript
 export const createFetchPositionBundle = (store) => async (positionId) => {
-  await fetchPosition(positionId);           // Position aggregate
+  await fetchPosition(positionId); // Position aggregate
   const position = getPosition(positionId);
   await fetchMarketConfig(position.marketId); // Market aggregate
   return { position, config: getMarketConfig(position.marketId) };
@@ -294,6 +308,7 @@ export const createFetchPositionBundle = (store) => async (positionId) => {
 **Location**: `*/domain/`
 
 **Contains**:
+
 - Entities
 - Value Objects
 - Domain Services
@@ -301,12 +316,14 @@ export const createFetchPositionBundle = (store) => async (positionId) => {
 - Pure business logic calculations
 
 **Rules**:
+
 - ✅ Can import from shared kernel only
 - ❌ Cannot import from application layer
 - ❌ Cannot import from infrastructure layer
 - ❌ No framework dependencies (Redux, GraphQL, etc.)
 
 **Example**:
+
 ```typescript
 // domain/positions.calculations.ts
 export function calculatePositionLeverage(position: Position): RatioOutput {
@@ -327,24 +344,32 @@ export function calculatePositionLeverage(position: Position): RatioOutput {
 **Location**: `*/application/`
 
 **Contains**:
+
 - Commands (write operations)
 - Queries (read operations)
 - Application services
 - Use case orchestration
 
 **Rules**:
+
 - ✅ Can import from domain layer
 - ✅ Can depend on port interfaces (not implementations)
 - ❌ Cannot import infrastructure implementations directly
 - Dependencies injected via factories
 
 **Example**:
+
 ```typescript
 // application/queries/get-positions-by-address.ts
 export const createGetAccountPositions =
-  (storeService: StoreService) =>           // Dependency injected
-  (address: Address): Position[] =>         // Domain types
-    selectLatestPositionsByAccount(         // Pure query
+  (
+    storeService: StoreService // Dependency injected
+  ) =>
+  (
+    address: Address
+  ): Position[] => // Domain types
+    selectLatestPositionsByAccount(
+      // Pure query
       storeService.getState(),
       address
     );
@@ -359,23 +384,25 @@ export const createGetAccountPositions =
 **Location**: `*/infrastructure/`
 
 **Contains**:
+
 - Repository implementations (adapters)
 - Redux state management
 - GraphQL queries
 - Mappers (DTO → Domain)
 
 **Rules**:
+
 - ✅ Can import from domain and application
 - ✅ Implements port interfaces from domain
 - ✅ All framework code lives here
 - ❌ Should not contain business logic
 
 **Example**:
+
 ```typescript
 // infrastructure/repositories/graphql-positions-repository/di.ts
-export const createGraphQLPositionRepository = (
-  client: GraphQLClient
-): PositionRepository => ({                    // Implements domain port
+export const createGraphQLPositionRepository = (client: GraphQLClient): PositionRepository => ({
+  // Implements domain port
   getPositionsByStableId: getPositionsByStableId(client),
   getPositionsByAccount: getPositionsByAccount(client),
 });
@@ -394,32 +421,35 @@ export const createGraphQLPositionRepository = (
 **Definition**: Objects with identity that persists over time, even if attributes change.
 
 **Characteristics**:
+
 - Has a unique identifier
 - Can be mutated (though we use immutable updates)
 - Identity is stable across lifecycle
 
 **When to use**:
+
 - ✅ Object has lifecycle (created, modified, deleted)
 - ✅ Identity matters more than attributes
 - ✅ Need to track object over time
 
 **Example**:
+
 ```typescript
 // domain/positions.entity.ts
 export type Position = {
   // Identity (what makes it unique)
-  revisionId: PositionRevisionId;              // Snapshot identity
+  revisionId: PositionRevisionId; // Snapshot identity
   positionKey: {
-    id: PositionStableId,                      // Permanent identity
-    account: Address,
-    indexAssetId: AssetId,
-    isLong: boolean,
-  },
+    id: PositionStableId; // Permanent identity
+    account: Address;
+    indexAssetId: AssetId;
+    isLong: boolean;
+  };
 
   // Attributes (can change)
-  collateralAmount: CollateralAmount,
-  size: PositionSize,
-  status: PositionStatus,
+  collateralAmount: CollateralAmount;
+  size: PositionSize;
+  status: PositionStatus;
   // ...
 };
 
@@ -428,10 +458,10 @@ export type Position = {
 ```
 
 **Identity Patterns**:
+
 ```typescript
 // Stable ID - never changes
-export const positionStableId = (id: string): PositionStableId =>
-  PositionStableIdSchema.parse(id);
+export const positionStableId = (id: string): PositionStableId => PositionStableIdSchema.parse(id);
 
 // Revision ID - tracks versions
 export const positionRevisionId = (id: string): PositionRevisionId =>
@@ -445,23 +475,26 @@ export const positionRevisionId = (id: string): PositionRevisionId =>
 **Definition**: Objects defined by their attributes, not identity. Immutable and replaceable.
 
 **Characteristics**:
+
 - No unique identifier
 - Immutable (cannot be changed after creation)
 - Equality by value (two objects with same values are equal)
 - Side-effect-free methods
 
 **When to use**:
+
 - ✅ Measuring, quantifying, or describing something
 - ✅ Immutability desired
 - ✅ No lifecycle
 - ✅ Prevents primitive obsession (passing raw numbers/strings)
 
 **Example**:
+
 ```typescript
 // shared/models/decimalValue.ts
 export abstract class DecimalValue {
   private constructor(
-    readonly value: bigint,      // Immutable
+    readonly value: bigint, // Immutable
     readonly decimals: bigint
   ) {}
 
@@ -471,7 +504,9 @@ export abstract class DecimalValue {
   }
 
   // Cannot mutate, only create new instance
-  static create(value: bigint): this { /* ... */ }
+  static create(value: bigint): this {
+    /* ... */
+  }
 }
 
 // Domain-specific value objects
@@ -492,6 +527,7 @@ const usd = UsdValue.create(100_000_000_000n);
 ```
 
 **Branded Types** (Lightweight Value Objects):
+
 ```typescript
 // shared/types.ts
 export const AddressSchema = z.string().brand<'Address'>();
@@ -501,15 +537,18 @@ export const AssetIdSchema = z.string().brand<'AssetId'>();
 export type AssetId = z.infer<typeof AssetIdSchema>;
 
 // Usage
-const address = address("0x1234...");        // Branded as Address
-const assetId = assetId("0xabcd...");        // Branded as AssetId
+const address = address('0x1234...'); // Branded as Address
+const assetId = assetId('0xabcd...'); // Branded as AssetId
 
 // ✅ Cannot mix up types
-function getPositions(addr: Address) { /* ... */ }
-getPositions(assetId);  // ❌ Compile error! AssetId is not Address
+function getPositions(addr: Address) {
+  /* ... */
+}
+getPositions(assetId); // ❌ Compile error! AssetId is not Address
 ```
 
 **Value Object Guidelines**:
+
 - Make them immutable (`readonly` fields)
 - Use branded types for simple values (strings, numbers)
 - Use classes for complex values (decimals, money, coordinates)
@@ -523,6 +562,7 @@ getPositions(assetId);  // ❌ Compile error! AssetId is not Address
 **Definition**: Cluster of entities and value objects treated as a single unit for data changes.
 
 **Characteristics**:
+
 - One entity is the **aggregate root** (entry point)
 - External objects hold references to root only, not internal entities
 - Root enforces invariants
@@ -531,13 +571,14 @@ getPositions(assetId);  // ❌ Compile error! AssetId is not Address
 **Current Aggregates**:
 
 #### Position Aggregate
+
 ```typescript
 // Aggregate Root: Position
 export type Position = {
-  revisionId: PositionRevisionId,
-  positionKey: PositionKey,           // Identity
-  collateralAmount: CollateralAmount, // Value Object
-  size: PositionSize,                 // Value Object
+  revisionId: PositionRevisionId;
+  positionKey: PositionKey; // Identity
+  collateralAmount: CollateralAmount; // Value Object
+  size: PositionSize; // Value Object
   // ... other value objects
 };
 
@@ -554,13 +595,14 @@ export function calculatePositionLeverage(position: Position): RatioOutput {
 ```
 
 #### MarketConfig Aggregate
+
 ```typescript
 // Aggregate Root: MarketConfig
 export type MarketConfig = {
-  id: MarketConfigId,                            // Identity
-  indexAssetId: AssetId,
-  initialMarginFraction: InitialMarginFraction,  // Value Object
-  maintenanceMarginFraction: MaintenanceMarginFraction,
+  id: MarketConfigId; // Identity
+  indexAssetId: AssetId;
+  initialMarginFraction: InitialMarginFraction; // Value Object
+  maintenanceMarginFraction: MaintenanceMarginFraction;
   // Invariant: initialMargin > maintenanceMargin enforced at creation
 };
 ```
@@ -568,6 +610,7 @@ export type MarketConfig = {
 **Aggregate Design Rules**:
 
 1. **Keep aggregates small**: Single entity + value objects is ideal
+
    ```typescript
    // ✅ Good: Small aggregate
    type Position = {
@@ -593,6 +636,7 @@ export type MarketConfig = {
    ```
 
 2. **Reference other aggregates by ID only**:
+
    ```typescript
    // ✅ Good
    export type Position = {
@@ -606,6 +650,7 @@ export type MarketConfig = {
    ```
 
 3. **One repository per aggregate root**:
+
    ```typescript
    // ✅ Good: Repository for Position aggregate
    export interface PositionRepository {
@@ -614,7 +659,8 @@ export type MarketConfig = {
    }
 
    // ❌ Bad: Repository for internal entity
-   export interface CollateralRepository {  // Don't do this!
+   export interface CollateralRepository {
+     // Don't do this!
      getCollateral(id: CollateralId): Promise<CollateralAmount>;
    }
    ```
@@ -622,13 +668,14 @@ export type MarketConfig = {
 4. **Enforce invariants at aggregate boundary**:
    ```typescript
    // Domain validation ensures invariants
-   export const MarketConfigSchema = z.object({
-     initialMarginFraction: InitialMarginFractionSchema,
-     maintenanceMarginFraction: MaintenanceMarginFractionSchema,
-   }).refine(
-     (data) => data.initialMarginFraction > data.maintenanceMarginFraction,
-     { message: "Initial margin must exceed maintenance margin" }
-   );
+   export const MarketConfigSchema = z
+     .object({
+       initialMarginFraction: InitialMarginFractionSchema,
+       maintenanceMarginFraction: MaintenanceMarginFractionSchema,
+     })
+     .refine((data) => data.initialMarginFraction > data.maintenanceMarginFraction, {
+       message: 'Initial margin must exceed maintenance margin',
+     });
    ```
 
 ---
@@ -638,21 +685,24 @@ export type MarketConfig = {
 **Definition**: Pure functions that work with multiple aggregates. Same as `positions.calculations.ts` but cross-aggregate.
 
 **When to use**:
+
 - ✅ Logic involves **objects from multiple aggregates**
 - ✅ Operation doesn't conceptually belong to any single entity
 - ✅ Pure calculation (no state reading, no infrastructure)
 
 **When NOT to use**:
+
 - ❌ Logic naturally belongs to an entity (put it in aggregate's domain/calculations)
 - ❌ Needs to read state or call repositories (that's application service)
 - ❌ Takes IDs as parameters (that's application service)
 
 **Example - Cross-Aggregate Pure Logic**:
+
 ```typescript
 // trading/src/domain/risk-calculator.ts
 export function calculateLiquidationPrice(
-  position: Position,      // Object from Position aggregate
-  config: MarketConfig     // Object from MarketConfig aggregate
+  position: Position, // Object from Position aggregate
+  config: MarketConfig // Object from MarketConfig aggregate
 ): OraclePrice {
   // Pure calculation using both aggregates
   const maintenanceMargin = DecimalCalculator.value(position.notional)
@@ -675,6 +725,7 @@ export function calculateLiquidationPrice(
 ```
 
 **Domain Service Guidelines**:
+
 - Make them pure functions (no side effects)
 - Take **objects** as parameters, never IDs
 - No state reading, no repository calls
@@ -682,10 +733,11 @@ export function calculateLiquidationPrice(
 - Same pattern as `positions.calculations.ts`, just cross-aggregate
 
 **NOT a Domain Service** (this is an application service):
+
 ```typescript
 // ❌ This belongs in application layer, NOT domain
 export const createCalculateRisk = (deps) => (positionId: PositionId) => {
-  const position = deps.getPosition(positionId);  // ❌ Reads state
+  const position = deps.getPosition(positionId); // ❌ Reads state
   const config = deps.getMarketConfig(position.marketId);
   return calculateRisk(position, config);
 };
@@ -700,6 +752,7 @@ export const createCalculateRisk = (deps) => (positionId: PositionId) => {
 **Pattern**: Port (interface) in domain, Adapter (implementation) in infrastructure
 
 **Port (Domain Layer)**:
+
 ```typescript
 // domain/positions.port.ts
 export interface PositionRepository {
@@ -714,11 +767,10 @@ export interface PositionRepository {
 ```
 
 **Adapter (Infrastructure Layer)**:
+
 ```typescript
 // infrastructure/repositories/graphql-positions-repository/di.ts
-export const createGraphQLPositionRepository = (
-  client: GraphQLClient
-): PositionRepository => ({
+export const createGraphQLPositionRepository = (client: GraphQLClient): PositionRepository => ({
   getPositionsByStableId: getPositionsByStableId(client),
   getPositionsByAccount: getPositionsByAccount(client),
 });
@@ -729,10 +781,12 @@ export const createGraphQLPositionRepository = (
 ```
 
 **Mapper (Anti-Corruption Layer)**:
+
 ```typescript
 // infrastructure/repositories/graphql-positions-repository/mappers.ts
 export function toDomainPosition(gql: GraphQLPosition): Position {
-  return PositionSchema.parse({  // Validates during translation
+  return PositionSchema.parse({
+    // Validates during translation
     revisionId: positionRevisionId(gql.id),
     positionKey: {
       id: positionStableId(gql.positionKey.id),
@@ -751,6 +805,7 @@ export function toDomainPosition(gql: GraphQLPosition): Position {
 ```
 
 **Repository Guidelines**:
+
 1. **One repository per aggregate root**
 2. **Interface in domain layer** (port)
 3. **Implementation in infrastructure layer** (adapter)
@@ -768,20 +823,23 @@ export function toDomainPosition(gql: GraphQLPosition): Position {
 #### Commands (Write Operations)
 
 **Characteristics**:
+
 - Change state
 - Return `void` or `Promise<void>` (don't return data)
 - May trigger side effects
 
 **Example**:
+
 ```typescript
 // application/commands/fetch-positions-by-account.ts
 export const createFetchPositionsByAccount =
-  (store: StoreService) =>              // Dependency injected
-  async (address: Address) => {         // Domain type
+  (
+    store: StoreService // Dependency injected
+  ) =>
+  async (address: Address) => {
+    // Domain type
     // Orchestrates infrastructure to update state
-    await store
-      .dispatch(positionsApi.endpoints.getPositionsByAddress.initiate(address))
-      .unwrap();
+    await store.dispatch(positionsApi.endpoints.getPositionsByAddress.initiate(address)).unwrap();
   };
 
 // ✅ Changes state (fetches and stores positions)
@@ -792,17 +850,24 @@ export const createFetchPositionsByAccount =
 #### Queries (Read Operations)
 
 **Characteristics**:
+
 - Read-only (no state changes)
 - Return data
 - Pure functions (no side effects)
 
 **Example**:
+
 ```typescript
 // application/queries/get-positions-by-address.ts
 export const createGetAccountPositions =
-  (storeService: StoreService) =>       // Dependency injected
-  (address: Address): Position[] =>     // Returns domain types
-    selectLatestPositionsByAccount(     // Pure read
+  (
+    storeService: StoreService // Dependency injected
+  ) =>
+  (
+    address: Address
+  ): Position[] => // Returns domain types
+    selectLatestPositionsByAccount(
+      // Pure read
       storeService.getState(),
       address
     );
@@ -817,25 +882,32 @@ export const createGetAccountPositions =
 **Definition**: Application services that **compose** commands and queries. Optional convenience layer.
 
 **Characteristics**:
+
 - Orchestrate multiple atomic operations
 - Can return data (not pure commands)
 - Encode business procedures
 - Only exist at **bounded context level** (not aggregate level)
 
 **Example**:
+
 ```typescript
 // trading/src/application/workflows/fetch-position-bundle.ts
 export const createFetchPositionBundle =
-  (deps: { fetchPosition: Command, fetchMarketConfig: Command, getPosition: Query, getMarketConfig: Query }) =>
+  (deps: {
+    fetchPosition: Command;
+    fetchMarketConfig: Command;
+    getPosition: Query;
+    getMarketConfig: Query;
+  }) =>
   async (positionId: PositionId) => {
     // Orchestrates atomic operations
-    await deps.fetchPosition(positionId);        // Command from positions/application
-    const position = deps.getPosition(positionId);  // Query from positions/application
+    await deps.fetchPosition(positionId); // Command from positions/application
+    const position = deps.getPosition(positionId); // Query from positions/application
 
-    await deps.fetchMarketConfig(position.marketId);  // Command from markets/application
-    const config = deps.getMarketConfig(position.marketId);  // Query from markets/application
+    await deps.fetchMarketConfig(position.marketId); // Command from markets/application
+    const config = deps.getMarketConfig(position.marketId); // Query from markets/application
 
-    return { position, config };  // ✅ Workflows can return data
+    return { position, config }; // ✅ Workflows can return data
   };
 
 // ✅ Composes atomic operations
@@ -844,14 +916,17 @@ export const createFetchPositionBundle =
 ```
 
 **When to create workflows**:
+
 - ✅ Operation encodes a **business procedure** (domain experts would recognize it)
 - ✅ Composition has business meaning (not just batching for convenience)
 
 **When NOT to create workflows**:
+
 - ❌ Just batching operations with no business logic
 - ❌ Pure convenience with no domain meaning
 
 **Workflows vs Commands/Queries**:
+
 ```typescript
 // Atomic command (positions/application/commands/)
 export const fetchPositions = (store) => async (address) => {
@@ -865,11 +940,11 @@ export const getPositions = (store) => (address) => {
 
 // Workflow (trading/src/application/workflows/)
 export const fetchAndCalculateRisk = (deps) => async (address) => {
-  await deps.fetchPositions(address);      // Uses atomic command
-  await deps.fetchMarketConfigs();          // Uses atomic command
+  await deps.fetchPositions(address); // Uses atomic command
+  await deps.fetchMarketConfigs(); // Uses atomic command
 
-  const positions = deps.getPositions(address);  // Uses atomic query
-  const configs = deps.getMarketConfigs();       // Uses atomic query
+  const positions = deps.getPositions(address); // Uses atomic query
+  const configs = deps.getMarketConfigs(); // Uses atomic query
 
   // Delegates to domain service for calculation
   return calculatePortfolioRisk(positions, configs);
@@ -877,6 +952,7 @@ export const fetchAndCalculateRisk = (deps) => async (address) => {
 ```
 
 **Application Service Guidelines**:
+
 - Keep them thin (orchestration only, no business logic)
 - Business logic belongs in domain layer
 - Use factory pattern for dependency injection
@@ -977,11 +1053,12 @@ my-new-feature/
 ### Module Exports Pattern
 
 **Root `index.ts`** (module public API):
+
 ```typescript
 // index.ts
-export * from './application';              // Commands & Queries
-export * from './domain';                   // Entities, Value Objects, Ports
-export * as myFeatureAdapters from './infrastructure';  // Namespaced!
+export * from './application'; // Commands & Queries
+export * from './domain'; // Entities, Value Objects, Ports
+export * as myFeatureAdapters from './infrastructure'; // Namespaced!
 
 export {
   myFeatureMiddleware,
@@ -991,15 +1068,16 @@ export {
 ```
 
 **Why namespace infrastructure?**
+
 - ✅ Prevents accidental coupling to implementation details
 - ✅ Makes it obvious when infrastructure is imported
 - ✅ Easier to swap implementations
 
 **Usage**:
+
 ```typescript
 // ✅ Good: Use public API
-import { createMyFeatureCommands, MyEntity } from '../my-feature';
-
+import { MyEntity, createMyFeatureCommands } from '../my-feature';
 // ❌ Bad: Import internals directly
 import { myFeatureSlice } from '../my-feature/infrastructure/redux/my-feature/slice';
 ```
@@ -1013,6 +1091,7 @@ import { myFeatureSlice } from '../my-feature/infrastructure/redux/my-feature/sl
 #### 1. Understand the Domain First
 
 Before writing code:
+
 1. **Talk to domain experts** (or understand business requirements)
 2. **Identify the entities**: What has identity and lifecycle?
 3. **Identify value objects**: What are measurements/quantities?
@@ -1022,6 +1101,7 @@ Before writing code:
 **Example**: Adding "Trade History" feature
 
 **Analysis**:
+
 - **Entity**: `Trade` (has identity, lifecycle: created, settled)
 - **Value Objects**: `TradePrice`, `TradeVolume`, `TradeFee`
 - **Aggregate**: `Trade` (aggregate root), may reference `Position` by ID
@@ -1069,8 +1149,8 @@ export const tradeId = (id: string): TradeId => TradeIdSchema.parse(id);
 // domain/trades.entity.ts
 import { z } from 'zod';
 import { Address, AssetId, Timestamp } from '@/shared/types';
+import { TradeFeeSchema, TradePriceSchema, TradeVolumeSchema } from './trades.decimals';
 import { TradeIdSchema } from './trades.types';
-import { TradePriceSchema, TradeVolumeSchema, TradeFeeSchema } from './trades.decimals';
 
 export enum TradeSide {
   BUY = 'BUY',
@@ -1079,7 +1159,7 @@ export enum TradeSide {
 
 export const TradeSchema = z.object({
   id: TradeIdSchema,
-  positionId: PositionStableIdSchema,  // Reference to Position aggregate
+  positionId: PositionStableIdSchema, // Reference to Position aggregate
   account: AddressSchema,
   assetId: AssetIdSchema,
   side: z.nativeEnum(TradeSide),
@@ -1096,21 +1176,17 @@ export type Trade = z.infer<typeof TradeSchema>;
 
 ```typescript
 // domain/trades.calculations.ts
-import { Trade } from './trades.entity';
 import { UsdValue } from '@/shared/models/decimals';
 import { DecimalCalculator } from '@/shared/utils/decimalCalculator';
+import { Trade } from './trades.entity';
 
 export function calculateTradeNotional(trade: Trade): UsdValue {
-  return DecimalCalculator.value(trade.price)
-    .multiplyBy(trade.volume)
-    .calculate(UsdValue);
+  return DecimalCalculator.value(trade.price).multiplyBy(trade.volume).calculate(UsdValue);
 }
 
 export function calculateNetValue(trade: Trade): UsdValue {
   const notional = calculateTradeNotional(trade);
-  return DecimalCalculator.value(notional)
-    .subtract(trade.fee)
-    .calculate(UsdValue);
+  return DecimalCalculator.value(notional).subtract(trade.fee).calculate(UsdValue);
 }
 
 // ✅ Pure functions
@@ -1122,9 +1198,9 @@ export function calculateNetValue(trade: Trade): UsdValue {
 
 ```typescript
 // domain/trades.port.ts
+import { Address, PositionStableId } from '@/shared/types';
 import { Trade } from './trades.entity';
 import { TradeId } from './trades.types';
-import { Address, PositionStableId } from '@/shared/types';
 
 export interface TradeRepository {
   getTradeById(id: TradeId): Promise<Trade | null>;
@@ -1176,9 +1252,9 @@ export const GET_TRADES_BY_ACCOUNT = gql`
 
 ```typescript
 // infrastructure/repositories/graphql-trades-repository/mappers.ts
+import { address, assetId, positionStableId, timestamp } from '@/shared/types';
 import { Trade, TradeSchema } from '../../../domain/trades.entity';
 import { tradeId } from '../../../domain/trades.types';
-import { address, assetId, positionStableId, timestamp } from '@/shared/types';
 
 type GraphQLTrade = {
   id: string;
@@ -1218,15 +1294,15 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 import { GraphQLClient } from 'graphql-request';
 import { Address } from '@/shared/types';
 import { Trade } from '../../../domain/trades.entity';
-import { GET_TRADES_BY_ACCOUNT } from './queries.gql';
 import { toDomainTrade } from './mappers';
+import { GET_TRADES_BY_ACCOUNT } from './queries.gql';
 
-export const getTradesByAccount = (client: GraphQLClient) => async (
-  account: Address
-): Promise<Trade[]> => {
-  const response = await client.request(GET_TRADES_BY_ACCOUNT, { account });
-  return response.trades.map(toDomainTrade);
-};
+export const getTradesByAccount =
+  (client: GraphQLClient) =>
+  async (account: Address): Promise<Trade[]> => {
+    const response = await client.request(GET_TRADES_BY_ACCOUNT, { account });
+    return response.trades.map(toDomainTrade);
+  };
 ```
 
 **Step 3.4: Create Repository Factory**
@@ -1239,9 +1315,7 @@ import { getTradeById } from './get-trade-by-id';
 import { getTradesByAccount } from './get-trades-by-account';
 import { getTradesByPosition } from './get-trades-by-position';
 
-export const createGraphQLTradeRepository = (
-  client: GraphQLClient
-): TradeRepository => ({
+export const createGraphQLTradeRepository = (client: GraphQLClient): TradeRepository => ({
   getTradeById: getTradeById(client),
   getTradesByAccount: getTradesByAccount(client),
   getTradesByPosition: getTradesByPosition(client),
@@ -1256,7 +1330,7 @@ export const createGraphQLTradeRepository = (
 
 ```typescript
 // infrastructure/redux/trades/trades.slice.ts
-import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
+import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 import { Trade } from '../../../domain/trades.entity';
 import { TradeId } from '../../../domain/trades.types';
 
@@ -1269,12 +1343,9 @@ export const tradesSlice = createSlice({
   initialState: tradesAdapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) => {
-    builder.addMatcher(
-      tradesApi.endpoints.getTradesByAccount.matchFulfilled,
-      (state, action) => {
-        if (action.payload) tradesAdapter.upsertMany(state, action.payload);
-      }
-    );
+    builder.addMatcher(tradesApi.endpoints.getTradesByAccount.matchFulfilled, (state, action) => {
+      if (action.payload) tradesAdapter.upsertMany(state, action.payload);
+    });
   },
 });
 
@@ -1305,9 +1376,7 @@ export const tradesApi = createApi({
         const result = await tradeRepository.getTradesByAccount(account);
         return { data: result ?? [] };
       },
-      providesTags: (_result, _error, arg) => [
-        { type: 'trades-by-account', id: arg }
-      ],
+      providesTags: (_result, _error, arg) => [{ type: 'trades-by-account', id: arg }],
     }),
   }),
 });
@@ -1321,28 +1390,24 @@ export const { useGetTradesByAccountQuery } = tradesApi;
 // infrastructure/redux/trades/trades.selectors.ts
 import { createSelector } from '@reduxjs/toolkit';
 import { createEntityAdapter } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
-import { Trade } from '../../../domain/trades.entity';
 import { Address, PositionStableId } from '@/shared/types';
+import { Trade } from '../../../domain/trades.entity';
+import { RootState } from '../../store';
 
 const tradesAdapter = createEntityAdapter<Trade>({
   selectId: (trade) => trade.id,
 });
 
-const tradesSelectors = tradesAdapter.getSelectors(
-  (state: RootState) => state.trades
-);
+const tradesSelectors = tradesAdapter.getSelectors((state: RootState) => state.trades);
 
 export const selectTradesByAccount = createSelector(
   [tradesSelectors.selectAll, (_state, account: Address) => account],
-  (trades, account) =>
-    trades.filter((trade) => trade.account === account)
+  (trades, account) => trades.filter((trade) => trade.account === account)
 );
 
 export const selectTradesByPosition = createSelector(
   [tradesSelectors.selectAll, (_state, positionId: PositionStableId) => positionId],
-  (trades, positionId) =>
-    trades.filter((trade) => trade.positionId === positionId)
+  (trades, positionId) => trades.filter((trade) => trade.positionId === positionId)
 );
 ```
 
@@ -1352,16 +1417,12 @@ export const selectTradesByPosition = createSelector(
 
 ```typescript
 // application/commands/fetch-trades-by-account.ts
-import { Address } from '@/shared/types';
 import { StoreService } from '@/shared/lib/store';
+import { Address } from '@/shared/types';
 import { tradesApi } from '../../infrastructure/redux/trades/trades.api';
 
-export const createFetchTradesByAccount = (store: StoreService) => async (
-  address: Address
-) => {
-  await store
-    .dispatch(tradesApi.endpoints.getTradesByAccount.initiate(address))
-    .unwrap();
+export const createFetchTradesByAccount = (store: StoreService) => async (address: Address) => {
+  await store.dispatch(tradesApi.endpoints.getTradesByAccount.initiate(address)).unwrap();
 };
 
 // ✅ Thin orchestration
@@ -1385,14 +1446,15 @@ export const createTradeCommands = (store: StoreService) => ({
 
 ```typescript
 // application/queries/get-trades-by-account.ts
+import { StoreService } from '@/shared/lib/store';
 import { Address } from '@/shared/types';
 import { Trade } from '../../domain/trades.entity';
-import { StoreService } from '@/shared/lib/store';
 import { selectTradesByAccount } from '../../infrastructure/redux/trades/trades.selectors';
 
-export const createGetTradesByAccount = (storeService: StoreService) => (
-  address: Address
-): Trade[] => selectTradesByAccount(storeService.getState(), address);
+export const createGetTradesByAccount =
+  (storeService: StoreService) =>
+  (address: Address): Trade[] =>
+    selectTradesByAccount(storeService.getState(), address);
 
 // ✅ Pure query
 // ✅ Returns domain types
@@ -1404,13 +1466,13 @@ export const createGetTradesByAccount = (storeService: StoreService) => (
 ```typescript
 // application/queries/di.ts
 import { StoreService } from '@/shared/lib/store';
+import { calculateNetValue, calculateTradeNotional } from '../../domain/trades.calculations';
 import { createGetTradesByAccount } from './get-trades-by-account';
-import { calculateTradeNotional, calculateNetValue } from '../../domain/trades.calculations';
 
 export const createTradeQueries = (storeService: StoreService) => ({
   getTradesByAccount: createGetTradesByAccount(storeService),
-  calculateTradeNotional,  // Pure domain function
-  calculateNetValue,       // Pure domain function
+  calculateTradeNotional, // Pure domain function
+  calculateNetValue, // Pure domain function
 });
 ```
 
@@ -1447,7 +1509,7 @@ export const createTradingModule = (graphqlClient: GraphQLClient) => {
 
 ```typescript
 // shared/lib/store/createStore.ts
-import { tradesReducer, tradesApi } from '@/trading/src/trades/infrastructure/redux';
+import { tradesApi, tradesReducer } from '@/trading/src/trades/infrastructure/redux';
 
 export const createStore = (thunkExtras: TradingThunkExtras) => {
   return configureStore({
@@ -1472,11 +1534,7 @@ export * from './application';
 export * from './domain';
 export * as tradesAdapters from './infrastructure';
 
-export {
-  tradesReducer,
-  tradesApi,
-  type TradesThunkExtra,
-} from './infrastructure/redux';
+export { tradesReducer, tradesApi, type TradesThunkExtra } from './infrastructure/redux';
 ```
 
 #### 7. Use in Client Code
@@ -1484,6 +1542,8 @@ export {
 ```typescript
 // Client usage
 import { createStarboardClient } from 'fuel-ts-sdk';
+// Domain types importable
+import { MarketConfig, Position, calculatePositionLeverage } from 'fuel-ts-sdk/trading';
 
 const client = createStarboardClient({ indexerUrl: '...' });
 
@@ -1496,9 +1556,6 @@ const config = client.trading.api.getMarketConfig(assetId('0xabcd...'));
 // Workflows (composite operations) - only ones with nesting
 const bundle = await client.trading.workflows.fetchPositionBundle(positionId('pos1'));
 const risk = client.trading.workflows.calculatePositionRisk(positionId('pos1'));
-
-// Domain types importable
-import { Position, MarketConfig, calculatePositionLeverage } from 'fuel-ts-sdk/trading';
 ```
 
 ---
@@ -1510,6 +1567,7 @@ import { Position, MarketConfig, calculatePositionLeverage } from 'fuel-ts-sdk/t
 #### ✅ Always Expose (Public API)
 
 1. **Domain Types**:
+
    ```typescript
    export * from './domain/trades.entity';
    export * from './domain/trades.types';
@@ -1517,11 +1575,13 @@ import { Position, MarketConfig, calculatePositionLeverage } from 'fuel-ts-sdk/t
    ```
 
 2. **Domain Calculations** (pure functions):
+
    ```typescript
    export { calculateTradeNotional, calculateNetValue } from './domain/trades.calculations';
    ```
 
 3. **Application Services** (commands & queries):
+
    ```typescript
    export { createTradeCommands, createTradeQueries } from './application';
    ```
@@ -1536,15 +1596,17 @@ import { Position, MarketConfig, calculatePositionLeverage } from 'fuel-ts-sdk/t
 **Why namespace?** Prevents accidental coupling to implementation details.
 
 ```typescript
+// Usage requires explicit namespace
+import { tradesAdapters } from 'fuel-ts-sdk';
+
 // ✅ Good: Namespace infrastructure
 export * as tradesAdapters from './infrastructure';
 
-// Usage requires explicit namespace
-import { tradesAdapters } from 'fuel-ts-sdk';
 const repo = tradesAdapters.createGraphQLTradeRepository(client);
 ```
 
 **What to namespace**:
+
 - Repository adapter factories
 - Redux internals (except reducer/middleware for store setup)
 - Mappers
@@ -1552,30 +1614,35 @@ const repo = tradesAdapters.createGraphQLTradeRepository(client);
 #### ❌ Never Expose (Internal Details)
 
 1. **GraphQL Queries**:
+
    ```typescript
    // ❌ Don't export
    export { GET_TRADES_BY_ACCOUNT } from './infrastructure/repositories/graphql-trades-repository/queries.gql';
    ```
 
 2. **Mappers**:
+
    ```typescript
    // ❌ Don't export (internal to repository)
    export { toDomainTrade } from './infrastructure/repositories/graphql-trades-repository/mappers';
    ```
 
 3. **Redux Action Types**:
+
    ```typescript
    // ❌ Don't export (internal to Redux)
    export { tradesSlice } from './infrastructure/redux/trades/trades.slice';
    ```
 
 4. **Implementation Methods**:
+
    ```typescript
    // ❌ Don't export (internal to repository)
    export { getTradesByAccount } from './infrastructure/repositories/graphql-trades-repository/get-trades-by-account';
    ```
 
 5. **Selectors** (use queries instead):
+
    ```typescript
    // ❌ Don't export selectors directly
    export { selectTradesByAccount } from './infrastructure/redux/trades/trades.selectors';
@@ -1599,11 +1666,7 @@ export * from './application';
 export * as myFeatureAdapters from './infrastructure';
 
 // ✅ Redux setup (needed for store configuration)
-export {
-  myFeatureReducer,
-  myFeatureApi,
-  type MyFeatureThunkExtra,
-} from './infrastructure/redux';
+export { myFeatureReducer, myFeatureApi, type MyFeatureThunkExtra } from './infrastructure/redux';
 
 // ❌ Don't export:
 // - GraphQL queries
@@ -1622,6 +1685,7 @@ export {
 ### RTK Query (createApi)
 
 **Use when you need advanced caching**:
+
 - ✅ Automatic cache invalidation with tags
 - ✅ Deduplicate concurrent requests
 - ✅ Automatic refetching on window focus/reconnect
@@ -1629,6 +1693,7 @@ export {
 - ✅ Polling/subscriptions
 
 **Example** (positions with caching):
+
 ```typescript
 // infrastructure/redux/positions/positions.api.ts
 export const positionsApi = createApi({
@@ -1642,9 +1707,7 @@ export const positionsApi = createApi({
         const result = await positionRepository.getPositionsByAccount(address);
         return { data: result ?? [] };
       },
-      providesTags: (_result, _error, arg) => [
-        { type: 'positions-by-address', id: arg }
-      ],
+      providesTags: (_result, _error, arg) => [{ type: 'positions-by-address', id: arg }],
     }),
   }),
 });
@@ -1654,6 +1717,7 @@ export const positionsApi = createApi({
 ```
 
 **Complexity cost**:
+
 - ⚠️ More boilerplate (reducerPath, baseQuery, tagTypes)
 - ⚠️ Cache management adds cognitive load
 - ⚠️ Harder to debug cache invalidation bugs
@@ -1661,12 +1725,14 @@ export const positionsApi = createApi({
 ### Plain Thunks (createAsyncThunk)
 
 **Use when you DON'T need caching**:
+
 - ✅ Simple data fetching
 - ✅ Write operations (commands)
 - ✅ One-time loads
 - ✅ Clear control flow
 
 **Example** (market configs without caching):
+
 ```typescript
 // infrastructure/redux/market-configs/market-configs.thunks.ts
 export const fetchMarketConfig = createAsyncThunk<
@@ -1684,39 +1750,41 @@ export const fetchMarketConfig = createAsyncThunk<
 
 // Slice handles the result
 extraReducers: (builder) => {
-  builder
-    .addCase(fetchMarketConfig.fulfilled, (state, action) => {
-      marketConfigsAdapter.upsertOne(state, action.payload);
-    });
-}
+  builder.addCase(fetchMarketConfig.fulfilled, (state, action) => {
+    marketConfigsAdapter.upsertOne(state, action.payload);
+  });
+};
 ```
 
 **Simplicity benefits**:
+
 - ✅ Straightforward async flow
 - ✅ Less boilerplate
 - ✅ Easier to understand
 
 ### Decision Matrix
 
-| Scenario | Use RTK Query | Use Thunks |
-|----------|---------------|------------|
-| **User data that changes frequently** | ✅ | ❌ |
-| **Need to invalidate cache across components** | ✅ | ❌ |
-| **Concurrent requests to same endpoint** | ✅ | ❌ |
-| **Config data (rarely changes)** | ❌ | ✅ |
-| **Write operations (commands)** | ❌ | ✅ |
-| **One-time data load** | ❌ | ✅ |
-| **Simple fetch-and-store** | ❌ | ✅ |
+| Scenario                                       | Use RTK Query | Use Thunks |
+| ---------------------------------------------- | ------------- | ---------- |
+| **User data that changes frequently**          | ✅            | ❌         |
+| **Need to invalidate cache across components** | ✅            | ❌         |
+| **Concurrent requests to same endpoint**       | ✅            | ❌         |
+| **Config data (rarely changes)**               | ❌            | ✅         |
+| **Write operations (commands)**                | ❌            | ✅         |
+| **One-time data load**                         | ❌            | ✅         |
+| **Simple fetch-and-store**                     | ❌            | ✅         |
 
 ### Our Codebase Usage
 
 **RTK Query** (positions):
+
 - Positions change frequently (trades, liquidations)
 - Multiple components need same position data
 - Need to invalidate when user trades
 - Cache deduplication saves GraphQL calls
 
 **Thunks** (markets):
+
 - Market configs change rarely
 - Usually fetched once per session
 - No cache invalidation needed
@@ -1739,7 +1807,7 @@ extraReducers: (builder) => {
 export const configApi = createApi({
   reducerPath: 'configApi',
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['config'],  // Unnecessary complexity
+  tagTypes: ['config'], // Unnecessary complexity
   endpoints: (builder) => ({
     getConfig: builder.query({
       async queryFn(_, api) {
@@ -1753,19 +1821,18 @@ export const configApi = createApi({
 ```
 
 **Better**:
+
 ```typescript
 // ✅ Good: Use thunk for simple load
-export const fetchConfig = createAsyncThunk(
-  'config/fetch',
-  async (_, { extra }) => {
-    return await extra.configRepository.get();
-  }
-);
+export const fetchConfig = createAsyncThunk('config/fetch', async (_, { extra }) => {
+  return await extra.configRepository.get();
+});
 ```
 
 ### When in Doubt
 
 **Ask**: "Does this data need cache invalidation or deduplication?"
+
 - **Yes** → RTK Query
 - **No** → Thunks
 
@@ -1781,22 +1848,22 @@ export const fetchConfig = createAsyncThunk(
 
 ```typescript
 // domain/trades.calculations.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { calculateTradeNotional } from './trades.calculations';
-import { Trade } from './trades.entity';
 import { TradePrice, TradeVolume } from './trades.decimals';
+import { Trade } from './trades.entity';
 
 describe('calculateTradeNotional', () => {
   it('calculates notional value correctly', () => {
     const trade: Trade = {
       // ... create test trade
-      price: TradePrice.create(100_000_000_000n),  // $100
-      volume: TradeVolume.create(5_000_000_000n),  // 5 units
+      price: TradePrice.create(100_000_000_000n), // $100
+      volume: TradeVolume.create(5_000_000_000n), // 5 units
     };
 
     const notional = calculateTradeNotional(trade);
 
-    expect(notional.value).toBe(500_000_000_000n);  // $500
+    expect(notional.value).toBe(500_000_000_000n); // $500
   });
 
   it('handles zero volume', () => {
@@ -1823,10 +1890,10 @@ describe('calculateTradeNotional', () => {
 
 ```typescript
 // application/queries/get-trades-by-account.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { createGetTradesByAccount } from './get-trades-by-account';
+import { describe, expect, it, vi } from 'vitest';
 import { StoreService } from '@/shared/lib/store';
 import { address } from '@/shared/types';
+import { createGetTradesByAccount } from './get-trades-by-account';
 
 describe('createGetTradesByAccount', () => {
   it('retrieves trades for account', () => {
@@ -1836,8 +1903,8 @@ describe('createGetTradesByAccount', () => {
         trades: {
           ids: ['trade1', 'trade2'],
           entities: {
-            trade1: { id: 'trade1', account: '0x1234', /* ... */ },
-            trade2: { id: 'trade2', account: '0x1234', /* ... */ },
+            trade1: { id: 'trade1', account: '0x1234' /* ... */ },
+            trade2: { id: 'trade2', account: '0x1234' /* ... */ },
           },
         },
       }),
@@ -1862,7 +1929,7 @@ describe('createGetTradesByAccount', () => {
 
 ```typescript
 // infrastructure/repositories/graphql-trades-repository/mappers.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { toDomainTrade } from './mappers';
 
 describe('toDomainTrade', () => {
@@ -1906,10 +1973,10 @@ describe('toDomainTrade', () => {
 
 ```typescript
 // integration/trades.integration.test.ts
-import { describe, it, expect } from 'vitest';
-import { createTradingModule } from '@/trading/di';
-import { createStore, createStoreService } from '@/shared/lib/store';
 import { GraphQLClient } from 'graphql-request';
+import { describe, expect, it } from 'vitest';
+import { createStore, createStoreService } from '@/shared/lib/store';
+import { createTradingModule } from '@/trading/di';
 
 describe('Trades Integration', () => {
   it('fetches and retrieves trades end-to-end', async () => {
@@ -1944,27 +2011,27 @@ describe('Trades Integration', () => {
 
 ```typescript
 // ❌ BAD: Business logic in repository
-export const getTradesByAccount = (client: GraphQLClient) => async (
-  account: Address
-): Promise<Trade[]> => {
-  const response = await client.request(GET_TRADES_BY_ACCOUNT, { account });
+export const getTradesByAccount =
+  (client: GraphQLClient) =>
+  async (account: Address): Promise<Trade[]> => {
+    const response = await client.request(GET_TRADES_BY_ACCOUNT, { account });
 
-  // ❌ Business logic doesn't belong here!
-  return response.trades
-    .map(toDomainTrade)
-    .filter((trade) => trade.volume.value > 0n)  // ❌ Filtering logic
-    .sort((a, b) => b.timestamp - a.timestamp);  // ❌ Sorting logic
-};
+    // ❌ Business logic doesn't belong here!
+    return response.trades
+      .map(toDomainTrade)
+      .filter((trade) => trade.volume.value > 0n) // ❌ Filtering logic
+      .sort((a, b) => b.timestamp - a.timestamp); // ❌ Sorting logic
+  };
 ```
 
 ```typescript
 // ✅ GOOD: Repository just retrieves, domain layer filters
-export const getTradesByAccount = (client: GraphQLClient) => async (
-  account: Address
-): Promise<Trade[]> => {
-  const response = await client.request(GET_TRADES_BY_ACCOUNT, { account });
-  return response.trades.map(toDomainTrade);  // ✅ Just translate
-};
+export const getTradesByAccount =
+  (client: GraphQLClient) =>
+  async (account: Address): Promise<Trade[]> => {
+    const response = await client.request(GET_TRADES_BY_ACCOUNT, { account });
+    return response.trades.map(toDomainTrade); // ✅ Just translate
+  };
 
 // ✅ Business logic in domain or application layer
 export function filterNonZeroTrades(trades: Trade[]): Trade[] {
@@ -1991,9 +2058,7 @@ export function calculateTradeNotional(trade: GraphQLTrade): UsdValue {
 // ✅ GOOD: Domain types only
 export function calculateTradeNotional(trade: Trade): UsdValue {
   // ✅ Uses domain type
-  return DecimalCalculator.value(trade.price)
-    .multiplyBy(trade.volume)
-    .calculate(UsdValue);
+  return DecimalCalculator.value(trade.price).multiplyBy(trade.volume).calculate(UsdValue);
 }
 ```
 
@@ -2009,9 +2074,15 @@ export type Position = {
 
 // Logic scattered in services
 export class PositionService {
-  calculateLeverage(position: Position) { /* ... */ }
-  calculateHealth(position: Position) { /* ... */ }
-  isLiquidatable(position: Position) { /* ... */ }
+  calculateLeverage(position: Position) {
+    /* ... */
+  }
+  calculateHealth(position: Position) {
+    /* ... */
+  }
+  isLiquidatable(position: Position) {
+    /* ... */
+  }
 }
 ```
 
@@ -2019,7 +2090,7 @@ export class PositionService {
 // ✅ GOOD: Rich domain model with behavior
 export type Position = {
   id: PositionId;
-  size: PositionSize;         // Value Object
+  size: PositionSize; // Value Object
   collateral: CollateralAmount;
 };
 
@@ -2043,9 +2114,9 @@ export function isPositionLiquidatable(position: Position): boolean {
 // ❌ BAD: Aggregate includes everything
 export type Position = {
   id: PositionId;
-  market: Market;              // ❌ Entire aggregate embedded
-  owner: User;                 // ❌ Entire aggregate embedded
-  trades: Trade[];             // ❌ Collection embedded
+  market: Market; // ❌ Entire aggregate embedded
+  owner: User; // ❌ Entire aggregate embedded
+  trades: Trade[]; // ❌ Collection embedded
   liquidations: Liquidation[]; // ❌ Collection embedded
 };
 ```
@@ -2054,8 +2125,8 @@ export type Position = {
 // ✅ GOOD: Small aggregate, references by ID
 export type Position = {
   id: PositionId;
-  marketId: MarketId;      // ✅ Reference by ID
-  ownerId: UserId;         // ✅ Reference by ID
+  marketId: MarketId; // ✅ Reference by ID
+  ownerId: UserId; // ✅ Reference by ID
   // Don't embed collections
 };
 
@@ -2075,7 +2146,7 @@ function calculateLeverage(size: bigint, collateral: bigint): bigint {
 }
 
 // ❌ Easy to accidentally swap parameters
-calculateLeverage(collateral, size);  // Oops! Wrong order
+calculateLeverage(collateral, size); // Oops! Wrong order
 ```
 
 ```typescript
@@ -2104,7 +2175,7 @@ import { GET_TRADES } from '../trades/infrastructure/repositories/graphql-trades
 
 ```typescript
 // ✅ GOOD: Use public API only
-import { createTradeQueries, Trade } from '../trades';
+import { Trade, createTradeQueries } from '../trades';
 
 const tradeQueries = createTradeQueries(storeService);
 const trades = tradeQueries.getTradesByAccount(address);
@@ -2116,9 +2187,9 @@ const trades = tradeQueries.getTradesByAccount(address);
 // ❌ BAD: No validation when mapping external data
 export function toDomainTrade(gql: GraphQLTrade): Trade {
   return {
-    id: gql.id,                 // ❌ No validation
-    price: gql.price,           // ❌ Could be negative
-    volume: gql.volume,         // ❌ Could be zero/negative
+    id: gql.id, // ❌ No validation
+    price: gql.price, // ❌ Could be negative
+    volume: gql.volume, // ❌ Could be zero/negative
   };
 }
 ```
@@ -2126,9 +2197,10 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ```typescript
 // ✅ GOOD: Validate at boundary
 export function toDomainTrade(gql: GraphQLTrade): Trade {
-  return TradeSchema.parse({   // ✅ Zod validates
-    id: tradeId(gql.id),       // ✅ Branded type validates
-    price: BigInt(gql.price),  // ✅ Convert to proper type
+  return TradeSchema.parse({
+    // ✅ Zod validates
+    id: tradeId(gql.id), // ✅ Branded type validates
+    price: BigInt(gql.price), // ✅ Convert to proper type
     volume: BigInt(gql.volume),
   });
   // Throws if validation fails - prevents corrupt data entering domain
@@ -2142,9 +2214,11 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ### Essential DDD Books
 
 #### 1. **Domain-Driven Design: Tackling Complexity in the Heart of Software** (Blue Book)
+
 **Author**: Eric Evans
 **Why read**: The original DDD book. Defines all core patterns.
 **Focus chapters**:
+
 - Chapter 5: A Model Expressed in Software (Entities, Value Objects, Services)
 - Chapter 6: The Life Cycle of a Domain Object (Aggregates, Repositories)
 - Chapter 14: Maintaining Model Integrity (Bounded Contexts)
@@ -2152,9 +2226,11 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 **Key takeaway**: "The heart of software is its ability to solve domain-related problems for its user."
 
 #### 2. **Implementing Domain-Driven Design** (Red Book)
+
 **Author**: Vaughn Vernon
 **Why read**: Practical implementation guide. More concrete than Evans.
 **Focus chapters**:
+
 - Chapter 4: Architecture (Hexagonal/Ports & Adapters)
 - Chapter 5: Entities
 - Chapter 6: Value Objects
@@ -2164,6 +2240,7 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 **Key takeaway**: "Design small aggregates" and "Model true invariants in consistency boundaries."
 
 #### 3. **Domain-Driven Design Distilled**
+
 **Author**: Vaughn Vernon
 **Why read**: Short overview (~150 pages). Great for team members who won't read full books.
 **What it covers**: Strategic DDD (Bounded Contexts) and Tactical DDD (patterns) in digestible format.
@@ -2173,9 +2250,11 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ### Architecture Books
 
 #### 4. **Clean Architecture**
+
 **Author**: Robert C. Martin (Uncle Bob)
 **Why read**: Explains dependency inversion and layered architecture principles.
 **Focus chapters**:
+
 - Chapter 22: The Clean Architecture
 - Chapter 23: Presenters and Humble Objects
 - Chapter 26: The Main Component (Composition Root)
@@ -2183,9 +2262,11 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 **Key takeaway**: "Source code dependencies must point only inward, toward higher-level policies."
 
 #### 5. **Patterns of Enterprise Application Architecture**
+
 **Author**: Martin Fowler
 **Why read**: Catalog of enterprise patterns (Repository, Unit of Work, Data Mapper).
 **Focus chapters**:
+
 - Repository pattern
 - Data Mapper pattern
 - Unit of Work pattern
@@ -2195,6 +2276,7 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ### Advanced Topics
 
 #### 6. **CQRS Documents** (Free Online)
+
 **Author**: Greg Young
 **Where**: https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf
 **Why read**: Understand CQRS and Event Sourcing from the creator.
@@ -2202,6 +2284,7 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 **Key takeaway**: "CQRS is simply the creation of two objects where there was previously only one."
 
 #### 7. **Hexagonal Architecture** (Original Paper)
+
 **Author**: Alistair Cockburn
 **Where**: https://alistair.cockburn.us/hexagonal-architecture/
 **Why read**: Understand Ports & Adapters pattern philosophy.
@@ -2211,22 +2294,26 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ### Online Resources
 
 #### 8. **Domain-Driven Design Reference**
+
 **Author**: Eric Evans (Free PDF)
 **Where**: https://www.domainlanguage.com/ddd/reference/
 **Why read**: Quick reference for DDD patterns. Keep it handy.
 
 #### 9. **Awesome DDD** (GitHub)
+
 **Where**: https://github.com/heynickc/awesome-ddd
 **Why read**: Curated list of DDD resources, articles, talks.
 
 ### Video Content
 
 #### 10. **Domain-Driven Design: The Good Parts**
+
 **Speaker**: Jimmy Bogard
 **Where**: YouTube
 **Why watch**: Practical advice on what DDD patterns to use (and which to skip).
 
 #### 11. **CQRS and Event Sourcing**
+
 **Speaker**: Greg Young
 **Where**: YouTube (multiple talks)
 **Why watch**: Understand CQRS from the source.
@@ -2236,27 +2323,32 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ## Reading Path for New Team Members
 
 ### Week 1: Core Concepts
+
 1. Read **DDD Distilled** (2-3 hours)
 2. Read this guide completely
 3. Explore codebase: [fuel-ts-sdk/src/trading/src/positions/](../../fuel-ts-sdk/src/trading/src/positions/)
 
 ### Week 2: Tactical Patterns
+
 1. Read **Implementing DDD** Chapters 5-7 (Entities, Value Objects, Services)
 2. Study: [positions.entity.ts](../../fuel-ts-sdk/src/trading/src/positions/domain/positions.entity.ts)
 3. Study: [decimalValue.ts](../../fuel-ts-sdk/src/shared/models/decimalValue.ts)
 
 ### Week 3: Architecture
+
 1. Read **Clean Architecture** Chapter 22
 2. Read **Hexagonal Architecture** paper
 3. Study: [client.ts](../../fuel-ts-sdk/src/client.ts) (Composition Root)
 4. Study: [di.ts](../../fuel-ts-sdk/src/trading/di.ts) (Dependency Injection)
 
 ### Week 4: Implementation Practice
+
 1. Read **Implementing DDD** Chapter 10 (Aggregates)
 2. Implement a small feature following [Adding New Features](#adding-new-features)
 3. Code review with experienced team member
 
 ### Ongoing: Deep Dive
+
 1. Read **Blue Book** (Evans) - foundational knowledge
 2. Read **CQRS Documents** (Greg Young) - advanced patterns
 3. Watch Jimmy Bogard talks - practical wisdom
@@ -2268,26 +2360,26 @@ export function toDomainTrade(gql: GraphQLTrade): Trade {
 ### Final SDK Tree Design
 
 ```typescript
-// sdk.trading.api.* - ALL atomic operations (flat)
-sdk.trading.api.fetchPositions(address)          // Aggregate-level atomic
-sdk.trading.api.getPositions(address)            // Aggregate-level atomic
-sdk.trading.api.fetchMarketConfig(assetId)       // Aggregate-level atomic
-sdk.trading.api.getMarketConfig(assetId)         // Aggregate-level atomic
-sdk.trading.api.fetchPositionBundle(positionId)  // Cross-aggregate atomic
-sdk.trading.api.getPositionRisk(positionId)      // Cross-aggregate atomic
-
-// sdk.trading.workflows.* - Composite operations (only workflows get nesting)
-sdk.trading.workflows.openPositionSafely(params)
-sdk.trading.workflows.liquidatePosition(positionId)
-sdk.trading.workflows.fetchCompletePortfolio(address)
-
 // import from 'fuel-ts-sdk/trading' - Domain types
 import {
-  Position,
   MarketConfig,
+  Position,
   PositionStatus,
-  calculatePositionLeverage,  // Pure domain function
+  calculatePositionLeverage, // Pure domain function
 } from 'fuel-ts-sdk/trading';
+
+// sdk.trading.api.* - ALL atomic operations (flat)
+sdk.trading.api.fetchPositions(address); // Aggregate-level atomic
+sdk.trading.api.getPositions(address); // Aggregate-level atomic
+sdk.trading.api.fetchMarketConfig(assetId); // Aggregate-level atomic
+sdk.trading.api.getMarketConfig(assetId); // Aggregate-level atomic
+sdk.trading.api.fetchPositionBundle(positionId); // Cross-aggregate atomic
+sdk.trading.api.getPositionRisk(positionId); // Cross-aggregate atomic
+
+// sdk.trading.workflows.* - Composite operations (only workflows get nesting)
+sdk.trading.workflows.openPositionSafely(params);
+sdk.trading.workflows.liquidatePosition(positionId);
+sdk.trading.workflows.fetchCompletePortfolio(address);
 ```
 
 ### Mapping to Codebase
@@ -2317,6 +2409,7 @@ trading/src/
 When adding a new feature, ask yourself:
 
 ### Domain Layer
+
 - [ ] Have I identified entities vs value objects correctly?
 - [ ] Are my value objects immutable?
 - [ ] Do I use branded types to prevent primitive obsession?
@@ -2326,6 +2419,7 @@ When adding a new feature, ask yourself:
 - [ ] Does domain layer have zero infrastructure dependencies?
 
 ### Application Layer
+
 - [ ] Are commands separated from queries?
 - [ ] Do commands return `void` or `Promise<void>`?
 - [ ] Are queries side-effect-free?
@@ -2333,6 +2427,7 @@ When adding a new feature, ask yourself:
 - [ ] Do I use factory pattern for dependency injection?
 
 ### Infrastructure Layer
+
 - [ ] Do my repository adapters implement domain ports?
 - [ ] Do I have mappers translating external types to domain types?
 - [ ] Do mappers validate with Zod schemas?
@@ -2341,12 +2436,14 @@ When adding a new feature, ask yourself:
 - [ ] Do selectors read from normalized state?
 
 ### Module Boundaries
+
 - [ ] Do I export domain types and logic?
 - [ ] Do I namespace infrastructure exports?
 - [ ] Do I avoid exporting internal implementation details?
 - [ ] Can other modules use my feature without importing internals?
 
 ### Testing
+
 - [ ] Can I unit test domain logic without mocks?
 - [ ] Can I mock dependencies for application services?
 - [ ] Do I test mappers to ensure correct translation?
@@ -2357,6 +2454,7 @@ When adding a new feature, ask yourself:
 ## Getting Help
 
 ### Code Examples
+
 - **Position Aggregate**: [positions.entity.ts](../../fuel-ts-sdk/src/trading/src/positions/domain/positions.entity.ts)
 - **Value Objects**: [decimalValue.ts](../../fuel-ts-sdk/src/shared/models/decimalValue.ts)
 - **Repository Pattern**: [positions.port.ts](../../fuel-ts-sdk/src/trading/src/positions/domain/positions.port.ts)
@@ -2364,6 +2462,7 @@ When adding a new feature, ask yourself:
 - **Cross-Aggregate Queries**: [trading/application/queries](../../fuel-ts-sdk/src/trading/src/application/queries/)
 
 ### Questions to Ask
+
 1. "Is this business logic or infrastructure orchestration?"
 2. "Does this entity have identity, or is it just a measurement?"
 3. "Should this be in domain layer, application layer, or infrastructure?"
@@ -2375,6 +2474,7 @@ When adding a new feature, ask yourself:
 ## Conclusion
 
 This architecture prioritizes:
+
 1. **Pure domain core**: Business logic isolated from frameworks
 2. **Clear boundaries**: Layers, modules, and aggregates well-defined
 3. **Type safety**: Branded types and value objects prevent errors
@@ -2387,4 +2487,4 @@ Follow these guidelines and your code will integrate seamlessly with the existin
 
 ---
 
-*This guide is a living document. Update it as the architecture evolves.*
+_This guide is a living document. Update it as the architecture evolves._
