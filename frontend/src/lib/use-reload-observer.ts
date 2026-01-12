@@ -20,7 +20,6 @@ export function useReloadObserver<T extends object>(dependencies: T) {
       if (hasValuesChanged) changedKeys.add(iteratedKey);
     });
 
-    // console.table('Volatile dependencies: ', changedKeys);
     // eslint-disable-next-line no-console
     console.log(changedKeys);
   }, [dependencies]);

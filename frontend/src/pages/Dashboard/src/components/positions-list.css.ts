@@ -10,7 +10,7 @@ export const positionsContainer = style({
   padding: '0.75rem',
 });
 
-export const totalCollateral = style({
+export const totalExposure = style({
   fontSize: '0.875rem',
   fontWeight: '600',
   color: '#e2e8f0',

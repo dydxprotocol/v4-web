@@ -55,7 +55,7 @@ function PositionCardHeader({ isLong, assetId }: PositionCardHeaderProps) {
       <span css={[styles.positionSide, isLong ? styles.longPosition : styles.shortPosition]}>
         {isLong ? 'LONG' : 'SHORT'}
       </span>
-      <span css={styles.fieldValue}>Asset: {symbol}...</span>
+      <span css={styles.fieldValue}>Asset: {symbol}</span>
     </div>
   );
 }

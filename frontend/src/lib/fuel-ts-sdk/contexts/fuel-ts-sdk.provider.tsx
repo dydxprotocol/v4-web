@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/refs */
-import { type PropsWithChildren, useRef } from 'react';
+import { type PropsWithChildren, useMemo } from 'react';
 import { createStarboardClient } from 'fuel-ts-sdk/client';
 import type { Asset } from 'fuel-ts-sdk/trading';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -9,7 +8,6 @@ import { NetworkSwitchContext } from '@/contexts/network-switch/network-switch.c
 import { getIndexerUrl } from '@/lib/env';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
 import type { Network } from '@/models/network';
-import type { FuelTsSdkContextType } from './fuel-ts-sdk.context';
 import { FuelTsSdkContext } from './fuel-ts-sdk.context';
 
 interface FuelTsSdkProviderProps extends PropsWithChildren {}
@@ -19,18 +17,17 @@ export function FuelTsSdkProvider({ children }: FuelTsSdkProviderProps) {
   const indexerUrl = getIndexerUrl(currentNetwork);
   const assets = getNetworkAssets(currentNetwork);
 
-  const clientRef = useRef<FuelTsSdkContextType | null>(null);
-
-  if (clientRef.current == null) {
-    clientRef.current = createStarboardClient({
+  const client = useMemo(() => {
+    const client = createStarboardClient({
       indexerUrl,
     });
-    clientRef.current.trading.populateAssets(assets);
-  }
+    client.trading.populateAssets(assets);
+    return client;
+  }, [assets, indexerUrl]);
 
   return (
-    <ReduxProvider store={clientRef.current.store}>
-      <FuelTsSdkContext.Provider value={clientRef.current}>{children}</FuelTsSdkContext.Provider>
+    <ReduxProvider store={client.store}>
+      <FuelTsSdkContext.Provider value={client}>{children}</FuelTsSdkContext.Provider>
     </ReduxProvider>
   );
 }

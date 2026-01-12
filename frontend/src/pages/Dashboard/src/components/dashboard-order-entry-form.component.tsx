@@ -1,8 +1,8 @@
 import { type FC, useMemo } from 'react';
-import { CollateralAmount, HeadlessDecimalValue, contractId } from 'fuel-ts-sdk';
-import { type Asset, PositionSize } from 'fuel-ts-sdk/trading';
+import { CollateralAmount, DecimalValue, HeadlessDecimalValue, contractId } from 'fuel-ts-sdk';
+import { type Asset } from 'fuel-ts-sdk/trading';
 import { WalletContext } from '@/contexts/wallet';
-import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
+import { useSdkQuery, useSdkQuerySignal, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { useAwaited } from '@/lib/use-awaited';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
 import { OrderEntryForm, type OrderEntryFormModel } from '@/modules/order-entry-form';
@@ -13,8 +13,15 @@ export const DashboardOrderEntryForm: FC = () => {
   const allAssets = useSdkQuery(tradingSdk.getAllAssets);
   const userBalances = useAwaited(useMemo(() => wallet.getUserBalances(), [wallet]));
 
-  const baseAsset = allAssets.find((asset) => asset.symbol === 'sUSDC');
+  const baseAsset = allAssets.find((asset) => asset.symbol === 'USDC');
   const quoteAsset = useSdkQuery(tradingSdk.getWatchedAsset);
+
+  const quoteAssetPriceSignal = useSdkQuerySignal(
+    () => tradingSdk.getWatchedAssetLatestPrice()?.value.toFloat() ?? 1
+  );
+  const baseAssetPriceSignal = useSdkQuerySignal(
+    () => tradingSdk.getBaseAssetLatestPrice()?.value.toFloat() ?? 1
+  );
 
   function getAssetBalance(asset: Asset | undefined) {
     const assetId = asset?.assetId;
@@ -29,34 +36,32 @@ export const DashboardOrderEntryForm: FC = () => {
     const userWallet = await wallet.getUserWalletReference();
     if (!userWallet || !baseAsset || !quoteAsset) return;
 
-    const positionSize = +formData.positionSize;
-    const collateral = positionSize / TEMP_FIXED_LEVERAGE;
-
     await tradingSdk.submitOrder({
       collateralAssetId: baseAsset?.assetId,
       indexAsset: quoteAsset.assetId,
       wallet: userWallet,
       vaultContractAddress: VAULT_CONTRACT_ID,
-      sizeDelta: PositionSize.fromFloat(positionSize),
-      collateralAmount: CollateralAmount.fromFloat(collateral),
-      isLong: formData.orderSide === 'buy',
+      leverage: DecimalValue.fromDecimalString(formData.leverage),
+      collateralAmount: CollateralAmount.fromDecimalString(formData.collateralSize),
+      isLong: formData.orderSide === 'long',
     });
   }
 
   return (
     <OrderEntryForm
-      baseAssetName={baseAsset?.name ?? '?'}
       quoteAssetName={quoteAsset?.name ?? '?'}
       userBalanceInBaseAsset={getAssetBalance(baseAsset)}
-      userBalanceInQuoteAsset={getAssetBalance(quoteAsset)}
-      currentQuoteAssetPrice={365.32}
+      currentBaseAssetPrice={baseAssetPriceSignal}
+      currentQuoteAssetPrice={quoteAssetPriceSignal}
+      minCollateral={10}
+      minPositionSize={0.001}
+      warnHighLeverage={true}
       onSubmitSuccessful={handleOrderSubmitSuccess}
       onSubmitFailure={console.error}
     />
   );
 };
 
-const TEMP_FIXED_LEVERAGE = 10;
 const VAULT_CONTRACT_ID = contractId(
-  '0x01bbCEFbC64350a092310d59E29cFF269DB01539866aBb263f6dB78C275a84F2'
+  '0x2D9585c7996af0A382Aff5ba298831cA26b190Bf3eDB37E3FDc1f27AEDefFfc2'
 );

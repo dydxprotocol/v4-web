@@ -17,7 +17,7 @@ export const NetworkSwitchContextProvider: FC<NetworkSwitchContextProviderProps>
 }) => {
   const wallet = useRequiredContext(WalletContext);
 
-  const [currentNetwork, setCurrentNetwork] = useState<Network>();
+  const [currentNetwork, setCurrentNetwork] = useState<Network>('testnet');
 
   const changeNetwork = useCallback(
     (network: Network) => {
