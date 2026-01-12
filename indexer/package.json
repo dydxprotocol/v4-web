@@ -2,6 +2,15 @@
   "name": "@starboard/indexer",
   "version": "1.0.0",
   "type": "module",
+  "exports": {
+    "./abis": {
+      "types": "./lib/abis/index.d.ts",
+      "import": "./lib/abis/index.js"
+    }
+  },
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build": "rimraf lib && tsc",
     "start": "ts-node --esm -r dotenv/config src/main.ts",

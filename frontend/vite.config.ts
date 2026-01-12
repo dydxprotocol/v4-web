@@ -15,7 +15,11 @@ export default defineConfig({
     cssTwTransformPlugin(), // Must run first (before react plugin)
     vanillaExtractPlugin(),
     tailwindcss(),
-    react(),
+    react({
+      babel: {
+        plugins: [['module:@preact/signals-react-transform']],
+      },
+    }),
   ],
   resolve: {
     alias: {
