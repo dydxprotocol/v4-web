@@ -9,6 +9,7 @@ type VolatileInputProps = {
   assetName: string;
   leverage?: number;
   label: string;
+  error?: string;
 };
 
 export const AssetSizeInput: FC<VolatileInputProps> = ({
@@ -19,6 +20,7 @@ export const AssetSizeInput: FC<VolatileInputProps> = ({
   usdPrice,
   leverage,
   label,
+  error,
 }) => (
   <div className={$.container}>
     <label className={$.label}>{label}</label>
@@ -37,5 +39,6 @@ export const AssetSizeInput: FC<VolatileInputProps> = ({
       <span className={$.usdValue}>${usdPrice.toFixed(2)}</span>
       {leverage && <span className={$.leverage}>Leverage: {leverage}x</span>}
     </div>
+    {error && <div className={$.error}>{error}</div>}
   </div>
 );

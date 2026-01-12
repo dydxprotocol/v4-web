@@ -80,3 +80,10 @@ export const leverage = style({
   fontFamily: 'monospace',
   fontWeight: '400',
 });
+
+export const error = style({
+  color: '#ff4444',
+  fontSize: '0.75rem',
+  marginTop: '0.25rem',
+  fontWeight: '400',
+});

@@ -7,7 +7,7 @@ import * as styles from './leverage-input.css';
 
 export const LeverageInput: FC = () => {
   const { control } = useRequiredContext(OrderEntryFormApiContext);
-  const { field } = useController({ control, name: 'leverage' });
+  const { field, fieldState } = useController({ control, name: 'leverage' });
 
   const stepIdx = STEP_VALUES.indexOf(+field.value);
 
@@ -21,7 +21,14 @@ export const LeverageInput: FC = () => {
 
   return (
     <div css={styles.sliderContainer}>
-      <label css={styles.sliderLabel}>Leverage</label>
+      <label css={styles.sliderLabel}>
+        Leverage
+        {fieldState.error && (
+          <span css={{ color: 'red', fontSize: '0.875rem', marginLeft: '0.5rem' }}>
+            {fieldState.error.message}
+          </span>
+        )}
+      </label>
       <Slider.Root
         css={styles.sliderRoot}
         value={[stepIdx]}

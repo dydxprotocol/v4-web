@@ -85,6 +85,7 @@ export const PositionSizeInputs: FC = () => {
         onSizeChange={updateCollateralSize}
         size={collateralSize.field.value}
         usdPrice={baseAssetUsdValue}
+        error={collateralSize.fieldState.error?.message}
       />
       <AssetSizeInput
         assetName={quoteAssetName}
@@ -94,6 +95,7 @@ export const PositionSizeInputs: FC = () => {
         size={positionSize.field.value}
         usdPrice={quoteAssetUsdValue}
         leverage={leverage}
+        error={positionSize.fieldState.error?.message}
       />
     </>
   );
