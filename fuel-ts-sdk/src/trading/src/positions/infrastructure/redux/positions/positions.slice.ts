@@ -1,10 +1,10 @@
 import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
-import type { PositionRevisionId } from '@/shared/types';
+import type { PositionStableId } from '@/shared/types';
 import type { Position } from '../../../domain';
 import { positionsApi } from './positions.api';
 
-export const positionsAdapter = createEntityAdapter<Position, PositionRevisionId>({
-  selectId: (position) => position.revisionId,
+export const positionsAdapter = createEntityAdapter<Position, PositionStableId>({
+  selectId: (position) => position.positionKey.id,
   sortComparer: (a, b) => b.timestamp - a.timestamp,
 });
 
