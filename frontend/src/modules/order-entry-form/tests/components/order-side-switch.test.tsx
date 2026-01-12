@@ -5,29 +5,29 @@ import { OrderSideSwitch } from '../../src/components/order-side-switch.componen
 import { OrderEntryFormTestWrapper } from '../test-utils';
 
 describe('OrderSideSwitch', () => {
-  it('renders buy and sell options', () => {
+  it('renders long and short options', () => {
     render(
       <OrderEntryFormTestWrapper>
         <OrderSideSwitch />
       </OrderEntryFormTestWrapper>
     );
 
-    expect(screen.getByText('Buy')).toBeInTheDocument();
-    expect(screen.getByText('Sell')).toBeInTheDocument();
+    expect(screen.getByText('Long')).toBeInTheDocument();
+    expect(screen.getByText('Short')).toBeInTheDocument();
   });
 
-  it('buy is selected by default', () => {
+  it('long is selected by default', () => {
     render(
       <OrderEntryFormTestWrapper>
         <OrderSideSwitch />
       </OrderEntryFormTestWrapper>
     );
 
-    const buyButton = screen.getByText('Buy');
-    expect(buyButton).toHaveAttribute('data-state', 'active');
+    const longButton = screen.getByText('Long');
+    expect(longButton).toHaveAttribute('data-state', 'active');
   });
 
-  it('switches to sell when clicked', async () => {
+  it('switches to short when clicked', async () => {
     const user = userEvent.setup();
     render(
       <OrderEntryFormTestWrapper>
@@ -35,13 +35,13 @@ describe('OrderSideSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const sellButton = screen.getByText('Sell');
-    await user.click(sellButton);
+    const shortButton = screen.getByText('Short');
+    await user.click(shortButton);
 
-    expect(sellButton).toHaveAttribute('data-state', 'active');
+    expect(shortButton).toHaveAttribute('data-state', 'active');
   });
 
-  it('switches back to buy when clicked', async () => {
+  it('switches back to long when clicked', async () => {
     const user = userEvent.setup();
     render(
       <OrderEntryFormTestWrapper>
@@ -49,12 +49,12 @@ describe('OrderSideSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const sellButton = screen.getByText('Sell');
-    await user.click(sellButton);
+    const shortButton = screen.getByText('Short');
+    await user.click(shortButton);
 
-    const buyButton = screen.getByText('Buy');
-    await user.click(buyButton);
+    const longButton = screen.getByText('Long');
+    await user.click(longButton);
 
-    expect(buyButton).toHaveAttribute('data-state', 'active');
+    expect(longButton).toHaveAttribute('data-state', 'active');
   });
 });

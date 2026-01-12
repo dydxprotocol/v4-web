@@ -14,7 +14,7 @@ export function SubmitButton() {
       type="button"
       css={[
         styles.button,
-        orderSide === 'buy' ? styles.buyButton : styles.sellButton,
+        orderSide === 'long' ? styles.buyButton : styles.sellButton,
         !formState.isValid && styles.disabledButton,
       ]}
       onClick={submitHandler}

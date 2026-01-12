@@ -1,13 +1,28 @@
 import { createContext } from 'react';
+import type { Signal } from '@preact/signals-react';
 
 export type OrderEntryFormMetaContextType = {
-  baseAssetName: string;
+  // Asset information
   quoteAssetName: string;
 
-  userBalanceInQuoteAsset: number;
+  // User balances
   userBalanceInBaseAsset: number;
 
-  currentQuoteAssetPrice: number;
+  // Current prices (reactive signals)
+  currentQuoteAssetPrice: Signal<number>;
+  currentBaseAssetPrice: Signal<number>;
+
+  // Market configuration (optional - for perpetuals validation)
+  maxLeverage?: number;
+  minCollateral?: number;
+  minPositionSize?: number;
+  maxPositionSize?: number;
+  maxPriceDeviation?: number;
+  initialMarginFraction?: number; // Used to calculate max leverage (1/IMF)
+  maintenanceMarginFraction?: number; // Used to calculate liquidation price
+
+  // Validation flags
+  warnHighLeverage?: boolean;
 };
 
 export const OrderEntryFormMetaContext = createContext<OrderEntryFormMetaContextType | null>(null);

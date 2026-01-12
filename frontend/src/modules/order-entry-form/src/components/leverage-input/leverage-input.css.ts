@@ -7,6 +7,15 @@ export const sliderContainer = style({
   minWidth: 0,
   boxSizing: 'border-box',
   position: 'relative',
+  overflow: 'visible',
+});
+
+export const sliderLabel = style({
+  display: 'block',
+  marginBottom: '8px',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  color: '#fff',
 });
 
 export const sliderRoot = style({
@@ -19,6 +28,7 @@ export const sliderRoot = style({
   height: '20px',
   marginBottom: '8px',
   boxSizing: 'border-box',
+  overflow: 'visible',
 });
 
 export const sliderTrack = style({

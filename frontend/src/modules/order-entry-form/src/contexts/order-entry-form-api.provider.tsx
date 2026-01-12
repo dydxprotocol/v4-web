@@ -35,7 +35,6 @@ export const OrderEntryFormApiContextProvider: FC<OrderEntryFormApiContextProvid
     () => ({
       submitHandler: form.handleSubmit(onSubmitSuccessful, onSubmitFailure),
       control: form.control,
-      formState: form.formState,
     }),
     [form, onSubmitFailure, onSubmitSuccessful]
   );

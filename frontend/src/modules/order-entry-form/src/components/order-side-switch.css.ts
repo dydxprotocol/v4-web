@@ -21,12 +21,12 @@ export const tabsTrigger = style({
     borderColor: '#555',
   },
   selectors: {
-    '&[data-state="active"][data-side="buy"]': {
+    '&[data-state="active"][data-side="long"]': {
       backgroundColor: '#22c55e',
       color: '#fff',
       borderColor: '#22c55e',
     },
-    '&[data-state="active"][data-side="sell"]': {
+    '&[data-state="active"][data-side="short"]': {
       backgroundColor: '#ef4444',
       color: '#fff',
       borderColor: '#ef4444',
