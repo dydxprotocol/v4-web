@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 import { WalletContext } from '@/contexts/wallet/wallet.context';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
+import logoStarboard from '@/assets/logo-starboard.png';
 import { AssetSelect } from './components/asset-select.component';
 import * as styles from './dashboard-layout.css';
 
@@ -17,7 +18,7 @@ export function DashboardLayout() {
     <div css={styles.page}>
       <header css={styles.header}>
         <div>
-          <div css={styles.logo}>Starboard</div>
+          <img src={logoStarboard} alt="Starboard" css={styles.logo} />
         </div>
 
         <AssetSelect />

@@ -28,10 +28,10 @@ export const headerLeft = style({
 });
 
 export const logo = style({
-  fontSize: '1.5rem',
-  fontWeight: '700',
-  color: colors.snow,
-  letterSpacing: '-0.025em',
+  height: '2rem',
+  width: 'auto',
+  objectFit: 'contain',
+  display: 'block',
 });
 
 export const nav = style({
