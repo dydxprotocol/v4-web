@@ -231,6 +231,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.2.7
         version: 2.11.2(react-redux@9.2.0)(react@19.2.0)
+      '@starboard/indexer':
+        specifier: workspace:*
+        version: link:../indexer
       '@types/lodash':
         specifier: ^4.17.21
         version: 4.17.21
@@ -283,9 +286,6 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.3.0
         version: 12.3.0(rollup@4.54.0)(typescript@5.9.3)
-      '@starboard/indexer':
-        specifier: workspace:*
-        version: link:../indexer
       '@types/node':
         specifier: ^25.0.3
         version: 25.0.3
@@ -8290,7 +8290,7 @@ packages:
       '@vitest/spy': 3.0.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
-      vite: 5.4.21(@types/node@24.10.1)
+      vite: 5.4.21(@types/node@25.0.3)
 
   /@vitest/pretty-format@3.0.9:
     resolution: {integrity: sha512-OW9F8t2J3AwFEwENg3yMyKWweF7oRJlMyHOMIhO5F3n0+cgQAJZBjNgrF8dLwFTEXl5jUqBLXd9QyyKv8zEcmA==}
@@ -18098,7 +18098,6 @@ packages:
       rollup: 4.53.3
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /vite@7.2.4(@types/node@24.10.1):
     resolution: {integrity: sha512-NL8jTlbo0Tn4dUEXEsUg8KeyG/Lkmc4Fnzb8JXN/Ykm9G4HNImjtABMJgkQoVjOBN/j2WAwDTRytdqJbZsah7w==}
