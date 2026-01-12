@@ -17,6 +17,8 @@ export enum StatsigFlags {
   ffTurnkeyWeb = 'ff_turnkey_web',
   ffSwapEnabled = 'ff_swap_ui_web',
   ffSpot = 'ff_spot',
+  ffHideMarketsFilter = 'ff_hide_markets_filter',
+  ffOpenInterestFilter = 'ff_open_interest_filter',
   abPopupDeposit = 'ab_popup_deposit',
   ffMobileWeb = 'ff_mobile_web',
 }

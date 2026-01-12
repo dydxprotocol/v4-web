@@ -152,7 +152,6 @@ import {
   WithdrawIcon,
   XCircleIcon,
 } from '@/icons';
-import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { LogoShortIcon } from '@/icons/logo-short';
 import SignalIcon from '@/icons/signal.svg';
 import UsdcIcon from '@/icons/usdc.svg';
@@ -177,7 +176,6 @@ export enum IconName {
   Caret = 'Caret',
   CautionCircle = 'CautionCircle',
   CautionCircleStroked = 'CautionCircleStroked',
-  ChaosLabs = 'ChaosLabs',
   Chat = 'Chat',
   ChefHat = 'ChefHat',
   Check = 'Check',
@@ -336,7 +334,6 @@ const icons = {
   [IconName.Caret]: CaretIcon,
   [IconName.CautionCircle]: CautionCircleIcon,
   [IconName.CautionCircleStroked]: CautionCircleStrokeIcon,
-  [IconName.ChaosLabs]: ChaosLabsIcon,
   [IconName.Chat]: ChatIcon,
   [IconName.ChefHat]: ChefHatIcon,
   [IconName.Check]: CheckIcon,

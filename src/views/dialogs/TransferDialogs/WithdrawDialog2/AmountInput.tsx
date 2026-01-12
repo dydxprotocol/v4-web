@@ -1,7 +1,6 @@
-import { EventHandler } from 'react';
-
 import { BonsaiCore } from '@/bonsai/ontology';
-import { SyntheticInputEvent } from 'react-number-format/types/types';
+import { NumberFormatValues, NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS } from '@/constants/tokens';
@@ -23,10 +22,6 @@ type AmountInputProps = {
 const TARGET_MARGIN_USAGE_MAX = 0.95;
 export const AmountInput = ({ value, onChange }: AmountInputProps) => {
   const stringGetter = useStringGetter();
-
-  const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
-    onChange(e.target.value);
-  };
 
   const isLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
@@ -87,14 +82,23 @@ export const AmountInput = ({ value, onChange }: AmountInputProps) => {
             </>
           )}
         </div>
-        <input
-          type="number"
+        <$NumericFormat
+          valueIsNumericString
+          allowNegative={false}
           placeholder="0.00"
-          tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
           value={value}
-          onChange={onValueChange}
+          onValueChange={(values: NumberFormatValues) => {
+            onChange(values.value);
+          }}
         />
       </div>
     </div>
   );
 };
+
+const $NumericFormat = styled(NumericFormat)`
+  font: var(--font-large-medium);
+  background-color: var(--color-layer-4);
+  color: var(--color-text-2);
+  outline: none;
+`;
