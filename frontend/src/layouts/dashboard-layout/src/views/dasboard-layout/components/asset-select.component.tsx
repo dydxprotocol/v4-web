@@ -8,7 +8,7 @@ import * as styles from './asset-select.css';
 export const AssetSelect: FC = () => {
   const tradingSdk = useTradingSdk();
 
-  const assets = useSdkQuery(tradingSdk.getAllAssets);
+  const assets = useSdkQuery(tradingSdk.getAllAssets).filter((a) => !a.isBaseAsset);
   const watchedAsset = useSdkQuery(tradingSdk.getWatchedAsset);
 
   const watchAsset = (assetId: AssetId) => {

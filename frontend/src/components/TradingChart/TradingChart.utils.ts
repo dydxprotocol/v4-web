@@ -1,3 +1,4 @@
+import { OraclePrice } from 'fuel-ts-sdk';
 import type { Candle, CandleInterval } from 'fuel-ts-sdk/trading';
 import type {
   Bar,
@@ -45,7 +46,7 @@ export function createDatafeed(
           exchange: 'Starboard',
           listed_exchange: 'Starboard',
           minmov: 1,
-          pricescale: 100000000, // 8 decimals
+          pricescale: 100000,
           has_intraday: true,
           has_daily: true,
           has_weekly_and_monthly: false,
@@ -78,10 +79,10 @@ export function createDatafeed(
           .map(
             (candle: Candle): Bar => ({
               time: candle.startedAt * 1000,
-              open: Number(candle.openPrice) / 100000000,
-              high: Number(candle.highPrice) / 100000000,
-              low: Number(candle.lowPrice) / 100000000,
-              close: Number(candle.closePrice) / 100000000,
+              open: OraclePrice.fromBigInt(candle.openPrice).toFloat(),
+              high: OraclePrice.fromBigInt(candle.highPrice).toFloat(),
+              low: OraclePrice.fromBigInt(candle.lowPrice).toFloat(),
+              close: OraclePrice.fromBigInt(candle.closePrice).toFloat(),
             })
           )
           .sort((a: Bar, b: Bar) => a.time - b.time);
