@@ -16,5 +16,13 @@
     "symbol": "ETHUSD",
     "name": "ETH/USD",
     "decimals": 18
+  },
+  {
+    "assetId": "0x02223454885e5de4e0d5dcbc19dc654bb2c5820b12955d716ee314b5cf0281a9",
+    "contractId": "0x5CDc3143D0bC1fFD896D025F0c88fC10593aa768D20416a151F6734430e78ad9",
+    "symbol": "USDC",
+    "name": "Mock USDC",
+    "decimals": 6,
+    "isBaseAsset": true
   }
 ]

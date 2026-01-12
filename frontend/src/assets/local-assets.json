@@ -15,6 +15,7 @@
     "assetId": "0x59102b37de83bdda9f38ac8254e596f0d9ac61d2035c07936675e87342817160",
     "symbol": "ETHUSD",
     "name": "ETH/USD",
-    "decimals": 18
+    "decimals": 18,
+    "isBaseAsset": true
   }
 ]
