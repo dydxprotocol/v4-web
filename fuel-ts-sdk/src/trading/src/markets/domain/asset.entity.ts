@@ -6,4 +6,5 @@ export interface Asset {
   decimals: number;
   assetId: AssetId;
   contractId?: ContractId;
+  isBaseAsset?: true;
 }

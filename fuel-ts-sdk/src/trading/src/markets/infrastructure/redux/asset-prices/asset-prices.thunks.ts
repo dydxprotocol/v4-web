@@ -25,12 +25,12 @@ export const fetchAssetPricesByIds = createAsyncThunk<
  * Fetch current asset prices
  */
 export const fetchCurrentAssetPrices = createAsyncThunk<
-  AssetPrice[],
-  GetAssetPricesOptions | undefined,
+  AssetPrice | undefined,
+  AssetId,
   { rejectValue: string; extra: AssetPricesThunkExtra }
->('markets/assetPrices/fetchCurrent', async (options, { rejectWithValue, extra }) => {
+>('markets/assetPrices/fetchCurrent', async (assetId, { rejectWithValue, extra }) => {
   try {
-    return await extra.assetPriceRepository.getCurrentAssetPrices(options);
+    return await extra.assetPriceRepository.getCurrentAssetPrice(assetId);
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
   }

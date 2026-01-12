@@ -18,7 +18,14 @@ export const selectWatchedAssetId = createSelector(
   (state) => state.watchedAssetId
 );
 
+export const selectBaseAssetId = createSelector(selectAssetsState, (state) => state.baseAssetId);
+
 export const selectWatchedAsset = createSelector(
   [selectAllAssets, selectWatchedAssetId],
   (allAssets, watchedAssetId) => allAssets.find((a) => a.assetId === watchedAssetId)
+);
+
+export const selectBaseAsset = createSelector(
+  [selectAllAssets, selectBaseAssetId],
+  (allAssets, baseAssetId) => allAssets.find((a) => a.assetId === baseAssetId)
 );

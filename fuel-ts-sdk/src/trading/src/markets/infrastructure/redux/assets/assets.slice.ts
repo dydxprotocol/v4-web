@@ -11,6 +11,7 @@ const assetsSlice = createSlice({
     populateAssets(state, action: PayloadAction<Asset[]>) {
       state.data = action.payload;
       state.watchedAssetId = action.payload.at(0)?.assetId;
+      state.baseAssetId = action.payload.find((asset) => asset.isBaseAsset)?.assetId;
     },
     watchAsset(state, action: PayloadAction<AssetId>) {
       state.watchedAssetId = action.payload;

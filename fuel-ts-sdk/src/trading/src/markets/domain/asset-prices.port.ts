@@ -27,9 +27,9 @@ export interface AssetPriceRepository {
   getAssetPricesByIds(assetIds: AssetId[]): Promise<AssetPrice[]>;
 
   /**
-   * Get current/latest prices with optional filtering
+   * Get current/latest price
    */
-  getCurrentAssetPrices(options?: GetAssetPricesOptions): Promise<AssetPrice[]>;
+  getCurrentAssetPrice(assetId: AssetId): Promise<AssetPrice | undefined>;
 
   /**
    * Get historical asset prices with optional filtering

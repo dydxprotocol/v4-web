@@ -1,5 +1,4 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { memoize } from 'lodash';
 import type { RootState } from '@/shared/lib/redux';
 import type { AssetId } from '@/shared/types';
 import { assetPricesAdapter } from './asset-prices.types';
@@ -20,13 +19,7 @@ export const selectAssetPricesError = createSelector(
   (state) => state.error
 );
 
-export const selectAssetPricesByAssetId = memoize((assetId: AssetId) =>
-  createSelector(
-    [selectAllAssetPrices],
-    (data) => data.filter((ap) => ap.assetId === assetId) ?? []
-  )
-);
-
-export const selectCurrentAssetPrice = memoize((assetId: AssetId) =>
-  createSelector([selectAssetPricesByAssetId(assetId)], (assetPrices) => assetPrices.at(0))
+export const selectAssetPricesByAssetId = createSelector(
+  [selectAllAssetPrices, (_state, assetId?: AssetId) => assetId],
+  (allAssets, assetId) => allAssets.filter((ap) => ap.assetId === assetId) ?? []
 );

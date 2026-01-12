@@ -25,12 +25,8 @@ export const assetPricesSlice = createSlice({
         state.error = action.payload ?? 'Failed to fetch asset prices by IDs';
       })
 
-      .addCase(fetchCurrentAssetPrices.pending, (state) => {
-        state.fetchStatus = 'pending';
-        state.error = null;
-      })
       .addCase(fetchCurrentAssetPrices.fulfilled, (state, action) => {
-        assetPricesAdapter.upsertMany(state, action.payload);
+        if (action.payload) assetPricesAdapter.upsertOne(state, action.payload);
         state.fetchStatus = 'fulfilled';
       })
       .addCase(fetchCurrentAssetPrices.rejected, (state, action) => {
