@@ -12,7 +12,7 @@ import {
   PositionSizeInputs,
   SubmitButton,
 } from '@/modules/order-entry-form';
-import { DashboardOrderFormMetaProvider } from './components/dashboard-order-form-meta.provider.';
+import { DashboardOrderFormMetaProvider } from './components/dashboard-order-form-meta.provider';
 import {
   ProcessingTransactionDialog,
   TransactionErrorDialog,
@@ -39,7 +39,10 @@ export const DashboardOrderEntryForm: FC = () => {
   const processOrder = useCallback(
     async (formData: OrderEntryFormModel) => {
       const userWallet = await wallet.getUserWalletReference();
-      if (!userWallet || !baseAsset || !quoteAsset) return;
+      if (!userWallet || !baseAsset || !quoteAsset)
+        throw new Error(
+          `Form is not ready for submission. All variables must be defined: userWallet (${userWallet}), baseAsset (${baseAsset}), quoteAsset (${quoteAsset})`
+        );
 
       await tradingSdk.submitOrder({
         collateralAssetId: baseAsset?.assetId,
