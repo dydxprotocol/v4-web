@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "pnpm tsc -b && vite build",
+    "sync:tradingview-css": "node scripts/sync-tradingview-styles.mjs",
+    "dev": "pnpm sync:tradingview-css && vite",
+    "build": "pnpm sync:tradingview-css && pnpm tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
@@ -13,7 +14,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "postinstall": "pnpm run generate-env && ([ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true)",
+    "postinstall": "pnpm run generate-env && ([ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true) && pnpm sync:tradingview-css",
     "generate-env": "node scripts/generate-env.js"
   },
   "dependencies": {
