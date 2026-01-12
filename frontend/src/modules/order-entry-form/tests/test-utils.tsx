@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
+import { signal } from '@preact/signals-react';
 import type { OrderEntryFormMetaContextType } from '../src/contexts';
 import { OrderEntryFormApiContextProvider, OrderEntryFormMetaContext } from '../src/contexts';
 
 const defaultMockContext: OrderEntryFormMetaContextType = {
-  baseAssetName: 'BTC',
   quoteAssetName: 'USD',
-  userBalanceInQuoteAsset: 10000,
   userBalanceInBaseAsset: 0.5,
-  currentQuoteAssetPrice: 50000,
+  currentQuoteAssetPrice: signal(50000),
+  currentBaseAssetPrice: signal(50000),
 };
 
 export function OrderEntryFormTestWrapper({

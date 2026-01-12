@@ -4,12 +4,13 @@
   "type": "module",
   "exports": {
     "./abis": {
-      "types": "./lib/abis/index.d.ts",
-      "import": "./lib/abis/index.js"
+      "types": "./src/abis/index.ts",
+      "import": "./src/abis/index.ts"
     }
   },
   "files": [
-    "lib"
+    "lib",
+    "src/abis"
   ],
   "scripts": {
     "build": "rimraf lib && tsc",

@@ -25,10 +25,10 @@ describe('OrderEntryForm', () => {
     expect(screen.getAllByText(/BTC/).length).toBeGreaterThan(0);
   });
 
-  it('renders size input', () => {
+  it('renders leverage input', () => {
     render(<OrderEntryForm {...defaultProps} />);
 
-    expect(screen.getByPlaceholderText('0.00')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /10x/i })).toBeInTheDocument();
   });
 
   it('renders submit button', () => {

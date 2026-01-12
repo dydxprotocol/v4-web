@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
+    "@starboard/indexer": "workspace:*",
     "@types/lodash": "^4.17.21",
     "fuels": "0.101.3",
     "graphql": "^16.8.1",
@@ -55,7 +56,6 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
-    "@starboard/indexer": "workspace:*",
     "@types/node": "^25.0.3",
     "rollup": "^4.54.0",
     "rollup-plugin-dts": "^6.3.0",

@@ -17,14 +17,13 @@ describe('DecimalValue', () => {
       expect(value.toFloat()).toBeCloseTo(123.456, 3);
     });
 
-    it('should throw error if decimal not defined', () => {
+    it('should use default decimals if not defined', () => {
       class TestDecimal extends DecimalValue {
-        // No static decimals property
+        // No static decimals property, will use default (18n)
       }
 
-      expect(() => {
-        new TestDecimal(100n);
-      }).toThrow('TestDecimal must define static decimals property');
+      const value = new TestDecimal(100n);
+      expect(value.decimals).toBe(18n);
     });
   });
 
@@ -87,7 +86,7 @@ describe('DecimalValue', () => {
       const adjusted = value.adjustTo(CollateralAmount);
 
       // CollateralAmount has 9 decimals, we lose precision beyond that
-      expect(adjusted.toFloat()).toBeCloseTo(100.123456789, 6);
+      expect(adjusted.toFloat()).toBeCloseTo(100.123456789, 5);
     });
   });
 

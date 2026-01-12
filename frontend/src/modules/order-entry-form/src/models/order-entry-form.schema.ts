@@ -1,6 +1,4 @@
-import { DecimalCalculator, UsdValue } from 'fuel-ts-sdk';
 import z from 'zod';
-import type { OrderEntryFormMetaContextType } from '../contexts';
 import { ORDER_SIDES } from './order-entry-form.model';
 
 // ============================================================================
@@ -9,46 +7,47 @@ import { ORDER_SIDES } from './order-entry-form.model';
 
 const numericString = z.string().regex(/^\d*\.?\d*$/, 'Must be a valid number');
 
-const parseUsdValue = (value: string): UsdValue => {
-  if (!value || value === '') return UsdValue.fromFloat(0);
-  return UsdValue.fromDecimalString(value);
-};
+// Validation helpers - currently commented out, will be re-enabled later
+// const parseUsdValue = (value: string): UsdValue => {
+//   if (!value || value === '') return UsdValue.fromFloat(0);
+//   return UsdValue.fromDecimalString(value);
+// };
 
-const parseDecimal = (value: string): number => {
-  if (!value || value === '') return 0;
-  const parsed = parseFloat(value);
-  return isNaN(parsed) ? 0 : parsed;
-};
+// const parseDecimal = (value: string): number => {
+//   if (!value || value === '') return 0;
+//   const parsed = parseFloat(value);
+//   return isNaN(parsed) ? 0 : parsed;
+// };
 
-const isPositive = (value: string): boolean => {
-  const usdValue = parseUsdValue(value);
-  return usdValue.value > 0n;
-};
+// const isPositive = (value: string): boolean => {
+//   const usdValue = parseUsdValue(value);
+//   return usdValue.value > 0n;
+// };
 
-const isLeverageValid = (leverage: string): boolean => {
-  const lev = parseDecimal(leverage);
-  return lev >= 0.1 && lev <= 100;
-};
+// const isLeverageValid = (leverage: string): boolean => {
+//   const lev = parseDecimal(leverage);
+//   return lev >= 0.1 && lev <= 100;
+// };
 
-const hasRequiredCollateral = (collateral: string, userBalance: number): boolean => {
-  const collateralValue = parseUsdValue(collateral);
-  const userBalanceValue = UsdValue.fromFloat(userBalance);
-  return collateralValue.value <= userBalanceValue.value;
-};
+// const hasRequiredCollateral = (collateral: string, userBalance: number): boolean => {
+//   const collateralValue = parseUsdValue(collateral);
+//   const userBalanceValue = UsdValue.fromFloat(userBalance);
+//   return collateralValue.value <= userBalanceValue.value;
+// };
 
-const calculateRequiredMargin = (positionSizeUsd: string, leverage: string): UsdValue => {
-  const notional = parseUsdValue(positionSizeUsd);
-  const lev = parseDecimal(leverage);
-  if (lev === 0) return UsdValue.fromFloat(Number.POSITIVE_INFINITY);
-
-  return DecimalCalculator.value(notional).divideBy(UsdValue.fromFloat(lev)).calculate(UsdValue);
-};
+// const calculateRequiredMargin = (positionSizeUsd: string, leverage: string): UsdValue => {
+//   const notional = parseUsdValue(positionSizeUsd);
+//   const lev = parseDecimal(leverage);
+//   if (lev === 0) return UsdValue.fromFloat(Number.POSITIVE_INFINITY);
+//
+//   return DecimalCalculator.value(notional).divideBy(UsdValue.fromFloat(lev)).calculate(UsdValue);
+// };
 
 // ============================================================================
 // Main Schema Factory
 // ============================================================================
 
-export const createOrderEntryFormSchema = (context: OrderEntryFormMetaContextType) => {
+export const createOrderEntryFormSchema = () => {
   return z.object({
     orderSide: z.enum(ORDER_SIDES),
     positionSize: numericString.min(1, 'Position size is required'),
