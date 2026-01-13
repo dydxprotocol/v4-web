@@ -104,7 +104,7 @@ const TradePage = () => {
       </$MobileContent>
 
       <div
-        tw="row fixed bottom-3 left-0 right-0 gap-1.25 px-1.25 py-1.25"
+        tw="row fixed bottom-4 left-0 right-0 gap-1.25 px-1.25 py-1.25"
         css={{
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',
         }}
@@ -122,4 +122,6 @@ export default TradePage;
 
 const $MobileContent = styled.article`
   ${layoutMixins.contentContainerPage}
+
+  padding-bottom: 10rem;
 `;

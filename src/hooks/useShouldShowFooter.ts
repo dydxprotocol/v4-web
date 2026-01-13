@@ -13,7 +13,7 @@ export const useShouldShowFooter = () => {
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   return (
-    !isTablet ||
+    isTablet ||
     !(
       !!(matchPath(TRADE_ROUTE, pathname) && canAccountTrade) ||
       !!(matchPath(AppRoute.Vault, pathname) && canAccountTrade)
