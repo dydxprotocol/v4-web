@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 
 import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
@@ -149,8 +149,40 @@ const CloseTradeForm = ({ market }: Props) => {
     </$MidPriceButton>
   );
 
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    switch (currentStep) {
+      case MobilePlaceOrderSteps.EditOrder: {
+        setCurrentStep?.(MobilePlaceOrderSteps.PreviewOrder);
+        break;
+      }
+      case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
+      case MobilePlaceOrderSteps.Confirmation: {
+        break;
+      }
+      case MobilePlaceOrderSteps.PreviewOrder:
+      default: {
+        placeOrder({
+          onFailure: () => {
+            setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
+          },
+          onPlaceOrder: () => {
+            onClearInputs();
+          },
+        });
+        setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
+        break;
+      }
+    }
+  };
+
   return (
-    <div tw="flexColumn items-center gap-[0.75em] px-2 pb-[12.5rem] pt-[6.5vh]">
+    <form
+      tw="flexColumn items-center gap-[0.75em] px-2 pb-[12.5rem] pt-[6.5vh]"
+      onSubmit={onSubmit}
+    >
       <TradeFormHeaderMobile />
       <div tw="w-full text-medium">Close {displayableAsset} Position</div>
       <MobileDropdownMenu
@@ -271,7 +303,7 @@ const CloseTradeForm = ({ market }: Props) => {
           }}
         />
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { FormEvent, useCallback, useState } from 'react';
 
 import {
   ExecutionType,
@@ -91,12 +91,17 @@ const RegularTradeForm = () => {
     }
   }, [currentStep, setCurrentStep]);
 
-  const { placeOrderError, tradingUnavailable, shouldEnableTrade, hasValidationErrors } =
-    useTradeForm({
-      source: TradeFormSource.SimpleTradeForm,
-      fullFormSummary,
-      onLastOrderIndexed,
-    });
+  const {
+    placeOrderError,
+    placeOrder,
+    tradingUnavailable,
+    shouldEnableTrade,
+    hasValidationErrors,
+  } = useTradeForm({
+    source: TradeFormSource.SimpleTradeForm,
+    fullFormSummary,
+    onLastOrderIndexed,
+  });
 
   const { isErrorShownInOrderStatusToast, primaryAlert, shortAlertKey } = useTradeErrors({
     placeOrderError,
@@ -145,13 +150,39 @@ const RegularTradeForm = () => {
     [dispatch, side]
   );
 
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    switch (currentStep) {
+      case MobilePlaceOrderSteps.EditOrder: {
+        setCurrentStep?.(MobilePlaceOrderSteps.PreviewOrder);
+        break;
+      }
+      case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
+      case MobilePlaceOrderSteps.Confirmation: {
+        break;
+      }
+      case MobilePlaceOrderSteps.PreviewOrder:
+      default: {
+        placeOrder({
+          onPlaceOrder: () => {
+            dispatch(tradeFormActions.resetPrimaryInputs());
+          },
+        });
+        setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
+        break;
+      }
+    }
+  };
+
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
     [OrderSide.SELL]: ButtonAction.Destroy,
   }[side];
 
   return (
-    <div tw="flexColumn items-center gap-[0.75em] px-1 pb-[12.5rem] pt-0">
+    <form tw="flexColumn items-center gap-[0.75em] px-1 pb-[12.5rem] pt-0" onSubmit={onSubmit}>
       <TradeFormHeaderMobile />
       <div tw="flex h-3 w-full items-center justify-between">
         <div tw="flex h-3">
@@ -337,7 +368,7 @@ const RegularTradeForm = () => {
         </$StyledWithDetailsReceipt> */}
       </div>
       <MarketsMenuDialog />
-    </div>
+    </form>
   );
 };
 
