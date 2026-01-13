@@ -16,6 +16,9 @@ export const WalletIcon = ({ wallet, size = '1em' }: { wallet: WalletInfo; size?
   }
 
   if (isWalletType(wallet.name)) {
+    const IconComponent = wallets[wallet.name].icon as ElementType;
+    // eslint-disable-next-line no-console
+    console.log('Rendering icon component:', IconComponent);
     return <Icon iconComponent={wallets[wallet.name].icon as ElementType} size={size} />;
   }
 

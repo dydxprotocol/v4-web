@@ -141,6 +141,7 @@ export { default as XCircleIcon } from './x-circle.svg';
 export { default as SolIcon } from './sol.svg';
 export { default as WalletIcon } from './wallet.svg';
 export { default as AppleIcon } from './wallets/apple.svg';
+export { default as BackpackIcon } from './wallets/backpack.svg';
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';
 export { default as BitpieIcon } from './wallets/bitpie.svg';
 export { default as CloverWalletIcon } from './wallets/clover-wallet.svg';

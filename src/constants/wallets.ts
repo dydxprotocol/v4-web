@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { LoginMethod } from '@/types/turnkey';
 
 import {
+  BackpackIcon,
   CoinbaseIcon,
   EmailIcon,
   GenericWalletIcon,
@@ -173,6 +174,11 @@ export const wallets = {
     type: WalletType.Turnkey,
     stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
     icon: EmailIcon,
+  },
+  [WalletType.Backpack]: {
+    type: WalletType.Backpack,
+    stringKey: STRING_KEYS.BACKPACK,
+    icon: BackpackIcon,
   },
 } satisfies Record<WalletInfo['name'], WalletConfig>;
 

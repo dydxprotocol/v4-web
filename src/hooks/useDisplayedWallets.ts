@@ -49,9 +49,9 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       (wallet) => wallet.detail.info.rdns === METAMASK_MIPD_RDNS
     );
 
-    const isBackpackDetected =
-      Boolean(window.ethereum?.isBackpack) ||
-      injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === BACKPACK_MIPD_RDNS) !== -1;
+    const isBackpackDetected = Boolean(window.backpack?.solana);
+    // Boolean(window.ethereum?.isBackpack) ||
+    // injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === BACKPACK_MIPD_RDNS) !== -1;
 
     const otherInjectedWallets = injectedWallets
       .filter(
@@ -113,6 +113,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
         },
         isPhantomDetected && phantomWallet,
         isKeplrDetected && keplrWallet,
+        isBackpackDetected && backpackWallet,
         { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
         isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
         Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {

@@ -145,9 +145,9 @@ const useSkipClientContext = () => {
           return (window as any).phantom.solana;
         }
 
-        if ((window as any).backpack) {
-          await (window as any).backpack.connect();
-          return (window as any).backpack;
+        if ((window as any).backpack?.solana) {
+          await (window as any).backpack.solana.connect();
+          return (window as any).backpack.solana;
         }
 
         throw new Error('no solana wallet connected');

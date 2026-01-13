@@ -303,9 +303,16 @@ export const useWalletConnectionContext = () => {
           });
         } else if (
           selectedWallet.connectorType === ConnectorType.PhantomSolana &&
-          !sourceAccount.address
+          !sourceAccount.address &&
+          !solAddressPhantom
         ) {
           await connectPhantom();
+        } else if (
+          selectedWallet.connectorType === ConnectorType.BackpackSolana &&
+          !sourceAccount.address &&
+          !solAddressBackpack
+        ) {
+          await connectBackpack();
         }
       }
     })();
@@ -317,6 +324,9 @@ export const useWalletConnectionContext = () => {
     isConnectedWagmi,
     walletConnectConfig,
     connectPhantom,
+    connectBackpack,
+    solAddressPhantom,
+    solAddressBackpack,
   ]);
 
   const selectWallet = useCallback(
