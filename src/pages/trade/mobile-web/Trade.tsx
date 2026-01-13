@@ -86,7 +86,7 @@ const TradePage = () => {
   );
 
   return (
-    <$TradeLayoutMobile>
+    <div tw="flexColumn items-center gap-[0.75em]">
       <TradeHeaderMobile />
 
       <$MobileContent>
@@ -114,16 +114,11 @@ const TradePage = () => {
 
       <UserMenuDialog />
       <MarketsMenuDialog />
-    </$TradeLayoutMobile>
+    </div>
   );
 };
 
 export default TradePage;
-
-const $TradeLayoutMobile = styled.div`
-  ${layoutMixins.expandingColumnWithHeader}
-  min-height: 100%;
-`;
 
 const $MobileContent = styled.article`
   ${layoutMixins.contentContainerPage}

@@ -456,20 +456,22 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   return (
     <>
-      <div tw="mx-1.5 mb-1 mt-0.5">
-        <div
-          tw="flex w-full flex-1 items-center justify-between rounded-0.25 bg-color-layer-3 px-1 py-0.75"
-          onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
-        >
-          <span tw="text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.AVAILABLE_TO_TRADE })}
-          </span>
-          <div tw="flex gap-0.25">
-            <Output type={OutputType.Fiat} value={availableBalance} />
-            <Icon iconName={IconName.PlusCircle} size="1.5rem" tw="text-color-accent" />
+      {isTablet && (
+        <div tw="mx-1.5 mb-1 mt-0.5">
+          <div
+            tw="flex w-full flex-1 items-center justify-between rounded-0.25 bg-color-layer-3 px-1 py-0.75"
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+          >
+            <span tw="text-color-text-0">
+              {stringGetter({ key: STRING_KEYS.AVAILABLE_TO_TRADE })}
+            </span>
+            <div tw="flex gap-0.25">
+              <Output type={OutputType.Fiat} value={availableBalance} />
+              <Icon iconName={IconName.PlusCircle} size="1.5rem" tw="text-color-accent" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <$CollapsibleTabs
         defaultTab={InfoSection.Position}
