@@ -312,7 +312,7 @@ const ItemRenderer = ({ listItem }: { listItem: ListItem }) => {
       css={{ height }}
     >
       {listItem.item}
-      {listItem.slotRight}
+      {(listItem as any)?.slotRight}
     </div>
   );
 };

@@ -104,7 +104,7 @@ export function getTradeFormFieldStates(
       states[key] = {
         ...(states[key] as any),
         state: 'enabled',
-        effectiveValue: states[key].effectiveValue ?? states[key].rawValue ?? defaults[key],
+        effectiveValue: states[key]?.effectiveValue ?? states[key]?.rawValue ?? defaults[key],
       };
     });
   }
