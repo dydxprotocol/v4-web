@@ -26,10 +26,10 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { CompetitionIncentivesPanel } from './CompetitionIncentivesPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { RebatesIncetivesPanel } from './RebatesIncetivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
@@ -117,7 +117,7 @@ const RewardsPage = () => {
                 {
                   content: (
                     <div tw="flexColumn gap-1.5">
-                      <CompetitionIncentivesPanel />
+                      <RebatesIncetivesPanel />
                       <CompetitionLeaderboardPanel />
                     </div>
                   ),

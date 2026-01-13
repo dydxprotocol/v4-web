@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { IncentiveCompetitionItem, useClcPnlDistribution } from '@/hooks/rewards/hooks';
-import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -17,6 +16,9 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ColumnDef, Table } from '@/components/Table';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { exportCSV } from '@/lib/csv';
 import { truncateAddress } from '@/lib/wallet';
@@ -32,6 +34,7 @@ export const CompetitionLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
   const { data: topPnls, isLoading } = useClcPnlDistribution();
   const { dydxAddress } = useAccounts();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const getRowKey = useCallback((row: IncentiveCompetitionItem) => row.rank, []);
 
@@ -67,7 +70,7 @@ export const CompetitionLeaderboardPanel = () => {
     }));
 
     exportCSV(csvRows, {
-      filename: `rewards-leaderboard-season-${CURRENT_SURGE_REWARDS_DETAILS.season}`,
+      filename: `loss-rebates-leaderboard-${new Date().toLocaleDateString(selectedLocale, { month: 'short', year: 'numeric' })}`,
       columnHeaders: [
         {
           key: 'rank',
