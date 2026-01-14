@@ -185,6 +185,10 @@ const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} a
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   background: var(--color-layer-2);
 
+  thead {
+    --stickyArea-totalInsetTop: 0;
+  }
+
   tr {
     --histogram-bucket-size: 1;
 
