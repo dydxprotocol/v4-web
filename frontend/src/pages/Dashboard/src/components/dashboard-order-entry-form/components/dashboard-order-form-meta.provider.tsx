@@ -1,6 +1,6 @@
 import { type FC, type ReactNode, useCallback, useMemo } from 'react';
 import { HeadlessDecimalValue } from 'fuel-ts-sdk';
-import type { Asset } from 'fuel-ts-sdk/trading';
+import type { AssetEntity } from 'fuel-ts-sdk/trading';
 import { WalletContext } from '@/contexts/wallet';
 import { useSdkQuery, useSdkQuerySignal, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { useAwaited } from '@/lib/use-awaited';
@@ -30,7 +30,7 @@ export const DashboardOrderFormMetaProvider: FC<DashboardOrderFormMetaProviderPr
   );
 
   const getAssetBalance = useCallback(
-    (asset: Asset | undefined) => {
+    (asset: AssetEntity | undefined) => {
       const assetId = asset?.assetId;
       if (!assetId) return 0;
       if (!userBalances) return 0;

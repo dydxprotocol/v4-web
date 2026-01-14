@@ -1,4 +1,40 @@
 {
+  "workbench.editor.customLabels.patterns": {
+    // fuel-ts-sdk: [type] filename (BC > Aggregate)
+
+    // BC-level Application Services (Trading/src/application)
+    "**/fuel-ts-sdk/src/*/src/application/queries/*.ts": "[query] ${filename} (${dirname(3)} Application Service)",
+    "**/fuel-ts-sdk/src/*/src/application/commands/*.ts": "[command] ${filename} (${dirname(3)} Application Service)",
+    "**/fuel-ts-sdk/src/*/src/application/workflows/*.ts": "[workflow] ${filename} (${dirname(3)} Application Service)",
+
+    // Aggregate-level Application layer - Commands & Queries
+    "**/fuel-ts-sdk/**/commands/*.ts": "[command] ${filename} (${dirname(4)} > ${dirname(2)})",
+    "**/fuel-ts-sdk/**/queries/*.ts": "[query] ${filename} (${dirname(4)} > ${dirname(2)})",
+    "**/fuel-ts-sdk/**/workflows/*.ts": "[workflow] ${filename} (${dirname(2)})",
+
+    // Domain layer
+    "**/fuel-ts-sdk/**/domain/*.ts": "[domain] ${filename} (${dirname(3)} > ${dirname(1)})",
+    "**/fuel-ts-sdk/**/domain/calculations/*.ts": "[calculation] ${filename} (${dirname(4)} > ${dirname(2)})",
+
+    // Infrastructure layer - Redux (with slice name)
+    "**/fuel-ts-sdk/**/infrastructure/redux/reducer.ts": "[redux] ${dirname(2)} ${filename} (${dirname(4)} > ${dirname(2)})",
+    "**/fuel-ts-sdk/**/infrastructure/redux/**/*.ts": "[redux] ${dirname(0)} ${filename} (${dirname(5)} > ${dirname(3)})",
+
+    // Infrastructure layer - Repositories (with repository name)
+    "**/fuel-ts-sdk/**/infrastructure/repositories/**/*.ts": "[${dirname(0)}] ${filename} (${dirname(5)} > ${dirname(3)})",
+
+    // Shared
+    "**/fuel-ts-sdk/src/shared/**/*.ts": "[shared] ${filename}",
+
+    // DI and tests
+    "**/fuel-ts-sdk/**/di.ts": "[di] ${dirname(1)}",
+    "**/fuel-ts-sdk/**/*.test.ts": "[test] ${filename}",
+
+    // Fallback
+    "**/*.ts": "${dirname(1)}/${dirname}/${filename}",
+    "**/*.tsx": "${dirname(1)}/${dirname}/${filename}"
+  },
+
   "explorer.sortOrder": "foldersNestsFiles",
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
@@ -31,7 +67,7 @@
     "tw\\.\\w+`([^`]*)", // tw.xxx`...`
     "tw\\(.*?\\)`([^`]*)" // tw(Component)`...`
   ],
-  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.emmetCompletions": false,
   "emmet.includeLanguages": {
     "\"typescript\"": "\"typescriptreact\""
   },

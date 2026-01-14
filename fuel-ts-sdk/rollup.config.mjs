@@ -24,7 +24,7 @@ export default [
     input: {
       index: 'src/index.ts',
       client: 'src/client.ts',
-      'trading/index': 'src/trading/index.ts',
+      'trading/index': 'src/Trading/index.ts',
     },
     output: {
       dir: 'dist',
@@ -50,7 +50,7 @@ export default [
     input: {
       index: 'src/index.ts',
       client: 'src/client.ts',
-      'trading/index': 'src/trading/index.ts',
+      'trading/index': 'src/Trading/index.ts',
     },
     output: {
       dir: 'dist',

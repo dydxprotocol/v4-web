@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { type AssetId } from 'fuel-ts-sdk';
-import { type Position, calculatePositionLeverage } from 'fuel-ts-sdk/trading';
+import { type PositionEntity, calculatePositionLeverage } from 'fuel-ts-sdk/trading';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import * as styles from './position-card.css';
 import {
@@ -14,7 +14,7 @@ import {
 } from './position-field.component';
 
 type PositionCardProps = {
-  position: Position;
+  position: PositionEntity;
 };
 
 export const PositionCard: FC<PositionCardProps> = ({ position }) => {

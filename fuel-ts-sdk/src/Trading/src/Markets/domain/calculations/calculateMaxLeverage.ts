@@ -1,0 +1,14 @@
+import { RatioOutput } from '@/shared/models/decimals';
+import { DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import type { MarketConfigEntity } from '../..';
+
+export const calculateMaxLeverage = (marketConfig: MarketConfigEntity): RatioOutput => {
+  const imfDecimal = marketConfig.initialMarginFraction;
+  if (imfDecimal.toBigInt() === 0n) {
+    return zero(RatioOutput);
+  }
+
+  return DecimalCalculator.value(RatioOutput.fromFloat(1))
+    .divideBy(imfDecimal)
+    .calculate(RatioOutput);
+};

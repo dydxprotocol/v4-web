@@ -1,8 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
-import { createTradingModule } from '@/trading/di';
+import { createTradingModule } from '@/Trading/di';
+import { createStoreService } from './shared/lib/StoreService';
 import type { RootState } from './shared/lib/redux';
 import { createStore } from './shared/lib/redux';
-import { createStoreService } from './shared/lib/store-service';
 
 export type { RootState };
 export type StarboardClient = ReturnType<typeof createStarboardClient>;

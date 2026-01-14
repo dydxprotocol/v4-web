@@ -1,4 +1,4 @@
-import { DecimalValue } from './decimalValue';
+import { DecimalValue } from './DecimalValue';
 
 export class OraclePrice extends DecimalValue {
   declare __brand: typeof OraclePrice;

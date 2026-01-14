@@ -2,5 +2,5 @@
  * Shared test helpers and utilities
  */
 
-export * from './decimal-test-helpers';
-export * from './mock-graphql-client';
+export * from './decimalTestHelpers';
+export * from './MockGraphqlClient';

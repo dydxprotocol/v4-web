@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useMemo } from 'react';
 import { createStarboardClient } from 'fuel-ts-sdk/client';
-import type { Asset } from 'fuel-ts-sdk/trading';
+import type { AssetEntity } from 'fuel-ts-sdk/trading';
 import { Provider as ReduxProvider } from 'react-redux';
 import localAssets from '@/assets/local-assets.json';
 import testnetAssets from '@/assets/testnet-assets.json';
@@ -33,7 +33,7 @@ export function FuelTsSdkProvider({ children }: FuelTsSdkProviderProps) {
 }
 
 function getNetworkAssets(network: Network) {
-  if (network === 'local') return localAssets as Asset[];
-  if (network === 'testnet') return testnetAssets as Asset[];
+  if (network === 'local') return localAssets as AssetEntity[];
+  if (network === 'testnet') return testnetAssets as AssetEntity[];
   throw new Error(`Unsupported Network:  ${network}`);
 }
