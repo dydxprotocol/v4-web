@@ -161,13 +161,13 @@ describe('Position Calculations', () => {
       const entryPrice = calculateEntryPrice(history);
 
       // Should be a non-zero price
-      expect(entryPrice.value).toBeGreaterThan(0n);
+      expect(BigInt(entryPrice.value)).toBeGreaterThan(0n);
     });
 
     it('should return zero for empty history', () => {
       const entryPrice = calculateEntryPrice([]);
 
-      expect(entryPrice.value).toBe(0n);
+      expect(entryPrice.value).toBe('0');
     });
 
     it('should only consider Increase events', () => {
@@ -189,7 +189,7 @@ describe('Position Calculations', () => {
       const entryPrice = calculateEntryPrice(history);
 
       // Should calculate based only on Increase event
-      expect(entryPrice.value).toBeGreaterThan(0n);
+      expect(BigInt(entryPrice.value)).toBeGreaterThan(0n);
     });
   });
 });

@@ -37,7 +37,7 @@ describe('Market Domain', () => {
 
       expect(price.id).toBeDefined();
       expect(price.assetId).toBeDefined();
-      expect(price.value.value).toBeGreaterThan(0n);
+      expect(BigInt(price.value.value)).toBeGreaterThan(0n);
       expect(price.timestamp).toBeGreaterThan(0);
     });
 

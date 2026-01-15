@@ -7,7 +7,7 @@ describe('DecimalValue', () => {
     it('should create from bigint', () => {
       const value = UsdValue.fromBigInt(100000000000n); // 100.0 with 9 decimals
 
-      expect(value.value).toBe(100000000000n);
+      expect(value.value).toBe('100000000000');
       expect(value.decimals).toBe(9);
     });
 

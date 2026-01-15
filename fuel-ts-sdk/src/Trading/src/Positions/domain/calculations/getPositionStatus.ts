@@ -6,11 +6,11 @@ export function getPositionStatus(position: PositionEntity): PositionStatus {
     return PositionStatus.CLOSED;
   }
 
-  if (position.size.value === 0n) {
+  if (position.size.value === '0') {
     return PositionStatus.CLOSED;
   }
 
-  if (position.latest && position.size.value !== 0n) {
+  if (position.latest && position.size.value !== '0') {
     return PositionStatus.OPEN;
   }
 

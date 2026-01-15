@@ -16,7 +16,7 @@ export const calculateLiquidationPrice = (
   const side = getPositionSide(position);
   const size = BigIntMath.abs(position.size);
 
-  if (size.value === 0n) return zero(OraclePrice);
+  if (size.value === '0') return zero(OraclePrice);
 
   const addOrSubtract = side === PositionSide.LONG ? 'add' : 'subtractBy';
   const mmfCoefficient = DecimalCalculator.value(PercentageValue.fromFloat(1))

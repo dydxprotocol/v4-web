@@ -13,7 +13,7 @@ describe('Asset Prices', () => {
       expect(price.assetId).toBeDefined();
       expect(price.value).toHaveProperty('value');
       expect(price.value).toHaveProperty('decimals', OraclePrice.decimals);
-      expect(price.value.value).toBeGreaterThan(0n);
+      expect(BigInt(price.value.value)).toBeGreaterThan(0n);
       expect(price.timestamp).toBeGreaterThan(0);
     });
 

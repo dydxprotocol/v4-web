@@ -20,7 +20,7 @@ export function calculateEntryPrice(positionHistory: PositionEntity[]): OraclePr
     totalSizeAddedFormula = totalSizeAddedFormula.add(BigIntMath.abs(event.size));
   }
 
-  if (totalSizeAddedFormula.calculate(OraclePrice).value === 0n) {
+  if (totalSizeAddedFormula.calculate(OraclePrice).value === '0') {
     return zero(OraclePrice);
   }
 
