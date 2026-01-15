@@ -9,7 +9,7 @@ export function calculateLeverage(
   equity: UsdValue,
   oraclePrice: OraclePrice
 ): RatioOutput {
-  if (equity.value <= 0n) {
+  if (BigInt(equity.value) <= 0n) {
     return zero(RatioOutput);
   }
 

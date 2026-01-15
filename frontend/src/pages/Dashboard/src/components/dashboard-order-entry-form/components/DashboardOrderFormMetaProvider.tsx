@@ -42,7 +42,7 @@ export const DashboardOrderFormMetaProvider: FC<DashboardOrderFormMetaProviderPr
       const bigintBalance = userBalances[assetId];
 
       return $decimalValue({
-        value: bigintBalance,
+        value: bigintBalance.toString(),
         decimals: asset.decimals,
       }).toFloat();
     },

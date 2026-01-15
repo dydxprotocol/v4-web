@@ -18,7 +18,7 @@ type PositionCardProps = {
 };
 
 export const PositionCard: FC<PositionCardProps> = ({ position }) => {
-  const isProfitable = position.pnlDelta.value > 0n;
+  const isProfitable = BigInt(position.pnlDelta.value) > 0n;
   const leverage = calculatePositionLeverage(position);
 
   return (

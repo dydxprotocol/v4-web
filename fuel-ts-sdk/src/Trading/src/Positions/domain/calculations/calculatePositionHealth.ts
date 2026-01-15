@@ -6,7 +6,7 @@ export function calculatePositionHealth(
   equity: UsdValue,
   maintenanceMargin: UsdValue
 ): PercentageValue {
-  if (equity.value <= 0n || maintenanceMargin.value <= 0n) {
+  if (BigInt(equity.value) <= 0n || BigInt(maintenanceMargin.value) <= 0n) {
     return zero(PercentageValue);
   }
 

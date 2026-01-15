@@ -3,7 +3,7 @@ import { DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { PositionEntity } from '../PositionsEntity';
 
 export function calculatePositionLeverage(position: PositionEntity): RatioOutput {
-  if (position.collateralAmount.value <= 0n) {
+  if (BigInt(position.collateralAmount.value) <= 0n) {
     return zero(RatioOutput);
   }
 

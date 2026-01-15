@@ -8,7 +8,7 @@ export function calculateUnrealizedPnlPercent(
   equity: UsdValue,
   oraclePrice: OraclePrice
 ): PercentageMultiplier {
-  if (equity.value <= 0n) return zero(PercentageMultiplier);
+  if (BigInt(equity.value) <= 0n) return zero(PercentageMultiplier);
 
   const unrealizedPnl = calculateUnrealizedPnl(positionHistory, oraclePrice);
   return DecimalCalculator.value(unrealizedPnl)
