@@ -1,10 +1,10 @@
 import { vaultAbi } from '@starboard/indexer/abis';
 import type { Account } from 'fuels';
 import { Contract } from 'fuels';
-import type { DecimalValueInstance } from '@/shared/models/DecimalValue';
-import { CollateralAmount } from '@/shared/models/decimals';
-import type { AssetId, ContractId } from '@/shared/types';
-import { DecimalCalculator } from '@/shared/utils/DecimalCalculator';
+import type { DecimalValueInstance } from '@sdk/shared/models/DecimalValue';
+import { CollateralAmount } from '@sdk/shared/models/decimals';
+import type { AssetId, ContractId } from '@sdk/shared/types';
+import { DecimalCalculator } from '@sdk/shared/utils/DecimalCalculator';
 
 export interface SubmitOrderParams {
   isLong: boolean;

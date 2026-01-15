@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { RootState } from '@/client';
-import type { AssetId } from '@/shared/types';
+import type { RootState } from '@sdk/client';
+import type { AssetId } from '@sdk/shared/types';
 import type { AssetEntity } from '../../../domain';
 import type { AssetsState } from './types';
 

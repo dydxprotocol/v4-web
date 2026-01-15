@@ -1,5 +1,5 @@
 import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
-import type { PositionStableId } from '@/shared/types';
+import type { PositionStableId } from '@sdk/shared/types';
 import type { PositionEntity } from '../../../domain';
 import { positionsApi } from './api';
 

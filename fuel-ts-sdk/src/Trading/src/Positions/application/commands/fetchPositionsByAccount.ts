@@ -1,5 +1,5 @@
-import type { StoreService } from '@/shared/lib/StoreService';
-import type { Address } from '@/shared/types';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
+import type { Address } from '@sdk/shared/types';
 import { positionsApi } from '../../infrastructure';
 
 export const createFetchPositionsByAccount =

@@ -1,6 +1,6 @@
-import type { OraclePrice, UsdValue } from '@/shared/models/decimals';
-import { RatioOutput } from '@/shared/models/decimals';
-import { DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import type { OraclePrice, UsdValue } from '@sdk/shared/models/decimals';
+import { RatioOutput } from '@sdk/shared/models/decimals';
+import { DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { PositionEntity } from '../../domain';
 import { calculateNotional } from './calculateNotional';
 

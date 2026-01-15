@@ -1,5 +1,5 @@
-import type { PercentageValue } from '@/shared/models/decimals';
-import type { AssetId, MarketConfigId } from '@/shared/types';
+import type { PercentageValue } from '@sdk/shared/models/decimals';
+import type { AssetId, MarketConfigId } from '@sdk/shared/types';
 
 /**
  * MarketConfig - Configuration parameters for a market

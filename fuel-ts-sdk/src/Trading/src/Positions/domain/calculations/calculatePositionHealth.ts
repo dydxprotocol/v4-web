@@ -1,6 +1,6 @@
-import type { UsdValue } from '@/shared/models/decimals';
-import { PercentageValue, RatioOutput } from '@/shared/models/decimals';
-import { DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import type { UsdValue } from '@sdk/shared/models/decimals';
+import { PercentageValue, RatioOutput } from '@sdk/shared/models/decimals';
+import { DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 
 export function calculatePositionHealth(
   equity: UsdValue,

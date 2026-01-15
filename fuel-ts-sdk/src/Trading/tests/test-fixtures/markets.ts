@@ -1,6 +1,6 @@
-import type { AssetPriceEntity, Candle, MarketConfigEntity } from '@/Trading/src/Markets/domain';
-import { OraclePrice, PercentageValue } from '@/shared/models/decimals';
-import { assetId, assetPriceId, candleId, marketConfigId } from '@/shared/types';
+import type { AssetPriceEntity, Candle, MarketConfigEntity } from '@sdk/Trading/src/Markets/domain';
+import { OraclePrice, PercentageValue } from '@sdk/shared/models/decimals';
+import { assetId, assetPriceId, candleId, marketConfigId } from '@sdk/shared/types';
 
 /**
  * Create a test market config

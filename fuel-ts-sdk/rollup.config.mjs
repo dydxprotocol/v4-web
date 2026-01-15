@@ -35,7 +35,7 @@ export default [
     external,
     plugins: [
       alias({
-        entries: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+        entries: [{ find: '@sdk', replacement: path.resolve(__dirname, 'src') }],
       }),
       json(),
       resolve({ extensions: ['.ts', '.js', '.json'] }),

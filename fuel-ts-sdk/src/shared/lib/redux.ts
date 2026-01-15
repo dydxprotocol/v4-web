@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { marketsMiddleware, positionsMiddleware } from '@/Trading';
-import { type TradingThunkExtras, tradingReducer } from '@/Trading/di';
+import { marketsMiddleware, positionsMiddleware } from '@sdk/Trading';
+import { type TradingThunkExtras, tradingReducer } from '@sdk/Trading/di';
 
 export type RequestStatus = 'uninitialized' | 'pending' | 'fulfilled' | 'rejected';
 

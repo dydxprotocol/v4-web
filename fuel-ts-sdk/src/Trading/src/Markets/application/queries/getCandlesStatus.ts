@@ -1,6 +1,6 @@
-import type { StoreService } from '@/shared/lib/StoreService';
-import type { RequestStatus } from '@/shared/lib/redux';
-import type { AssetId } from '@/shared/types';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
+import type { RequestStatus } from '@sdk/shared/lib/redux';
+import type { AssetId } from '@sdk/shared/types';
 import type { CandleInterval } from '../../domain';
 import { selectCandlesFetchStatus } from '../../infrastructure';
 

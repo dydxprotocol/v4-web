@@ -1,4 +1,4 @@
-import type { StoreService } from '@/shared/lib/StoreService';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
 import { createFetchPositionsByAccount } from './fetchPositionsByAccount';
 import { createSubmitOrder } from './submitOrder';
 

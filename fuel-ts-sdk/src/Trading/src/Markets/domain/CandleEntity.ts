@@ -1,4 +1,4 @@
-import type { AssetId, CandleId } from '@/shared/types';
+import type { AssetId, CandleId } from '@sdk/shared/types';
 
 /**
  * Candle interval options

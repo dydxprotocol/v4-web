@@ -1,6 +1,6 @@
 import { createEntityAdapter } from '@reduxjs/toolkit';
-import type { LoadableMixin } from '@/shared/lib/redux';
-import type { AssetPriceId } from '@/shared/types';
+import type { LoadableMixin } from '@sdk/shared/lib/redux';
+import type { AssetPriceId } from '@sdk/shared/types';
 import type { AssetPriceEntity } from '../../../domain';
 
 export const assetPricesAdapter = createEntityAdapter<AssetPriceEntity, AssetPriceId>({

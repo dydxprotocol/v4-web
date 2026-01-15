@@ -1,4 +1,4 @@
-import type { DecimalValueInstance, DecimalValueSchema } from '@/shared/models/DecimalValue';
+import type { DecimalValueInstance, DecimalValueSchema } from '@sdk/shared/models/DecimalValue';
 
 export function zero<TDecimals extends number, TBrand extends string>(
   schema: DecimalValueSchema<TDecimals, TBrand>

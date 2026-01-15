@@ -1,14 +1,14 @@
-import type { PositionEntity } from '@/Trading/src/Positions/domain';
-import { PositionChange } from '@/Trading/src/Positions/domain';
+import type { PositionEntity } from '@sdk/Trading/src/Positions/domain';
+import { PositionChange } from '@sdk/Trading/src/Positions/domain';
 import {
   FundingRate,
   PnlDelta,
   PositionFee,
   PositionSize,
   RealizedPnl,
-} from '@/Trading/src/Positions/domain/positionsDecimals';
-import { CollateralAmount } from '@/shared/models/decimals';
-import { address, assetId, positionRevisionId, positionStableId } from '@/shared/types';
+} from '@sdk/Trading/src/Positions/domain/positionsDecimals';
+import { CollateralAmount } from '@sdk/shared/models/decimals';
+import { address, assetId, positionRevisionId, positionStableId } from '@sdk/shared/types';
 
 /**
  * Create a test position with default values

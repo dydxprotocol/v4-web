@@ -1,4 +1,4 @@
-import type { DecimalValueInstance } from '@/shared/models/DecimalValue';
+import type { DecimalValueInstance } from '@sdk/shared/models/DecimalValue';
 
 export const BigIntMath = {
   abs<T extends DecimalValueInstance>(dv: T): T {

@@ -1,5 +1,5 @@
-import type { InferDecimalValueType } from '@/shared/models/DecimalValue';
-import { createDecimalValueSchema } from '@/shared/models/DecimalValue';
+import type { InferDecimalValueType } from '@sdk/shared/models/DecimalValue';
+import { createDecimalValueSchema } from '@sdk/shared/models/DecimalValue';
 
 export const PositionSize = createDecimalValueSchema(6, 'PositionSize');
 export type PositionSize = InferDecimalValueType<typeof PositionSize>;

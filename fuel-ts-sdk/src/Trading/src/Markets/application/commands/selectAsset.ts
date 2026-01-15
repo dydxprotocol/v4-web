@@ -1,5 +1,5 @@
-import type { StoreService } from '@/shared/lib/StoreService';
-import type { AssetId } from '@/shared/types';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
+import type { AssetId } from '@sdk/shared/types';
 import { assetPrices, marketConfigs } from '../../infrastructure';
 
 export const createSelectAssetCommand = (store: StoreService) => async (assetId: AssetId) => {

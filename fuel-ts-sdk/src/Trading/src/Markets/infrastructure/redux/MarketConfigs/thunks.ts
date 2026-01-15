@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { AssetId } from '@/shared/types';
+import type { AssetId } from '@sdk/shared/types';
 import type { MarketConfigEntity, MarketConfigRepository } from '../../../domain';
 
 export const fetchMarketConfig = createAsyncThunk<

@@ -1,13 +1,13 @@
 import { z } from 'zod';
-import { PositionChange } from '@/generated/graphql';
-import * as Decimals from '@/shared/models/decimals';
+import { PositionChange } from '@sdk/generated/graphql';
+import * as Decimals from '@sdk/shared/models/decimals';
 import {
   AddressSchema,
   AssetIdSchema,
   PositionRevisionIdSchema,
   PositionStableIdSchema,
-} from '@/shared/types';
-import { decimalValueSchema } from '@/shared/utils/DecimalCalculator/utils/zod';
+} from '@sdk/shared/types';
+import { decimalValueSchema } from '@sdk/shared/utils/DecimalCalculator/utils/zod';
 import type { PositionEntity, PositionKeyEntity } from './PositionsEntity';
 import * as pd from './positionsDecimals';
 

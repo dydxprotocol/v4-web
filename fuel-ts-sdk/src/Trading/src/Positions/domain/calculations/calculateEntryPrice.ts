@@ -1,5 +1,5 @@
-import { OraclePrice } from '@/shared/models/decimals';
-import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import { OraclePrice } from '@sdk/shared/models/decimals';
+import { BigIntMath, DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { PositionEntity } from '../PositionsEntity';
 import { PositionChange } from '../PositionsEntity';
 

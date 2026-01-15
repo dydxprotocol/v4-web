@@ -1,6 +1,6 @@
-import type { UsdValue } from '@/shared/models/decimals';
-import { OraclePrice, PercentageValue } from '@/shared/models/decimals';
-import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import type { UsdValue } from '@sdk/shared/models/decimals';
+import { OraclePrice, PercentageValue } from '@sdk/shared/models/decimals';
+import { BigIntMath, DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { MarketConfigEntity } from '../../Markets';
 import type { PositionEntity } from '../../Positions';
 import { PositionSide, getPositionSide } from '../../Positions';

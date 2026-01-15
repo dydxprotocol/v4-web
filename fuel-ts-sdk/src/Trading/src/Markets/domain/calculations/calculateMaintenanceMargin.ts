@@ -1,5 +1,5 @@
-import { UsdValue } from '@/shared/models/decimals';
-import { DecimalCalculator } from '@/shared/utils/DecimalCalculator';
+import { UsdValue } from '@sdk/shared/models/decimals';
+import { DecimalCalculator } from '@sdk/shared/utils/DecimalCalculator';
 import type { MarketConfigEntity } from '../MarketConfigEntity';
 
 export const calculateMaintenanceMargin = (

@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { RootState } from '@/shared/lib/redux';
-import { type AssetId } from '@/shared/types';
+import type { RootState } from '@sdk/shared/lib/redux';
+import { type AssetId } from '@sdk/shared/types';
 import { marketConfigsAdapter } from './types';
 
 export const selectMarketConfigsState = (state: RootState) => state.markets.marketConfigs;

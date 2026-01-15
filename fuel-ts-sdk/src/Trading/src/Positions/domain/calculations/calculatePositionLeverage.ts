@@ -1,5 +1,5 @@
-import { RatioOutput } from '@/shared/models/decimals';
-import { DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import { RatioOutput } from '@sdk/shared/models/decimals';
+import { DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { PositionEntity } from '../PositionsEntity';
 
 export function calculatePositionLeverage(position: PositionEntity): RatioOutput {

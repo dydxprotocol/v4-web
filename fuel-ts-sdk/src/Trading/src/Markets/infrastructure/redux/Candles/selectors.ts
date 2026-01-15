@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { memoize } from 'lodash';
-import type { RootState } from '@/shared/lib/redux';
-import { type AssetId } from '@/shared/types';
+import type { RootState } from '@sdk/shared/lib/redux';
+import { type AssetId } from '@sdk/shared/types';
 import type { CandleInterval } from '../../../domain';
 import { candlesApi } from './api';
 

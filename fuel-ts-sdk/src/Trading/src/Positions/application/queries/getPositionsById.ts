@@ -1,5 +1,5 @@
-import type { StoreService } from '@/shared/lib/StoreService';
-import type { PositionStableId } from '@/shared/types';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
+import type { PositionStableId } from '@sdk/shared/types';
 import type { PositionEntity } from '../../domain';
 import { selectLatestPositionByKeyId } from '../../infrastructure';
 

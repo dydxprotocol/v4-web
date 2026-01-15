@@ -1,4 +1,4 @@
-import type { StoreService } from '@/shared/lib/StoreService';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { AssetEntity } from '../../domain';
 import { selectAllAssets } from '../../infrastructure';
 

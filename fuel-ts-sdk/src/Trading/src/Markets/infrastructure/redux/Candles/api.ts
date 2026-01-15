@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query';
-import type { AssetId } from '@/shared/types';
+import type { AssetId } from '@sdk/shared/types';
 import type { Candle, CandleInterval, CandleRepository } from '../../../domain';
 
 export interface GetCandlesArgs {

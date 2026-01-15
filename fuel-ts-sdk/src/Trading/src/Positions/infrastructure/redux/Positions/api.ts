@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query';
-import type { Address, PositionStableId } from '@/shared/types';
+import type { Address, PositionStableId } from '@sdk/shared/types';
 import type { PositionRepository } from '../../../domain';
 
 export const positionsApi = createApi({

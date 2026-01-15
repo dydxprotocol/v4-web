@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AssetIdSchema, CandleIdSchema } from '@/shared/types';
+import { AssetIdSchema, CandleIdSchema } from '@sdk/shared/types';
 import type { Candle } from './CandleEntity';
 
 export const CandleEntitySchema = z.object({

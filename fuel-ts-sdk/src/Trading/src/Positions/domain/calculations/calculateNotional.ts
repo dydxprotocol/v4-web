@@ -1,6 +1,6 @@
-import type { OraclePrice } from '@/shared/models/decimals';
-import { UsdValue } from '@/shared/models/decimals';
-import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import type { OraclePrice } from '@sdk/shared/models/decimals';
+import { UsdValue } from '@sdk/shared/models/decimals';
+import { BigIntMath, DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { PositionEntity } from '../../domain';
 
 export function calculateNotional(

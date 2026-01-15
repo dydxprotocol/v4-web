@@ -1,4 +1,4 @@
-import type { Address, AssetId, PositionStableId } from '@/shared/types';
+import type { Address, AssetId, PositionStableId } from '@sdk/shared/types';
 import type { PositionEntity } from './PositionsEntity';
 
 /**

@@ -1,4 +1,4 @@
-import type { AssetId, ContractId } from '@/shared/types';
+import type { AssetId, ContractId } from '@sdk/shared/types';
 
 export interface AssetEntity {
   name: string;

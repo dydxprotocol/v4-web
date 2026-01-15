@@ -1,5 +1,5 @@
-import type { StoreService } from '@/shared/lib/StoreService';
-import type { MarketConfigId } from '@/shared/types';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
+import type { MarketConfigId } from '@sdk/shared/types';
 import type { MarketConfigEntity } from '../../domain';
 import { selectMarketConfigById } from '../../infrastructure';
 

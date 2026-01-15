@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { OraclePrice } from '@/shared/models/decimals';
-import { AssetIdSchema, AssetPriceIdSchema } from '@/shared/types';
-import { decimalValueSchema } from '@/shared/utils/DecimalCalculator';
+import { OraclePrice } from '@sdk/shared/models/decimals';
+import { AssetIdSchema, AssetPriceIdSchema } from '@sdk/shared/types';
+import { decimalValueSchema } from '@sdk/shared/utils/DecimalCalculator';
 import type { AssetPriceEntity } from './AssetPriceEntity';
 
 export const AssetPriceEntitySchema = z.object({

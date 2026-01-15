@@ -1,6 +1,6 @@
 import type { GraphQLClient } from 'graphql-request';
-import type { Position as GraphQLPosition } from '@/generated/graphql';
-import type { Address } from '@/shared/types';
+import type { Position as GraphQLPosition } from '@sdk/generated/graphql';
+import type { Address } from '@sdk/shared/types';
 import type { PositionEntity } from '../../../domain';
 import {
   GET_POSITIONS_BY_KEY_IDS_QUERY,

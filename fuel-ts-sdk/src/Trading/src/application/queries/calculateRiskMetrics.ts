@@ -1,4 +1,4 @@
-import type { UsdValue } from '@/shared/models/decimals';
+import type { UsdValue } from '@sdk/shared/models/decimals';
 import type { MarketConfigEntity, MarketQueries } from '../../Markets';
 import {
   calculateInitialMargin,

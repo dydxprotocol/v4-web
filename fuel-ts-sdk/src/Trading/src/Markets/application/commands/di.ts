@@ -1,4 +1,4 @@
-import type { StoreService } from '@/shared/lib/StoreService';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
 import { createFetchCandlesCommand } from './fetchCandles';
 import { createFetchLatestAssetPriceCommand } from './fetchLatestAssetPrice';
 import { createFetchMarketConfigCommand } from './fetchMarketConfig';

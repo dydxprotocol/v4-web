@@ -1,6 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { AssetId } from '@/shared/types';
+import type { AssetId } from '@sdk/shared/types';
 import type { AssetEntity } from '../../../domain';
 import { assetsInitialState } from './types';
 

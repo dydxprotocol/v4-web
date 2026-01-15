@@ -1,4 +1,4 @@
-import type { Address } from '@/shared/types';
+import type { Address } from '@sdk/shared/types';
 import type { MarketQueries } from '../../Markets';
 import type { PositionsQueries } from '../../Positions';
 import { filterPositionsByAsset } from '../../Positions';

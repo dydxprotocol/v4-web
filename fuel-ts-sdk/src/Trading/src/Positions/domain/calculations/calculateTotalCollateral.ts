@@ -1,5 +1,5 @@
-import { CollateralAmount } from '@/shared/models/decimals';
-import { DecimalCalculator, zero } from '@/shared/utils/DecimalCalculator';
+import { CollateralAmount } from '@sdk/shared/models/decimals';
+import { DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
 import type { PositionEntity } from '../PositionsEntity';
 
 export function calculateTotalCollateral(positions: PositionEntity[]): CollateralAmount {

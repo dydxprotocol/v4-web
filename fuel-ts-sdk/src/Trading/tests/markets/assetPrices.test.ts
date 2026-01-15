@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { $decimalValue } from '@/shared/models/DecimalValue';
-import { OraclePrice } from '@/shared/models/decimals';
-import { assetId } from '@/shared/types';
+import { $decimalValue } from '@sdk/shared/models/DecimalValue';
+import { OraclePrice } from '@sdk/shared/models/decimals';
+import { assetId } from '@sdk/shared/types';
 import { createTestAssetPrice } from '../test-fixtures/markets';
 
 describe('Asset Prices', () => {

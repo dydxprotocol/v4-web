@@ -1,6 +1,6 @@
 import { createEntityAdapter } from '@reduxjs/toolkit';
-import type { LoadableMixin } from '@/shared/lib/redux';
-import type { MarketConfigId } from '@/shared/types';
+import type { LoadableMixin } from '@sdk/shared/lib/redux';
+import type { MarketConfigId } from '@sdk/shared/types';
 import type { MarketConfigEntity } from '../../../domain';
 
 export const marketConfigsAdapter = createEntityAdapter<MarketConfigEntity, MarketConfigId>({

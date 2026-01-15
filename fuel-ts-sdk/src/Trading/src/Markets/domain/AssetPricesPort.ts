@@ -1,4 +1,4 @@
-import type { AssetId } from '@/shared/types';
+import type { AssetId } from '@sdk/shared/types';
 import type { AssetPriceEntity } from './AssetPriceEntity';
 
 /**

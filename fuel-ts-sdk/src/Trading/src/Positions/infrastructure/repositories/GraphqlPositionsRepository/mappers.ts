@@ -1,5 +1,5 @@
-import type { Position as GraphQLPosition } from '@/generated/graphql';
-import { address, assetId, positionRevisionId, positionStableId } from '@/shared/types';
+import type { Position as GraphQLPosition } from '@sdk/generated/graphql';
+import { address, assetId, positionRevisionId, positionStableId } from '@sdk/shared/types';
 import type { PositionEntity } from '../../../domain';
 import { PositionSchema } from '../../../domain';
 

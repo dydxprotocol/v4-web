@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@sdk/*": ["src/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

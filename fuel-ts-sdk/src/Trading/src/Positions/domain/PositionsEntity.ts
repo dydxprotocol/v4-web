@@ -1,6 +1,6 @@
-import type { PositionChange } from '@/generated/graphql';
-import type { CollateralAmount } from '@/shared/models/decimals';
-import type { Address, AssetId, PositionRevisionId, PositionStableId } from '@/shared/types';
+import type { PositionChange } from '@sdk/generated/graphql';
+import type { CollateralAmount } from '@sdk/shared/models/decimals';
+import type { Address, AssetId, PositionRevisionId, PositionStableId } from '@sdk/shared/types';
 import type {
   FundingRate,
   PnlDelta,
@@ -9,7 +9,7 @@ import type {
   RealizedPnl,
 } from './positionsDecimals';
 
-export { PositionChange } from '@/generated/graphql';
+export { PositionChange } from '@sdk/generated/graphql';
 
 export type PositionKeyEntity = {
   id: PositionStableId;

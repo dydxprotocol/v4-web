@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { $decimalValue } from '@/shared/models/DecimalValue';
-import { OraclePrice, PercentageValue } from '@/shared/models/decimals';
+import { $decimalValue } from '@sdk/shared/models/DecimalValue';
+import { OraclePrice, PercentageValue } from '@sdk/shared/models/decimals';
 import {
   createTestAssetPrice,
   createTestCandle,
