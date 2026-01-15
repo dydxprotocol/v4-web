@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_, StringColumn as StringColumn_, Index as Index_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class Liquidity {
@@ -9,22 +9,25 @@ export class Liquidity {
     @PrimaryColumn_()
     id!: string
 
-    @Index_()
-    @StringColumn_({nullable: false})
-    provider!: string
-
-    @BigIntColumn_({nullable: false})
-    stable!: bigint
-
-    @BigIntColumn_({nullable: false})
-    lpAmount!: bigint
-
-    @BigIntColumn_({nullable: false})
-    fee!: bigint
-
     @IntColumn_({nullable: false})
     timestamp!: number
 
     @BooleanColumn_({nullable: false})
     latest!: boolean
+
+    @BigIntColumn_({nullable: false})
+    lpAssetBalance!: bigint
+
+    @Index_()
+    @StringColumn_({nullable: false})
+    account!: string
+
+    @BigIntColumn_({nullable: false})
+    baseAsset!: bigint
+
+    @BigIntColumn_({nullable: false})
+    lpAsset!: bigint
+
+    @BigIntColumn_({nullable: false})
+    fee!: bigint
 }

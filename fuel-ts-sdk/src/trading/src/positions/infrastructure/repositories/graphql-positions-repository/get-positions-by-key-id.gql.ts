@@ -14,13 +14,15 @@ export const GET_POSITIONS_BY_KEY_ID_QUERY = gql`
           indexAssetId
           isLong
         }
-        collateralAmount
+        collateral
         size
         timestamp
         latest
         change
-        collateralTransferred
-        positionFee
+        collateralDelta
+        outLiquidityFee
+        outProtocolFee
+        outLiquidationFee
         fundingRate
         pnlDelta
         realizedFundingRate

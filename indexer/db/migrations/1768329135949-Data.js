@@ -1,6 +1,6 @@
 // NON GENERATED MIGRATION
-export class Data1763857851809 {
-  name = 'Data1763857851809';
+export default class Data1768329135949 {
+  name = 'Data1768329135949';
 
   async up(db) {
     await db.query(

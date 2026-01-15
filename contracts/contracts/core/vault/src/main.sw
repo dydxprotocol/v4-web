@@ -634,20 +634,8 @@ fn _transfer_out(asset: AssetId, amount: u64, receiver: Identity) {
 }
 
 #[storage(write)]
-fn _write_position(position_key: b256, position: Position) {
-    storage::vault.positions.insert(position_key, position);
-    // TODO remove this event?
-    log(WritePosition {
-        position_key,
-        position,
-    });
-}
-
-#[storage(write)]
 fn _write_fee_reserve(fee_reserve: u256) {
     storage::vault.fee_reserve.write(fee_reserve);
-    // TODO remove this event?
-    log(WriteFeeReserve { fee_reserve });
 }
 
 //TODO: add overflow check
@@ -1195,22 +1183,24 @@ fn _increase_position(
 
     // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
     // validates the average_price. If not for this position write, it would receive a stale avg price (could be 0)
-    _write_position(position_key, position);
+    storage::vault.positions.insert(position_key, position);
 
     let (_liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, true);
 
     log(IncreasePosition {
         key: position_key,
-        account,
-        index_asset,
-        is_long,
         collateral_delta,
         size_delta,
         price,
-        average_price: position.average_price,
-        position_fee: out_position_fee,
-        funding_rate: out_funding_rate,
+        out_average_price: position.average_price,
+        out_liquidity_fee,
+        out_protocol_fee,
+        funding_rate,
+        out_funding_rate,
         funding_rate_has_profit,
+        pnl_delta: 0,
+        out_pnl_delta: 0,
+        pnl_delta_has_profit: true,
         cumulative_funding_rate: new_cumulative_funding_rate,
     });
     (position.collateral, price)
@@ -1338,6 +1328,7 @@ fn _decrease_position(
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, size_delta, is_long);
 
     if position.size != size_delta {
+        // update the position
         position.collateral = out_collateral;
         // no threat to underflow
         position.size = position.size - size_delta;
@@ -1357,53 +1348,52 @@ fn _decrease_position(
         // update storage because the above changes are ignored by call to other fn `validate_liquidation`
         // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
         // validates the max_leverage. If not for this position write, it would receive an incorrect max_leverage error
-        _write_position(position_key, position);
+        storage::vault.positions.insert(position_key, position);
 
         let (_liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, true);
 
         log(DecreasePosition {
             key: position_key,
-            account,
-            index_asset,
-            is_long,
             collateral_delta,
             size_delta,
             price,
-            average_price: position.average_price,
-            position_fee: out_position_fee,
-            funding_rate: out_funding_rate,
+            out_average_price: position.average_price,
+            out_liquidity_fee,
+            out_protocol_fee,
+            funding_rate,
+            out_funding_rate,
             funding_rate_has_profit,
+            pnl_delta,
+            out_pnl_delta,
             pnl_delta_has_profit: has_profit,
-            pnl_delta: out_pnl_delta,
             cumulative_funding_rate: new_cumulative_funding_rate,
+            amount_out,
+            receiver,
         });
     } else {
-        // remove the position from storage
+        // remove the position
         storage::vault.positions.remove(position_key);
-        log(WritePosition { // TODO do we need this event?
-            position_key,
-            position: Position::default(),
-        });
 
         log(DecreasePosition {
             key: position_key,
-            account,
-            index_asset,
-            is_long,
             collateral_delta,
             size_delta,
             price,
-            average_price: position.average_price,
-            position_fee: out_position_fee,
+            out_average_price: position.average_price,
+            out_liquidity_fee,
+            out_protocol_fee,
             funding_rate: out_funding_rate,
+            out_funding_rate,
             funding_rate_has_profit,
+            pnl_delta,
+            out_pnl_delta,
             pnl_delta_has_profit: has_profit,
-            pnl_delta: out_pnl_delta,
             cumulative_funding_rate: new_cumulative_funding_rate,
+            amount_out,
+            receiver,
         });
         log(ClosePosition {
             key: position_key,
-            realized_pnl: position.realized_pnl,
         });
     }
 
@@ -1515,26 +1505,21 @@ fn _liquidate_position(
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, position.size, is_long);
 
     storage::vault.positions.remove(position_key);
-    log(WritePosition {
-        position_key,
-        position: Position::default(),
-    });
 
     log(LiquidatePosition {
         key: position_key,
-        account,
-        index_asset,
-        is_long,
-        collateral: position.collateral,
-        size: position.size,
-        mark_price: price,
-        position_fee: out_position_fee,
-        funding_rate: out_funding_rate,
+        price,
+        out_liquidity_fee,
+        out_protocol_fee,
+        out_liquidation_fee,
+        funding_rate,
+        out_funding_rate,
         funding_rate_has_profit,
-        liquidation_fee: out_liquidation_fee,
+        pnl_delta,
+        out_pnl_delta,
         pnl_delta_has_profit: has_profit,
-        pnl_delta: out_pnl_delta,
         cumulative_funding_rate: new_cumulative_funding_rate,
+        fee_receiver,
     });
 
     // pay the fee receiver using the pool

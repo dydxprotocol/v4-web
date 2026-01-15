@@ -866,7 +866,6 @@ describe("Vault.liquidation", () => {
                     }),
             )
             const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, true).get()).value
-            const position = (await vault.functions.get_position_by_key(positionKey).get()).value
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18))) // this is exactly max_leverage, but also must be paid
             const tx = await call(
                 vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
@@ -874,12 +873,8 @@ describe("Vault.liquidation", () => {
             // LiquidatePosition is the last log in the transaction
             const liquidatePositionLog = tx.logs[tx.logs.length - 1]
             expect(liquidatePositionLog.key).eq(positionKey)
-            expect(liquidatePositionLog.account.Address.bits).eq(user1Identity.Address.bits)
-            expect(liquidatePositionLog.index_asset).eq(BTC_ASSET)
-            expect(liquidatePositionLog.is_long).eq(true)
-            expect(liquidatePositionLog.collateral.toString()).eq(position.collateral.toString())
-            expect(liquidatePositionLog.size.toString()).eq(position.size.toString())
-            expect(liquidatePositionLog.mark_price.toString()).eq(expandDecimals(36800, 18).toString())
+            expect(liquidatePositionLog.price.toString()).eq(expandDecimals(36800, 18).toString())
+            expect(liquidatePositionLog.fee_receiver.Address.bits).eq(liquidatorIdentity.Address.bits)
             // position fee and funding rate are not checked here
         })
 
@@ -1220,7 +1215,6 @@ describe("Vault.liquidation", () => {
                     }),
             )
             const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
-            const position = (await vault.functions.get_position_by_key(positionKey).get()).value
             await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18))) // this is exactly max_leverage, but also must be paid
             const tx = await call(
                 vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
@@ -1228,12 +1222,8 @@ describe("Vault.liquidation", () => {
             // LiquidatePosition is the last log in the transaction
             const liquidatePositionLog = tx.logs[tx.logs.length - 1]
             expect(liquidatePositionLog.key).eq(positionKey)
-            expect(liquidatePositionLog.account.Address.bits).eq(user1Identity.Address.bits)
-            expect(liquidatePositionLog.index_asset).eq(BTC_ASSET)
-            expect(liquidatePositionLog.is_long).eq(false)
-            expect(liquidatePositionLog.collateral.toString()).eq(position.collateral.toString())
-            expect(liquidatePositionLog.size.toString()).eq(position.size.toString())
-            expect(liquidatePositionLog.mark_price.toString()).eq(expandDecimals(43200, 18).toString())
+            expect(liquidatePositionLog.price.toString()).eq(expandDecimals(43200, 18).toString())
+            expect(liquidatePositionLog.fee_receiver.Address.bits).eq(liquidatorIdentity.Address.bits)
             // position fee and funding rate are not checked here
         })
 
@@ -1358,6 +1348,326 @@ describe("Vault.liquidation", () => {
             const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
             const position = (await vault.functions.get_position_by_key(positionKey).get()).value
             expect(position.size.toString()).eq("0")
+        })
+    })
+
+    describe("LiquidatePosition event verification", () => {
+        describe("long positions", () => {
+            it("verifies all fee fields in LiquidatePosition event", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), true)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, true).get()).value
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                expect(liquidatePositionLog.key).eq(positionKey)
+                expect(liquidatePositionLog.out_liquidity_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_protocol_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_liquidation_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.fee_receiver.Address.bits).eq(liquidatorIdentity.Address.bits)
+            })
+
+            it("verifies PnL fields in LiquidatePosition event", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), true)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, true).get()).value
+                const position = (await vault.functions.get_position_by_key(positionKey).get()).value
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+                const [expectedHasProfit, expectedPnlDelta] = (
+                    await vault.functions.get_pnl(BTC_ASSET, position.size, position.average_price, true).get()
+                ).value
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                expect(liquidatePositionLog.key).eq(positionKey)
+                expect(liquidatePositionLog.pnl_delta.toString()).eq(expectedPnlDelta.toString())
+                expect(liquidatePositionLog.out_pnl_delta.toNumber()).gte(0)
+                expect(liquidatePositionLog.pnl_delta_has_profit).eq(expectedHasProfit)
+            })
+
+            it("verifies funding rate fields in LiquidatePosition event", async () => {
+                await call(
+                    vault.functions.set_fees(
+                        0, // liquidity_fee_basis_points
+                        0, // position_fee_basis_points
+                        0, // liquidation_fee_basis_points
+                    ),
+                )
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), true)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, true).get()).value
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+                // Generate some funding rate debt
+                await moveBlockchainTime(launchedNode, 110)
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+                const [expectedFundingRate, expectedFundingRateHasProfit] = (
+                    await vault.functions.get_position_funding_rate(user1Identity, BTC_ASSET, true).get()
+                ).value
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                expect(liquidatePositionLog.key).eq(positionKey)
+                // Allow 2% tolerance for funding_rate due to time elapsed between update_price and liquidate_position
+                expect(liquidatePositionLog.funding_rate.toNumber()).gte(expectedFundingRate.toNumber())
+                expect(liquidatePositionLog.funding_rate.toNumber()).lte(
+                    expectedFundingRate.toNumber() + expectedFundingRate.toNumber() * 0.02,
+                )
+                expect(liquidatePositionLog.out_funding_rate.toNumber()).gte(0)
+                expect(liquidatePositionLog.funding_rate_has_profit).eq(expectedFundingRateHasProfit)
+
+                const fundingInfo = (await vault.functions.get_funding_info(BTC_ASSET).get()).value
+                expect(liquidatePositionLog.cumulative_funding_rate.toString()).eq(
+                    fundingInfo.long_cumulative_funding_rate.toString(),
+                )
+            })
+
+            it("verifies all fields in LiquidatePosition event comprehensively", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), true)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, true).get()).value
+                const position = (await vault.functions.get_position_by_key(positionKey).get()).value
+                const expectedPrice = expandDecimals(36800, 18)
+                await call(storkMock.functions.update_price(BTC_ASSET, expectedPrice))
+                const [expectedHasProfit, expectedPnlDelta] = (
+                    await vault.functions.get_pnl(BTC_ASSET, position.size, position.average_price, true).get()
+                ).value
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                // Verify all fields exist and have correct types/values
+                expect(liquidatePositionLog.key).eq(positionKey)
+                expect(liquidatePositionLog.price.toString()).eq(expectedPrice.toString())
+                expect(liquidatePositionLog.out_liquidity_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_protocol_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_liquidation_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.funding_rate.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_funding_rate.toNumber()).gte(0)
+                expect(typeof liquidatePositionLog.funding_rate_has_profit).eq("boolean")
+                expect(liquidatePositionLog.pnl_delta.toString()).eq(expectedPnlDelta.toString())
+                expect(liquidatePositionLog.out_pnl_delta.toNumber()).gte(0)
+                expect(liquidatePositionLog.pnl_delta_has_profit).eq(expectedHasProfit)
+
+                const fundingInfo = (await vault.functions.get_funding_info(BTC_ASSET).get()).value
+                expect(liquidatePositionLog.cumulative_funding_rate.toString()).eq(
+                    fundingInfo.long_cumulative_funding_rate.toString(),
+                )
+
+                expect(liquidatePositionLog.fee_receiver.Address.bits).eq(liquidatorIdentity.Address.bits)
+            })
+
+            it("verifies liquidator receives the liquidation fee specified in the event", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), true)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const balanceBefore = await liquidator.getBalance(USDC_ASSET_ID)
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                const liquidationFeeFromEvent = liquidatePositionLog.out_liquidation_fee
+                const balanceAfter = await liquidator.getBalance(USDC_ASSET_ID)
+                const balanceIncrease = balanceAfter.toNumber() - balanceBefore.toNumber()
+                expect(balanceIncrease).eq(liquidationFeeFromEvent.toNumber())
+            })
+        })
+
+        describe("short positions", () => {
+            it("verifies all fee fields in LiquidatePosition event", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), false)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                expect(liquidatePositionLog.key).eq(positionKey)
+                expect(liquidatePositionLog.out_liquidity_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_protocol_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_liquidation_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.fee_receiver.Address.bits).eq(liquidatorIdentity.Address.bits)
+            })
+
+            it("verifies PnL fields in LiquidatePosition event", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), false)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
+                const position = (await vault.functions.get_position_by_key(positionKey).get()).value
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+                const [expectedHasProfit, expectedPnlDelta] = (
+                    await vault.functions.get_pnl(BTC_ASSET, position.size, position.average_price, false).get()
+                ).value
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                expect(liquidatePositionLog.key).eq(positionKey)
+                expect(liquidatePositionLog.pnl_delta.toString()).eq(expectedPnlDelta.toString())
+                expect(liquidatePositionLog.out_pnl_delta.toNumber()).gte(0)
+                expect(liquidatePositionLog.pnl_delta_has_profit).eq(expectedHasProfit)
+            })
+
+            it("verifies funding rate fields in LiquidatePosition event", async () => {
+                await call(
+                    vault.functions.set_fees(
+                        0, // liquidity_fee_basis_points
+                        0, // position_fee_basis_points
+                        0, // liquidation_fee_basis_points
+                    ),
+                )
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), false)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+                // Generate some funding rate debt
+                await moveBlockchainTime(launchedNode, 110)
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+                const [expectedFundingRate, expectedFundingRateHasProfit] = (
+                    await vault.functions.get_position_funding_rate(user1Identity, BTC_ASSET, false).get()
+                ).value
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                expect(liquidatePositionLog.key).eq(positionKey)
+                // Allow 2% tolerance for funding_rate due to time elapsed between update_price and liquidate_position
+                expect(liquidatePositionLog.funding_rate.toNumber()).gte(expectedFundingRate.toNumber())
+                expect(liquidatePositionLog.funding_rate.toNumber()).lte(
+                    expectedFundingRate.toNumber() + expectedFundingRate.toNumber() * 0.02,
+                )
+                expect(liquidatePositionLog.out_funding_rate.toNumber()).gte(0)
+                expect(liquidatePositionLog.funding_rate_has_profit).eq(expectedFundingRateHasProfit)
+
+                const fundingInfo = (await vault.functions.get_funding_info(BTC_ASSET).get()).value
+                expect(liquidatePositionLog.cumulative_funding_rate.toString()).eq(
+                    fundingInfo.short_cumulative_funding_rate.toString(),
+                )
+            })
+
+            it("verifies all fields in LiquidatePosition event comprehensively", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), false)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
+                const position = (await vault.functions.get_position_by_key(positionKey).get()).value
+                const expectedPrice = expandDecimals(43200, 18)
+                await call(storkMock.functions.update_price(BTC_ASSET, expectedPrice))
+                const [expectedHasProfit, expectedPnlDelta] = (
+                    await vault.functions.get_pnl(BTC_ASSET, position.size, position.average_price, false).get()
+                ).value
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                // Verify all fields exist and have correct types/values
+                expect(liquidatePositionLog.key).eq(positionKey)
+                expect(liquidatePositionLog.price.toString()).eq(expectedPrice.toString())
+                expect(liquidatePositionLog.out_liquidity_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_protocol_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_liquidation_fee.toNumber()).gte(0)
+                expect(liquidatePositionLog.funding_rate.toNumber()).gte(0)
+                expect(liquidatePositionLog.out_funding_rate.toNumber()).gte(0)
+                expect(typeof liquidatePositionLog.funding_rate_has_profit).eq("boolean")
+                expect(liquidatePositionLog.pnl_delta.toString()).eq(expectedPnlDelta.toString())
+                expect(liquidatePositionLog.out_pnl_delta.toNumber()).gte(0)
+                expect(liquidatePositionLog.pnl_delta_has_profit).eq(expectedHasProfit)
+
+                const fundingInfo = (await vault.functions.get_funding_info(BTC_ASSET).get()).value
+                expect(liquidatePositionLog.cumulative_funding_rate.toString()).eq(
+                    fundingInfo.short_cumulative_funding_rate.toString(),
+                )
+
+                expect(liquidatePositionLog.fee_receiver.Address.bits).eq(liquidatorIdentity.Address.bits)
+            })
+
+            it("verifies liquidator receives the liquidation fee specified in the event", async () => {
+                await call(USDC.functions.mint(user1Identity, expandDecimals(40000)))
+                await call(
+                    vaultUser1.functions
+                        .increase_position(user1Identity, BTC_ASSET, expandDecimals(1000), false)
+                        .addContracts(attachedContracts)
+                        .callParams({
+                            forward: [expandDecimals(100), USDC_ASSET_ID],
+                        }),
+                )
+                const balanceBefore = await liquidator.getBalance(USDC_ASSET_ID)
+                await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+                const tx = await call(
+                    vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
+                )
+                const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+                const liquidationFeeFromEvent = liquidatePositionLog.out_liquidation_fee
+                const balanceAfter = await liquidator.getBalance(USDC_ASSET_ID)
+                const balanceIncrease = balanceAfter.toNumber() - balanceBefore.toNumber()
+                expect(balanceIncrease).eq(liquidationFeeFromEvent.toNumber())
+            })
         })
     })
 

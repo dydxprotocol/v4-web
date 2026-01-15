@@ -1,6 +1,6 @@
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { BNB_ASSET, BTC_ASSET, ETH_ASSET, USER_0_ADDRESS, expandDecimals } from './utils';
+import { BNB_ASSET, BTC_ASSET, USER_0_ADDRESS } from './utils';
 
 const { Client } = pg;
 
@@ -24,45 +24,6 @@ describe('Verify Positions', () => {
     });
 
     await client.connect();
-  });
-
-  it('should find correct total positions', async () => {
-    const totalPositionBTCLongResult = await client.query(
-      'SELECT * FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [BTC_ASSET, true]
-    );
-    const totalPositionBTCShortResult = await client.query(
-      'SELECT * FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [BTC_ASSET, false]
-    );
-    const totalPositionETHLongResult = await client.query(
-      'SELECT * FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [ETH_ASSET, true]
-    );
-    const totalPositionETHShortResult = await client.query(
-      'SELECT * FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [ETH_ASSET, false]
-    );
-    const totalPositionBNBLongResult = await client.query(
-      'SELECT * FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [BNB_ASSET, true]
-    );
-    const totalPositionBNBShortResult = await client.query(
-      'SELECT * FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [BNB_ASSET, false]
-    );
-
-    expect(totalPositionBTCLongResult.rows.length).toBe(1);
-    expect(totalPositionBTCShortResult.rows.length).toBe(1);
-    expect(totalPositionETHLongResult.rows.length).toBe(1);
-    expect(totalPositionETHShortResult.rows.length).toBe(0);
-    expect(totalPositionBNBLongResult.rows.length).toBe(1);
-    expect(totalPositionBNBShortResult.rows.length).toBe(0);
-
-    expect(totalPositionBTCLongResult.rows[0].size).toBe(expandDecimals(1000));
-    expect(totalPositionBTCShortResult.rows[0].size).toBe(expandDecimals(1000));
-    expect(totalPositionETHLongResult.rows[0].size).toBe(expandDecimals(3000));
-    expect(totalPositionBNBLongResult.rows[0].size).toBe('0');
   });
 
   it('should position key be unique', async () => {
@@ -131,16 +92,85 @@ describe('Verify Positions', () => {
 
   it('should positions with no size have no collateral', async () => {
     const closedPositionResult = await client.query(
-      'SELECT id FROM position WHERE size = 0 AND collateral_amount <> 0'
+      'SELECT id FROM position WHERE size = 0 AND collateral <> 0'
     );
     expect(closedPositionResult.rows.length).toBe(0);
   });
 
   it('should positions with no collateral have no size', async () => {
     const closedPositionResult = await client.query(
-      'SELECT id FROM position WHERE collateral_amount = 0 AND size <> 0'
+      'SELECT id FROM position WHERE collateral = 0 AND size <> 0'
     );
     expect(closedPositionResult.rows.length).toBe(0);
+  });
+
+  it('should have aggregated values for positions', async () => {
+    // Check that latest positions have aggregated values
+    const latestPositions = await client.query(
+      'SELECT collateral, size, realized_funding_rate, realized_pnl, change FROM position WHERE latest = true'
+    );
+    expect(latestPositions.rows.length).toBeGreaterThan(0);
+
+    latestPositions.rows.forEach((row: any) => {
+      // All positions should have aggregated values defined
+      expect(row.collateral).toBeDefined();
+      expect(row.size).toBeDefined();
+      expect(row.realized_funding_rate).toBeDefined();
+      expect(row.realized_pnl).toBeDefined();
+
+      // If position is in final status (CLOSE or LIQUIDATE), collateral and size should be 0
+      // but they keep their aggregated realized values
+      if (row.change === 'CLOSE' || row.change === 'LIQUIDATE') {
+        expect(row.collateral).toBe('0');
+        expect(row.size).toBe('0');
+        // But realized values should be kept (not reset to 0)
+        expect(row.realized_funding_rate).toBeDefined();
+        expect(row.realized_pnl).toBeDefined();
+      }
+    });
+  });
+
+  it('should reset aggregated values when position is reopened after final status', async () => {
+    // Check if any position was reopened after CLOSE or LIQUIDATE
+    // Get all position keys that have both final status and INCREASE events
+    const reopenedPositions = await client.query(`
+      SELECT DISTINCT pk.id as position_key_id
+      FROM position_key pk
+      INNER JOIN position p1 ON p1.position_key_id = pk.id AND p1.change IN ('CLOSE', 'LIQUIDATE')
+      INNER JOIN position p2 ON p2.position_key_id = pk.id AND p2.change = 'INCREASE' AND p2.timestamp > p1.timestamp
+    `);
+
+    for (const row of reopenedPositions.rows) {
+      const positionKeyId = row.position_key_id;
+
+      // Get the final status record (CLOSE or LIQUIDATE)
+      const finalStatus = await client.query(
+        'SELECT realized_pnl, realized_funding_rate, change FROM position WHERE position_key_id = $1 AND change IN ($2, $3) ORDER BY timestamp DESC LIMIT 1',
+        [positionKeyId, 'CLOSE', 'LIQUIDATE']
+      );
+
+      if (finalStatus.rows.length > 0) {
+        // Get the first INCREASE position after final status
+        const increaseAfterFinal = await client.query(
+          'SELECT realized_pnl, realized_funding_rate, out_funding_rate, out_pnl_delta FROM position WHERE position_key_id = $1 AND change = $2 AND timestamp > (SELECT timestamp FROM position WHERE position_key_id = $1 AND change IN ($3, $4) ORDER BY timestamp DESC LIMIT 1) ORDER BY timestamp ASC LIMIT 1',
+          [positionKeyId, 'INCREASE', 'CLOSE', 'LIQUIDATE']
+        );
+
+        if (increaseAfterFinal.rows.length > 0) {
+          const increaseRealizedPnl = BigInt(increaseAfterFinal.rows[0].realized_pnl);
+          const increaseRealizedFundingRate = BigInt(
+            increaseAfterFinal.rows[0].realized_funding_rate
+          );
+          const increaseOutFundingRate = BigInt(increaseAfterFinal.rows[0].out_funding_rate);
+          const increaseOutPnlDelta = BigInt(increaseAfterFinal.rows[0].out_pnl_delta);
+
+          // The new position should NOT inherit realized values from final status position
+          // It should start fresh - realized values should equal the deltas from this event only
+          expect(increaseRealizedPnl).toBe(increaseOutPnlDelta);
+          expect(increaseRealizedFundingRate).toBe(increaseOutFundingRate);
+        }
+      }
+    }
   });
 
   describe('API tests', () => {
@@ -164,42 +194,6 @@ describe('Verify Positions', () => {
       }
       return response.json();
     }
-
-    it('should find correct total positions', async () => {
-      const btcLongData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id,size}}`
-      );
-      expect(btcLongData.data.totalPositions.nodes.length).toBe(1);
-      expect(btcLongData.data.totalPositions.nodes[0].size).toBe(expandDecimals(1000));
-
-      const btcShortData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id,size}}`
-      );
-      expect(btcShortData.data.totalPositions.nodes.length).toBe(1);
-      expect(btcShortData.data.totalPositions.nodes[0].size).toBe(expandDecimals(1000));
-
-      const ethLongData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id,size}}`
-      );
-      expect(ethLongData.data.totalPositions.nodes.length).toBe(1);
-      expect(ethLongData.data.totalPositions.nodes[0].size).toBe(expandDecimals(3000));
-
-      const ethShortData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:false}){nodes{id}}`
-      );
-      expect(ethShortData.data.totalPositions.nodes.length).toBe(0);
-
-      const bnbLongData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id,size}}`
-      );
-      expect(bnbLongData.data.totalPositions.nodes.length).toBe(1);
-      expect(bnbLongData.data.totalPositions.nodes[0].size).toBe('0');
-
-      const bnbShortData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:false}){nodes{id}}`
-      );
-      expect(bnbShortData.data.totalPositions.nodes.length).toBe(0);
-    });
 
     it('should position key be unique', async () => {
       const positionKeysData = await graphQLPost(
@@ -307,31 +301,105 @@ describe('Verify Positions', () => {
     });
 
     it('should positions with no size have no collateral', async () => {
-      const allPositionsData = await graphQLPost(`positions{nodes{id,size,collateralAmount}}`);
+      const allPositionsData = await graphQLPost(`positions{nodes{id,size,collateral}}`);
 
       // Filter positions with size 0
       const positionsWithNoSize = allPositionsData.data.positions.nodes.filter(
         (p: { size: string }) => p.size === '0'
       );
 
-      // All should have collateralAmount 0
-      positionsWithNoSize.forEach((position: { collateralAmount: string }) => {
-        expect(position.collateralAmount).toBe('0');
+      // All should have collateral 0
+      positionsWithNoSize.forEach((position: { collateral: string }) => {
+        expect(position.collateral).toBe('0');
       });
     });
 
     it('should positions with no collateral have no size', async () => {
-      const allPositionsData = await graphQLPost(`positions{nodes{id,size,collateralAmount}}`);
+      const allPositionsData = await graphQLPost(`positions{nodes{id,size,collateral}}`);
 
-      // Filter positions with collateralAmount 0
+      // Filter positions with collateral 0
       const positionsWithNoCollateral = allPositionsData.data.positions.nodes.filter(
-        (p: { collateralAmount: string }) => p.collateralAmount === '0'
+        (p: { collateral: string }) => p.collateral === '0'
       );
 
       // All should have size 0
       positionsWithNoCollateral.forEach((position: { size: string }) => {
         expect(position.size).toBe('0');
       });
+    });
+
+    it('should have aggregated values for positions', async () => {
+      // Check that latest positions have aggregated values
+      const latestPositionsData = await graphQLPost(
+        `positions(condition:{latest:true}){nodes{collateral,size,realizedFundingRate,realizedPnl,change}}`
+      );
+      expect(latestPositionsData.data.positions.nodes.length).toBeGreaterThan(0);
+
+      latestPositionsData.data.positions.nodes.forEach((position: any) => {
+        // All positions should have aggregated values defined
+        expect(position.collateral).toBeDefined();
+        expect(position.size).toBeDefined();
+        expect(position.realizedFundingRate).toBeDefined();
+        expect(position.realizedPnl).toBeDefined();
+
+        // If position is in final status (CLOSE or LIQUIDATE), collateral and size should be 0
+        // but they keep their aggregated realized values
+        if (position.change === 'CLOSE' || position.change === 'LIQUIDATE') {
+          expect(position.collateral).toBe('0');
+          expect(position.size).toBe('0');
+          // But realized values should be kept (not reset to 0)
+          expect(position.realizedFundingRate).toBeDefined();
+          expect(position.realizedPnl).toBeDefined();
+        }
+      });
+    });
+
+    it('should reset aggregated values when position is reopened after final status', async () => {
+      // Get all position keys that have both final status (CLOSE/LIQUIDATE) and INCREASE events
+      const allPositionsData = await graphQLPost(
+        `positions{nodes{positionKeyId,change,timestamp,realizedPnl,realizedFundingRate,outFundingRate,outPnlDelta}}`
+      );
+
+      // Group by positionKeyId
+      const positionsByKey = new Map<string, any[]>();
+      allPositionsData.data.positions.nodes.forEach((p: any) => {
+        if (!positionsByKey.has(p.positionKeyId)) {
+          positionsByKey.set(p.positionKeyId, []);
+        }
+        positionsByKey.get(p.positionKeyId)!.push(p);
+      });
+
+      for (const [_positionKeyId, positions] of positionsByKey.entries()) {
+        // Sort by timestamp
+        positions.sort((a: any, b: any) => a.timestamp - b.timestamp);
+
+        // Find final status events (CLOSE or LIQUIDATE)
+        const finalStatusEvents = positions.filter(
+          (p: any) => p.change === 'CLOSE' || p.change === 'LIQUIDATE'
+        );
+
+        for (const finalStatus of finalStatusEvents) {
+          const finalStatusIndex = positions.indexOf(finalStatus);
+
+          // Find INCREASE events after this final status
+          const increasesAfter = positions
+            .slice(finalStatusIndex + 1)
+            .filter((p: any) => p.change === 'INCREASE');
+
+          if (increasesAfter.length > 0) {
+            const firstIncrease = increasesAfter[0];
+            const increaseRealizedPnl = BigInt(firstIncrease.realizedPnl);
+            const increaseRealizedFundingRate = BigInt(firstIncrease.realizedFundingRate);
+            const increaseOutFundingRate = BigInt(firstIncrease.outFundingRate);
+            const increaseOutPnlDelta = BigInt(firstIncrease.outPnlDelta);
+
+            // The new position should NOT inherit realized values from final status position
+            // It should start fresh - realized values should equal the deltas from this event only
+            expect(increaseRealizedPnl).toBe(increaseOutPnlDelta);
+            expect(increaseRealizedFundingRate).toBe(increaseOutFundingRate);
+          }
+        }
+      }
     });
   });
 

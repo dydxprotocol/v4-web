@@ -35,15 +35,19 @@ describe('Verify Liquidation', () => {
     expect(liquidationCount).toBe('3'); // 3 liquidations: user0 BTC long, user1 BTC short, user0 ETH long
   });
 
-  it('should have liquidated positions with zero collateral and size', async () => {
+  it('should have liquidated positions with zero collateral and size but keep aggregated values', async () => {
     const liquidations = await client.query(
-      'SELECT collateral_amount, size FROM position WHERE change = $1',
+      'SELECT collateral, size, realized_funding_rate, realized_pnl FROM position WHERE change = $1',
       ['LIQUIDATE']
     );
     expect(liquidations.rows.length).toBeGreaterThan(0);
     liquidations.rows.forEach((row: any) => {
-      expect(BigInt(row.collateral_amount)).toBe(BigInt(0));
+      // Liquidated positions should have zero collateral and size
+      expect(BigInt(row.collateral)).toBe(BigInt(0));
       expect(BigInt(row.size)).toBe(BigInt(0));
+      // But they should keep their aggregated realized values (not reset to 0)
+      expect(row.realized_funding_rate).toBeDefined();
+      expect(row.realized_pnl).toBeDefined();
     });
   });
 
@@ -62,11 +66,13 @@ describe('Verify Liquidation', () => {
     expect(liquidationResult.rows.length).toBe(1);
     const liquidation = liquidationResult.rows[0];
 
-    expect(liquidation.collateral_amount).toBe('0');
+    expect(liquidation.collateral).toBe('0');
     expect(liquidation.size).toBe('0');
     expect(liquidation.latest).toBe(true);
-    expect(BigInt(liquidation.position_fee)).toBeGreaterThanOrEqual(0);
-    expect(BigInt(liquidation.collateral_transferred)).toBeGreaterThan(0); // liquidation fee
+    // Liquidated positions keep their aggregated realized values
+    expect(liquidation.realized_funding_rate).toBeDefined();
+    expect(liquidation.realized_pnl).toBeDefined();
+    expect(BigInt(liquidation.out_liquidation_fee)).toBeGreaterThan(0); // liquidation fee
   });
 
   it('should store correct liquidation for user1 BTC short position', async () => {
@@ -84,11 +90,13 @@ describe('Verify Liquidation', () => {
     expect(liquidationResult.rows.length).toBe(1);
     const liquidation = liquidationResult.rows[0];
 
-    expect(liquidation.collateral_amount).toBe('0');
+    expect(liquidation.collateral).toBe('0');
     expect(liquidation.size).toBe('0');
     expect(liquidation.latest).toBe(true);
-    expect(BigInt(liquidation.position_fee)).toBeGreaterThanOrEqual(0);
-    expect(BigInt(liquidation.collateral_transferred)).toBeGreaterThan(0); // liquidation fee
+    // Liquidated positions keep their aggregated realized values
+    expect(liquidation.realized_funding_rate).toBeDefined();
+    expect(liquidation.realized_pnl).toBeDefined();
+    expect(BigInt(liquidation.out_liquidation_fee)).toBeGreaterThan(0); // liquidation fee
   });
 
   it('should store correct liquidation for user0 ETH long position', async () => {
@@ -106,11 +114,13 @@ describe('Verify Liquidation', () => {
     expect(liquidationResult.rows.length).toBe(1);
     const liquidation = liquidationResult.rows[0];
 
-    expect(liquidation.collateral_amount).toBe('0');
+    expect(liquidation.collateral).toBe('0');
     expect(liquidation.size).toBe('0');
     expect(liquidation.latest).toBe(true);
-    expect(BigInt(liquidation.position_fee)).toBeGreaterThanOrEqual(0);
-    expect(BigInt(liquidation.collateral_transferred)).toBeGreaterThan(0); // liquidation fee
+    // Liquidated positions keep their aggregated realized values
+    expect(liquidation.realized_funding_rate).toBeDefined();
+    expect(liquidation.realized_pnl).toBeDefined();
+    expect(BigInt(liquidation.out_liquidation_fee)).toBeGreaterThan(0); // liquidation fee
   });
 
   it('should have only one latest record per position key after liquidation', async () => {
@@ -181,7 +191,7 @@ describe('Verify Liquidation', () => {
     );
     if (user0BtcLongKey.rows.length > 0) {
       const positions = await client.query(
-        'SELECT change, collateral_amount, size FROM position WHERE position_key_id = $1 ORDER BY timestamp ASC',
+        'SELECT change, collateral, size, realized_funding_rate, realized_pnl FROM position WHERE position_key_id = $1 ORDER BY timestamp ASC',
         [user0BtcLongKey.rows[0].id]
       );
       expect(positions.rows.length).toBeGreaterThan(0);
@@ -194,14 +204,17 @@ describe('Verify Liquidation', () => {
       // The liquidation should be the last one with zero collateral and size
       const liquidation = positions.rows.find((r: any) => r.change === 'LIQUIDATE');
       expect(liquidation).toBeDefined();
-      expect(BigInt(liquidation.collateral_amount)).toBe(BigInt(0));
+      expect(BigInt(liquidation.collateral)).toBe(BigInt(0));
       expect(BigInt(liquidation.size)).toBe(BigInt(0));
+      // But it should keep aggregated realized values
+      expect(liquidation.realized_funding_rate).toBeDefined();
+      expect(liquidation.realized_pnl).toBeDefined();
     }
   });
 
   it('should store liquidation fees correctly', async () => {
     const liquidations = await client.query(
-      'SELECT id, position_key_id, collateral_transferred, position_fee FROM position WHERE change = $1',
+      'SELECT id, position_key_id, out_liquidation_fee FROM position WHERE change = $1',
       ['LIQUIDATE']
     );
     expect(liquidations.rows.length).toBe(3);
@@ -219,20 +232,17 @@ describe('Verify Liquidation', () => {
       // Liquidation fee is 0.1% of the position size before liquidation (0.1% = 1/1000)
       const expectedFee = previousSize / BigInt(1000);
 
-      // Check that collateral_transferred is approximately the liquidation fee (0.1% of size)
+      // Check that out_liquidation_fee is approximately the liquidation fee (0.1% of size)
       // Allow a small tolerance for rounding differences
-      const fee = BigInt(liquidation.collateral_transferred);
+      const fee = BigInt(liquidation.out_liquidation_fee);
       expect(fee).toBeGreaterThanOrEqual((expectedFee * BigInt(99)) / BigInt(100)); // Allow 1% tolerance
       expect(fee).toBeLessThanOrEqual((expectedFee * BigInt(101)) / BigInt(100)); // Allow 1% tolerance
-
-      // position_fee should be non-negative
-      expect(BigInt(liquidation.position_fee)).toBeGreaterThanOrEqual(0);
     }
   });
 
   it('should store PnL and funding rate for liquidations', async () => {
     const liquidations = await client.query(
-      'SELECT pnl_delta, funding_rate FROM position WHERE change = $1',
+      'SELECT pnl_delta, out_pnl_delta, funding_rate, out_funding_rate FROM position WHERE change = $1',
       ['LIQUIDATE']
     );
     expect(liquidations.rows.length).toBe(3);
@@ -240,11 +250,13 @@ describe('Verify Liquidation', () => {
     liquidations.rows.forEach((row: any) => {
       // PnL delta and funding rate should be stored (can be positive or negative)
       expect(row.pnl_delta).toBeDefined();
+      expect(row.out_pnl_delta).toBeDefined();
       expect(row.funding_rate).toBeDefined();
+      expect(row.out_funding_rate).toBeDefined();
     });
   });
 
-  it('should store realized PnL and funding rate for liquidations', async () => {
+  it('should store realized PnL and funding rate for liquidations (keep aggregated values)', async () => {
     const liquidations = await client.query(
       'SELECT realized_pnl, realized_funding_rate FROM position WHERE change = $1',
       ['LIQUIDATE']
@@ -252,10 +264,57 @@ describe('Verify Liquidation', () => {
     expect(liquidations.rows.length).toBe(3);
 
     liquidations.rows.forEach((row: any) => {
-      // Realized values should be stored
+      // Realized values should be kept (not reset to 0) for liquidated positions
       expect(row.realized_pnl).toBeDefined();
       expect(row.realized_funding_rate).toBeDefined();
     });
+  });
+
+  it('should reset aggregated values when position is reopened after liquidation', async () => {
+    // Check if any position was reopened after liquidation
+    // Get all position keys that have both LIQUIDATE and INCREASE events
+    const reopenedPositions = await client.query(`
+      SELECT DISTINCT pk.id as position_key_id
+      FROM position_key pk
+      INNER JOIN position p1 ON p1.position_key_id = pk.id AND p1.change = 'LIQUIDATE'
+      INNER JOIN position p2 ON p2.position_key_id = pk.id AND p2.change = 'INCREASE' AND p2.timestamp > p1.timestamp
+    `);
+
+    for (const row of reopenedPositions.rows) {
+      const positionKeyId = row.position_key_id;
+
+      // Get the liquidation record
+      const liquidation = await client.query(
+        'SELECT realized_pnl, realized_funding_rate FROM position WHERE position_key_id = $1 AND change = $2 ORDER BY timestamp DESC LIMIT 1',
+        [positionKeyId, 'LIQUIDATE']
+      );
+
+      if (liquidation.rows.length > 0) {
+        // Get the first INCREASE position after liquidation
+        const increaseAfterLiquidation = await client.query(
+          'SELECT realized_pnl, realized_funding_rate, out_funding_rate, out_pnl_delta FROM position WHERE position_key_id = $1 AND change = $2 AND timestamp > (SELECT timestamp FROM position WHERE position_key_id = $1 AND change = $3 ORDER BY timestamp DESC LIMIT 1) ORDER BY timestamp ASC LIMIT 1',
+          [positionKeyId, 'INCREASE', 'LIQUIDATE']
+        );
+
+        if (increaseAfterLiquidation.rows.length > 0) {
+          const increaseRealizedPnl = BigInt(increaseAfterLiquidation.rows[0].realized_pnl);
+          const increaseRealizedFundingRate = BigInt(
+            increaseAfterLiquidation.rows[0].realized_funding_rate
+          );
+          const increaseOutFundingRate = BigInt(increaseAfterLiquidation.rows[0].out_funding_rate);
+          const increaseOutPnlDelta = BigInt(increaseAfterLiquidation.rows[0].out_pnl_delta);
+
+          // The new position should NOT inherit realized values from liquidation
+          // It should start fresh - realized values should equal the deltas from this event only
+          // (not including the liquidation's realized values)
+          expect(increaseRealizedPnl).toBe(increaseOutPnlDelta);
+          expect(increaseRealizedFundingRate).toBe(increaseOutFundingRate);
+
+          // Verify they are different from liquidation's values (unless by coincidence they're the same)
+          // The key point is that the new position's realized values come only from its own deltas
+        }
+      }
+    }
   });
 
   it('should have liquidation events marked as latest for closed positions', async () => {
@@ -267,32 +326,6 @@ describe('Verify Liquidation', () => {
     liquidations.rows.forEach((row: any) => {
       expect(row.latest).toBe(true);
     });
-  });
-
-  it('should update total positions correctly after liquidations', async () => {
-    // Check BTC long total position (should decrease after user0 liquidation)
-    const btcLongTotal = await client.query(
-      'SELECT collateral_amount, size FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [BTC_ASSET, true]
-    );
-    if (btcLongTotal.rows.length > 0) {
-      const total = btcLongTotal.rows[0];
-      // After liquidation, total should reflect the removed position
-      expect(BigInt(total.collateral_amount)).toBeGreaterThanOrEqual(0);
-      expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
-    }
-
-    // Check BTC short total position (should decrease after user1 liquidation)
-    const btcShortTotal = await client.query(
-      'SELECT collateral_amount, size FROM total_position WHERE index_asset_id = $1 AND is_long = $2',
-      [BTC_ASSET, false]
-    );
-    if (btcShortTotal.rows.length > 0) {
-      const total = btcShortTotal.rows[0];
-      // After liquidation, total should reflect the removed position
-      expect(BigInt(total.collateral_amount)).toBeGreaterThanOrEqual(0);
-      expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
-    }
   });
 
   describe('API tests', () => {
@@ -324,15 +357,19 @@ describe('Verify Liquidation', () => {
       expect(liquidationsData.data.positions.nodes.length).toBe(3); // 3 liquidations: user0 BTC long, user1 BTC short, user0 ETH long
     });
 
-    it('should have liquidated positions with zero collateral and size', async () => {
+    it('should have liquidated positions with zero collateral and size but keep aggregated values', async () => {
       const liquidationsData = await graphQLPost(
-        `positions(condition:{change:"LIQUIDATE"}){nodes{id,collateralAmount,size}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{id,collateral,size,realizedFundingRate,realizedPnl}}`
       );
       expect(liquidationsData.data.positions.nodes.length).toBeGreaterThan(0);
 
       liquidationsData.data.positions.nodes.forEach((position: any) => {
-        expect(BigInt(position.collateralAmount)).toBe(BigInt(0));
+        // Liquidated positions should have zero collateral and size
+        expect(BigInt(position.collateral)).toBe(BigInt(0));
         expect(BigInt(position.size)).toBe(BigInt(0));
+        // But they should keep their aggregated realized values (not reset to 0)
+        expect(position.realizedFundingRate).toBeDefined();
+        expect(position.realizedPnl).toBeDefined();
       });
     });
 
@@ -346,16 +383,18 @@ describe('Verify Liquidation', () => {
 
       // Then get liquidation position for this key
       const liquidationData = await graphQLPost(
-        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateral,size,latest,realizedFundingRate,realizedPnl,outLiquidationFee}}`
       );
       expect(liquidationData.data.positions.nodes.length).toBe(1);
       const liquidation = liquidationData.data.positions.nodes[0];
 
-      expect(liquidation.collateralAmount).toBe('0');
+      expect(liquidation.collateral).toBe('0');
       expect(liquidation.size).toBe('0');
       expect(liquidation.latest).toBe(true);
-      expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
-      expect(BigInt(liquidation.collateralTransferred)).toBeGreaterThan(0); // liquidation fee
+      // Liquidated positions keep their aggregated realized values
+      expect(liquidation.realizedFundingRate).toBeDefined();
+      expect(liquidation.realizedPnl).toBeDefined();
+      expect(BigInt(liquidation.outLiquidationFee)).toBeGreaterThan(0); // liquidation fee
     });
 
     it('should store correct liquidation for user1 BTC short position', async () => {
@@ -368,16 +407,18 @@ describe('Verify Liquidation', () => {
 
       // Then get liquidation position for this key
       const liquidationData = await graphQLPost(
-        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateral,size,latest,realizedFundingRate,realizedPnl,outLiquidationFee}}`
       );
       expect(liquidationData.data.positions.nodes.length).toBe(1);
       const liquidation = liquidationData.data.positions.nodes[0];
 
-      expect(liquidation.collateralAmount).toBe('0');
+      expect(liquidation.collateral).toBe('0');
       expect(liquidation.size).toBe('0');
       expect(liquidation.latest).toBe(true);
-      expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
-      expect(BigInt(liquidation.collateralTransferred)).toBeGreaterThan(0); // liquidation fee
+      // Liquidated positions keep their aggregated realized values
+      expect(liquidation.realizedFundingRate).toBeDefined();
+      expect(liquidation.realizedPnl).toBeDefined();
+      expect(BigInt(liquidation.outLiquidationFee)).toBeGreaterThan(0); // liquidation fee
     });
 
     it('should store correct liquidation for user0 ETH long position', async () => {
@@ -390,16 +431,18 @@ describe('Verify Liquidation', () => {
 
       // Then get liquidation position for this key
       const liquidationData = await graphQLPost(
-        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateral,size,latest,realizedFundingRate,realizedPnl,outLiquidationFee}}`
       );
       expect(liquidationData.data.positions.nodes.length).toBe(1);
       const liquidation = liquidationData.data.positions.nodes[0];
 
-      expect(liquidation.collateralAmount).toBe('0');
+      expect(liquidation.collateral).toBe('0');
       expect(liquidation.size).toBe('0');
       expect(liquidation.latest).toBe(true);
-      expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
-      expect(BigInt(liquidation.collateralTransferred)).toBeGreaterThan(0); // liquidation fee
+      // Liquidated positions keep their aggregated realized values
+      expect(liquidation.realizedFundingRate).toBeDefined();
+      expect(liquidation.realizedPnl).toBeDefined();
+      expect(BigInt(liquidation.outLiquidationFee)).toBeGreaterThan(0); // liquidation fee
     });
 
     it('should have only one latest record per position key after liquidation', async () => {
@@ -471,7 +514,7 @@ describe('Verify Liquidation', () => {
       if (user0BtcLongKeyData.data.positionKeys.nodes.length > 0) {
         const positionKeyId = user0BtcLongKeyData.data.positionKeys.nodes[0].id;
         const positionsData = await graphQLPost(
-          `positions(condition:{positionKeyId:"${positionKeyId}"}){nodes{change,collateralAmount,size,timestamp}}`
+          `positions(condition:{positionKeyId:"${positionKeyId}"}){nodes{change,collateral,size,realizedFundingRate,realizedPnl,timestamp}}`
         );
         expect(positionsData.data.positions.nodes.length).toBeGreaterThan(0);
 
@@ -490,14 +533,17 @@ describe('Verify Liquidation', () => {
           (p: { change: string }) => p.change === 'LIQUIDATE'
         );
         expect(liquidation).toBeDefined();
-        expect(BigInt(liquidation.collateralAmount)).toBe(BigInt(0));
+        expect(BigInt(liquidation.collateral)).toBe(BigInt(0));
         expect(BigInt(liquidation.size)).toBe(BigInt(0));
+        // But it should keep aggregated realized values
+        expect(liquidation.realizedFundingRate).toBeDefined();
+        expect(liquidation.realizedPnl).toBeDefined();
       }
     });
 
     it('should store liquidation fees correctly', async () => {
       const liquidationsData = await graphQLPost(
-        `positions(condition:{change:"LIQUIDATE"}){nodes{id,positionKeyId,collateralTransferred,positionFee}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{id,positionKeyId,outLiquidationFee}}`
       );
       expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
@@ -524,41 +570,87 @@ describe('Verify Liquidation', () => {
         // Liquidation fee is 0.1% of the position size before liquidation (0.1% = 1/1000)
         const expectedFee = previousSize / BigInt(1000);
 
-        // Check that collateralTransferred is approximately the liquidation fee (0.1% of size)
+        // Check that outLiquidationFee is approximately the liquidation fee (0.1% of size)
         // Allow a small tolerance for rounding differences
-        const fee = BigInt(liquidation.collateralTransferred);
+        const fee = BigInt(liquidation.outLiquidationFee);
         expect(fee).toBeGreaterThanOrEqual((expectedFee * BigInt(99)) / BigInt(100)); // Allow 1% tolerance
         expect(fee).toBeLessThanOrEqual((expectedFee * BigInt(101)) / BigInt(100)); // Allow 1% tolerance
-
-        // positionFee should be non-negative
-        expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
       }
     });
 
     it('should store PnL and funding rate for liquidations', async () => {
       const liquidationsData = await graphQLPost(
-        `positions(condition:{change:"LIQUIDATE"}){nodes{pnlDelta,fundingRate}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{pnlDelta,outPnlDelta,fundingRate,outFundingRate}}`
       );
       expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
       liquidationsData.data.positions.nodes.forEach((position: any) => {
         // PnL delta and funding rate should be stored (can be positive or negative)
         expect(position.pnlDelta).toBeDefined();
+        expect(position.outPnlDelta).toBeDefined();
         expect(position.fundingRate).toBeDefined();
+        expect(position.outFundingRate).toBeDefined();
       });
     });
 
-    it('should store realized PnL and funding rate for liquidations', async () => {
+    it('should store realized PnL and funding rate for liquidations (keep aggregated values)', async () => {
       const liquidationsData = await graphQLPost(
         `positions(condition:{change:"LIQUIDATE"}){nodes{realizedPnl,realizedFundingRate}}`
       );
       expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
       liquidationsData.data.positions.nodes.forEach((position: any) => {
-        // Realized values should be stored
+        // Realized values should be kept (not reset to 0) for liquidated positions
         expect(position.realizedPnl).toBeDefined();
         expect(position.realizedFundingRate).toBeDefined();
       });
+    });
+
+    it('should reset aggregated values when position is reopened after liquidation', async () => {
+      // Get all position keys that have both LIQUIDATE and INCREASE events
+      const allPositionsData = await graphQLPost(
+        `positions{nodes{positionKeyId,change,timestamp,realizedPnl,realizedFundingRate,outFundingRate,outPnlDelta}}`
+      );
+
+      // Group by positionKeyId
+      const positionsByKey = new Map<string, any[]>();
+      allPositionsData.data.positions.nodes.forEach((p: any) => {
+        if (!positionsByKey.has(p.positionKeyId)) {
+          positionsByKey.set(p.positionKeyId, []);
+        }
+        positionsByKey.get(p.positionKeyId)!.push(p);
+      });
+
+      for (const [_positionKeyId, positions] of positionsByKey.entries()) {
+        // Sort by timestamp
+        positions.sort((a: any, b: any) => a.timestamp - b.timestamp);
+
+        // Find liquidation events
+        const liquidations = positions.filter((p: any) => p.change === 'LIQUIDATE');
+
+        for (const liquidation of liquidations) {
+          const liquidationIndex = positions.indexOf(liquidation);
+
+          // Find INCREASE events after this liquidation
+          const increasesAfter = positions
+            .slice(liquidationIndex + 1)
+            .filter((p: any) => p.change === 'INCREASE');
+
+          if (increasesAfter.length > 0) {
+            const firstIncrease = increasesAfter[0];
+            const increaseRealizedPnl = BigInt(firstIncrease.realizedPnl);
+            const increaseRealizedFundingRate = BigInt(firstIncrease.realizedFundingRate);
+            const increaseOutFundingRate = BigInt(firstIncrease.outFundingRate);
+            const increaseOutPnlDelta = BigInt(firstIncrease.outPnlDelta);
+
+            // The new position should NOT inherit realized values from liquidation
+            // It should start fresh - realized values should equal the deltas from this event only
+            // (not including the liquidation's realized values)
+            expect(increaseRealizedPnl).toBe(increaseOutPnlDelta);
+            expect(increaseRealizedFundingRate).toBe(increaseOutFundingRate);
+          }
+        }
+      }
     });
 
     it('should have liquidation events marked as latest for closed positions', async () => {
@@ -570,30 +662,6 @@ describe('Verify Liquidation', () => {
       liquidationsData.data.positions.nodes.forEach((position: any) => {
         expect(position.latest).toBe(true);
       });
-    });
-
-    it('should update total positions correctly after liquidations', async () => {
-      // Check BTC long total position (should decrease after user0 liquidation)
-      const btcLongTotalData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{collateralAmount,size}}`
-      );
-      if (btcLongTotalData.data.totalPositions.nodes.length > 0) {
-        const total = btcLongTotalData.data.totalPositions.nodes[0];
-        // After liquidation, total should reflect the removed position
-        expect(BigInt(total.collateralAmount)).toBeGreaterThanOrEqual(0);
-        expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
-      }
-
-      // Check BTC short total position (should decrease after user1 liquidation)
-      const btcShortTotalData = await graphQLPost(
-        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{collateralAmount,size}}`
-      );
-      if (btcShortTotalData.data.totalPositions.nodes.length > 0) {
-        const total = btcShortTotalData.data.totalPositions.nodes[0];
-        // After liquidation, total should reflect the removed position
-        expect(BigInt(total.collateralAmount)).toBeGreaterThanOrEqual(0);
-        expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
-      }
     });
   });
 

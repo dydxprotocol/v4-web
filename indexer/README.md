@@ -110,18 +110,43 @@ Here a dedicated mode `indexer-e2e` is used to execute the script with vitest.
 
 **NOTICE.** Important when changing the schema and generating migrations scripts.
 
-Some functionalities are enable through db views.
-Views are not generated from the schema, they are provided with custom migrations scripts.
-See `db/migrations/1762648930785-Data.js` for instance.
+### Views, etc
+
+Some functionalities are enable through db views, triggers, associated tables.
+They are not generated from the schema, they are provided with custom migrations scripts.
 Such scripts are marked with the comment `// NON GENERATED MIGRATION`.
-In case the schema is changed, views may need to be updated as well - it must be done manually.
+In case the schema is changed, they may need to be updated as well - it must be done manually.
+
+### ES module compliance
+
+If you apply a generated migration script and get this or similar error:
+
+```text
+ReferenceError: module is not defined in ES module scope
+```
+
+then provide the following changes in the migrations scripts.
+At the beginning of migration script, replace such lines
+
+```javascript
+module.exports = class Data1768329135947 {
+```
+
+with such lines
+
+```javascript
+export default class Data1768329135947 {
+```
+
+It must be done manually.
 
 ## Model Generation - Codegen
 
 **NOTICE.** Important when schemas are changed.
 
 There are two schema files: `schema.graphql` and `schema.derivatives.graphql`.
-Codegen tool generates ts source files from the schemas.
+Codegen tool generates .ts source files from the schemas
+into the `src/model/generated`.
 Codegen is not in the chain of build process
 because it generates code incompatible with ECMAScript.
 Rather generated files are added to the repo.

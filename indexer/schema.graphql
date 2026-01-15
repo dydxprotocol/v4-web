@@ -1,25 +1,19 @@
-type Price @entity {
+type Price @entity @index(fields: ["asset", "timestamp"]) {
   id: ID!
-  asset: String! @index
-  timestamp: Int! @index
+  asset: String!
+  timestamp: Int!
   price: BigInt!
 }
 
 type Liquidity @entity {
   id: ID!
-  provider: String! @index
-  stable: BigInt!
-  lpAmount: BigInt!
-  fee: BigInt!
   timestamp: Int!
   latest: Boolean!
-}
-
-type TotalLiquidity @entity {
-  id: ID!
-  stable: BigInt!
-  lpAmount: BigInt!
-  lastTimestamp: Int!
+  lpAssetBalance: BigInt!
+  account: String! @index
+  baseAsset: BigInt!
+  lpAsset: BigInt!
+  fee: BigInt!
 }
 
 type PositionKey @entity {
@@ -39,24 +33,22 @@ enum PositionChange {
 type Position @entity {
   id: ID!
   positionKey: PositionKey!
-  collateralAmount: BigInt!
-  size: BigInt!
+  change: PositionChange!
   timestamp: Int!
   latest: Boolean!
-  change: PositionChange!
-  collateralTransferred: BigInt!
-  positionFee: BigInt!
-  fundingRate: BigInt!
-  pnlDelta: BigInt!
+  collateral: BigInt!
+  size: BigInt!
+  outAveragePrice: BigInt!
   realizedFundingRate: BigInt!
   realizedPnl: BigInt!
-}
-
-type TotalPosition @entity {
-  id: ID!
-  indexAssetId: String! @index
-  isLong: Boolean!
-  collateralAmount: BigInt!
-  size: BigInt!
-  lastTimestamp: Int!
+  collateralDelta: BigInt!
+  sizeDelta: BigInt!
+  outLiquidityFee: BigInt!
+  outProtocolFee: BigInt!
+  outLiquidationFee: BigInt!
+  fundingRate: BigInt!
+  outFundingRate: BigInt!
+  pnlDelta: BigInt!
+  outPnlDelta: BigInt!
+  outAmount: BigInt!
 }

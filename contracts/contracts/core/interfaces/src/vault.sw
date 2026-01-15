@@ -9,9 +9,9 @@ pub struct Position {
     pub collateral: u256,
     pub average_price: u256,
     pub cumulative_funding_rate: u256,
-    pub reserve_amount: u256,
-    pub realized_pnl: I256,
-    pub last_increased_time: u64,
+    pub reserve_amount: u256, // TODO
+    pub realized_pnl: I256, // TODO
+    pub last_increased_time: u64, // TODO
 }
 pub struct PositionKey {
     pub account: Identity,

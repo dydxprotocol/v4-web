@@ -67,3 +67,14 @@ type CurrentPrice @entity {
   timestamp: Int! @index
   price: BigInt!
 }
+
+type CurrentPosition @entity {
+  id: ID!
+  positionId: String!
+  change: PositionChange!
+  timestamp: Int!
+  collateral: BigInt!
+  size: BigInt!
+  outAveragePrice: BigInt!
+  position_key_id: String!
+}

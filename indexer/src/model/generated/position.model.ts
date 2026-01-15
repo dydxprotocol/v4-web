@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 import {PositionKey} from "./positionKey.model.js"
 import {PositionChange} from "./_positionChange.js"
 
@@ -15,11 +15,8 @@ export class Position {
     @ManyToOne_(() => PositionKey, {nullable: true})
     positionKey!: PositionKey
 
-    @BigIntColumn_({nullable: false})
-    collateralAmount!: bigint
-
-    @BigIntColumn_({nullable: false})
-    size!: bigint
+    @Column_("varchar", {length: 9, nullable: false})
+    change!: PositionChange
 
     @IntColumn_({nullable: false})
     timestamp!: number
@@ -27,24 +24,48 @@ export class Position {
     @BooleanColumn_({nullable: false})
     latest!: boolean
 
-    @Column_("varchar", {length: 9, nullable: false})
-    change!: PositionChange
+    @BigIntColumn_({nullable: false})
+    collateral!: bigint
 
     @BigIntColumn_({nullable: false})
-    collateralTransferred!: bigint
+    size!: bigint
 
     @BigIntColumn_({nullable: false})
-    positionFee!: bigint
-
-    @BigIntColumn_({nullable: false})
-    fundingRate!: bigint
-
-    @BigIntColumn_({nullable: false})
-    pnlDelta!: bigint
+    outAveragePrice!: bigint
 
     @BigIntColumn_({nullable: false})
     realizedFundingRate!: bigint
 
     @BigIntColumn_({nullable: false})
     realizedPnl!: bigint
+
+    @BigIntColumn_({nullable: false})
+    collateralDelta!: bigint
+
+    @BigIntColumn_({nullable: false})
+    sizeDelta!: bigint
+
+    @BigIntColumn_({nullable: false})
+    outLiquidityFee!: bigint
+
+    @BigIntColumn_({nullable: false})
+    outProtocolFee!: bigint
+
+    @BigIntColumn_({nullable: false})
+    outLiquidationFee!: bigint
+
+    @BigIntColumn_({nullable: false})
+    fundingRate!: bigint
+
+    @BigIntColumn_({nullable: false})
+    outFundingRate!: bigint
+
+    @BigIntColumn_({nullable: false})
+    pnlDelta!: bigint
+
+    @BigIntColumn_({nullable: false})
+    outPnlDelta!: bigint
+
+    @BigIntColumn_({nullable: false})
+    outAmount!: bigint
 }

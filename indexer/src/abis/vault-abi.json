@@ -189,54 +189,44 @@
       "metadataTypeId": 33
     },
     {
-      "type": "struct events::WriteFeeReserve",
-      "concreteTypeId": "6f1254771865ae1159b4b3823bac0a3a304ad5425210a89e0dec5017cab985ca",
-      "metadataTypeId": 34
-    },
-    {
-      "type": "struct events::WritePosition",
-      "concreteTypeId": "f9d1d0fb63cf5f45168c897aabad8f67bcd0374494acb3b8acaa0ba07a87fec7",
-      "metadataTypeId": 35
-    },
-    {
       "type": "struct ownership::events::OwnershipSet",
       "concreteTypeId": "8c0d2488561c35a28ef795bb8bcc4c43999cdd1e3ecbd10c226e0a68660c54d4",
-      "metadataTypeId": 36
+      "metadataTypeId": 34
     },
     {
       "type": "struct src20::SetDecimalsEvent",
       "concreteTypeId": "b6a606756ed20ecf9e047dfc134b0a9ba42ccc642956ce4205e784e82ee1daa1",
-      "metadataTypeId": 38
+      "metadataTypeId": 36
     },
     {
       "type": "struct src20::SetNameEvent",
       "concreteTypeId": "2c4e26d9fde4e3c732683d47b93ece2ba27aa77cc27495ea42fe5491ef144f0d",
-      "metadataTypeId": 39
+      "metadataTypeId": 37
     },
     {
       "type": "struct src20::SetSymbolEvent",
       "concreteTypeId": "3dc850985943a7e8e5becd967e8b8eaa26a7dec1f75a1a80ace5b3bf622b1e1a",
-      "metadataTypeId": 40
+      "metadataTypeId": 38
     },
     {
       "type": "struct src20::TotalSupplyEvent",
       "concreteTypeId": "7a3907033239b7e20b602aaf2a1a55863934467688426a359aae8b410786d2ba",
-      "metadataTypeId": 41
+      "metadataTypeId": 39
     },
     {
       "type": "struct std::asset_id::AssetId",
       "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
-      "metadataTypeId": 43
+      "metadataTypeId": 41
     },
     {
       "type": "struct std::contract_id::ContractId",
       "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
-      "metadataTypeId": 46
+      "metadataTypeId": 44
     },
     {
       "type": "struct std::string::String",
       "concreteTypeId": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c",
-      "metadataTypeId": 47
+      "metadataTypeId": 45
     },
     {
       "type": "u256",
@@ -542,11 +532,11 @@
       "components": [
         {
           "name": "Address",
-          "typeId": 42
+          "typeId": 40
         },
         {
           "name": "ContractId",
-          "typeId": 46
+          "typeId": 44
         }
       ]
     },
@@ -625,7 +615,7 @@
         },
         {
           "name": "realized_pnl",
-          "typeId": 37
+          "typeId": 35
         },
         {
           "name": "last_increased_time",
@@ -672,10 +662,6 @@
         {
           "name": "key",
           "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "realized_pnl",
-          "typeId": 37
         }
       ]
     },
@@ -688,18 +674,6 @@
           "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         },
         {
-          "name": "account",
-          "typeId": 12
-        },
-        {
-          "name": "index_asset",
-          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "is_long",
-          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
-        },
-        {
           "name": "collateral_delta",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
@@ -712,15 +686,23 @@
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "average_price",
+          "name": "out_average_price",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "position_fee",
+          "name": "out_liquidity_fee",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "out_protocol_fee",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
           "name": "funding_rate",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "out_funding_rate",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
@@ -732,12 +714,24 @@
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
+          "name": "out_pnl_delta",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
           "name": "pnl_delta_has_profit",
           "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
         },
         {
           "name": "cumulative_funding_rate",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "amount_out",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "receiver",
+          "typeId": 12
         }
       ]
     },
@@ -750,18 +744,6 @@
           "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         },
         {
-          "name": "account",
-          "typeId": 12
-        },
-        {
-          "name": "index_asset",
-          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "is_long",
-          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
-        },
-        {
           "name": "collateral_delta",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
@@ -774,11 +756,15 @@
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "average_price",
+          "name": "out_average_price",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "position_fee",
+          "name": "out_liquidity_fee",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "out_protocol_fee",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
@@ -786,7 +772,23 @@
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
+          "name": "out_funding_rate",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
           "name": "funding_rate_has_profit",
+          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        },
+        {
+          "name": "pnl_delta",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "out_pnl_delta",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "pnl_delta_has_profit",
           "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
         },
         {
@@ -804,31 +806,19 @@
           "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         },
         {
-          "name": "account",
-          "typeId": 12
-        },
-        {
-          "name": "index_asset",
-          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "is_long",
-          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
-        },
-        {
-          "name": "collateral",
+          "name": "price",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "size",
+          "name": "out_liquidity_fee",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "mark_price",
+          "name": "out_protocol_fee",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "position_fee",
+          "name": "out_liquidation_fee",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
@@ -836,15 +826,19 @@
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
+          "name": "out_funding_rate",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
           "name": "funding_rate_has_profit",
           "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
         },
         {
-          "name": "liquidation_fee",
+          "name": "pnl_delta",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
-          "name": "pnl_delta",
+          "name": "out_pnl_delta",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         },
         {
@@ -854,6 +848,10 @@
         {
           "name": "cumulative_funding_rate",
           "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "fee_receiver",
+          "typeId": 12
         }
       ]
     },
@@ -1026,32 +1024,8 @@
       ]
     },
     {
-      "type": "struct events::WriteFeeReserve",
-      "metadataTypeId": 34,
-      "components": [
-        {
-          "name": "fee_reserve",
-          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
-        }
-      ]
-    },
-    {
-      "type": "struct events::WritePosition",
-      "metadataTypeId": 35,
-      "components": [
-        {
-          "name": "position_key",
-          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
-        },
-        {
-          "name": "position",
-          "typeId": 17
-        }
-      ]
-    },
-    {
       "type": "struct ownership::events::OwnershipSet",
-      "metadataTypeId": 36,
+      "metadataTypeId": 34,
       "components": [
         {
           "name": "new_owner",
@@ -1061,7 +1035,7 @@
     },
     {
       "type": "struct signed_int::i256::I256",
-      "metadataTypeId": 37,
+      "metadataTypeId": 35,
       "components": [
         {
           "name": "underlying",
@@ -1071,11 +1045,11 @@
     },
     {
       "type": "struct src20::SetDecimalsEvent",
-      "metadataTypeId": 38,
+      "metadataTypeId": 36,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 41
         },
         {
           "name": "decimals",
@@ -1089,11 +1063,11 @@
     },
     {
       "type": "struct src20::SetNameEvent",
-      "metadataTypeId": 39,
+      "metadataTypeId": 37,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 41
         },
         {
           "name": "name",
@@ -1101,7 +1075,7 @@
           "typeArguments": [
             {
               "name": "",
-              "typeId": 47
+              "typeId": 45
             }
           ]
         },
@@ -1113,11 +1087,11 @@
     },
     {
       "type": "struct src20::SetSymbolEvent",
-      "metadataTypeId": 40,
+      "metadataTypeId": 38,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 41
         },
         {
           "name": "symbol",
@@ -1125,7 +1099,7 @@
           "typeArguments": [
             {
               "name": "",
-              "typeId": 47
+              "typeId": 45
             }
           ]
         },
@@ -1137,11 +1111,11 @@
     },
     {
       "type": "struct src20::TotalSupplyEvent",
-      "metadataTypeId": 41,
+      "metadataTypeId": 39,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 41
         },
         {
           "name": "supply",
@@ -1155,7 +1129,7 @@
     },
     {
       "type": "struct std::address::Address",
-      "metadataTypeId": 42,
+      "metadataTypeId": 40,
       "components": [
         {
           "name": "bits",
@@ -1165,7 +1139,7 @@
     },
     {
       "type": "struct std::asset_id::AssetId",
-      "metadataTypeId": 43,
+      "metadataTypeId": 41,
       "components": [
         {
           "name": "bits",
@@ -1175,11 +1149,11 @@
     },
     {
       "type": "struct std::bytes::Bytes",
-      "metadataTypeId": 44,
+      "metadataTypeId": 42,
       "components": [
         {
           "name": "buf",
-          "typeId": 45
+          "typeId": 43
         },
         {
           "name": "len",
@@ -1189,7 +1163,7 @@
     },
     {
       "type": "struct std::bytes::RawBytes",
-      "metadataTypeId": 45,
+      "metadataTypeId": 43,
       "components": [
         {
           "name": "ptr",
@@ -1203,7 +1177,7 @@
     },
     {
       "type": "struct std::contract_id::ContractId",
-      "metadataTypeId": 46,
+      "metadataTypeId": 44,
       "components": [
         {
           "name": "bits",
@@ -1213,11 +1187,11 @@
     },
     {
       "type": "struct std::string::String",
-      "metadataTypeId": 47,
+      "metadataTypeId": 45,
       "components": [
         {
           "name": "bytes",
-          "typeId": 44
+          "typeId": 42
         }
       ]
     }
@@ -2028,10 +2002,6 @@
       "concreteTypeId": "e52e660ff9a330c417b6493bb8d3d0049bafaa6c4a771b32b205d71bc2bc5ace"
     },
     {
-      "logId": "8003552358277950993",
-      "concreteTypeId": "6f1254771865ae1159b4b3823bac0a3a304ad5425210a89e0dec5017cab985ca"
-    },
-    {
       "logId": "8807078256608655330",
       "concreteTypeId": "7a3907033239b7e20b602aaf2a1a55863934467688426a359aae8b410786d2ba"
     },
@@ -2046,10 +2016,6 @@
     {
       "logId": "5997125308282845126",
       "concreteTypeId": "533a11b199b437c6858157a89214892fb11c6a37a787f46e2268aa4fe6bfa71c"
-    },
-    {
-      "logId": "18001398963706486597",
-      "concreteTypeId": "f9d1d0fb63cf5f45168c897aabad8f67bcd0374494acb3b8acaa0ba07a87fec7"
     },
     {
       "logId": "17276184846747919138",
@@ -2125,25 +2091,25 @@
     {
       "name": "BASE_ASSET_ID",
       "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
-      "offset": 93512,
+      "offset": 92848,
       "indirect": false
     },
     {
       "name": "BASE_ASSET",
       "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b",
-      "offset": 93472,
+      "offset": 92808,
       "indirect": false
     },
     {
       "name": "BASE_ASSET_DECIMALS",
       "concreteTypeId": "d7649d428b9ff33d188ecbf38a7e4d8fd167fa01b2e10fe9a8f9308e52f1d7cc",
-      "offset": 93504,
+      "offset": 92840,
       "indirect": false
     },
     {
       "name": "PRICEFEED_WRAPPER",
       "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
-      "offset": 93544,
+      "offset": 92880,
       "indirect": false
     }
   ],

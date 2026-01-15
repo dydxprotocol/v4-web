@@ -12,4 +12,5 @@ pnpm-lock.yaml
 **/generated
 frontend/src/vite-env.d.ts
 indexer/src/main.ts
-indexer/src/abis/index.ts
+indexer/src/abis/
+indexer/db/migrations/

@@ -26,13 +26,6 @@ pub struct SetFees {
     pub position_fee_basis_points: u64,
     pub liquidation_fee_basis_points: u64,
 }
-pub struct WritePosition {
-    pub position_key: b256,
-    pub position: Position,
-}
-pub struct WriteFeeReserve {
-    pub fee_reserve: u256,
-}
 pub struct SetLiquidator {
     pub liquidator: Identity,
     pub is_active: bool,
@@ -61,53 +54,55 @@ pub struct RegisterPositionByKey {
 }
 pub struct IncreasePosition {
     pub key: b256,
-    pub account: Identity,
-    pub index_asset: b256,
-    pub is_long: bool,
-    pub collateral_delta: u256,
-    pub size_delta: u256,
-    pub price: u256,
-    pub average_price: u256,
-    pub position_fee: u256,
-    pub funding_rate: u256,
-    pub funding_rate_has_profit: bool,
-    pub cumulative_funding_rate: u256,
+    pub collateral_delta: u256, // transferred from the user to the vault
+    pub size_delta: u256, // requested by the user
+    pub price: u256, // the current price of the asset
+    pub out_average_price: u256, // the average price of the position after the increase
+    pub out_liquidity_fee: u256, // the liquidity fee paid, increases the total liquidity and the total reserves
+    pub out_protocol_fee: u256, // the protocol fee paid to the protocol
+    pub funding_rate: u256, // the calculated funding rate of the position
+    pub out_funding_rate: u256, // the actual funding rate of the position paid or received, not greater than funding_rate
+    pub funding_rate_has_profit: bool, // whether the funding rate has profit
+    pub pnl_delta: u256, // the calculated pnl delta of the position
+    pub out_pnl_delta: u256, // the actual pnl delta of the position paid or received, not greater than pnl_delta
+    pub pnl_delta_has_profit: bool, // whether the pnl delta has profit
+    pub cumulative_funding_rate: u256, // the cumulative funding rate after the increase
 }
 pub struct DecreasePosition {
     pub key: b256,
-    pub account: Identity,
-    pub index_asset: b256,
-    pub is_long: bool,
-    pub collateral_delta: u256,
-    pub size_delta: u256,
-    pub price: u256,
-    pub average_price: u256,
-    pub position_fee: u256,
-    pub funding_rate: u256,
-    pub funding_rate_has_profit: bool,
-    pub pnl_delta: u256,
-    pub pnl_delta_has_profit: bool,
-    pub cumulative_funding_rate: u256,
+    pub collateral_delta: u256, // requested by the user
+    pub size_delta: u256, // requested by the user
+    pub price: u256, // the current price of the asset
+    pub out_average_price: u256, // the average price of the position after the decrease
+    pub out_liquidity_fee: u256, // the liquidity fee paid, increases the total liquidity and the total reserves
+    pub out_protocol_fee: u256, // the protocol fee paid to the protocol
+    pub funding_rate: u256, // the calculated funding rate of the position
+    pub out_funding_rate: u256, // the actual funding rate of the position paid or received, not greater than funding_rate
+    pub funding_rate_has_profit: bool, // whether the funding rate has profit
+    pub pnl_delta: u256, // the calculated pnl delta of the position
+    pub out_pnl_delta: u256, // the actual pnl delta of the position paid or received, not greater than pnl_delta
+    pub pnl_delta_has_profit: bool, // whether the pnl delta has profit
+    pub cumulative_funding_rate: u256, // the cumulative funding rate after the decrease
+    pub amount_out: u256, // the amount of the asset received by the user
+    pub receiver: Identity, // the receiver of the amount
 }
 pub struct ClosePosition {
     pub key: b256,
-    pub realized_pnl: I256,
 }
 pub struct LiquidatePosition {
     pub key: b256,
-    pub account: Identity,
-    pub index_asset: b256,
-    pub is_long: bool,
-    pub collateral: u256,
-    pub size: u256,
-    pub mark_price: u256,
-    pub position_fee: u256,
-    pub funding_rate: u256,
-    pub funding_rate_has_profit: bool,
-    pub liquidation_fee: u256,
-    pub pnl_delta: u256,
-    pub pnl_delta_has_profit: bool,
-    pub cumulative_funding_rate: u256,
+    pub price: u256, // the current price of the asset
+    pub out_liquidity_fee: u256, // the liquidity fee paid, increases the total liquidity and the total reserves
+    pub out_protocol_fee: u256, // the protocol fee paid to the protocol
+    pub out_liquidation_fee: u256, // the liquidation fee paid to the liquidator
+    pub funding_rate: u256, // the calculated funding rate of the position
+    pub out_funding_rate: u256, // the actual funding rate of the position paid or received, not greater than funding_rate
+    pub funding_rate_has_profit: bool, // whether the funding rate has profit
+    pub pnl_delta: u256, // the calculated pnl delta of the position
+    pub out_pnl_delta: u256, // the actual pnl delta of the position paid or received, not greater than pnl_delta
+    pub pnl_delta_has_profit: bool, // whether the pnl delta has profit
+    pub cumulative_funding_rate: u256, // the cumulative funding rate after the liquidation
+    pub fee_receiver: Identity, // the receiver of the fee
 }
 pub struct UpdateFundingInfo {
     pub asset: b256,
