@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { $decimalValue } from '@/shared/models/DecimalValue';
 import { OraclePrice } from '@/shared/models/decimals';
 import { assetId } from '@/shared/types';
 import { createTestAssetPrice } from '../test-fixtures/markets';
@@ -10,7 +11,8 @@ describe('Asset Prices', () => {
 
       expect(price.id).toBeDefined();
       expect(price.assetId).toBeDefined();
-      expect(price.value).toBeInstanceOf(OraclePrice);
+      expect(price.value).toHaveProperty('value');
+      expect(price.value).toHaveProperty('decimals', OraclePrice.decimals);
       expect(price.value.value).toBeGreaterThan(0n);
       expect(price.timestamp).toBeGreaterThan(0);
     });
@@ -21,7 +23,7 @@ describe('Asset Prices', () => {
         value: customPrice,
       });
 
-      expect(price.value.toFloat()).toBeCloseTo(75000, 2);
+      expect($decimalValue(price.value).toFloat()).toBeCloseTo(75000, 2);
     });
 
     it('should support different assets', () => {
@@ -40,7 +42,7 @@ describe('Asset Prices', () => {
         value: OraclePrice.fromFloat(0),
       });
 
-      expect(price.value.toFloat()).toBe(0);
+      expect($decimalValue(price.value).toFloat()).toBe(0);
     });
 
     it('should have timestamp in milliseconds', () => {
@@ -71,7 +73,7 @@ describe('Asset Prices', () => {
       );
 
       expect(prices).toHaveLength(4);
-      expect(prices[3].value.toFloat()).toBeGreaterThan(prices[0].value.toFloat());
+      expect($decimalValue(prices[3].value).toFloat()).toBeGreaterThan($decimalValue(prices[0].value).toFloat());
     });
   });
 
@@ -81,7 +83,7 @@ describe('Asset Prices', () => {
         value: OraclePrice.fromFloat(50123.456789),
       });
 
-      expect(price.value.toFloat()).toBeCloseTo(50123.456789, 6);
+      expect($decimalValue(price.value).toFloat()).toBeCloseTo(50123.456789, 6);
     });
 
     it('should handle very large prices', () => {
@@ -89,7 +91,7 @@ describe('Asset Prices', () => {
         value: OraclePrice.fromFloat(1000000),
       });
 
-      expect(price.value.toFloat()).toBeCloseTo(1000000, 2);
+      expect($decimalValue(price.value).toFloat()).toBeCloseTo(1000000, 2);
     });
 
     it('should handle very small prices', () => {
@@ -97,7 +99,7 @@ describe('Asset Prices', () => {
         value: OraclePrice.fromFloat(0.0001),
       });
 
-      expect(price.value.toFloat()).toBeCloseTo(0.0001, 6);
+      expect($decimalValue(price.value).toFloat()).toBeCloseTo(0.0001, 6);
     });
   });
 });

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PositionChange } from '@/generated/graphql';
-import { CollateralAmount } from '@/shared/models/decimals';
+import * as Decimals from '@/shared/models/decimals';
 import {
   AddressSchema,
   AssetIdSchema,
@@ -9,14 +9,14 @@ import {
 } from '@/shared/types';
 import { decimalValueSchema } from '@/shared/utils/DecimalCalculator/utils/zod';
 import type { PositionEntity, PositionKeyEntity } from './PositionsEntity';
-import { FundingRate, PnlDelta, PositionFee, PositionSize, RealizedPnl } from './positionsDecimals';
+import * as pd from './positionsDecimals';
 
-const PositionSizeSchema = decimalValueSchema(PositionSize);
-const CollateralAmountSchema = decimalValueSchema(CollateralAmount);
-const PositionFeeSchema = decimalValueSchema(PositionFee);
-const FundingRateSchema = decimalValueSchema(FundingRate);
-const PnlDeltaSchema = decimalValueSchema(PnlDelta);
-const RealizedPnlSchema = decimalValueSchema(RealizedPnl);
+const PositionSizeSchema = decimalValueSchema(pd.PositionSize);
+const CollateralAmountSchema = decimalValueSchema(Decimals.CollateralAmount);
+const PositionFeeSchema = decimalValueSchema(pd.PositionFee);
+const FundingRateSchema = decimalValueSchema(pd.FundingRate);
+const PnlDeltaSchema = decimalValueSchema(pd.PnlDelta);
+const RealizedPnlSchema = decimalValueSchema(pd.RealizedPnl);
 
 export const PositionKeySchema = z.object({
   id: PositionStableIdSchema,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DecimalValue, HeadlessDecimalValue } from './decimalValue';
+import { $decimalValue, createDecimalValueSchema } from './DecimalValue';
 import { CollateralAmount, OraclePrice, UsdValue } from './decimals';
 
 describe('DecimalValue', () => {
@@ -8,22 +8,20 @@ describe('DecimalValue', () => {
       const value = UsdValue.fromBigInt(100000000000n); // 100.0 with 9 decimals
 
       expect(value.value).toBe(100000000000n);
-      expect(value.decimals).toBe(9n);
+      expect(value.decimals).toBe(9);
     });
 
     it('should create from float', () => {
       const value = UsdValue.fromFloat(123.456);
 
-      expect(value.toFloat()).toBeCloseTo(123.456, 3);
+      expect($decimalValue(value).toFloat()).toBeCloseTo(123.456, 3);
     });
 
-    it('should use default decimals if not defined', () => {
-      class TestDecimal extends DecimalValue {
-        // No static decimals property, will use default (18n)
-      }
+    it('should create schema with custom decimals', () => {
+      const TestDecimal = createDecimalValueSchema(18, 'TestDecimal');
 
-      const value = new TestDecimal(100n);
-      expect(value.decimals).toBe(18n);
+      const value = TestDecimal.fromBigInt(100n);
+      expect(value.decimals).toBe(18);
     });
   });
 
@@ -31,33 +29,33 @@ describe('DecimalValue', () => {
     it('should convert to float', () => {
       const value = UsdValue.fromBigInt(123456789000n); // 123.456789 with 9 decimals
 
-      expect(value.toFloat()).toBeCloseTo(123.456789, 6);
+      expect($decimalValue(value).toFloat()).toBeCloseTo(123.456789, 6);
     });
 
     it('should convert to bigint', () => {
       const value = UsdValue.fromFloat(100.5);
 
-      expect(value.toBigInt()).toBe(100500000000n);
+      expect($decimalValue(value).toBigInt()).toBe(100500000000n);
     });
 
     it('should handle zero', () => {
       const value = UsdValue.fromFloat(0);
 
-      expect(value.toFloat()).toBe(0);
-      expect(value.toBigInt()).toBe(0n);
+      expect($decimalValue(value).toFloat()).toBe(0);
+      expect($decimalValue(value).toBigInt()).toBe(0n);
     });
 
     it('should handle negative values', () => {
       const value = UsdValue.fromFloat(-50.5);
 
-      expect(value.toFloat()).toBeCloseTo(-50.5, 6);
+      expect($decimalValue(value).toFloat()).toBeCloseTo(-50.5, 6);
     });
   });
 
   describe('adjustTo', () => {
     it('should adjust to same decimals', () => {
       const value = UsdValue.fromFloat(100);
-      const adjusted = value.adjustTo(UsdValue);
+      const adjusted = $decimalValue(value).adjustTo(UsdValue);
 
       expect(adjusted.value).toBe(value.value);
       expect(adjusted.decimals).toBe(UsdValue.decimals);
@@ -66,51 +64,61 @@ describe('DecimalValue', () => {
     it('should adjust to higher decimals', () => {
       // UsdValue has 9 decimals, OraclePrice has 18
       const value = UsdValue.fromFloat(100);
-      const adjusted = value.adjustTo(OraclePrice);
+      const adjusted = $decimalValue(value).adjustTo(OraclePrice);
 
-      expect(adjusted.toFloat()).toBeCloseTo(100, 6);
+      expect($decimalValue(adjusted).toFloat()).toBeCloseTo(100, 6);
       expect(adjusted.decimals).toBe(OraclePrice.decimals);
     });
 
     it('should adjust to lower decimals', () => {
-      // UsdValue has 9 decimals, same as CollateralAmount
-      const value = UsdValue.fromFloat(100);
-      const adjusted = value.adjustTo(CollateralAmount);
+      // OraclePrice has 18 decimals, CollateralAmount has 6
+      const value = OraclePrice.fromFloat(100);
+      const adjusted = $decimalValue(value).adjustTo(CollateralAmount);
 
-      expect(adjusted.toFloat()).toBeCloseTo(100, 6);
+      expect($decimalValue(adjusted).toFloat()).toBeCloseTo(100, 6);
       expect(adjusted.decimals).toBe(CollateralAmount.decimals);
     });
 
     it('should handle precision loss when reducing decimals', () => {
-      const value = UsdValue.fromFloat(100.123456789012345);
-      const adjusted = value.adjustTo(CollateralAmount);
+      const value = OraclePrice.fromFloat(100.123456789012345);
+      const adjusted = $decimalValue(value).adjustTo(CollateralAmount);
 
-      // CollateralAmount has 9 decimals, we lose precision beyond that
-      expect(adjusted.toFloat()).toBeCloseTo(100.123456789, 5);
+      // CollateralAmount has 6 decimals, we lose precision beyond that
+      expect($decimalValue(adjusted).toFloat()).toBeCloseTo(100.123456, 5);
     });
   });
 
-  describe('HeadlessDecimalValue', () => {
-    it('should create with custom decimals', () => {
-      const value = new HeadlessDecimalValue(123456n, 3n);
+  describe('toDecimalString', () => {
+    it('should convert to decimal string', () => {
+      const value = UsdValue.fromFloat(123.456);
 
-      expect(value.value).toBe(123456n);
-      expect(value.decimals).toBe(3n);
-      expect(value.toFloat()).toBeCloseTo(123.456, 3);
+      expect($decimalValue(value).toDecimalString()).toBe('123.456');
     });
 
-    it('should adjust to typed decimal', () => {
-      const headless = new HeadlessDecimalValue(100000000000n, 9n);
-      const adjusted = headless.adjustTo(UsdValue);
+    it('should handle whole numbers', () => {
+      const value = UsdValue.fromFloat(100);
 
-      expect(adjusted.toFloat()).toBeCloseTo(100, 6);
-      expect(adjusted.decimals).toBe(UsdValue.decimals);
+      expect($decimalValue(value).toDecimalString()).toBe('100');
     });
 
-    it('should handle different decimal precision', () => {
-      const value = new HeadlessDecimalValue(123n, 2n); // 1.23
+    it('should handle small decimals', () => {
+      const value = UsdValue.fromFloat(0.001);
 
-      expect(value.toFloat()).toBeCloseTo(1.23, 2);
+      expect($decimalValue(value).toDecimalString()).toBe('0.001');
+    });
+  });
+
+  describe('fromDecimalString', () => {
+    it('should parse decimal string', () => {
+      const value = UsdValue.fromDecimalString('123.456');
+
+      expect($decimalValue(value).toFloat()).toBeCloseTo(123.456, 3);
+    });
+
+    it('should parse whole number string', () => {
+      const value = UsdValue.fromDecimalString('100');
+
+      expect($decimalValue(value).toFloat()).toBe(100);
     });
   });
 
@@ -118,13 +126,13 @@ describe('DecimalValue', () => {
     it('should handle very large numbers', () => {
       const value = UsdValue.fromFloat(1e15);
 
-      expect(value.toFloat()).toBe(1e15);
+      expect($decimalValue(value).toFloat()).toBe(1e15);
     });
 
     it('should handle very small numbers', () => {
       const value = UsdValue.fromFloat(0.000001);
 
-      expect(value.toFloat()).toBeCloseTo(0.000001, 6);
+      expect($decimalValue(value).toFloat()).toBeCloseTo(0.000001, 6);
     });
 
     it('should handle maximum safe integer', () => {

@@ -1,1 +1,1 @@
-export * from './dashboard-order-entry-form.component';
+export * from './DashboardOrderEntryForm';

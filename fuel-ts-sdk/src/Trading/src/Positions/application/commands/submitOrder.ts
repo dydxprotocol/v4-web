@@ -1,7 +1,7 @@
 import { vaultAbi } from '@starboard/indexer/abis';
 import type { Account } from 'fuels';
 import { Contract } from 'fuels';
-import type { DecimalValue } from '@/shared/models/DecimalValue';
+import type { DecimalValueInstance } from '@/shared/models/DecimalValue';
 import { CollateralAmount } from '@/shared/models/decimals';
 import type { AssetId, ContractId } from '@/shared/types';
 import { DecimalCalculator } from '@/shared/utils/DecimalCalculator';
@@ -12,7 +12,7 @@ export interface SubmitOrderParams {
   indexAsset: AssetId;
   collateralAssetId: AssetId;
   vaultContractAddress: ContractId;
-  leverage: DecimalValue;
+  leverage: DecimalValueInstance;
   collateralAmount: CollateralAmount;
 }
 
@@ -32,8 +32,7 @@ export const createSubmitOrder = () => async (params: SubmitOrderParams) => {
   const size = DecimalCalculator.value(collateralAmount)
     .multiplyBy(leverage)
     .calculate(CollateralAmount)
-    .toBigInt()
-    .toString();
+    .value.toString();
 
   const account = { Address: { bits: wallet.address.toB256() } };
 

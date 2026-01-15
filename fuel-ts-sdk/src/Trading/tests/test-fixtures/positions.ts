@@ -6,7 +6,7 @@ import {
   PositionFee,
   PositionSize,
   RealizedPnl,
-} from '@/Trading/src/Positions/domain/positions.decimals';
+} from '@/Trading/src/Positions/domain/positionsDecimals';
 import { CollateralAmount } from '@/shared/models/decimals';
 import { address, assetId, positionRevisionId, positionStableId } from '@/shared/types';
 

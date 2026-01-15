@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { $decimalValue } from '@/shared/models/DecimalValue';
 import { CollateralAmount, UsdValue } from '@/shared/models/decimals';
 import { DecimalCalculator } from './DecimalCalculator';
 
@@ -10,7 +11,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).add(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(150);
+      expect($decimalValue(result).toFloat()).toBe(150);
     });
 
     it('should subtract values', () => {
@@ -19,7 +20,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).subtractBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(70);
+      expect($decimalValue(result).toFloat()).toBe(70);
     });
 
     it('should multiply values', () => {
@@ -28,7 +29,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).multiplyBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(50);
+      expect($decimalValue(result).toFloat()).toBe(50);
     });
 
     it('should divide values', () => {
@@ -37,7 +38,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).divideBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(25);
+      expect($decimalValue(result).toFloat()).toBe(25);
     });
   });
 
@@ -50,7 +51,7 @@ describe('DecimalCalculator', () => {
       // (100 + 50) * 2 = 300
       const result = DecimalCalculator.first(a).add(b).multiplyBy(c).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(300);
+      expect($decimalValue(result).toFloat()).toBe(300);
     });
 
     it('should handle division with remainder', () => {
@@ -59,7 +60,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).divideBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBeCloseTo(33.3333, 4);
+      expect($decimalValue(result).toFloat()).toBeCloseTo(33.3333, 4);
     });
 
     it('should handle complex denominator', () => {
@@ -72,7 +73,7 @@ describe('DecimalCalculator', () => {
         .inDenominator((calc) => calc.value(b).add(c))
         .calculate(UsdValue);
 
-      expect(result.toFloat()).toBeCloseTo(6.6667, 4);
+      expect($decimalValue(result).toFloat()).toBeCloseTo(6.6667, 4);
     });
 
     it('should handle numerator with operations', () => {
@@ -85,7 +86,7 @@ describe('DecimalCalculator', () => {
         .divideBy(c)
         .calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(20);
+      expect($decimalValue(result).toFloat()).toBe(20);
     });
   });
 
@@ -96,7 +97,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(collateral).multiplyBy(price).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(2000);
+      expect($decimalValue(result).toFloat()).toBe(2000);
     });
 
     it('should adjust decimals when calculating result', () => {
@@ -105,7 +106,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).multiplyBy(b).calculate(CollateralAmount);
 
-      expect(result.toFloat()).toBe(200);
+      expect($decimalValue(result).toFloat()).toBe(200);
       expect(result.decimals).toBe(CollateralAmount.decimals);
     });
   });
@@ -155,7 +156,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(zero).add(value).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(100);
+      expect($decimalValue(result).toFloat()).toBe(100);
     });
 
     it('should handle negative values', () => {
@@ -164,7 +165,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).subtractBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(-50);
+      expect($decimalValue(result).toFloat()).toBe(-50);
     });
 
     it('should handle very large numbers', () => {
@@ -173,7 +174,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).multiplyBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBe(2e12);
+      expect($decimalValue(result).toFloat()).toBe(2e12);
     });
 
     it('should handle very small numbers', () => {
@@ -182,7 +183,7 @@ describe('DecimalCalculator', () => {
 
       const result = DecimalCalculator.first(a).multiplyBy(b).calculate(UsdValue);
 
-      expect(result.toFloat()).toBeCloseTo(0.0002, 6);
+      expect($decimalValue(result).toFloat()).toBeCloseTo(0.0002, 6);
     });
   });
 });

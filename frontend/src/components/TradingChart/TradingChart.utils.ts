@@ -1,4 +1,4 @@
-import { OraclePrice } from 'fuel-ts-sdk';
+import { $decimalValue, OraclePrice } from 'fuel-ts-sdk';
 import type { Candle, CandleInterval } from 'fuel-ts-sdk/trading';
 import type {
   Bar,
@@ -79,10 +79,10 @@ export function createDatafeed(
           .map(
             (candle: Candle): Bar => ({
               time: candle.startedAt * 1000,
-              open: OraclePrice.fromBigInt(candle.openPrice).toFloat(),
-              high: OraclePrice.fromBigInt(candle.highPrice).toFloat(),
-              low: OraclePrice.fromBigInt(candle.lowPrice).toFloat(),
-              close: OraclePrice.fromBigInt(candle.closePrice).toFloat(),
+              open: $decimalValue(OraclePrice.fromBigInt(candle.openPrice)).toFloat(),
+              high: $decimalValue(OraclePrice.fromBigInt(candle.highPrice)).toFloat(),
+              low: $decimalValue(OraclePrice.fromBigInt(candle.lowPrice)).toFloat(),
+              close: $decimalValue(OraclePrice.fromBigInt(candle.closePrice)).toFloat(),
             })
           )
           .sort((a: Bar, b: Bar) => a.time - b.time);

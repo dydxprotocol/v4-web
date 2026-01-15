@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { calculateUnrealizedPnl } from '@/Trading/src/Positions/application/queries/calculate-unrealized-pnl';
-import { PositionSize } from '@/Trading/src/Positions/domain/positions.decimals';
+import { calculateUnrealizedPnl } from '@/Trading/src/Positions/domain/calculations/calculateUnrealizedPnL';
+import { PositionSize } from '@/Trading/src/Positions/domain/positionsDecimals';
+import { $decimalValue } from '@/shared/models/DecimalValue';
 import { CollateralAmount, OraclePrice } from '@/shared/models/decimals';
 import { createOpenLongPosition, createOpenShortPosition } from '../test-fixtures/positions';
 
@@ -20,7 +21,7 @@ describe('calculateUnrealizedPnl', () => {
       const pnl = calculateUnrealizedPnl(history, currentPrice);
 
       // For long: PnL = (size * currentPrice) - costBasis = (1 * 55000) - 50000 = 5000
-      expect(pnl.toFloat()).toBeCloseTo(5000, 0);
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(5000, 0);
     });
 
     it('should return zero for no latest position', () => {
@@ -34,7 +35,7 @@ describe('calculateUnrealizedPnl', () => {
 
       const pnl = calculateUnrealizedPnl(history, currentPrice);
 
-      expect(pnl.toFloat()).toBe(0);
+      expect($decimalValue(pnl).toFloat()).toBe(0);
     });
   });
 
@@ -53,7 +54,7 @@ describe('calculateUnrealizedPnl', () => {
       const pnl = calculateUnrealizedPnl(history, currentPrice);
 
       // For short: PnL = costBasis - (|size| * currentPrice) = 50000 - (1 * 45000) = 5000
-      expect(pnl.toFloat()).toBeCloseTo(5000, 0);
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(5000, 0);
     });
   });
 
@@ -61,7 +62,7 @@ describe('calculateUnrealizedPnl', () => {
     it('should handle empty position history', () => {
       const pnl = calculateUnrealizedPnl([], OraclePrice.fromFloat(50000));
 
-      expect(pnl.toFloat()).toBe(0);
+      expect($decimalValue(pnl).toFloat()).toBe(0);
     });
 
     it('should use absolute value of size', () => {
@@ -77,7 +78,7 @@ describe('calculateUnrealizedPnl', () => {
 
       const pnl = calculateUnrealizedPnl(history, currentPrice);
 
-      expect(pnl.toFloat()).toBeCloseTo(10000, 0);
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(10000, 0);
     });
   });
 });

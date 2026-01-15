@@ -8,9 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "public/*": ["./public/*"],
-      "fuel-ts-sdk/trading": ["../fuel-ts-sdk/src/Trading/index.ts"],
-      "fuel-ts-sdk": ["../fuel-ts-sdk/src/index.ts"]
+      "public/*": ["./public/*"]
     },
     "strict": true,
     "noUnusedLocals": true,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PositionChange, PositionSide, PositionStatus } from '@/Trading/src/Positions/domain';
-import { PositionSize } from '@/Trading/src/Positions/domain/positions.decimals';
+import { PositionSize } from '@/Trading/src/Positions/domain/positionsDecimals';
 import {
   calculateEntryPrice,
   filterClosedPositions,
@@ -9,7 +9,7 @@ import {
   getPositionStatus,
   isPositionClosed,
   isPositionOpen,
-} from '@/Trading/src/positions/domain/positions.calculations';
+} from '@/Trading/src/Positions/domain';
 import { positionRevisionId } from '@/shared/types';
 import {
   createClosedPosition,

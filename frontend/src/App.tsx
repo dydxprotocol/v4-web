@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router';
-import { DashboardLayout } from './layouts/dashboard-layout';
+import { DashboardLayout } from './layouts/DashboardLayout';
 import { Dashboard } from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { $decimalValue } from '@/shared/models/DecimalValue';
 import { OraclePrice, PercentageValue } from '@/shared/models/decimals';
 import {
   createTestAssetPrice,
@@ -13,20 +14,20 @@ describe('Market Domain', () => {
 
       expect(config.id).toBeDefined();
       expect(config.asset).toBeDefined();
-      expect(config.initialMarginFraction.toFloat()).toBeGreaterThan(0);
-      expect(config.maintenanceMarginFraction.toFloat()).toBeLessThan(
-        config.initialMarginFraction.toFloat()
+      expect($decimalValue(config.initialMarginFraction).toFloat()).toBeGreaterThan(0);
+      expect($decimalValue(config.maintenanceMarginFraction).toFloat()).toBeLessThan(
+        $decimalValue(config.initialMarginFraction).toFloat()
       );
     });
 
     it('should allow custom values', () => {
       const config = createTestMarketConfig({
-        initialMarginFraction: PercentageValue.fromFloat(0.1),
-        maintenanceMarginFraction: PercentageValue.fromFloat(0.05),
+        initialMarginFraction: PercentageValue.fromFloat(10),
+        maintenanceMarginFraction: PercentageValue.fromFloat(5),
       });
 
-      expect(config.initialMarginFraction.toFloat()).toBeCloseTo(0.1, 4);
-      expect(config.maintenanceMarginFraction.toFloat()).toBeCloseTo(0.05, 4);
+      expect($decimalValue(config.initialMarginFraction).toFloat()).toBeCloseTo(10, 4);
+      expect($decimalValue(config.maintenanceMarginFraction).toFloat()).toBeCloseTo(5, 4);
     });
   });
 
@@ -45,7 +46,7 @@ describe('Market Domain', () => {
         value: OraclePrice.fromFloat(100000),
       });
 
-      expect(price.value.toFloat()).toBeCloseTo(100000, 2);
+      expect($decimalValue(price.value).toFloat()).toBeCloseTo(100000, 2);
     });
   });
 

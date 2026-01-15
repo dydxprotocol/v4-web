@@ -1,4 +1,4 @@
-import { DecimalValue, HeadlessDecimalValue } from '../../models/DecimalValue';
+import type { DecimalValueInstance } from '@/shared/models/DecimalValue';
 
 export class Formula {
   constructor(private elements: FormulaElement[] = []) {}
@@ -15,7 +15,7 @@ export class Formula {
     this.elements.push(element);
   }
 
-  calculate() {
+  calculate(): DecimalValueInstance {
     let numerator: bigint = 0n;
     let decimalExponent: bigint = 0n;
 
@@ -29,7 +29,10 @@ export class Formula {
       // These are handled by processNumerator when processing the next element
     });
 
-    return new HeadlessDecimalValue(numerator, decimalExponent);
+    return {
+      value: numerator,
+      decimals: Number(decimalExponent),
+    };
   }
 
   private processNumerator(
@@ -38,7 +41,7 @@ export class Formula {
     numerator: bigint,
     decimalExponent: bigint
   ): bigint {
-    if (!(event instanceof DecimalValue)) throw new Error('Expected DecimalValue');
+    if (!isDecimalValue(event)) throw new Error('Expected DecimalValue');
     if (idx === 0) return event.value;
 
     const operation = this.elements[idx - 1] as NumeratorOperation;
@@ -49,7 +52,7 @@ export class Formula {
     if (operation === 'mul') return a * b;
 
     const aDecimals = decimalExponent;
-    const bDecimals = event.decimals;
+    const bDecimals = BigInt(event.decimals);
     [a, b] = this.scaleOperandsToMatch(a, aDecimals, b, bDecimals);
 
     if (operation === 'add') return a + b;
@@ -58,8 +61,8 @@ export class Formula {
   }
 
   private processExponent(event: FormulaElement, idx: number, decimalExponent: bigint): bigint {
-    if (!(event instanceof DecimalValue)) throw new Error('Expected DecimalValue');
-    const iteratedExponent = event.decimals;
+    if (!isDecimalValue(event)) throw new Error('Expected DecimalValue');
+    const iteratedExponent = BigInt(event.decimals);
     if (idx === 0) return iteratedExponent;
 
     const operation = this.elements[idx - 1] as NumeratorOperation;
@@ -92,5 +95,10 @@ export class Formula {
   }
 }
 
-export type FormulaElement = bigint | 'mul' | 'div' | 'add' | 'sub' | DecimalValue;
+export type FormulaElement = bigint | 'mul' | 'div' | 'add' | 'sub' | DecimalValueInstance;
 export type NumeratorOperation = 'mul' | 'div' | 'add' | 'sub';
+
+function isDecimalValue(v: FormulaElement): v is DecimalValueInstance {
+  if (typeof v === 'object' && 'value' in v) return true;
+  return false;
+}

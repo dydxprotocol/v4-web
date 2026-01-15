@@ -17,6 +17,7 @@
     "start": "ts-node --esm -r dotenv/config src/main.ts",
     "start:e2e": "ts-node --esm -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
     "test:e2e": "vitest --mode indexer-e2e run",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ e2e/",
     "lint:fix": "eslint --fix src/ e2e/"
   },

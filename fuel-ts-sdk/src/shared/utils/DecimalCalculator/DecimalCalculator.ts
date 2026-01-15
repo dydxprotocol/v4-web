@@ -1,5 +1,5 @@
-import type { DecimalValueCtor } from '../../models/DecimalValue';
-import { DecimalValue, HeadlessDecimalValue } from '../../models/DecimalValue';
+import type { DecimalValueInstance, DecimalValueSchema } from '../../models/DecimalValue';
+import { $decimalValue, DecimalValue } from '../../models/DecimalValue';
 import { Formula } from './Formula';
 
 export class DecimalCalculator {
@@ -20,11 +20,11 @@ export class DecimalCalculator {
     return new DecimalCalculator(this.numeratorFormula.copy(), this.denominatorFormula?.copy());
   }
 
-  static first(value: DecimalValue) {
+  static first(value: DecimalValueInstance) {
     return this.initializeWithValue(value);
   }
 
-  static value(value: DecimalValue) {
+  static value(value: DecimalValueInstance) {
     return this.initializeWithValue(value);
   }
 
@@ -38,11 +38,11 @@ export class DecimalCalculator {
     return new DecimalCalculator(builtFormula.numeratorFormula);
   }
 
-  private static initializeWithValue(value: DecimalValue) {
+  private static initializeWithValue(value: DecimalValueInstance) {
     return new DecimalCalculator().populateFormula(value);
   }
 
-  value(value: DecimalValue) {
+  value(value: DecimalValueInstance) {
     if (this.currentFormula.hasElements())
       throw new Error('Cannot initialize a populated formula.');
     const calculator = this.deepCopy();
@@ -50,28 +50,28 @@ export class DecimalCalculator {
     return calculator;
   }
 
-  multiplyBy(value: DecimalValue) {
+  multiplyBy(value: DecimalValueInstance) {
     const calculator = this.deepCopy();
     calculator.currentFormula.addElement('mul');
     calculator.currentFormula.addElement(value);
     return calculator;
   }
 
-  add(value: DecimalValue) {
+  add(value: DecimalValueInstance) {
     const calculator = this.deepCopy();
     calculator.currentFormula.addElement('add');
     calculator.currentFormula.addElement(value);
     return calculator;
   }
 
-  subtractBy(value: DecimalValue) {
+  subtractBy(value: DecimalValueInstance) {
     const calculator = this.deepCopy();
     calculator.currentFormula.addElement('sub');
     calculator.currentFormula.addElement(value);
     return calculator;
   }
 
-  divideBy(value: DecimalValue) {
+  divideBy(value: DecimalValueInstance) {
     if (!this.numeratorFormula.hasElements())
       throw new Error('Denominator cannot be invoked before numerator');
     if (this.denominatorFormula) throw new Error('Illegal consecutive denominator invocation');
@@ -95,24 +95,29 @@ export class DecimalCalculator {
     return calc;
   }
 
-  calculate<T extends DecimalValue>(
-    DecimalValueConstructor: DecimalValueCtor<T> = DecimalValue as unknown as DecimalValueCtor<T>
-  ): T {
+  calculate<TDecimals extends number, TBrand extends string>(
+    decimalValueSchema: DecimalValueSchema<TDecimals, TBrand> = DecimalValue as DecimalValueSchema<
+      TDecimals,
+      TBrand
+    >
+  ): DecimalValueInstance<TDecimals, TBrand> {
     const numeratorResult = this.numeratorFormula.calculate();
-    if (!this.denominatorFormula) return numeratorResult.adjustTo(DecimalValueConstructor);
 
+    if (!this.denominatorFormula)
+      return $decimalValue(numeratorResult).adjustTo(decimalValueSchema);
     const denominatorResult = this.denominatorFormula.calculate();
 
-    const scaleFactor = 2n * denominatorResult.decimals;
+    const scaleFactor = 2n * BigInt(denominatorResult.decimals);
     const resultNumerator = (numeratorResult.value * 10n ** scaleFactor) / denominatorResult.value;
     const resultDecimals = numeratorResult.decimals + denominatorResult.decimals;
 
-    return new HeadlessDecimalValue(resultNumerator, resultDecimals).adjustTo(
-      DecimalValueConstructor
-    );
+    return $decimalValue({
+      decimals: resultDecimals,
+      value: resultNumerator,
+    }).adjustTo(decimalValueSchema);
   }
 
-  private populateFormula(value: DecimalValue) {
+  private populateFormula(value: DecimalValueInstance) {
     if (this.currentFormula.hasElements()) throw new Error('Formula has already been populated');
     const calculator = this.deepCopy();
     calculator.currentFormula.addElement(value);

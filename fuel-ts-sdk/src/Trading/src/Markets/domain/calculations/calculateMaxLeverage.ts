@@ -4,7 +4,7 @@ import type { MarketConfigEntity } from '../..';
 
 export const calculateMaxLeverage = (marketConfig: MarketConfigEntity): RatioOutput => {
   const imfDecimal = marketConfig.initialMarginFraction;
-  if (imfDecimal.toBigInt() === 0n) {
+  if (imfDecimal.value === 0n) {
     return zero(RatioOutput);
   }
 

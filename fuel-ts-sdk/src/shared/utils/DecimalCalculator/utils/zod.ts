@@ -1,8 +1,10 @@
 import { z } from 'zod';
-import type { DecimalValue } from '../../../models/DecimalValue';
+import type { DecimalValueInstance, DecimalValueSchema } from '@/shared/models/DecimalValue';
 
-export function decimalValueSchema<T extends DecimalValue>(
-  DecimalValueCtor: new (value: bigint) => T
+export function decimalValueSchema<TDecimals extends number, TBrand extends string>(
+  schema: DecimalValueSchema<TDecimals, TBrand>
 ) {
-  return z.bigint().transform((val) => new DecimalValueCtor(val));
+  return z
+    .bigint()
+    .transform((val): DecimalValueInstance<TDecimals, TBrand> => schema.fromBigInt(val));
 }

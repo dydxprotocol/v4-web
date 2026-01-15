@@ -1,26 +1,17 @@
-import { DecimalValue } from '@/shared/models/DecimalValue';
+import type { InferDecimalValueType } from '@/shared/models/DecimalValue';
+import { createDecimalValueSchema } from '@/shared/models/DecimalValue';
 
-export class PositionSize extends DecimalValue {
-  declare __brand: typeof PositionSize;
-  static decimals = 6n as const;
-}
+export const PositionSize = createDecimalValueSchema(6, 'PositionSize');
+export type PositionSize = InferDecimalValueType<typeof PositionSize>;
 
-export class PositionFee extends DecimalValue {
-  declare __brand: typeof PositionFee;
-  static decimals = 9n as const;
-}
+export const PositionFee = createDecimalValueSchema(9, 'PositionFee');
+export type PositionFee = InferDecimalValueType<typeof PositionFee>;
 
-export class FundingRate extends DecimalValue {
-  declare __brand: typeof FundingRate;
-  static decimals = 9n as const;
-}
+export const FundingRate = createDecimalValueSchema(9, 'FundingRate');
+export type FundingRate = InferDecimalValueType<typeof FundingRate>;
 
-export class PnlDelta extends DecimalValue {
-  declare __brand: typeof PnlDelta;
-  static decimals = 9n as const;
-}
+export const PnlDelta = createDecimalValueSchema(9, 'PnlDelta');
+export type PnlDelta = InferDecimalValueType<typeof PnlDelta>;
 
-export class RealizedPnl extends DecimalValue {
-  declare __brand: typeof RealizedPnl;
-  static decimals = 9n as const;
-}
+export const RealizedPnl = createDecimalValueSchema(9, 'RealizedPnl');
+export type RealizedPnl = InferDecimalValueType<typeof RealizedPnl>;

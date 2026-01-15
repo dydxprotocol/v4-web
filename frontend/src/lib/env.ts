@@ -1,4 +1,4 @@
-import { NETWORKS, type Network, type NetworkConfig } from '@/models/network';
+import { NETWORKS, type Network, type NetworkConfig } from '@/models/Network';
 
 export function getEnv<K extends keyof ImportMetaEnv>(key: K): ImportMetaEnv[K] {
   const value = import.meta.env[key];

@@ -1,16 +1,18 @@
+import type { AssetPriceEntity, Candle, MarketConfigEntity } from '@/Trading/src/Markets/domain';
 import { OraclePrice, PercentageValue } from '@/shared/models/decimals';
 import { assetId, assetPriceId, candleId, marketConfigId } from '@/shared/types';
-import type { AssetPriceEntity, Candle, MarketConfig } from '@/trading/src/markets/domain';
 
 /**
  * Create a test market config
  */
-export function createTestMarketConfig(overrides: Partial<MarketConfig> = {}): MarketConfig {
-  const base: MarketConfig = {
+export function createTestMarketConfig(
+  overrides: Partial<MarketConfigEntity> = {}
+): MarketConfigEntity {
+  const base: MarketConfigEntity = {
     id: marketConfigId('test-market-1'),
     asset: assetId('0xbtc'),
-    initialMarginFraction: PercentageValue.fromFloat(0.05),
-    maintenanceMarginFraction: PercentageValue.fromFloat(0.025),
+    initialMarginFraction: PercentageValue.fromFloat(5),
+    maintenanceMarginFraction: PercentageValue.fromFloat(3),
     tickSizeDecimals: 2,
     stepSizeDecimals: 3,
   };

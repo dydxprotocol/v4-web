@@ -18,6 +18,7 @@
     "build:indexer": "pnpm --filter indexer run build",
     "build:contracts": "pnpm --filter contracts run build",
     "test": "pnpm --filter fuel-ts-sdk run test && pnpm --filter frontend run test && pnpm --filter contracts run test",
+    "typecheck": "pnpm -r --parallel run typecheck",
     "lint": "eslint . && pnpm --filter frontend lint && pnpm --filter fuel-ts-sdk lint && pnpm --filter contracts lint && pnpm --filter indexer lint",
     "lint:fix": "eslint . --fix && pnpm --filter frontend lint:fix && pnpm --filter fuel-ts-sdk lint:fix && pnpm --filter contracts lint:fix && pnpm --filter indexer lint:fix",
     "format": "prettier --write .",

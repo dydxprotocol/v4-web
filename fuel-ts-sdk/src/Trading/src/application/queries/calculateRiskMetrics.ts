@@ -21,11 +21,8 @@ export const createCalculateRiskMetrics = (
   notional: UsdValue,
   equity: UsdValue
 ): RiskMetricsEntity => {
-  const initialMargin = calculateInitialMargin(marketConfig.initialMarginFraction, notional);
-  const maintenanceMargin = calculateMaintenanceMargin(
-    notional,
-    marketConfig.maintenanceMarginFraction
-  );
+  const initialMargin = calculateInitialMargin(marketConfig, notional);
+  const maintenanceMargin = calculateMaintenanceMargin(marketConfig, notional);
   const maxLeverage = calculateMaxLeverage(marketConfig);
   const positionHealth = calculatePositionHealth(equity, maintenanceMargin);
 

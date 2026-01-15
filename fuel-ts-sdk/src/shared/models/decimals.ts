@@ -1,42 +1,32 @@
-import { DecimalValue } from './DecimalValue';
+import type { InferDecimalValueType } from './DecimalValue';
+import { createDecimalValueSchema } from './DecimalValue';
 
-export class OraclePrice extends DecimalValue {
-  declare __brand: typeof OraclePrice;
-  static decimals = 18n as const;
-}
-export class UsdValue extends DecimalValue {
-  declare __brand: typeof UsdValue;
-  static decimals = 9n as const;
-}
-export class PercentageMultiplier extends DecimalValue {
-  declare __brand: typeof PercentageMultiplier;
-  static decimals = 0n as const;
-}
-export class PercentageValue extends DecimalValue {
-  declare __brand: typeof PercentageValue;
-  static decimals = 18n as const;
-}
-export class RatioOutput extends DecimalValue {
-  declare __brand: typeof RatioOutput;
-  static decimals = 18n as const;
-}
-export class CollateralAmount extends DecimalValue {
-  declare __brand: typeof CollateralAmount;
-  static decimals = 6n as const;
-}
-export class Usdc extends DecimalValue {
-  declare __brand: typeof Usdc;
-  static decimals = 18n as const;
-}
-export class Btc extends DecimalValue {
-  declare __brand: typeof Btc;
-  static decimals = 18n as const;
-}
-export class Bnb extends DecimalValue {
-  declare __brand: typeof Bnb;
-  static decimals = 18n as const;
-}
-export class Eth extends DecimalValue {
-  declare __brand: typeof Eth;
-  static decimals = 18n as const;
-}
+export const OraclePrice = createDecimalValueSchema(18, 'OraclePrice');
+export type OraclePrice = InferDecimalValueType<typeof OraclePrice>;
+
+export const UsdValue = createDecimalValueSchema(9, 'UsdValue');
+export type UsdValue = InferDecimalValueType<typeof UsdValue>;
+
+export const PercentageMultiplier = createDecimalValueSchema(0, 'PercentageMultiplier');
+export type PercentageMultiplier = InferDecimalValueType<typeof PercentageMultiplier>;
+
+export const PercentageValue = createDecimalValueSchema(0, 'PercentageValue');
+export type PercentageValue = InferDecimalValueType<typeof PercentageValue>;
+
+export const RatioOutput = createDecimalValueSchema(18, 'RatioOutput');
+export type RatioOutput = InferDecimalValueType<typeof RatioOutput>;
+
+export const CollateralAmount = createDecimalValueSchema(6, 'CollateralAmount');
+export type CollateralAmount = InferDecimalValueType<typeof CollateralAmount>;
+
+export const Usdc = createDecimalValueSchema(18, 'Usdc');
+export type Usdc = InferDecimalValueType<typeof Usdc>;
+
+export const Btc = createDecimalValueSchema(18, 'Btc');
+export type Btc = InferDecimalValueType<typeof Btc>;
+
+export const Bnb = createDecimalValueSchema(18, 'Bnb');
+export type Bnb = InferDecimalValueType<typeof Bnb>;
+
+export const Eth = createDecimalValueSchema(18, 'Eth');
+export type Eth = InferDecimalValueType<typeof Eth>;

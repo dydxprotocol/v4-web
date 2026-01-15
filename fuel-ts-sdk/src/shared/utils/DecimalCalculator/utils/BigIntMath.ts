@@ -1,9 +1,8 @@
-import type { DecimalValue } from '../../../models/DecimalValue';
-import { HeadlessDecimalValue } from '../../../models/DecimalValue';
+import type { DecimalValueInstance } from '@/shared/models/DecimalValue';
 
 export const BigIntMath = {
-  abs<T extends DecimalValue>(decimalValue: T): DecimalValue {
-    const absValue = decimalValue.value >= 0n ? decimalValue.value : -decimalValue.value;
-    return new HeadlessDecimalValue(absValue, decimalValue.decimals);
+  abs<T extends DecimalValueInstance>(dv: T): T {
+    const absValue = dv.value >= 0n ? dv.value : -dv.value;
+    return { ...dv, value: absValue };
   },
 };
