@@ -55,7 +55,6 @@ export const chartSection = style({
   flexDirection: 'column',
   backgroundColor: colors.gluonGrey,
   borderRadius: '0.5rem',
-  padding: '1rem',
   overflow: 'hidden',
   position: 'relative',
   '@media': {

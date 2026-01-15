@@ -15,12 +15,78 @@ export interface TradingChartProps {
   candlesGetter: (interval: CandleInterval) => Promise<Candle[]>;
 }
 
+function createTradingViewCustomCssUrl(): string {
+  // Keep the existing TradingView theme file intact, but layer our Starboard overrides after it.
+  // This avoids editing any CSS files and avoids runtime DOM injection into the iframe.
+  const css = `
+@import url("/tradingview/custom-styles.css");
+
+/* Starboard: match dashboard panel grey for the Object Tree panel container. */
+.wrap-ukH4sVzT,
+.wrap-ukH4sVzT .space-ukH4sVzT,
+.wrap-ukH4sVzT .tree-ukH4sVzT {
+  background-color: ${colors.gluonGrey} !important;
+}
+
+/* Starboard: remove blue selection highlight in the Object Tree list. */
+.wrap-IEe5qpW4,
+html.theme-dark .wrap-IEe5qpW4 {
+  background-color: ${colors.gluonGrey} !important;
+}
+
+@media (any-hover:hover) {
+  .wrap-IEe5qpW4:hover,
+  html.theme-dark .wrap-IEe5qpW4:hover {
+    background-color: ${colors.slateGrey} !important;
+  }
+}
+
+.wrap-IEe5qpW4.selected-IEe5qpW4,
+html.theme-dark .wrap-IEe5qpW4.selected-IEe5qpW4,
+.wrap-IEe5qpW4.childOfSelected-IEe5qpW4,
+html.theme-dark .wrap-IEe5qpW4.childOfSelected-IEe5qpW4 {
+  background-color: ${colors.slateGrey} !important;
+}
+
+@media (any-hover:hover) {
+  .wrap-IEe5qpW4.selected-IEe5qpW4:hover,
+  html.theme-dark .wrap-IEe5qpW4.selected-IEe5qpW4:hover,
+  .wrap-IEe5qpW4.childOfSelected-IEe5qpW4:hover,
+  html.theme-dark .wrap-IEe5qpW4.childOfSelected-IEe5qpW4:hover {
+    background-color: ${colors.slateGrey} !important;
+  }
+}
+
+/* Starboard: use Liquid Lava as TradingView active accent (fixes blue active widgetbar icon). */
+:root, html, body {
+  --color-accent: ${colors.liquidLava} !important;
+
+  /* Starboard: remove the subtle bluish frame/padding around the chart (use gluonGrey). */
+  --tv-color-platform-background: ${colors.gluonGrey} !important;
+  --tv-color-pane-background: ${colors.gluonGrey} !important;
+
+  --tv-color-toolbar-button-background-active: ${colors.liquidLava} !important;
+  --tv-color-toolbar-button-background-active-hover: ${colors.liquidLava} !important;
+  --tv-color-toolbar-button-text-active: ${colors.snow} !important;
+  --tv-color-toolbar-button-text-active-hover: ${colors.snow} !important;
+
+  --tv-color-popup-element-background-active: ${colors.liquidLava} !important;
+  --tv-color-popup-element-toolbox-background-active-hover: ${colors.liquidLava} !important;
+  --tv-color-item-active-text: ${colors.snow} !important;
+}
+`;
+
+  return URL.createObjectURL(new Blob([css], { type: 'text/css' }));
+}
+
 export function TradingChart({ symbol, candlesGetter }: TradingChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<IChartingLibraryWidget | null>(null);
+  const customCssUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (!customCssUrlRef.current) customCssUrlRef.current = createTradingViewCustomCssUrl();
 
     const lavaOverrides: ChartingLibraryWidgetOptions['overrides'] = {
       // Canvas / pane background
@@ -52,7 +118,7 @@ export function TradingChart({ symbol, candlesGetter }: TradingChartProps) {
       // Global TradingView theming (toolbars, side panels, dialogs, etc.)
       // This is loaded by TradingView (typically inside its chart iframe), and is the most reliable way
       // to eliminate default blue accents.
-      custom_css_url: '/tradingview/custom-styles.css',
+      custom_css_url: customCssUrlRef.current,
       loading_screen: {
         backgroundColor: colors.darkVoid,
         foregroundColor: colors.liquidLava,
@@ -62,7 +128,7 @@ export function TradingChart({ symbol, candlesGetter }: TradingChartProps) {
         'trading_account_manager' as ChartingLibraryFeatureset,
         'use_localstorage_for_settings' as ChartingLibraryFeatureset,
       ],
-      enabled_features: [],
+      enabled_features: ['iframe_loading_same_origin' as ChartingLibraryFeatureset],
       load_last_chart: false,
       theme: 'Dark',
       fullscreen: false,
@@ -85,6 +151,10 @@ export function TradingChart({ symbol, candlesGetter }: TradingChartProps) {
       if (widgetRef.current) {
         widgetRef.current.remove();
         widgetRef.current = null;
+      }
+      if (customCssUrlRef.current) {
+        URL.revokeObjectURL(customCssUrlRef.current);
+        customCssUrlRef.current = null;
       }
     };
   }, [candlesGetter, symbol]);
