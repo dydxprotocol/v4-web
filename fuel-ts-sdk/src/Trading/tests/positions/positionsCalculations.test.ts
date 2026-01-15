@@ -1,6 +1,4 @@
-import { describe, expect, it } from 'vitest';
 import { PositionChange, PositionSide, PositionStatus } from '@sdk/Trading/src/Positions/domain';
-import { PositionSize } from '@sdk/Trading/src/Positions/domain/positionsDecimals';
 import {
   calculateEntryPrice,
   filterClosedPositions,
@@ -10,7 +8,9 @@ import {
   isPositionClosed,
   isPositionOpen,
 } from '@sdk/Trading/src/Positions/domain';
+import { PositionSize } from '@sdk/Trading/src/Positions/domain/positionsDecimals';
 import { positionRevisionId } from '@sdk/shared/types';
+import { describe, expect, it } from 'vitest';
 import {
   createClosedPosition,
   createOpenLongPosition,

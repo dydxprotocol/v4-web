@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import type { PositionEntity } from '@sdk/Trading/src/Positions/domain';
 import { getPositionsByAccount } from '@sdk/Trading/src/Positions/infrastructure/repositories/GraphqlPositionsRepository/getPositionsByAccount';
 import { createMockGraphQLClient } from '@sdk/shared/test-helpers';
 import { address, positionRevisionId } from '@sdk/shared/types';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createTestPosition } from '../test-fixtures/positions';
 
 describe('GraphQLPositionsRepository', () => {

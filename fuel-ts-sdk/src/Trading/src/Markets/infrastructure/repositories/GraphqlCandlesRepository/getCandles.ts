@@ -1,4 +1,3 @@
-import type { GraphQLClient } from 'graphql-request';
 import type {
   CandleD1,
   CandleH1,
@@ -9,6 +8,7 @@ import type {
   CandleM30,
 } from '@sdk/generated/graphql';
 import { assetId, candleId } from '@sdk/shared/types';
+import type { GraphQLClient } from 'graphql-request';
 import type { CandleInterval, GetCandlesOptions } from '../../../domain';
 import { type Candle, CandleEntitySchema } from '../../../domain';
 import {

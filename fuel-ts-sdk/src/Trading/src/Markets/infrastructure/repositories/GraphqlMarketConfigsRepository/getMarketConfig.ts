@@ -1,6 +1,6 @@
-import type { GraphQLClient } from 'graphql-request';
 import { PercentageValue } from '@sdk/shared/models/decimals';
 import { type AssetId, marketConfigId } from '@sdk/shared/types';
+import type { GraphQLClient } from 'graphql-request';
 import { type MarketConfigEntity, MarketConfigEntitySchema } from '../../../domain';
 import { GET_MARKET_CONFIG_QUERY } from './getMarketConfig.gql';
 

@@ -1,5 +1,5 @@
-import { GraphQLClient } from 'graphql-request';
 import { createTradingModule } from '@sdk/Trading/di';
+import { GraphQLClient } from 'graphql-request';
 import { createStoreService } from './shared/lib/StoreService';
 import type { RootState } from './shared/lib/redux';
 import { createStore } from './shared/lib/redux';

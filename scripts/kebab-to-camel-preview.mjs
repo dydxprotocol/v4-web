@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -46,7 +45,8 @@ function isReactComponent(filePath) {
     // Check for common React component patterns
     const hasExportDefault = /export\s+default\s+/.test(content);
     const hasExportFunction = /export\s+(function|const)\s+[A-Z]/.test(content);
-    const hasJSX = /<[A-Z]/.test(content) || /<>/.test(content) || /React\.createElement/.test(content);
+    const hasJSX =
+      /<[A-Z]/.test(content) || /<>/.test(content) || /React\.createElement/.test(content);
 
     return (hasExportDefault || hasExportFunction) && hasJSX;
   } catch (error) {
@@ -210,7 +210,9 @@ function main() {
     console.log('');
   }
 
-  console.log(`\nTotal: ${components.length} components, ${files.length} files, ${dirs.length} directories`);
+  console.log(
+    `\nTotal: ${components.length} components, ${files.length} files, ${dirs.length} directories`
+  );
   console.log('\nTo apply these changes, run: node scripts/kebab-to-camel.mjs');
 }
 

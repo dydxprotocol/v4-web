@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -49,7 +48,8 @@ function isReactComponent(filePath) {
     // Check for common React component patterns
     const hasExportDefault = /export\s+default\s+/.test(content);
     const hasExportFunction = /export\s+(function|const)\s+[A-Z]/.test(content);
-    const hasJSX = /<[A-Z]/.test(content) || /<>/.test(content) || /React\.createElement/.test(content);
+    const hasJSX =
+      /<[A-Z]/.test(content) || /<>/.test(content) || /React\.createElement/.test(content);
 
     return (hasExportDefault || hasExportFunction) && hasJSX;
   } catch (error) {
@@ -177,104 +177,43 @@ function updateImportsInFile(filePath, renameMap) {
   // Match import/export statements
   const importRegex = /(import|export)([^'"]*from\s+['"])([^'"]+)(['"])/g;
 
-  newContent = newContent.replace(importRegex, (match, keyword, beforePath, importPath, afterPath) => {
-    // Resolve the import path relative to the current file
-    let resolvedPath;
+  newContent = newContent.replace(
+    importRegex,
+    (match, keyword, beforePath, importPath, afterPath) => {
+      // Resolve the import path relative to the current file
+      let resolvedPath;
 
-    if (importPath.startsWith('.')) {
-      // Relative import
-      const fileDir = path.dirname(filePath);
-      resolvedPath = path.resolve(fileDir, importPath);
-    } else {
-      // Absolute or package import - skip
-      return match;
-    }
-
-    // Check if this path (or any parent) has been renamed
-    let newImportPath = importPath;
-    let changed = false;
-
-    // Try to resolve with various extensions
-    const possibleExts = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
-
-    for (const ext of possibleExts) {
-      const testPath = resolvedPath + ext;
-
-      // Check if this exact file was renamed
-      if (renameMap.has(testPath)) {
-        const newResolvedPath = renameMap.get(testPath);
+      if (importPath.startsWith('.')) {
+        // Relative import
         const fileDir = path.dirname(filePath);
-        let relative = path.relative(fileDir, newResolvedPath);
-
-        // Ensure relative paths start with ./ or ../
-        if (!relative.startsWith('.')) {
-          relative = './' + relative;
-        }
-
-        // Remove extension if original import didn't have one
-        if (!path.extname(importPath)) {
-          relative = relative.replace(/\.(tsx?|jsx?|[cm]js)$/, '');
-        }
-
-        newImportPath = relative;
-        changed = true;
-        break;
+        resolvedPath = path.resolve(fileDir, importPath);
+      } else {
+        // Absolute or package import - skip
+        return match;
       }
 
-      // Check if it's a directory import (index file)
-      const indexPath = path.join(testPath, 'index' + ext);
-      if (renameMap.has(indexPath) || renameMap.has(testPath)) {
-        // Check if any parent directory in the path was renamed
-        let currentPath = testPath;
-        let newPath = testPath;
+      // Check if this path (or any parent) has been renamed
+      let newImportPath = importPath;
+      let changed = false;
 
-        while (currentPath !== path.dirname(currentPath)) {
-          if (renameMap.has(currentPath)) {
-            newPath = newPath.replace(currentPath, renameMap.get(currentPath));
-            changed = true;
-          }
-          currentPath = path.dirname(currentPath);
-        }
+      // Try to resolve with various extensions
+      const possibleExts = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
 
-        if (changed) {
+      for (const ext of possibleExts) {
+        const testPath = resolvedPath + ext;
+
+        // Check if this exact file was renamed
+        if (renameMap.has(testPath)) {
+          const newResolvedPath = renameMap.get(testPath);
           const fileDir = path.dirname(filePath);
-          let relative = path.relative(fileDir, newPath);
+          let relative = path.relative(fileDir, newResolvedPath);
 
+          // Ensure relative paths start with ./ or ../
           if (!relative.startsWith('.')) {
             relative = './' + relative;
           }
 
-          if (!path.extname(importPath)) {
-            relative = relative.replace(/\.(tsx?|jsx?|[cm]js)$/, '');
-          }
-
-          newImportPath = relative;
-          break;
-        }
-      }
-    }
-
-    // Also check if any parent directory in the import path was renamed
-    if (!changed) {
-      const fileDir = path.dirname(filePath);
-      let testResolvedPath = resolvedPath;
-
-      while (testResolvedPath !== path.dirname(testResolvedPath)) {
-        if (renameMap.has(testResolvedPath)) {
-          // A parent directory was renamed
-          const oldDirPart = testResolvedPath;
-          const newDirPart = renameMap.get(testResolvedPath);
-
-          // Replace the old directory with the new one in the full resolved path
-          const fullOldPath = resolvedPath;
-          const fullNewPath = fullOldPath.replace(oldDirPart, newDirPart);
-
-          let relative = path.relative(fileDir, fullNewPath);
-
-          if (!relative.startsWith('.')) {
-            relative = './' + relative;
-          }
-
+          // Remove extension if original import didn't have one
           if (!path.extname(importPath)) {
             relative = relative.replace(/\.(tsx?|jsx?|[cm]js)$/, '');
           }
@@ -283,17 +222,81 @@ function updateImportsInFile(filePath, renameMap) {
           changed = true;
           break;
         }
-        testResolvedPath = path.dirname(testResolvedPath);
+
+        // Check if it's a directory import (index file)
+        const indexPath = path.join(testPath, 'index' + ext);
+        if (renameMap.has(indexPath) || renameMap.has(testPath)) {
+          // Check if any parent directory in the path was renamed
+          let currentPath = testPath;
+          let newPath = testPath;
+
+          while (currentPath !== path.dirname(currentPath)) {
+            if (renameMap.has(currentPath)) {
+              newPath = newPath.replace(currentPath, renameMap.get(currentPath));
+              changed = true;
+            }
+            currentPath = path.dirname(currentPath);
+          }
+
+          if (changed) {
+            const fileDir = path.dirname(filePath);
+            let relative = path.relative(fileDir, newPath);
+
+            if (!relative.startsWith('.')) {
+              relative = './' + relative;
+            }
+
+            if (!path.extname(importPath)) {
+              relative = relative.replace(/\.(tsx?|jsx?|[cm]js)$/, '');
+            }
+
+            newImportPath = relative;
+            break;
+          }
+        }
       }
-    }
 
-    if (changed) {
-      modified = true;
-      return `${keyword}${beforePath}${newImportPath}${afterPath}`;
-    }
+      // Also check if any parent directory in the import path was renamed
+      if (!changed) {
+        const fileDir = path.dirname(filePath);
+        let testResolvedPath = resolvedPath;
 
-    return match;
-  });
+        while (testResolvedPath !== path.dirname(testResolvedPath)) {
+          if (renameMap.has(testResolvedPath)) {
+            // A parent directory was renamed
+            const oldDirPart = testResolvedPath;
+            const newDirPart = renameMap.get(testResolvedPath);
+
+            // Replace the old directory with the new one in the full resolved path
+            const fullOldPath = resolvedPath;
+            const fullNewPath = fullOldPath.replace(oldDirPart, newDirPart);
+
+            let relative = path.relative(fileDir, fullNewPath);
+
+            if (!relative.startsWith('.')) {
+              relative = './' + relative;
+            }
+
+            if (!path.extname(importPath)) {
+              relative = relative.replace(/\.(tsx?|jsx?|[cm]js)$/, '');
+            }
+
+            newImportPath = relative;
+            changed = true;
+            break;
+          }
+          testResolvedPath = path.dirname(testResolvedPath);
+        }
+      }
+
+      if (changed) {
+        modified = true;
+        return `${keyword}${beforePath}${newImportPath}${afterPath}`;
+      }
+
+      return match;
+    }
+  );
 
   if (modified) {
     fs.writeFileSync(filePath, newContent, 'utf8');

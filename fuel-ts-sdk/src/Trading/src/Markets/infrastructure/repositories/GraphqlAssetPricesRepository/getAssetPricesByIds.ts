@@ -1,7 +1,7 @@
-import type { GraphQLClient } from 'graphql-request';
 import { OraclePrice } from '@sdk/shared/models/decimals';
 import type { AssetId } from '@sdk/shared/types';
 import { assetId, assetPriceId } from '@sdk/shared/types';
+import type { GraphQLClient } from 'graphql-request';
 import type { AssetPriceEntity } from '../../../domain';
 import { AssetPriceEntitySchema } from '../../../domain';
 import { GET_ASSET_PRICES_BY_IDS_QUERY } from './getAssetPricesByIds.gql';

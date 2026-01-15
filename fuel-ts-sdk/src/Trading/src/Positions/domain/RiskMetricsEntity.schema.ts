@@ -1,6 +1,6 @@
-import { z } from 'zod';
 import { PercentageValue, RatioOutput, UsdValue } from '@sdk/shared/models/decimals';
 import { decimalValueSchema } from '@sdk/shared/utils/DecimalCalculator';
+import { z } from 'zod';
 
 export const RiskMetricsEntitySchema = z.object({
   initialMargin: decimalValueSchema(UsdValue),

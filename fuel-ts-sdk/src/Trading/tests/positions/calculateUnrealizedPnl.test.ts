@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { calculateUnrealizedPnl } from '@sdk/Trading/src/Positions/domain/calculations/calculateUnrealizedPnL';
 import { PositionSize } from '@sdk/Trading/src/Positions/domain/positionsDecimals';
 import { $decimalValue } from '@sdk/shared/models/DecimalValue';
 import { CollateralAmount, OraclePrice } from '@sdk/shared/models/decimals';
+import { describe, expect, it } from 'vitest';
 import { createOpenLongPosition, createOpenShortPosition } from '../test-fixtures/positions';
 
 describe('calculateUnrealizedPnl', () => {

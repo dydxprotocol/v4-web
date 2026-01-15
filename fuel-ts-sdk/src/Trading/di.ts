@@ -1,6 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import type { GraphQLClient } from 'graphql-request';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
+import type { GraphQLClient } from 'graphql-request';
 import * as Markets from './src/Markets';
 import * as Positions from './src/Positions';
 import * as ApplicationServices from './src/application';

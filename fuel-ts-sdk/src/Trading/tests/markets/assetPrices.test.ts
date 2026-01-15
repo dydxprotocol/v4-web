@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
 import { $decimalValue } from '@sdk/shared/models/DecimalValue';
 import { OraclePrice } from '@sdk/shared/models/decimals';
 import { assetId } from '@sdk/shared/types';
+import { describe, expect, it } from 'vitest';
 import { createTestAssetPrice } from '../test-fixtures/markets';
 
 describe('Asset Prices', () => {
@@ -73,7 +73,9 @@ describe('Asset Prices', () => {
       );
 
       expect(prices).toHaveLength(4);
-      expect($decimalValue(prices[3].value).toFloat()).toBeGreaterThan($decimalValue(prices[0].value).toFloat());
+      expect($decimalValue(prices[3].value).toFloat()).toBeGreaterThan(
+        $decimalValue(prices[0].value).toFloat()
+      );
     });
   });
 

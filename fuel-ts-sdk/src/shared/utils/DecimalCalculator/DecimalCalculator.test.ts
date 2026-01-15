@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
 import { $decimalValue } from '@sdk/shared/models/DecimalValue';
 import { CollateralAmount, UsdValue } from '@sdk/shared/models/decimals';
+import { describe, expect, it } from 'vitest';
 import { DecimalCalculator } from './DecimalCalculator';
 
 describe('DecimalCalculator', () => {
