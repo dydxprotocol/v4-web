@@ -4,6 +4,10 @@ import type { PositionEntity } from '../../../domain';
 import { PositionSchema } from '../../../domain';
 
 export function toDomainPosition(gql: GraphQLPosition): PositionEntity {
+  // Calculate positionFee as sum of liquidity fee, protocol fee, and liquidation fee
+  const positionFee =
+    BigInt(gql.outLiquidityFee) + BigInt(gql.outProtocolFee) + BigInt(gql.outLiquidationFee);
+
   return PositionSchema.parse({
     revisionId: positionRevisionId(gql.id),
     positionKey: {
@@ -12,13 +16,13 @@ export function toDomainPosition(gql: GraphQLPosition): PositionEntity {
       indexAssetId: assetId(gql.positionKey.indexAssetId),
       isLong: gql.positionKey.isLong,
     },
-    collateralAmount: BigInt(gql.collateralAmount),
+    collateralAmount: BigInt(gql.collateral),
     size: BigInt(gql.size),
     timestamp: gql.timestamp,
     latest: gql.latest,
     change: gql.change,
-    collateralTransferred: BigInt(gql.collateralTransferred),
-    positionFee: BigInt(gql.positionFee),
+    collateralTransferred: BigInt(gql.collateralDelta),
+    positionFee: positionFee,
     fundingRate: BigInt(gql.fundingRate),
     pnlDelta: BigInt(gql.pnlDelta),
     realizedFundingRate: BigInt(gql.realizedFundingRate),
