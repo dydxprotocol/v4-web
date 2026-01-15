@@ -141,7 +141,10 @@ describe('DecimalValue', () => {
       // Due to floating point precision, we can't expect exact match
       // Just verify it's approximately correct
       const expected = BigInt(Number.MAX_SAFE_INTEGER) * 1000000000n; // 9 decimals
-      const diff = maxSafe.value > expected ? maxSafe.value - expected : expected - maxSafe.value;
+      const diff =
+        BigInt(maxSafe.value) > expected
+          ? BigInt(maxSafe.value) - expected
+          : expected - BigInt(maxSafe.value);
 
       // Allow up to 0.1% difference due to floating point precision
       expect(diff).toBeLessThan(expected / 1000n);

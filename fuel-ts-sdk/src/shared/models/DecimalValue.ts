@@ -2,7 +2,7 @@ export interface DecimalValueInstance<
   TDecimals extends number = number,
   TBrand extends string = string,
 > {
-  value: bigint;
+  value: string;
   decimals: TDecimals;
   readonly __brand?: TBrand;
 }
@@ -15,6 +15,7 @@ export interface DecimalValueSchema<TDecimals extends number, TBrand extends str
 
   fromFloat(floatValue: number): DecimalValueInstance<TDecimals, TBrand>;
   fromBigInt(value: bigint): DecimalValueInstance<TDecimals, TBrand>;
+  fromBigIntString(value: string): DecimalValueInstance<TDecimals, TBrand>;
   fromDecimalString(str: string): DecimalValueInstance<TDecimals, TBrand>;
 }
 
@@ -30,9 +31,9 @@ export function createDecimalValueSchema<
   decimals: TDecimals,
   brand: TBrand = 'unbranded' as TBrand
 ): DecimalValueSchema<TDecimals, TBrand> {
-  function createInstance(value: bigint): DecimalValueInstance<TDecimals, TBrand> {
+  function createInstance(value: bigint | string): DecimalValueInstance<TDecimals, TBrand> {
     return {
-      value,
+      value: String(value),
       decimals,
     };
   }
@@ -40,6 +41,10 @@ export function createDecimalValueSchema<
   return {
     decimals,
     __brand: brand,
+
+    fromBigIntString(value: string): DecimalValueInstance<TDecimals, TBrand> {
+      return createInstance(value);
+    },
 
     fromBigInt(value: bigint): DecimalValueInstance<TDecimals, TBrand> {
       return createInstance(value);
@@ -69,14 +74,14 @@ export function $decimalValue<T extends DecimalValueInstance<number, string>>(dv
       const adjustment = BigInt(dv.decimals - targetDecimals);
 
       if (adjustment === 0n) {
-        return schema.fromBigInt(dv.value);
+        return schema.fromBigInt(BigInt(dv.value));
       }
 
       let newValue: bigint;
       if (adjustment > 0n) {
-        newValue = dv.value / 10n ** adjustment;
+        newValue = BigInt(dv.value) / 10n ** adjustment;
       } else {
-        newValue = dv.value * 10n ** -adjustment;
+        newValue = BigInt(dv.value) * 10n ** -adjustment;
       }
 
       return schema.fromBigInt(newValue);
@@ -93,7 +98,7 @@ export function $decimalValue<T extends DecimalValueInstance<number, string>>(dv
     },
 
     toBigInt(): bigint {
-      return dv.value;
+      return BigInt(dv.value);
     },
   };
 }

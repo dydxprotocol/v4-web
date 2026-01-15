@@ -108,12 +108,13 @@ export class DecimalCalculator {
     const denominatorResult = this.denominatorFormula.calculate();
 
     const scaleFactor = 2n * BigInt(denominatorResult.decimals);
-    const resultNumerator = (numeratorResult.value * 10n ** scaleFactor) / denominatorResult.value;
+    const resultNumerator =
+      (BigInt(numeratorResult.value) * 10n ** scaleFactor) / BigInt(denominatorResult.value);
     const resultDecimals = numeratorResult.decimals + denominatorResult.decimals;
 
     return $decimalValue({
       decimals: resultDecimals,
-      value: resultNumerator,
+      value: resultNumerator.toString(),
     }).adjustTo(decimalValueSchema);
   }
 

@@ -49,7 +49,7 @@ export const createStore = (extraArgument: StoreThunkExtraArgument) => {
         thunk: {
           extraArgument,
         },
-        serializableCheck: false,
+        // serializableCheck: false,
       })
         .concat(marketsMiddleware)
         .concat(positionsMiddleware),

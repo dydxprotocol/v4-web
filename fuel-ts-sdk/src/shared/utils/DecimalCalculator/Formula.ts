@@ -30,7 +30,7 @@ export class Formula {
     });
 
     return {
-      value: numerator,
+      value: numerator.toString(),
       decimals: Number(decimalExponent),
     };
   }
@@ -42,11 +42,11 @@ export class Formula {
     decimalExponent: bigint
   ): bigint {
     if (!isDecimalValue(event)) throw new Error('Expected DecimalValue');
-    if (idx === 0) return event.value;
+    if (idx === 0) return BigInt(event.value);
 
     const operation = this.elements[idx - 1] as NumeratorOperation;
     let a = numerator;
-    let b = event.value;
+    let b = BigInt(event.value);
 
     if (operation === 'div') return a / b;
     if (operation === 'mul') return a * b;
