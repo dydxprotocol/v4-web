@@ -322,11 +322,11 @@ describe("Vault.liquidity", () => {
             )
 
             // Get balances after the transaction
-            const totalLiquidityafter = (await vault.functions.get_total_liquidity().get()).value
+            const totalLiquidityAfter = (await vault.functions.get_total_liquidity().get()).value
             const usdcBalanceAfter = await user1.getBalance(USDC_ASSET_ID)
             const lpBalanceAfter = await user1.getBalance(LP_ASSET_ID)
 
-            expect(totalLiquidityafter.toNumber()).eq(totalLiquidityBefore.toNumber() + expectedLiquidityAmount.toNumber())
+            expect(totalLiquidityAfter.toNumber()).eq(totalLiquidityBefore.toNumber() + expectedLiquidityAmount.toNumber())
 
             // Verify USDC balance decreased by base_asset_amount
             expect(usdcBalanceBefore.toNumber() - usdcBalanceAfter.toNumber()).eq(Number(baseAssetAmount))
@@ -593,8 +593,8 @@ describe("Vault.liquidity", () => {
             const usdcBalanceAfter = await user1.getBalance(USDC_ASSET_ID)
             const lpBalanceAfter = await user1.getBalance(LP_ASSET_ID)
 
-            const totalLiquidityafter = (await vault.functions.get_total_liquidity().get()).value
-            expect(totalLiquidityafter.toNumber()).eq(totalLiquidityBefore.toNumber() - expectedLiquidityAmount.toNumber())
+            const totalLiquidityAfter = (await vault.functions.get_total_liquidity().get()).value
+            expect(totalLiquidityAfter.toNumber()).eq(totalLiquidityBefore.toNumber() - expectedLiquidityAmount.toNumber())
 
             // Verify LP balance decreased by lp_asset_amount
             expect(lpBalanceBefore.toNumber() - lpBalanceAfter.toNumber()).eq(lpBalance.toNumber())

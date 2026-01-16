@@ -2,16 +2,12 @@
 library;
 
 use std::hash::*;
-use signed_int::i256::I256;
 
 pub struct Position {
     pub size: u256,
     pub collateral: u256,
     pub average_price: u256,
     pub cumulative_funding_rate: u256,
-    pub reserve_amount: u256, // TODO
-    pub realized_pnl: I256, // TODO
-    pub last_increased_time: u64, // TODO
 }
 pub struct PositionKey {
     pub account: Identity,
@@ -170,9 +166,6 @@ impl Position {
             collateral: 0,
             average_price: 0,
             cumulative_funding_rate: 0,
-            reserve_amount: 0,
-            realized_pnl: I256::zero(),
-            last_increased_time: 0,
         }
     }
 }

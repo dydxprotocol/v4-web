@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 library;
 
-use signed_int::i256::I256;
 use core_interfaces::vault::Position;
 pub struct SetGov {
     pub gov: Identity,

@@ -160,7 +160,6 @@ dependencies = [
     "ownership",
     "pausable",
     "reentrancy",
-    "signed_int",
     "src20",
     "src3",
     "src5",

@@ -33,7 +33,6 @@ use src3::SRC3;
 use src20::{SetDecimalsEvent, SetNameEvent, SetSymbolEvent, SRC20, TotalSupplyEvent};
 use src5::{SRC5, State};
 use ownership::{_owner, initialize_ownership, only_owner, renounce_ownership, transfer_ownership};
-use signed_int::i256::I256;
 use core_interfaces::{
     pricefeed_wrapper::PricefeedWrapper,
     vault::{
@@ -1178,8 +1177,6 @@ fn _increase_position(
         Error::VaultSizeMustBeMoreThanCollateral,
     );
 
-    position.last_increased_time = timestamp();
-
     let new_cumulative_funding_rate = _increase_and_update_funding_info(index_asset, size_delta, is_long);
     position.cumulative_funding_rate = new_cumulative_funding_rate;
 
@@ -1293,14 +1290,6 @@ fn _decrease_position(
 
     let out_position_fee = out_protocol_fee + out_liquidity_fee;
 
-    if pnl_delta > 0 {
-        if has_profit {
-            position.realized_pnl = position.realized_pnl + I256::from_uint(out_pnl_delta);
-        } else {
-            position.realized_pnl = position.realized_pnl - I256::from_uint(out_pnl_delta);
-        }
-    }
-
     // if the position is not closed, amount above the collateral target is returned to the user
     let collateral_target = position.collateral - collateral_delta;
     let mut amount_out = 0;
@@ -1334,8 +1323,6 @@ fn _decrease_position(
         position.collateral = out_collateral;
         // no threat to underflow
         position.size = position.size - size_delta;
-
-        position.last_increased_time = timestamp();
 
         position.cumulative_funding_rate = new_cumulative_funding_rate;
 
