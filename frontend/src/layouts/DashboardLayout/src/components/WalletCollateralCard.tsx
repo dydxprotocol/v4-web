@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { Tooltip } from '@radix-ui/themes';
 import { $decimalValue, Usdc } from 'fuel-ts-sdk';
 import { WalletContext } from '@/contexts/WalletContext';
@@ -15,7 +15,13 @@ export const WalletCollateralCard: FC = () => {
   const baseAsset = useSdkQuery(() => trading.getBaseAsset());
 
   const collateralPromise = usePromise<bigint | undefined>(
-    baseAsset ? wallet.getUserBalances().then((a) => a[baseAsset.assetId]) : Promise.resolve(0n),
+    useMemo(
+      () =>
+        baseAsset
+          ? wallet.getUserBalances().then((a) => a[baseAsset.assetId])
+          : Promise.resolve(0n),
+      [baseAsset, wallet]
+    ),
     true
   );
 
