@@ -23,38 +23,62 @@ describe('GraphQLPositionsRepository', () => {
         '0x1234567890123456789012345678901234567890123456789012345678901234'
       );
 
-      // Mock the first query: GetPositionKeysByAccount
-      mockClient.mockResponse('GetPositionKeysByAccount', {
+      mockClient.mockResponse('GetPositionsByAccount', {
         positionKeys: {
-          nodes: [{ id: 'key-1' }, { id: 'key-2' }],
-        },
-      });
-
-      // Mock the second query: GetPositionsByKeyIds
-      mockClient.mockResponse('GetPositionsByKeyIds', {
-        positions: {
-          nodes: mockPositions.map((p) => ({
-            id: p.revisionId,
-            positionKey: {
-              id: p.positionKey.id,
-              account: p.positionKey.account,
-              indexAssetId: p.positionKey.indexAssetId,
-              isLong: p.positionKey.isLong,
+          nodes: [
+            {
+              id: mockPositions[0].positionKey.id,
+              account: mockPositions[0].positionKey.account,
+              indexAssetId: mockPositions[0].positionKey.indexAssetId,
+              isLong: mockPositions[0].positionKey.isLong,
+              positions: {
+                nodes: [
+                  {
+                    id: mockPositions[0].revisionId,
+                    collateral: mockPositions[0].collateralAmount.value.toString(),
+                    size: mockPositions[0].size.value.toString(),
+                    timestamp: mockPositions[0].timestamp,
+                    latest: mockPositions[0].latest,
+                    change: mockPositions[0].change,
+                    collateralDelta: mockPositions[0].collateralTransferred.value.toString(),
+                    outLiquidityFee: '0',
+                    outProtocolFee: '0',
+                    outLiquidationFee: mockPositions[0].positionFee.value.toString(),
+                    fundingRate: mockPositions[0].fundingRate.value.toString(),
+                    pnlDelta: mockPositions[0].pnlDelta.value.toString(),
+                    realizedFundingRate: mockPositions[0].realizedFundingRate.value.toString(),
+                    realizedPnl: mockPositions[0].realizedPnl.value.toString(),
+                  },
+                ],
+              },
             },
-            collateral: p.collateralAmount.value.toString(),
-            size: p.size.value.toString(),
-            timestamp: p.timestamp,
-            latest: p.latest,
-            change: p.change,
-            collateralDelta: p.collateralTransferred.value.toString(),
-            outLiquidityFee: '0',
-            outProtocolFee: '0',
-            outLiquidationFee: p.positionFee.value.toString(),
-            fundingRate: p.fundingRate.value.toString(),
-            pnlDelta: p.pnlDelta.value.toString(),
-            realizedFundingRate: p.realizedFundingRate.value.toString(),
-            realizedPnl: p.realizedPnl.value.toString(),
-          })),
+            {
+              id: mockPositions[1].positionKey.id,
+              account: mockPositions[1].positionKey.account,
+              indexAssetId: mockPositions[1].positionKey.indexAssetId,
+              isLong: mockPositions[1].positionKey.isLong,
+              positions: {
+                nodes: [
+                  {
+                    id: mockPositions[1].revisionId,
+                    collateral: mockPositions[1].collateralAmount.value.toString(),
+                    size: mockPositions[1].size.value.toString(),
+                    timestamp: mockPositions[1].timestamp,
+                    latest: mockPositions[1].latest,
+                    change: mockPositions[1].change,
+                    collateralDelta: mockPositions[1].collateralTransferred.value.toString(),
+                    outLiquidityFee: '0',
+                    outProtocolFee: '0',
+                    outLiquidationFee: mockPositions[1].positionFee.value.toString(),
+                    fundingRate: mockPositions[1].fundingRate.value.toString(),
+                    pnlDelta: mockPositions[1].pnlDelta.value.toString(),
+                    realizedFundingRate: mockPositions[1].realizedFundingRate.value.toString(),
+                    realizedPnl: mockPositions[1].realizedPnl.value.toString(),
+                  },
+                ],
+              },
+            },
+          ],
         },
       });
 
@@ -70,8 +94,7 @@ describe('GraphQLPositionsRepository', () => {
         '0x1234567890123456789012345678901234567890123456789012345678901234'
       );
 
-      // Mock empty position keys
-      mockClient.mockResponse('GetPositionKeysByAccount', {
+      mockClient.mockResponse('GetPositionsByAccount', {
         positionKeys: {
           nodes: [],
         },
@@ -88,38 +111,34 @@ describe('GraphQLPositionsRepository', () => {
         '0x1234567890123456789012345678901234567890123456789012345678901234'
       );
 
-      // Mock the first query: GetPositionKeysByAccount
-      mockClient.mockResponse('GetPositionKeysByAccount', {
+      mockClient.mockResponse('GetPositionsByAccount', {
         positionKeys: {
-          nodes: [{ id: 'key-1' }],
-        },
-      });
-
-      // Mock the second query: GetPositionsByKeyIds
-      mockClient.mockResponse('GetPositionsByKeyIds', {
-        positions: {
           nodes: [
             {
-              id: mockPosition.revisionId,
-              positionKey: {
-                id: mockPosition.positionKey.id,
-                account: mockPosition.positionKey.account,
-                indexAssetId: mockPosition.positionKey.indexAssetId,
-                isLong: mockPosition.positionKey.isLong,
+              id: mockPosition.positionKey.id,
+              account: mockPosition.positionKey.account,
+              indexAssetId: mockPosition.positionKey.indexAssetId,
+              isLong: mockPosition.positionKey.isLong,
+              positions: {
+                nodes: [
+                  {
+                    id: mockPosition.revisionId,
+                    collateral: mockPosition.collateralAmount.value.toString(),
+                    size: mockPosition.size.value.toString(),
+                    timestamp: mockPosition.timestamp,
+                    latest: mockPosition.latest,
+                    change: mockPosition.change,
+                    collateralDelta: mockPosition.collateralTransferred.value.toString(),
+                    outLiquidityFee: '0',
+                    outProtocolFee: '0',
+                    outLiquidationFee: mockPosition.positionFee.value.toString(),
+                    fundingRate: mockPosition.fundingRate.value.toString(),
+                    pnlDelta: mockPosition.pnlDelta.value.toString(),
+                    realizedFundingRate: mockPosition.realizedFundingRate.value.toString(),
+                    realizedPnl: mockPosition.realizedPnl.value.toString(),
+                  },
+                ],
               },
-              collateral: mockPosition.collateralAmount.value.toString(),
-              size: mockPosition.size.value.toString(),
-              timestamp: mockPosition.timestamp,
-              latest: mockPosition.latest,
-              change: mockPosition.change,
-              collateralDelta: mockPosition.collateralTransferred.value.toString(),
-              outLiquidityFee: '0',
-              outProtocolFee: '0',
-              outLiquidationFee: mockPosition.positionFee.value.toString(),
-              fundingRate: mockPosition.fundingRate.value.toString(),
-              pnlDelta: mockPosition.pnlDelta.value.toString(),
-              realizedFundingRate: mockPosition.realizedFundingRate.value.toString(),
-              realizedPnl: mockPosition.realizedPnl.value.toString(),
             },
           ],
         },
