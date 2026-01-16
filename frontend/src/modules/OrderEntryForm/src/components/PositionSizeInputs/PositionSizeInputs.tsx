@@ -1,14 +1,14 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { $decimalValue, DecimalCalculator, DecimalValue } from 'fuel-ts-sdk';
+import { $decimalValue, DecimalCalculator, DecimalValue, Usdc } from 'fuel-ts-sdk';
 import { useController, useWatch } from 'react-hook-form';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import { OrderEntryFormApiContext, OrderEntryFormMetaContext } from '../../contexts';
 import type { OrderEntryFormModel } from '../../models';
-import { AssetSizeInput } from './components/asset-size-input.component';
+import { AssetSizeInput } from './components/AssetSizeInput';
 
 export const PositionSizeInputs: FC = () => {
   const { control } = useRequiredContext(OrderEntryFormApiContext);
-  const { currentQuoteAssetPrice, currentBaseAssetPrice, quoteAssetName } =
+  const { currentQuoteAssetPrice, currentBaseAssetPrice, quoteAssetName, userBalanceInBaseAsset } =
     useRequiredContext(OrderEntryFormMetaContext);
   const collateralSize = useController({ control, name: 'collateralSize' });
   const positionSize = useController({ control, name: 'positionSize' });
@@ -46,7 +46,7 @@ export const PositionSizeInputs: FC = () => {
     const leverageDv = DecimalValue.fromFloat(leverage);
     const quoteAssetPriceDv = DecimalValue.fromFloat(currentQuoteAssetPrice.value);
 
-    if (focusedField === 'collateralSize') {
+    if (focusedField === 'collateralSize' || !focusedField) {
       const sizeDv = DecimalValue.fromDecimalString(collateralSize.field.value);
 
       const nextPositionSize = $decimalValue(
@@ -78,6 +78,18 @@ export const PositionSizeInputs: FC = () => {
     updatePositionSize,
   ]);
 
+  const handleAllIn = useCallback(() => {
+    setFocusedField('collateralSize');
+    updateCollateralSize($decimalValue(Usdc.fromFloat(userBalanceInBaseAsset)).toDecimalString());
+  }, [updateCollateralSize, userBalanceInBaseAsset]);
+
+  const handleHalfIn = useCallback(() => {
+    setFocusedField('collateralSize');
+    updateCollateralSize(
+      $decimalValue(Usdc.fromFloat(userBalanceInBaseAsset / 2)).toDecimalString()
+    );
+  }, [updateCollateralSize, userBalanceInBaseAsset]);
+
   return (
     <>
       <AssetSizeInput
@@ -88,11 +100,16 @@ export const PositionSizeInputs: FC = () => {
         size={collateralSize.field.value}
         usdPrice={baseAssetUsdValue}
         error={collateralSize.fieldState.error?.message}
+        onHalf={handleHalfIn}
+        onMax={handleAllIn}
+        focused={focusedField === 'collateralSize'}
       />
       <AssetSizeInput
+        onMax={handleAllIn}
         assetName={quoteAssetName}
         label={orderSide}
         onFocus={() => setFocusedField('positionSize')}
+        focused={focusedField === 'positionSize'}
         onSizeChange={updatePositionSize}
         size={positionSize.field.value}
         usdPrice={quoteAssetUsdValue}
