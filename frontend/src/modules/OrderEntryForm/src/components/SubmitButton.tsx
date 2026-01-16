@@ -19,7 +19,7 @@ export function SubmitButton() {
       ]}
       onClick={submitHandler}
     >
-      {orderSide} starboard token
+      Open Position
     </button>
   );
 }

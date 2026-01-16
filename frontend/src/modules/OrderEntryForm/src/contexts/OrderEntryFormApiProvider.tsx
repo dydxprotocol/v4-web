@@ -15,21 +15,25 @@ export type OrderEntryFormApiContextProviderProps = {
   children: ReactNode;
   onSubmitSuccessful: (data: OrderEntryFormModel) => void;
   onSubmitFailure?: SubmitErrorHandler<OrderEntryFormModel>;
+  skipValidation?: boolean;
 };
 
 export const OrderEntryFormApiContextProvider: FC<OrderEntryFormApiContextProviderProps> = ({
   children,
   onSubmitSuccessful,
   onSubmitFailure,
+  skipValidation,
 }) => {
   const meta = useRequiredContext(OrderEntryFormMetaContext);
 
   const form = useForm<OrderEntryFormModel>({
     defaultValues: nullOrderEntryForm,
-    resolver: zodResolver(createOrderEntryFormSchema(meta)),
     mode: 'all',
     reValidateMode: 'onChange',
     criteriaMode: 'all',
+    ...(!skipValidation && {
+      resolver: zodResolver(createOrderEntryFormSchema(meta)),
+    }),
   });
 
   const contextValue = useMemo<OrderEntryFormApiContextType>(

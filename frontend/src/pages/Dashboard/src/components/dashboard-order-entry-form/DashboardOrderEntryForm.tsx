@@ -10,7 +10,6 @@ import {
   type OrderEntryFormModel,
   OrderSideSwitch,
   PositionSizeInputs,
-  SubmitButton,
 } from '@/modules/OrderEntryForm';
 import * as styles from './DashboardOrderEntryForm.css';
 import { DashboardOrderFormMetaProvider } from './components/DashboardOrderFormMetaProvider';
@@ -20,6 +19,7 @@ import {
   TransactionSuccessDialog,
   ValidationErrorDialog,
 } from './components/OrderFormDialog';
+import { SubmitPositionButton } from './components/SubmitPositionButton';
 
 type TransactionState = 'idle' | 'pending' | 'success' | 'error';
 
@@ -83,12 +83,13 @@ export const DashboardOrderEntryForm: FC = () => {
         <OrderEntryFormApiContextProvider
           onSubmitSuccessful={handleOrderSubmission}
           onSubmitFailure={handleValidationError}
+          skipValidation={!isWalletConnected}
         >
           <OrderSideSwitch />
           <PositionSizeInputs />
           <LeverageInput />
           {isWalletConnected ? (
-            <SubmitButton />
+            <SubmitPositionButton />
           ) : (
             <Button size="3" onClick={wallet.establishConnection} css={styles.connectWalletButton}>
               Connect Wallet
