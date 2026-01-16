@@ -3,6 +3,9 @@ dist/
 build/
 fuel-ts-sdk/lib/
 contracts/lib/
+contracts/types/
+contracts/**/out/
+contracts/cache/
 indexer/lib/
 .next/
 coverage/

@@ -153,7 +153,8 @@ async function handleAddLiquidity(
   const log = logs[0];
   const account = log.account.Address.bits;
   // the user transfers in
-  const baseAssetIn = BigInt(log.base_asset_amount.toString());
+  const baseAsset = BigInt(log.base_asset_amount.toString());
+  const liquidityIn = BigInt(log.liquidity_amount.toString());
   const lpAsset = BigInt(log.lp_asset_amount.toString());
   const fee = BigInt(log.fee.toString());
 
@@ -161,7 +162,6 @@ async function handleAddLiquidity(
     where: { account, latest: true },
   });
   let lpAssetBalance = lpAsset;
-  const baseAsset = baseAssetIn - fee;
   if (currentLiquidity) {
     currentLiquidity.latest = false;
     await ctx.store.upsert(currentLiquidity);
@@ -172,6 +172,7 @@ async function handleAddLiquidity(
     account,
     lpAssetBalance,
     baseAsset,
+    liquidity: liquidityIn,
     lpAsset,
     fee,
     timestamp: getUTCBlockTime(block),
@@ -189,7 +190,8 @@ async function handleRemoveLiquidity(
   const log = logs[0];
   const account = log.account.Address.bits;
   // the amount transferred out to the user
-  const baseAssetOut = BigInt(log.base_asset_amount.toString());
+  const baseAsset = BigInt(log.base_asset_amount.toString());
+  const liquidityOut = BigInt(log.liquidity_amount.toString());
   const lpAsset = BigInt(log.lp_asset_amount.toString());
   const fee = BigInt(log.fee.toString());
 
@@ -203,12 +205,12 @@ async function handleRemoveLiquidity(
   await ctx.store.upsert(currentLiquidity);
   // the amount substracted from the liquidity pool
   const lpAssetBalance = currentLiquidity.lpAssetBalance - lpAsset;
-  const baseAsset = baseAssetOut + fee;
   const liquidity: Liquidity = new Liquidity({
     id: generateId(receipt, block),
     account,
     lpAssetBalance,
     baseAsset: -baseAsset,
+    liquidity: -liquidityOut,
     lpAsset: -lpAsset,
     fee,
     timestamp: getUTCBlockTime(block),

@@ -31,16 +31,18 @@ pub struct SetLiquidator {
     pub is_active: bool,
 }
 pub struct AddLiquidity {
-    pub account: Identity,
-    pub base_asset_amount: u64,
-    pub lp_asset_amount: u64,
-    pub fee: u64,
+    pub account: Identity, // the liquidity provider
+    pub base_asset_amount: u64, // the amount sent by the lp
+    pub liquidity_amount: u64, // the amount added to the liquidity reserves
+    pub lp_asset_amount: u64, // minted lp tokens
+    pub fee: u64, // paid fees (== base_asset_amount - liquidity_amount)
 }
 pub struct RemoveLiquidity {
-    pub account: Identity,
-    pub base_asset_amount: u64,
-    pub lp_asset_amount: u64,
-    pub fee: u64,
+    pub account: Identity, // the liquidity provider
+    pub base_asset_amount: u64, // the amount sent to the lp
+    pub liquidity_amount: u64, // the amount actually removed from the liquidity reserves
+    pub lp_asset_amount: u64, // burnt lp tokens
+    pub fee: u64, // paid fees (<= liquidity_amount - base_asset_amount, it is not equal if the total reserves < total liquidity)
 }
 pub struct WithdrawFees {
     pub receiver: Identity,

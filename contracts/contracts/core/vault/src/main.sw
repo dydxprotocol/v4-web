@@ -965,7 +965,8 @@ fn _add_liquidity(receiver: Identity) -> u64 {
 
     log(AddLiquidity {
         account: receiver,
-        base_asset_amount: base_asset_amount,
+        base_asset_amount,
+        liquidity_amount: amount_after_fees,
         lp_asset_amount: mint_amount,
         fee: fee_amount,
     });
@@ -1034,6 +1035,7 @@ fn _remove_liquidity(receiver: Identity) -> u64 {
     log(RemoveLiquidity {
         account: receiver,
         base_asset_amount: amount_out,
+        liquidity_amount,
         lp_asset_amount: burn_amount_u64,
         fee: fee_amount,
     });

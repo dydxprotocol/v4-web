@@ -26,6 +26,9 @@ export class Liquidity {
     baseAsset!: bigint
 
     @BigIntColumn_({nullable: false})
+    liquidity!: bigint
+
+    @BigIntColumn_({nullable: false})
     lpAsset!: bigint
 
     @BigIntColumn_({nullable: false})

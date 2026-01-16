@@ -296,6 +296,66 @@ describe("Vault.liquidity", () => {
             ).rejects.toThrowError("Paused")
             await call(vault.functions.unpause().addContracts([attachedContracts[1]]))
         })
+
+        it("emits AddLiquidity event on add_liquidity", async () => {
+            await call(USDC.functions.mint(user1Identity, expandDecimals(10000)))
+            const baseAssetAmount = expandDecimals(1000)
+
+            // Get balances before the transaction
+            const usdcBalanceBefore = await user1.getBalance(USDC_ASSET_ID)
+            const lpBalanceBefore = await user1.getBalance(LP_ASSET_ID)
+
+            // Get expected values before the transaction
+            const totalLiquidityBefore = (await vault.functions.get_total_liquidity().get()).value
+            const getAddResult = (await vault.functions.get_add_liquidity_amount(baseAssetAmount).get()).value
+            const expectedMintAmount = getAddResult[0] // lp_asset_amount
+            const expectedLiquidityAmount = getAddResult[1] // liquidity_amount (amount_after_fees)
+            const expectedFee = Number(baseAssetAmount) - expectedLiquidityAmount.toNumber()
+
+            const tx = await call(
+                vaultUser1.functions
+                    .add_liquidity(user1Identity)
+                    .addContracts(attachedContracts)
+                    .callParams({
+                        forward: [baseAssetAmount, USDC_ASSET_ID],
+                    }),
+            )
+
+            // Get balances after the transaction
+            const totalLiquidityafter = (await vault.functions.get_total_liquidity().get()).value
+            const usdcBalanceAfter = await user1.getBalance(USDC_ASSET_ID)
+            const lpBalanceAfter = await user1.getBalance(LP_ASSET_ID)
+
+            expect(totalLiquidityafter.toNumber()).eq(totalLiquidityBefore.toNumber() + expectedLiquidityAmount.toNumber())
+
+            // Verify USDC balance decreased by base_asset_amount
+            expect(usdcBalanceBefore.toNumber() - usdcBalanceAfter.toNumber()).eq(Number(baseAssetAmount))
+
+            // Verify LP balance increased by lp_asset_amount
+            expect(lpBalanceAfter.toNumber() - lpBalanceBefore.toNumber()).eq(expectedMintAmount.toNumber())
+
+            // Find the AddLiquidity event
+            const addLiquidityLog = tx.logs.find((log) => log.account && log.base_asset_amount && log.liquidity_amount)
+            expect(addLiquidityLog).toBeDefined()
+
+            if (addLiquidityLog) {
+                // Verify account field (the liquidity provider)
+                expect(addLiquidityLog.account.Address.bits).eq(user1Identity.Address.bits)
+
+                // Verify base_asset_amount (the amount sent by the lp)
+                expect(addLiquidityLog.base_asset_amount.toString()).eq(baseAssetAmount.toString())
+
+                // Verify liquidity_amount (the amount added to the liquidity reserves)
+                expect(addLiquidityLog.liquidity_amount.toNumber()).eq(expectedLiquidityAmount.toNumber())
+
+                // Verify lp_asset_amount (minted lp tokens)
+                expect(addLiquidityLog.lp_asset_amount.toNumber()).eq(expectedMintAmount.toNumber())
+                expect(addLiquidityLog.lp_asset_amount.toNumber()).eq(lpBalanceAfter.toNumber() - lpBalanceBefore.toNumber())
+
+                // Verify fee (paid fees == base_asset_amount - liquidity_amount)
+                expect(addLiquidityLog.fee.toNumber()).eq(expectedFee)
+            }
+        })
     })
 
     describe("remove liquidity", () => {
@@ -494,6 +554,82 @@ describe("Vault.liquidity", () => {
             await call(vault.functions.unpause().addContracts([attachedContracts[1]]))
         })
 
+        it("emits RemoveLiquidity event on remove_liquidity", async () => {
+            // First add liquidity
+            await call(USDC.functions.mint(user1Identity, expandDecimals(10000)))
+            await call(
+                vaultUser1.functions
+                    .add_liquidity(user1Identity)
+                    .addContracts(attachedContracts)
+                    .callParams({
+                        forward: [expandDecimals(5000), USDC_ASSET_ID],
+                    }),
+            )
+
+            const lpBalance = await user1.getBalance(LP_ASSET_ID)
+
+            // Get balances before the transaction
+            const totalLiquidityBefore = (await vault.functions.get_total_liquidity().get()).value
+            const usdcBalanceBefore = await user1.getBalance(USDC_ASSET_ID)
+            const lpBalanceBefore = await user1.getBalance(LP_ASSET_ID)
+
+            // Get expected values before the transaction
+            const getRemoveResult = (await vault.functions.get_remove_liquidity_amount(lpBalance).get()).value
+            const expectedLiquidityAmount = getRemoveResult[0] // liquidity_amount
+            const expectedRedemptionAmount = getRemoveResult[1] // redemption_amount
+            const expectedAmountOut = getRemoveResult[2] // base_asset_amount (amount_out)
+            const expectedFee = expectedRedemptionAmount.toNumber() - expectedAmountOut.toNumber()
+
+            const tx = await call(
+                vaultUser1.functions
+                    .remove_liquidity(user1Identity)
+                    .addContracts(attachedContracts)
+                    .callParams({
+                        forward: [lpBalance, LP_ASSET_ID],
+                    }),
+            )
+
+            // Get balances after the transaction
+            const usdcBalanceAfter = await user1.getBalance(USDC_ASSET_ID)
+            const lpBalanceAfter = await user1.getBalance(LP_ASSET_ID)
+
+            const totalLiquidityafter = (await vault.functions.get_total_liquidity().get()).value
+            expect(totalLiquidityafter.toNumber()).eq(totalLiquidityBefore.toNumber() - expectedLiquidityAmount.toNumber())
+
+            // Verify LP balance decreased by lp_asset_amount
+            expect(lpBalanceBefore.toNumber() - lpBalanceAfter.toNumber()).eq(lpBalance.toNumber())
+
+            // Verify USDC balance increased by base_asset_amount (amount_out)
+            expect(usdcBalanceAfter.toNumber() - usdcBalanceBefore.toNumber()).eq(expectedAmountOut.toNumber())
+
+            // Find the RemoveLiquidity event
+            const removeLiquidityLog = tx.logs.find((log) => log.account && log.lp_asset_amount && log.liquidity_amount)
+            expect(removeLiquidityLog).toBeDefined()
+
+            if (removeLiquidityLog) {
+                // Verify account field (the liquidity provider)
+                expect(removeLiquidityLog.account.Address.bits).eq(user1Identity.Address.bits)
+
+                // Verify base_asset_amount (the amount sent to the lp)
+                expect(removeLiquidityLog.base_asset_amount.toNumber()).eq(expectedAmountOut.toNumber())
+                expect(removeLiquidityLog.base_asset_amount.toNumber()).eq(
+                    usdcBalanceAfter.toNumber() - usdcBalanceBefore.toNumber(),
+                )
+
+                // Verify liquidity_amount (the amount actually removed from the liquidity reserves)
+                expect(removeLiquidityLog.liquidity_amount.toNumber()).eq(expectedLiquidityAmount.toNumber())
+
+                // Verify lp_asset_amount (burnt lp tokens)
+                expect(removeLiquidityLog.lp_asset_amount.toNumber()).eq(lpBalance.toNumber())
+                expect(removeLiquidityLog.lp_asset_amount.toNumber()).eq(lpBalanceBefore.toNumber() - lpBalanceAfter.toNumber())
+
+                // Verify fee (paid fees <= liquidity_amount - base_asset_amount)
+                // fee == redemption_amount - amount_out
+                expect(removeLiquidityLog.fee.toNumber()).eq(expectedFee)
+                expect(removeLiquidityLog.fee.toNumber()).lte(expectedLiquidityAmount.toNumber() - expectedAmountOut.toNumber())
+            }
+        })
+
         it("cannot remove more liquidity than owned", async () => {
             await call(
                 vaultUser0.functions
@@ -571,6 +707,123 @@ describe("Vault.liquidity", () => {
             // Check fee reserve increased by the fee amount
             const feeAmount = removeResult[1].toNumber() - removeResult[2].toNumber()
             expect(feeReserveAfter.toNumber() - feeReserveBefore.toNumber()).eq(feeAmount)
+        })
+
+        it("emits RemoveLiquidity event when total_reserves < total_liquidity", async () => {
+            // Add liquidity first
+            await call(USDC.functions.mint(user1Identity, expandDecimals(50000)))
+            await call(
+                vaultUser1.functions
+                    .add_liquidity(user1Identity)
+                    .addContracts(attachedContracts)
+                    .callParams({
+                        forward: [expandDecimals(20000), USDC_ASSET_ID],
+                    }),
+            )
+
+            const lpBalance = await user1.getBalance(LP_ASSET_ID)
+            const totalReservesBeforeTrades = (await vault.functions.get_total_reserves().get()).value
+            const totalLiquidityBeforeTrades = (await vault.functions.get_total_liquidity().get()).value
+
+            // Initially total_reserves should equal total_liquidity
+            expect(totalReservesBeforeTrades.toNumber()).eq(totalLiquidityBeforeTrades.toNumber())
+
+            // Execute trades to create a situation where total_reserves < total_liquidity
+            // This happens when profitable PnL is paid from reserves while liquidity fees increase total_liquidity
+            await call(USDC.functions.mint(user0Identity, expandDecimals(50000)))
+            await call(
+                vaultUser0.functions
+                    .increase_position(user0Identity, BTC_ASSET, expandDecimals(10000), true)
+                    .addContracts(attachedContracts)
+                    .callParams({
+                        forward: [expandDecimals(2000), USDC_ASSET_ID],
+                    }),
+            )
+
+            // Move price in favor of the trader to create profit
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(45000, 18)))
+
+            // Close position to realize profit - this pays from reserves
+            const positionKey = (await vault.functions.get_position_key(user0Identity, BTC_ASSET, true).get()).value
+            const position = (await vault.functions.get_position_by_key(positionKey).get()).value
+            await call(
+                vaultUser0.functions
+                    .decrease_position(user0Identity, BTC_ASSET, position.collateral, position.size, true, user0Identity)
+                    .addContracts(attachedContracts),
+            )
+
+            // Verify that total_reserves < total_liquidity after trades
+            const totalReservesAfterTrades = (await vault.functions.get_total_reserves().get()).value
+            const totalLiquidityAfterTrades = (await vault.functions.get_total_liquidity().get()).value
+            expect(totalReservesAfterTrades.toNumber()).lt(totalLiquidityAfterTrades.toNumber())
+
+            // Get balances before removing liquidity
+            const usdcBalanceBefore = await user1.getBalance(USDC_ASSET_ID)
+            const lpBalanceBefore = await user1.getBalance(LP_ASSET_ID)
+
+            // Verify lpBalance hasn't changed (no liquidity was removed during trades)
+            expect(lpBalanceBefore.toNumber()).eq(lpBalance.toNumber())
+
+            // Get expected values before removing liquidity
+            const getRemoveResult = (await vault.functions.get_remove_liquidity_amount(lpBalanceBefore).get()).value
+            const expectedLiquidityAmount = getRemoveResult[0] // liquidity_amount
+            const expectedRedemptionAmount = getRemoveResult[1] // redemption_amount (reduced because reserves < liquidity)
+            const expectedAmountOut = getRemoveResult[2] // base_asset_amount (amount_out)
+            const expectedFee = expectedRedemptionAmount.toNumber() - expectedAmountOut.toNumber()
+
+            // When total_reserves < total_liquidity, redemption_amount < liquidity_amount
+            // This means the fee relationship is: fee <= liquidity_amount - base_asset_amount
+            // but fee == redemption_amount - base_asset_amount
+            expect(expectedRedemptionAmount.toNumber()).lt(expectedLiquidityAmount.toNumber())
+
+            const tx = await call(
+                vaultUser1.functions
+                    .remove_liquidity(user1Identity)
+                    .addContracts(attachedContracts)
+                    .callParams({
+                        forward: [lpBalanceBefore, LP_ASSET_ID],
+                    }),
+            )
+
+            // Get balances after removing liquidity
+            const usdcBalanceAfter = await user1.getBalance(USDC_ASSET_ID)
+            const lpBalanceAfter = await user1.getBalance(LP_ASSET_ID)
+
+            // Verify LP balance decreased by lp_asset_amount
+            expect(lpBalanceBefore.toNumber() - lpBalanceAfter.toNumber()).eq(lpBalanceBefore.toNumber())
+
+            // Verify USDC balance increased by base_asset_amount (amount_out)
+            expect(usdcBalanceAfter.toNumber() - usdcBalanceBefore.toNumber()).eq(expectedAmountOut.toNumber())
+
+            // Find the RemoveLiquidity event
+            const removeLiquidityLog = tx.logs.find((log) => log.account && log.lp_asset_amount && log.liquidity_amount)
+            expect(removeLiquidityLog).toBeDefined()
+
+            if (removeLiquidityLog) {
+                // Verify account field (the liquidity provider)
+                expect(removeLiquidityLog.account.Address.bits).eq(user1Identity.Address.bits)
+
+                // Verify base_asset_amount (the amount sent to the lp)
+                expect(removeLiquidityLog.base_asset_amount.toNumber()).eq(expectedAmountOut.toNumber())
+                expect(removeLiquidityLog.base_asset_amount.toNumber()).eq(
+                    usdcBalanceAfter.toNumber() - usdcBalanceBefore.toNumber(),
+                )
+
+                // Verify liquidity_amount (the amount actually removed from the liquidity reserves)
+                expect(removeLiquidityLog.liquidity_amount.toNumber()).eq(expectedLiquidityAmount.toNumber())
+
+                // Verify lp_asset_amount (burnt lp tokens)
+                expect(removeLiquidityLog.lp_asset_amount.toNumber()).eq(lpBalanceBefore.toNumber())
+                expect(removeLiquidityLog.lp_asset_amount.toNumber()).eq(lpBalanceBefore.toNumber() - lpBalanceAfter.toNumber())
+
+                // Verify fee (paid fees <= liquidity_amount - base_asset_amount)
+                // When total_reserves < total_liquidity, fee is not equal to liquidity_amount - base_asset_amount
+                // Instead, fee == redemption_amount - base_asset_amount, where redemption_amount < liquidity_amount
+                expect(removeLiquidityLog.fee.toNumber()).eq(expectedFee)
+                expect(removeLiquidityLog.fee.toNumber()).lte(expectedLiquidityAmount.toNumber() - expectedAmountOut.toNumber())
+                // When reserves < liquidity, fee < liquidity_amount - base_asset_amount
+                expect(removeLiquidityLog.fee.toNumber()).lt(expectedLiquidityAmount.toNumber() - expectedAmountOut.toNumber())
+            }
         })
     })
 

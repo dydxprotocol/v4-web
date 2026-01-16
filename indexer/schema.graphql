@@ -12,6 +12,7 @@ type Liquidity @entity {
   lpAssetBalance: BigInt!
   account: String! @index
   baseAsset: BigInt!
+  liquidity: BigInt!
   lpAsset: BigInt!
   fee: BigInt!
 }
