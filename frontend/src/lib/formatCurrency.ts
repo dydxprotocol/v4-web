@@ -28,13 +28,7 @@ export function formatCurrency(
   value: number | bigint,
   options: FormatCurrencyOptions = {}
 ): string {
-  const {
-    decimals = 2,
-    showSymbol = true,
-    symbol = '$',
-    compact = false,
-    minDisplay,
-  } = options;
+  const { decimals = 2, showSymbol = true, symbol = '$', compact = false, minDisplay } = options;
 
   const numValue = typeof value === 'bigint' ? Number(value) : value;
 
@@ -109,10 +103,7 @@ type FormatNumberOptions = {
  * formatNumber(0.12345, { decimals: 4 }) // "0.1235"
  * formatNumber(100, { signDisplay: 'always' }) // "+100"
  */
-export function formatNumber(
-  value: number | bigint,
-  options: FormatNumberOptions = {}
-): string {
+export function formatNumber(value: number | bigint, options: FormatNumberOptions = {}): string {
   const { decimals, useGrouping = true, signDisplay = 'auto' } = options;
 
   const numValue = typeof value === 'bigint' ? Number(value) : value;
