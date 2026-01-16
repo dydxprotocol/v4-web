@@ -11,28 +11,20 @@ export function usePromise<T>(promised: Promise<T>, autorun = false): UsePromise
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
-    let cancelled = false;
     (async () => {
       if (status === 'uninitialized') {
         setStatus('pending');
         setError(undefined);
         try {
           const result = await promised;
-          if (!cancelled) {
-            setResolved(result);
-            setStatus('fulfilled');
-          }
+          setResolved(result);
+          setStatus('fulfilled');
         } catch (err) {
-          if (!cancelled) {
-            setError(err instanceof Error ? err : new Error(String(err)));
-            setStatus('rejected');
-          }
+          setError(err instanceof Error ? err : new Error(String(err)));
+          setStatus('rejected');
         }
       }
     })();
-    return () => {
-      cancelled = true;
-    };
   }, [promised, status]);
 
   const initialize = useCallback(() => {
