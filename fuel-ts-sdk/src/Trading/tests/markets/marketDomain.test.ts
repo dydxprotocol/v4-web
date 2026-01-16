@@ -62,22 +62,22 @@ describe('Market Domain', () => {
 
     it('should have valid OHLC values', () => {
       const candle = createTestCandle({
-        highPrice: 110n,
-        lowPrice: 95n,
-        closePrice: 105n,
+        highPrice: '110',
+        lowPrice: '95',
+        closePrice: '105',
       });
 
-      expect(candle.highPrice).toBeGreaterThanOrEqual(candle.closePrice);
-      expect(candle.lowPrice).toBeLessThanOrEqual(candle.closePrice);
+      expect(BigInt(candle.highPrice)).toBeGreaterThanOrEqual(BigInt(candle.closePrice));
+      expect(BigInt(candle.lowPrice)).toBeLessThanOrEqual(BigInt(candle.closePrice));
     });
 
-    it('should have price as bigint', () => {
+    it('should have price as string', () => {
       const candle = createTestCandle({
-        closePrice: 50000n,
+        closePrice: '50000',
       });
 
-      expect(typeof candle.closePrice).toBe('bigint');
-      expect(candle.closePrice).toBeGreaterThan(0n);
+      expect(typeof candle.closePrice).toBe('string');
+      expect(BigInt(candle.closePrice)).toBeGreaterThan(0n);
     });
   });
 });

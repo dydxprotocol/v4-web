@@ -10,30 +10,30 @@ describe('Candles', () => {
       expect(candle.asset).toBeDefined();
       expect(candle.interval).toBe('M15');
       expect(candle.startedAt).toBeGreaterThan(0);
-      expect(candle.closePrice).toBeGreaterThan(0n);
-      expect(candle.highPrice).toBeGreaterThan(0n);
-      expect(candle.lowPrice).toBeGreaterThan(0n);
+      expect(BigInt(candle.closePrice)).toBeGreaterThan(0n);
+      expect(BigInt(candle.highPrice)).toBeGreaterThan(0n);
+      expect(BigInt(candle.lowPrice)).toBeGreaterThan(0n);
     });
 
     it('should have high >= low', () => {
       const candle = createTestCandle({
-        highPrice: 52000n,
-        lowPrice: 48000n,
-        closePrice: 50000n,
+        highPrice: '52000',
+        lowPrice: '48000',
+        closePrice: '50000',
       });
 
-      expect(candle.highPrice).toBeGreaterThanOrEqual(candle.lowPrice);
+      expect(BigInt(candle.highPrice)).toBeGreaterThanOrEqual(BigInt(candle.lowPrice));
     });
 
     it('should have close price within range', () => {
       const candle = createTestCandle({
-        highPrice: 52000n,
-        lowPrice: 48000n,
-        closePrice: 50000n,
+        highPrice: '52000',
+        lowPrice: '48000',
+        closePrice: '50000',
       });
 
-      expect(candle.closePrice).toBeGreaterThanOrEqual(candle.lowPrice);
-      expect(candle.closePrice).toBeLessThanOrEqual(candle.highPrice);
+      expect(BigInt(candle.closePrice)).toBeGreaterThanOrEqual(BigInt(candle.lowPrice));
+      expect(BigInt(candle.closePrice)).toBeLessThanOrEqual(BigInt(candle.highPrice));
     });
 
     it('should support different intervals', () => {
@@ -81,18 +81,18 @@ describe('Candles', () => {
       const candles = createCandleSeries(20);
 
       candles.forEach((candle) => {
-        expect(candle.highPrice).toBeGreaterThanOrEqual(candle.closePrice);
-        expect(candle.lowPrice).toBeLessThanOrEqual(candle.closePrice);
-        expect(candle.highPrice).toBeGreaterThanOrEqual(candle.lowPrice);
+        expect(BigInt(candle.highPrice)).toBeGreaterThanOrEqual(BigInt(candle.closePrice));
+        expect(BigInt(candle.lowPrice)).toBeLessThanOrEqual(BigInt(candle.closePrice));
+        expect(BigInt(candle.highPrice)).toBeGreaterThanOrEqual(BigInt(candle.lowPrice));
       });
     });
 
-    it('should have all prices as bigint', () => {
+    it('should have all prices as string', () => {
       const candle = createTestCandle();
 
-      expect(typeof candle.highPrice).toBe('bigint');
-      expect(typeof candle.lowPrice).toBe('bigint');
-      expect(typeof candle.closePrice).toBe('bigint');
+      expect(typeof candle.highPrice).toBe('string');
+      expect(typeof candle.lowPrice).toBe('string');
+      expect(typeof candle.closePrice).toBe('string');
     });
   });
 });

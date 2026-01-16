@@ -42,10 +42,10 @@ export function createTestCandle(overrides: Partial<Candle> = {}): Candle {
     asset: assetId('0xbtc'),
     interval: 'M15' as const,
     startedAt: baseTime,
-    openPrice: 50000n,
-    closePrice: 50500n,
-    highPrice: 51000n,
-    lowPrice: 49000n,
+    openPrice: '50000',
+    closePrice: '50500',
+    highPrice: '51000',
+    lowPrice: '49000',
   };
   return { ...base, ...overrides };
 }
@@ -63,7 +63,7 @@ export function createCandleSeries(count: number): Candle[] {
       createTestCandle({
         id: candleId(`candle-${startedAt}`),
         startedAt,
-        closePrice: 50000n + BigInt(Math.floor(Math.random() * 1000)),
+        closePrice: String(50000 + Math.floor(Math.random() * 1000)),
       })
     );
   }
