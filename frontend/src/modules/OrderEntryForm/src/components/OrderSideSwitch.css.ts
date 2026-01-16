@@ -3,8 +3,7 @@ import { colors } from '../../../../styles/colors';
 
 export const tabsList = style({
   display: 'flex',
-  gap: '8px',
-  marginBottom: '0.5rem',
+  borderBottom: `1px solid ${colors.slateGrey}`,
 });
 
 export const tabsTrigger = style({
@@ -12,25 +11,26 @@ export const tabsTrigger = style({
   padding: '12px 16px',
   backgroundColor: 'transparent',
   color: colors.dustyGrey,
-  border: `1px solid ${colors.slateGrey}`,
-  borderRadius: '4px',
+  border: 'none',
+  borderBottom: '2px solid transparent',
+  marginBottom: '-1px',
   cursor: 'pointer',
   fontSize: '0.875rem',
-  fontWeight: '600',
-  transition: 'all 0.2s',
+  fontWeight: '500',
+  transition: 'all 0.15s ease',
   ':hover': {
-    borderColor: colors.whiteAlpha[20],
+    color: colors.snow,
   },
   selectors: {
     '&[data-state="active"][data-side="long"]': {
-      backgroundColor: colors.liquidLava,
-      color: colors.snow,
-      borderColor: colors.liquidLava,
+      color: colors.success,
+      borderBottomColor: colors.success,
+      fontWeight: '600',
     },
     '&[data-state="active"][data-side="short"]': {
-      backgroundColor: colors.liquidLava,
-      color: colors.snow,
-      borderColor: colors.liquidLava,
+      color: colors.error,
+      borderBottomColor: colors.error,
+      fontWeight: '600',
     },
   },
 });
