@@ -1,3 +1,4 @@
+import { computed } from '@preact/signals-react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -133,8 +134,8 @@ describe('AssetSizeInput', () => {
           context={{
             quoteAssetName: 'USD',
             userBalanceInBaseAsset: 0,
-            currentQuoteAssetPrice: { value: 50000 },
-            currentBaseAssetPrice: { value: 50000 },
+            currentQuoteAssetPrice: computed(() => 5000),
+            currentBaseAssetPrice: computed(() => 50000),
           }}
         >
           <AssetSizeInput {...defaultProps} onHalf={onHalf} onMax={onMax} />
