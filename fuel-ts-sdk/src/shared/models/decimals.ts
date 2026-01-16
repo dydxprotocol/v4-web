@@ -19,7 +19,7 @@ export type RatioOutput = InferDecimalValueType<typeof RatioOutput>;
 export const CollateralAmount = createDecimalValueSchema(6, 'CollateralAmount');
 export type CollateralAmount = InferDecimalValueType<typeof CollateralAmount>;
 
-export const Usdc = createDecimalValueSchema(18, 'Usdc');
+export const Usdc = createDecimalValueSchema(6, 'Usdc');
 export type Usdc = InferDecimalValueType<typeof Usdc>;
 
 export const Btc = createDecimalValueSchema(18, 'Btc');
