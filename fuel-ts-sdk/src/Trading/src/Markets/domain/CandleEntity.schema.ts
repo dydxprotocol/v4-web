@@ -6,9 +6,9 @@ export const CandleEntitySchema = z.object({
   id: CandleIdSchema,
   asset: AssetIdSchema,
   interval: z.enum(['D1', 'H1', 'H4', 'M1', 'M5', 'M15', 'M30']),
-  openPrice: z.bigint(),
-  closePrice: z.bigint(),
-  highPrice: z.bigint(),
-  lowPrice: z.bigint(),
+  openPrice: z.string(),
+  closePrice: z.string(),
+  highPrice: z.string(),
+  lowPrice: z.string(),
   startedAt: z.number().int(),
 }) satisfies z.ZodType<Candle, z.ZodTypeDef, unknown>;

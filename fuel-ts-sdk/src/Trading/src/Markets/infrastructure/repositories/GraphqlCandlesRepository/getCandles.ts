@@ -76,16 +76,16 @@ function mapCandlesWithOpen(gqlCandles: GraphQLCandle[], interval: CandleInterva
 
     // Use previous candle's close as this candle's open
     // For the first candle, use its own close as open (will appear flat)
-    const openPrice = index > 0 ? BigInt(sorted[index - 1].closePrice) : BigInt(gql.closePrice);
+    const openPrice = index > 0 ? sorted[index - 1].closePrice : gql.closePrice;
 
     return CandleEntitySchema.parse({
       id,
       asset,
       interval,
       openPrice,
-      closePrice: BigInt(gql.closePrice),
-      highPrice: BigInt(gql.highPrice),
-      lowPrice: BigInt(gql.lowPrice),
+      closePrice: gql.closePrice,
+      highPrice: gql.highPrice,
+      lowPrice: gql.lowPrice,
       startedAt: gql.startedAt,
     });
   });

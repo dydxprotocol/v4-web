@@ -79,10 +79,10 @@ export function createDatafeed(
           .map(
             (candle: Candle): Bar => ({
               time: candle.startedAt * 1000,
-              open: $decimalValue(OraclePrice.fromBigInt(candle.openPrice)).toFloat(),
-              high: $decimalValue(OraclePrice.fromBigInt(candle.highPrice)).toFloat(),
-              low: $decimalValue(OraclePrice.fromBigInt(candle.lowPrice)).toFloat(),
-              close: $decimalValue(OraclePrice.fromBigInt(candle.closePrice)).toFloat(),
+              open: $decimalValue(OraclePrice.fromBigIntString(candle.openPrice)).toFloat(),
+              high: $decimalValue(OraclePrice.fromBigIntString(candle.highPrice)).toFloat(),
+              low: $decimalValue(OraclePrice.fromBigIntString(candle.lowPrice)).toFloat(),
+              close: $decimalValue(OraclePrice.fromBigIntString(candle.closePrice)).toFloat(),
             })
           )
           .sort((a: Bar, b: Bar) => a.time - b.time);

@@ -5,6 +5,6 @@ export function decimalValueSchema<TDecimals extends number, TBrand extends stri
   schema: DecimalValueSchema<TDecimals, TBrand>
 ) {
   return z
-    .bigint()
-    .transform((val): DecimalValueInstance<TDecimals, TBrand> => schema.fromBigInt(val));
+    .string()
+    .transform((val): DecimalValueInstance<TDecimals, TBrand> => schema.fromBigIntString(val));
 }
