@@ -32,9 +32,8 @@ export function usePromise<T>(promised: Promise<T>, autorun = false): UsePromise
   }, []);
 
   if (status === 'fulfilled') {
-    if (!resolved) throw new Error();
     return {
-      data: resolved,
+      data: resolved!,
       error,
       status,
       initialize,

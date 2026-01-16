@@ -14,14 +14,14 @@ export const WalletCollateralCard: FC = () => {
 
   const baseAsset = useSdkQuery(() => trading.getBaseAsset());
 
-  const collateralPromise = usePromise(
+  const collateralPromise = usePromise<bigint | undefined>(
     baseAsset ? wallet.getUserBalances().then((a) => a[baseAsset.assetId]) : Promise.resolve(0n),
     true
   );
 
   const isLoading = collateralPromise.status === 'pending';
   const amount =
-    collateralPromise.status === 'fulfilled'
+    collateralPromise.status === 'fulfilled' && !!collateralPromise.data
       ? $decimalValue(Usdc.fromBigInt(collateralPromise.data)).toFloat()
       : 0;
 
