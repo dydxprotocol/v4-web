@@ -15,15 +15,15 @@ export default class Data1768329135947 {
     }
 
     async down(db) {
-        await db.query(`DROP TABLE "price"`)
-        await db.query(`DROP INDEX "public"."IDX_c70fa4f1953ea41d18d7cfc3c2"`)
-        await db.query(`DROP TABLE "liquidity"`)
-        await db.query(`DROP INDEX "public"."IDX_7035ee47c646130e2dbfe5f185"`)
-        await db.query(`DROP TABLE "position_key"`)
-        await db.query(`DROP INDEX "public"."IDX_d58a67ef86d17d278df99c28f5"`)
-        await db.query(`DROP INDEX "public"."IDX_c764b3789b19236ccb6c4159dd"`)
-        await db.query(`DROP TABLE "position"`)
-        await db.query(`DROP INDEX "public"."IDX_3306a154148b37f510ef9e5daf"`)
         await db.query(`ALTER TABLE "position" DROP CONSTRAINT "FK_3306a154148b37f510ef9e5daf4"`)
+        await db.query(`DROP INDEX "public"."IDX_3306a154148b37f510ef9e5daf"`)
+        await db.query(`DROP TABLE "position"`)
+        await db.query(`DROP INDEX "public"."IDX_c764b3789b19236ccb6c4159dd"`)
+        await db.query(`DROP INDEX "public"."IDX_d58a67ef86d17d278df99c28f5"`)
+        await db.query(`DROP TABLE "position_key"`)
+        await db.query(`DROP INDEX "public"."IDX_7035ee47c646130e2dbfe5f185"`)
+        await db.query(`DROP TABLE "liquidity"`)
+        await db.query(`DROP INDEX "public"."IDX_c70fa4f1953ea41d18d7cfc3c2"`)
+        await db.query(`DROP TABLE "price"`)
     }
 }

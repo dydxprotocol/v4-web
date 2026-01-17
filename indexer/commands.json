@@ -30,6 +30,10 @@
       "description": "Apply the DB migrations",
       "cmd": ["squid-typeorm-migration", "apply"]
     },
+    "migration:revert": {
+      "description": "Revert the last DB migrations",
+      "cmd": ["squid-typeorm-migration", "revert"]
+    },
     "migration:generate": {
       "description": "Generate a DB migration matching the TypeORM entities",
       "deps": ["build"],
