@@ -1,6 +1,6 @@
 import { type FC, useCallback, useState } from 'react';
 import { Button } from '@radix-ui/themes';
-import { CollateralAmount, DecimalValue, contractId } from 'fuel-ts-sdk';
+import { CollateralAmount, DecimalValue } from 'fuel-ts-sdk';
 import { WalletContext } from '@/contexts/WalletContext';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { useRequiredContext } from '@/lib/useRequiredContext';
@@ -48,7 +48,6 @@ export const DashboardOrderEntryForm: FC = () => {
         collateralAssetId: baseAsset?.assetId,
         indexAsset: quoteAsset.assetId,
         wallet: userWallet,
-        vaultContractAddress: VAULT_CONTRACT_ID,
         leverage: DecimalValue.fromDecimalString(formData.leverage),
         collateralAmount: CollateralAmount.fromDecimalString(formData.collateralSize),
         isLong: formData.orderSide === 'long',
@@ -120,7 +119,3 @@ export const DashboardOrderEntryForm: FC = () => {
     </div>
   );
 };
-
-const VAULT_CONTRACT_ID = contractId(
-  '0x6B0c0d05587F865Ef531688FF303B74313D5a0a0e7334EE9Cb87CfE2B9A56922'
-);

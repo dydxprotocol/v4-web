@@ -22,7 +22,7 @@ export const SubmitPositionButton: FC = () => {
   const hasPositions = useSdkQuery(
     () =>
       tradingSdk
-        .getAccountWatchedAssetPositions(userAddress)
+        .getAccountWatchedAssetOpenPositions(userAddress)
         .filter((p) => getPositionSide(p) === orderSide.toUpperCase()).length > 0
   );
 
