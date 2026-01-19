@@ -3,10 +3,15 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './styles/toastify.css';
 import App from './App.tsx';
 import { NetworkSwitchContextProvider } from './contexts/NetworkSwitchContext/index.ts';
 import { WalletContextProvider } from './contexts/WalletContext/WalletContextProvider.tsx';
 import { FuelTsSdkProvider } from './lib/fuel-ts-sdk';
+import './lib/pipe';
+import './lib/toBigInt';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -23,5 +28,6 @@ createRoot(document.getElementById('root')!).render(
         )}
       </NetworkSwitchContextProvider>
     </WalletContextProvider>
+    <ToastContainer position="bottom-right" theme="dark" />
   </StrictMode>
 );

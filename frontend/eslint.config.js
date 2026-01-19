@@ -44,6 +44,7 @@ export default tseslint.config(
       // React-specific
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/preserve-manual-memoization': 'off', // Only needed for React Compiler
       'react/jsx-no-constructed-context-values': 'warn',
       'react/no-unknown-property': ['error', { ignore: ['css', 'tw'] }],
       'react/no-unescaped-entities': 'off',
