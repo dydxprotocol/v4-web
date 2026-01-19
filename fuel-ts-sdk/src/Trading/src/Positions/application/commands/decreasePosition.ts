@@ -1,5 +1,6 @@
+import type { SdkConfig } from '@sdk/shared/lib/SdkConfig';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
-import type { ContractId, PositionStableId } from '@sdk/shared/types';
+import type { PositionStableId } from '@sdk/shared/types';
 import { vaultAbi } from '@starboard/indexer/abis';
 import type { Account } from 'fuels';
 import { Contract } from 'fuels';
@@ -9,13 +10,12 @@ import { selectLatestPositionByKeyId } from '../../infrastructure';
 export interface DecreasePositionParams {
   positionId: PositionStableId;
   wallet: Account;
-  vaultContractAddress: ContractId;
   sizeDelta: PositionSize;
 }
 
 export const createDecreasePositionCommand =
-  (storeService: StoreService) => async (params: DecreasePositionParams) => {
-    const { positionId, wallet, vaultContractAddress, sizeDelta } = params;
+  (storeService: StoreService, sdkConfig: SdkConfig) => async (params: DecreasePositionParams) => {
+    const { positionId, wallet, sizeDelta } = params;
 
     const position = selectLatestPositionByKeyId(storeService.getState(), positionId);
 
@@ -26,7 +26,7 @@ export const createDecreasePositionCommand =
     const isFullClose = sizeDelta.value === position.size.value;
     const collateralDelta = isFullClose ? position.collateralAmount.value : '0';
 
-    const vault = new Contract(vaultContractAddress, vaultAbi, wallet);
+    const vault = new Contract(sdkConfig.vaultAddress, vaultAbi, wallet);
     const account = { Address: { bits: wallet.address.toB256() } };
 
     await vault.functions

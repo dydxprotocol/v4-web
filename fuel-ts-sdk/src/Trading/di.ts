@@ -1,4 +1,5 @@
 import { combineReducers } from '@reduxjs/toolkit';
+import type { SdkConfig } from '@sdk/shared/lib/SdkConfig';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { GraphQLClient } from 'graphql-request';
 import * as Markets from './src/Markets';
@@ -10,7 +11,7 @@ export const tradingReducer = combineReducers({
   ...Positions.positionsReducer,
 });
 
-export const createTradingModule = (graphqlClient: GraphQLClient) => {
+export const createTradingModule = (graphqlClient: GraphQLClient, sdkConfig: SdkConfig) => {
   return {
     getThunkExtras: (): TradingThunkExtras => ({
       assetPriceRepository:
@@ -22,7 +23,7 @@ export const createTradingModule = (graphqlClient: GraphQLClient) => {
         Positions.positionsAdapters.createGraphQLPositionRepository(graphqlClient),
     }),
     createCommandsAndQueries: (storeService: StoreService) => {
-      const positionCommands = Positions.createPositionCommands(storeService);
+      const positionCommands = Positions.createPositionCommands(storeService, sdkConfig);
       const positionsQueries = Positions.createPositionQueries(storeService);
       const marketCommands = Markets.createMarketCommands(storeService);
       const marketQueries = Markets.createMarketQueries(storeService);

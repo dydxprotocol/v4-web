@@ -1,6 +1,7 @@
+import type { SdkConfig } from '@sdk/shared/lib/SdkConfig';
 import type { DecimalValueInstance } from '@sdk/shared/models/DecimalValue';
 import { CollateralAmount } from '@sdk/shared/models/decimals';
-import type { AssetId, ContractId } from '@sdk/shared/types';
+import type { AssetId } from '@sdk/shared/types';
 import { DecimalCalculator } from '@sdk/shared/utils/DecimalCalculator';
 import { vaultAbi } from '@starboard/indexer/abis';
 import type { Account } from 'fuels';
@@ -11,23 +12,14 @@ export interface SubmitOrderParams {
   wallet: Account;
   indexAsset: AssetId;
   collateralAssetId: AssetId;
-  vaultContractAddress: ContractId;
   leverage: DecimalValueInstance;
   collateralAmount: CollateralAmount;
 }
 
-export const createSubmitOrder = () => async (params: SubmitOrderParams) => {
-  const {
-    wallet,
-    vaultContractAddress,
-    indexAsset,
-    leverage,
-    isLong,
-    collateralAmount,
-    collateralAssetId,
-  } = params;
+export const createSubmitOrder = (sdkConfig: SdkConfig) => async (params: SubmitOrderParams) => {
+  const { wallet, indexAsset, leverage, isLong, collateralAmount, collateralAssetId } = params;
 
-  const vault = new Contract(vaultContractAddress, vaultAbi, wallet);
+  const vault = new Contract(sdkConfig.vaultAddress, vaultAbi, wallet);
 
   const size = DecimalCalculator.value(collateralAmount)
     .multiplyBy(leverage)
