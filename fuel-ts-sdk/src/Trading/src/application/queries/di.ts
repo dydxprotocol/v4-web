@@ -1,16 +1,16 @@
 import type { CalculateRiskMetricsDependencies } from './calculateRiskMetrics';
+import { createGetAccountOpenPositions } from './getAccountOpenPositions';
 import {
-  type GetAccountWatchedAssetPositionsDeps,
-  createGetAccountWatchedAssetPositions,
-} from './getAccountWatchedAssetPositions';
+  type GetAccountWatchedAssetOpenPositionsDeps,
+  createGetAccountWatchedAssetOpenPositions,
+} from './getAccountWatchedAssetOpenPositions';
 
 export type TradingQueriesDependencies = CalculateRiskMetricsDependencies &
-  GetAccountWatchedAssetPositionsDeps;
+  GetAccountWatchedAssetOpenPositionsDeps;
 
 export function createTradingQueries(deps: TradingQueriesDependencies) {
-  const getAccountWatchedAssetPositions = createGetAccountWatchedAssetPositions(deps);
-
   return {
-    getAccountWatchedAssetPositions,
+    getAccountWatchedAssetOpenPositions: createGetAccountWatchedAssetOpenPositions(deps),
+    getAccountOpenPositions: createGetAccountOpenPositions(deps),
   };
 }
