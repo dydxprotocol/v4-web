@@ -90,6 +90,7 @@ export function $decimalValue<T extends DecimalValueInstance<number, string>>(dv
     toDecimalString(): string {
       const str = dv.value.toString().padStart(Number(dv.decimals) + 1, '0');
       const dotIndex = str.length - Number(dv.decimals);
+      if (dotIndex === str.length) return str;
       return (str.slice(0, dotIndex) + '.' + str.slice(dotIndex)).replace(/\.?0+$/, '');
     },
 
