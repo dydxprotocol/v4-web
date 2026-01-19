@@ -1,9 +1,9 @@
 import { useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { usePolling } from '@/lib/usePolling';
 import * as styles from './Dashboard.css';
+import { DashboardOrderEntryForm } from './components/DashboardOrderEntryForm';
 import { DashboardTradingChart } from './components/DashboardTradingChart';
 import { PositionsList } from './components/PositionsList';
-import { DashboardOrderEntryForm } from './components/dashboard-order-entry-form';
 
 export function Dashboard() {
   return (

@@ -1,0 +1,65 @@
+import type { FC } from 'react';
+import { type AssetId } from 'fuel-ts-sdk';
+import { type PositionEntity, calculatePositionLeverage } from 'fuel-ts-sdk/trading';
+import { useBoolean } from 'usehooks-ts';
+import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
+import * as styles from './PositionCard.old.css';
+import {
+  CollateralField,
+  FundingRateField,
+  LeverageField,
+  PnLField,
+  PositionFeeField,
+  RealizedPnLField,
+  SizeField,
+} from './PositionField';
+
+type PositionCardProps = {
+  position: PositionEntity;
+};
+
+export const PositionCard: FC<PositionCardProps> = ({ position }) => {
+  const isProfitable = BigInt(position.pnlDelta.value) > 0n;
+  const leverage = calculatePositionLeverage(position);
+
+  return (
+    <div css={styles.positionCard}>
+      <PositionCardHeader
+        isLong={position.positionKey.isLong}
+        assetId={position.positionKey.indexAssetId}
+      />
+
+      <div css={styles.positionGrid}>
+        <SizeField value={position.size} />
+        <CollateralField value={position.collateralAmount} />
+        <LeverageField value={leverage} />
+        <PnLField value={position.pnlDelta} variant={isProfitable ? 'profit' : 'loss'} />
+        <RealizedPnLField value={position.realizedPnl} />
+        <PositionFeeField value={position.positionFee} />
+        <FundingRateField value={position.fundingRate} />
+      </div>
+    </div>
+  );
+};
+
+type PositionCardHeaderProps = {
+  isLong: boolean;
+  assetId: AssetId;
+};
+
+function PositionCardHeader({ isLong, assetId }: PositionCardHeaderProps) {
+  const tradingSdk = useTradingSdk();
+  const asset = useSdkQuery(() => tradingSdk.getAssetById(assetId));
+  const symbol = asset?.symbol ?? assetId.slice(0, 8) + '...';
+  const modalOpenBoolean = useBoolean();
+
+  return (
+    <div css={styles.positionHeader}>
+      <span css={[styles.positionSide, isLong ? styles.longPosition : styles.shortPosition]}>
+        {isLong ? 'LONG' : 'SHORT'}
+      </span>
+      <span css={styles.fieldValue}>Asset: {symbol}</span>
+      <button onClick={modalOpenBoolean.setTrue}>Decrease</button>
+    </div>
+  );
+}

@@ -1,8 +1,10 @@
 import type { FC } from 'react';
-import { type AssetId } from 'fuel-ts-sdk';
+import { MinusIcon } from '@radix-ui/react-icons';
+import { Tooltip } from '@radix-ui/themes';
+import { type AssetId, type PositionStableId } from 'fuel-ts-sdk';
 import { type PositionEntity, calculatePositionLeverage } from 'fuel-ts-sdk/trading';
+import { useBoolean } from 'usehooks-ts';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
-import * as styles from './PositionCard.css';
 import {
   CollateralField,
   FundingRateField,
@@ -11,7 +13,9 @@ import {
   PositionFeeField,
   RealizedPnLField,
   SizeField,
-} from './PositionField';
+} from '../PositionField';
+import * as styles from './PositionCard.css';
+import { DecreasePositionDialog } from './components/DecreasePositionDialog';
 
 type PositionCardProps = {
   position: PositionEntity;
@@ -24,6 +28,7 @@ export const PositionCard: FC<PositionCardProps> = ({ position }) => {
   return (
     <div css={styles.positionCard}>
       <PositionCardHeader
+        positionId={position.positionKey.id}
         isLong={position.positionKey.isLong}
         assetId={position.positionKey.indexAssetId}
       />
@@ -44,18 +49,32 @@ export const PositionCard: FC<PositionCardProps> = ({ position }) => {
 type PositionCardHeaderProps = {
   isLong: boolean;
   assetId: AssetId;
+  positionId: PositionStableId;
 };
 
-function PositionCardHeader({ isLong, assetId }: PositionCardHeaderProps) {
+function PositionCardHeader({ isLong, assetId, positionId }: PositionCardHeaderProps) {
   const tradingSdk = useTradingSdk();
   const asset = useSdkQuery(() => tradingSdk.getAssetById(assetId));
   const symbol = asset?.symbol ?? assetId.slice(0, 8) + '...';
+  const modalOpenBoolean = useBoolean();
+
   return (
     <div css={styles.positionHeader}>
       <span css={[styles.positionSide, isLong ? styles.longPosition : styles.shortPosition]}>
         {isLong ? 'LONG' : 'SHORT'}
       </span>
       <span css={styles.fieldValue}>Asset: {symbol}</span>
+      <Tooltip content="Decrease or close position">
+        <button className={styles.iconButton} onClick={modalOpenBoolean.setTrue}>
+          <MinusIcon />
+        </button>
+      </Tooltip>
+
+      <DecreasePositionDialog
+        positionId={positionId}
+        open={modalOpenBoolean.value}
+        onOpenChange={modalOpenBoolean.setValue}
+      />
     </div>
   );
 }
