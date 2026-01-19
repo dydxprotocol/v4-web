@@ -1,6 +1,6 @@
 import { DecimalCalculator, zero } from '@sdk/shared/utils/DecimalCalculator';
-import { PositionSize } from '../positionsDecimals';
 import type { PositionEntity } from '../PositionsEntity';
+import { PositionSize } from '../positionsDecimals';
 
 export function calculateTotalSize(positions: PositionEntity[]): PositionSize {
   if (positions.length === 0) {
