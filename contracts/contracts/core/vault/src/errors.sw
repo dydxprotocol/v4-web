@@ -5,6 +5,7 @@ pub enum Error {
     VaultAlreadyInitialized: (),
     VaultNotInitialized: (),
     VaultInvalidMsgCaller: (),
+    VaultInvalidPrice: (),
     VaultSizeExceeded: (),
     VaultCollateralExceeded: (),
     VaultInsufficientCollateralForFees: (),

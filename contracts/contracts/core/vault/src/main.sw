@@ -391,12 +391,8 @@ impl Vault for Contract {
         average_price: u256,
         is_long: bool,
     ) -> (bool, u256) {
-        // TODO one price
-        let price = if is_long {
-            _get_min_price(index_asset)
-        } else {
-            _get_max_price(index_asset)
-        };
+        // _is_increase is false because pnl is realized only on decreasing the position
+        let price = _get_price(index_asset, is_long, false);
 
         _get_pnl(index_asset, size, price, average_price, is_long)
     }
@@ -407,13 +403,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_max_price(asset: b256) -> u256 {
-        _get_max_price(asset)
-    }
-
-    #[storage(read)]
-    fn get_min_price(asset: b256) -> u256 {
-        _get_min_price(asset)
+    fn get_price(asset: b256, is_long: bool, is_increase: bool) -> u256 {
+        _get_price(asset, is_long, is_increase)
     }
 
     #[storage(read)]
@@ -637,31 +628,38 @@ fn _write_fee_reserve(fee_reserve: u256) {
     storage::vault.fee_reserve.write(fee_reserve);
 }
 
-//TODO: add overflow check
+/// the amount after fees is rounded down
+/// required fee_basis_points < BASIS_POINTS_DIVISOR, unchecked
 fn _get_after_fee_amount(amount: u64, fee_basis_points: u64) -> u64 {
-    amount * (BASIS_POINTS_DIVISOR - fee_basis_points) / BASIS_POINTS_DIVISOR
+    if amount < u64::max() / BASIS_POINTS_DIVISOR {
+        amount * (BASIS_POINTS_DIVISOR - fee_basis_points) / BASIS_POINTS_DIVISOR
+    } else {
+        let after_fee_amount_u256 = amount.as_u256() * (BASIS_POINTS_DIVISOR - fee_basis_points).as_u256() / BASIS_POINTS_DIVISOR.as_u256();
+        // no threat to overflow since all values fit u64
+        u64::try_from(after_fee_amount_u256).unwrap()
+    }
 }
 
-/// price in the usd
-/// max/min prices express the spread, to be provided in the future
+/// the price is the rate of the asset in the base asset (i.e. USDC)
+/// the arguments _is_long and _is_increase are for possible future extension - applying the spread
+/// The price in the base asset so it is asset_price / base_asset_price
 #[storage(read)]
-fn _get_max_price(asset: b256) -> u256 {
+fn _get_price(asset: b256, _is_long: bool, _is_increase: bool) -> u256 {
     let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
-    let collateral_asset_price = pricefeed_wrapper.price(BASE_ASSET);
+    let base_asset_price = pricefeed_wrapper.price(BASE_ASSET);
     let asset_price = pricefeed_wrapper.price(asset);
-    // TODO overflow check
-    asset_price * PRICE_PRECISION / collateral_asset_price
-}
-
-/// price in the usd
-/// max/min prices express the spread, to be provided in the future
-#[storage(read)]
-fn _get_min_price(asset: b256) -> u256 {
-    let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
-    let collateral_asset_price = pricefeed_wrapper.price(BASE_ASSET);
-    let asset_price = pricefeed_wrapper.price(asset);
-    // TODO overflow check
-    asset_price * PRICE_PRECISION / collateral_asset_price
+    // overly defensive programming
+    require(base_asset_price > 0, Error::VaultInvalidPrice);
+    require(asset_price > 0, Error::VaultInvalidPrice);
+    if asset_price < u256::max() / PRICE_PRECISION {
+        asset_price * PRICE_PRECISION / base_asset_price
+    } else {
+        require(
+            asset_price / base_asset_price < u256::max() / PRICE_PRECISION,
+            Error::VaultInvalidPrice,
+        );
+        asset_price / base_asset_price * PRICE_PRECISION
+    }
 }
 
 #[storage(read)]
@@ -705,13 +703,9 @@ fn _validate_liquidation(
 
     require(position.size > 0, Error::VaultEmptyPosition);
 
-    // TODO one price
-    // TODO move this to the caller to avoid repeated external calls
-    let price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
+    // we take the fresh price here, it potentially may be different than for the caller
+    // the spread may be applied
+    let price = _get_price(index_asset, is_long, false);
 
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
@@ -753,7 +747,7 @@ fn _validate_liquidation(
 
     if losses_and_fees > available_collateral {
         if should_raise {
-            require(false, Error::VaultLossesExceedCollateral); // TODO good error message?
+            require(false, Error::VaultLossesExceedCollateral);
         }
         return (1, 0);
     }
@@ -838,12 +832,8 @@ fn _get_position_pnl(account: Identity, index_asset: b256, is_long: bool) -> (bo
 
     let position = _get_position_by_key(position_key);
 
-    // TODO one price
-    let price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
+    // _is_increase is false because pnl is realized only on decreasing the position
+    let price = _get_price(index_asset, is_long, false);
 
     _get_pnl(
         index_asset,
@@ -1129,12 +1119,7 @@ fn _increase_position(
 
     let out_position_fee = out_protocol_fee + out_liquidity_fee;
 
-    // TODO one price
-    let price = if is_long {
-        _get_max_price(index_asset)
-    } else {
-        _get_min_price(index_asset)
-    };
+    let price = _get_price(index_asset, is_long, true);
 
     // update the average price before the size and collateral are updated
     position.average_price = if position.size == 0 {
@@ -1169,7 +1154,7 @@ fn _increase_position(
     position.size = position.size + size_delta;
     position.collateral = out_collateral;
 
-    // TODO collateral may be high because of funding rate, maybe excess should be returned to the user?
+    // collateral may be high because of funding rate, the excess is not returned to the user
     require(
         position
             .size >= position
@@ -1230,12 +1215,7 @@ fn _decrease_position(
 
     let total_reserves = storage::vault.total_reserves.read();
 
-    // TODO one price
-    let price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
+    let price = _get_price(index_asset, is_long, false);
 
     let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
 
@@ -1326,7 +1306,7 @@ fn _decrease_position(
 
         position.cumulative_funding_rate = new_cumulative_funding_rate;
 
-        // TODO collateral may be high because of funding rate, maybe excess should be returned to the user?
+        // collateral may be high because of funding rate, the excess is not returned to the user
         require(
             position
                 .size >= position
@@ -1422,12 +1402,7 @@ fn _liquidate_position(
 
     let total_reserves = storage::vault.total_reserves.read();
 
-    // TODO one price
-    let price = if is_long {
-        _get_min_price(index_asset)
-    } else {
-        _get_max_price(index_asset)
-    };
+    let price = _get_price(index_asset, is_long, false);
 
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
@@ -1788,7 +1763,7 @@ fn _decrease_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
         funding_info.long_cumulative_funding_rate = long_cumulative_funding_rate;
         funding_info.short_cumulative_funding_rate = short_cumulative_funding_rate;
     }
-    // TODO underflow check
+    // no threat to underflow
     if (is_long) {
         funding_info.total_long_sizes = funding_info.total_long_sizes - size;
     } else {

@@ -74,9 +74,7 @@ abi Vault {
     #[storage(read)]
     fn get_position_by_key(position_key: b256) -> Position;
     #[storage(read)]
-    fn get_max_price(asset: b256) -> u256;
-    #[storage(read)]
-    fn get_min_price(asset: b256) -> u256;
+    fn get_price(asset: b256, is_long: bool, is_increase: bool) -> u256;
     #[storage(read)]
     fn get_total_reserves() -> u256;
     #[storage(read)]
