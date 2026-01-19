@@ -1,10 +1,12 @@
 import { Outlet } from 'react-router';
 import logoStarboard from '@/assets/logo-starboard.png';
 import { WalletContext } from '@/contexts/WalletContext/WalletContext';
+import { getEnv } from '@/lib/env';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import { WalletCollateralCard } from '../../components/WalletCollateralCard';
 import * as styles from './DashboardLayout.css';
-import { AssetSelect } from './components/AssetSelect';
+import { MarketStats } from './components/MarketStats';
+import { MintButton } from './components/MintButton';
 
 export function DashboardLayout() {
   const wallet = useRequiredContext(WalletContext);
@@ -18,13 +20,14 @@ export function DashboardLayout() {
   return (
     <div css={styles.page}>
       <header css={styles.header}>
-        <div>
+        <div css={styles.headerLeft}>
           <img src={logoStarboard} alt="Starboard" css={styles.logo} />
+
+          <MarketStats />
         </div>
 
-        <AssetSelect />
-
         <div css={styles.headerRight}>
+          {getEnv('VITE_ENV') === 'dev' && <MintButton />}
           {isWalletConnected && <WalletCollateralCard />}
           <button
             onClick={connectOrDisconnectWallet}
