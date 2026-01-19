@@ -4,21 +4,50 @@ import { colors } from '../../../../styles/colors';
 export const positionsContainer = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.5rem',
+  gap: '0.75rem',
   flex: '0 0 auto',
-  backgroundColor: colors.gluonGrey,
-  borderRadius: '0.5rem',
-  padding: '0.75rem',
 });
 
-export const totalExposure = style({
-  fontSize: '0.875rem',
+export const header = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '0 0.25rem',
+});
+
+export const headerTitle = style({
+  fontSize: '0.8125rem',
   fontWeight: '600',
   color: colors.snow,
-  padding: '0.5rem 0.75rem',
-  backgroundColor: colors.liquidLavaAlpha[10],
-  borderRadius: '0.375rem',
-  border: `1px solid ${colors.liquidLavaAlpha[20]}`,
-  marginBottom: '0.5rem',
-  flexShrink: 0,
+  letterSpacing: '-0.01em',
+});
+
+export const headerStats = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+});
+
+export const statItem = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.375rem',
+});
+
+export const statLabel = style({
+  fontSize: '0.6875rem',
+  color: colors.dustyGrey,
+});
+
+export const statValue = style({
+  fontSize: '0.6875rem',
+  fontWeight: '600',
+  color: colors.snow,
+  fontFamily: 'monospace',
+});
+
+export const positionCards = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
 });

@@ -13,7 +13,7 @@ export const PositionsList: FC = () => {
   const trading = useTradingSdk();
   const { getUserAddress } = useRequiredContext(WalletContext);
   const userAddress = useAwaited(useMemo(() => getUserAddress(), [getUserAddress]));
-  const positions = useSdkQuery(() => trading.getAccountWatchedAssetPositions(userAddress));
+  const positions = useSdkQuery(() => trading.getAccountOpenPositions(userAddress));
 
   const totalExposure = calculateTotalExposure(positions);
 
@@ -23,18 +23,29 @@ export const PositionsList: FC = () => {
     }, [trading, userAddress])
   );
 
+  if (positions.length === 0) return null;
+
   return (
-    <>
-      {positions.length > 0 && (
-        <div css={styles.positionsContainer}>
-          <div css={styles.totalExposure}>
-            Total Exposure: ${$decimalValue(totalExposure).toFloat().toFixed(2)}
+    <div css={styles.positionsContainer}>
+      <div css={styles.header}>
+        <span css={styles.headerTitle}>Open Positions ({positions.length})</span>
+        <div css={styles.headerStats}>
+          <div css={styles.statItem}>
+            <span css={styles.statLabel}>Exposure</span>
+            <span css={styles.statValue}>
+              $
+              {$decimalValue(totalExposure)
+                .toFloat()
+                .toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
           </div>
-          {positions.map((position) => (
-            <PositionCard key={position.revisionId} position={position} />
-          ))}
         </div>
-      )}
-    </>
+      </div>
+      <div css={styles.positionCards}>
+        {positions.map((position) => (
+          <PositionCard key={position.revisionId} position={position} />
+        ))}
+      </div>
+    </div>
   );
 };
