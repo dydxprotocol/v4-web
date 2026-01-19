@@ -1,12 +1,6 @@
 import { memo, useCallback, useState } from 'react';
 import { Dialog } from '@radix-ui/themes';
-import {
-  $decimalValue,
-  DecimalCalculator,
-  type PositionStableId,
-  RatioOutput,
-  contractId,
-} from 'fuel-ts-sdk';
+import { $decimalValue, DecimalCalculator, type PositionStableId, RatioOutput } from 'fuel-ts-sdk';
 import { PositionSize } from 'fuel-ts-sdk/trading';
 import { toast } from 'react-toastify';
 import { WalletContext } from '@/contexts/WalletContext';
@@ -18,10 +12,6 @@ import { CurrenPositionInfo } from './components/CurrenPositionInfo';
 import { SizeInput } from './components/SizeInput';
 import { SizeSlider } from './components/SizeSlider';
 import { Summary } from './components/Summary';
-
-const VAULT_CONTRACT_ID = contractId(
-  '0x6B0c0d05587F865Ef531688FF303B74313D5a0a0e7334EE9Cb87CfE2B9A56922'
-);
 
 type DecreasePositionDialogProps = {
   open: boolean;
@@ -93,7 +83,6 @@ export const DecreasePositionDialog = memo(
         await tradingSdk.decreasePosition({
           positionId,
           wallet: userWallet,
-          vaultContractAddress: VAULT_CONTRACT_ID,
           sizeDelta,
         });
         toast.success(`Position ${action} successfully`);
