@@ -7,20 +7,20 @@ import {
 } from './formatCurrency';
 
 describe('formatCurrency', () => {
-  it('formats basic numbers with dollar sign and 2 decimals', () => {
-    expect(formatCurrency(1234.56)).toBe('$1,234.56');
-    expect(formatCurrency(0)).toBe('$0.00');
-    expect(formatCurrency(1000000)).toBe('$1,000,000.00');
+  it('formats basic numbers with 2 decimals', () => {
+    expect(formatCurrency(1234.56)).toBe('1,234.56');
+    expect(formatCurrency(0)).toBe('0.00');
+    expect(formatCurrency(1000000)).toBe('1,000,000.00');
   });
 
   it('handles bigint values', () => {
-    expect(formatCurrency(1234n)).toBe('$1,234.00');
-    expect(formatCurrency(1000000n)).toBe('$1,000,000.00');
+    expect(formatCurrency(1234n)).toBe('1,234.00');
+    expect(formatCurrency(1000000n)).toBe('1,000,000.00');
   });
 
   it('supports custom decimal places', () => {
-    expect(formatCurrency(1234.5678, { decimals: 4 })).toBe('$1,234.5678');
-    expect(formatCurrency(1234.5, { decimals: 0 })).toBe('$1,235');
+    expect(formatCurrency(1234.5678, { decimals: 4 })).toBe('1,234.5678');
+    expect(formatCurrency(1234.5, { decimals: 0 })).toBe('1,235');
   });
 
   it('supports hiding the symbol', () => {
@@ -29,52 +29,63 @@ describe('formatCurrency', () => {
 
   it('supports custom symbol', () => {
     expect(formatCurrency(1234.56, { symbol: '€' })).toBe('€1,234.56');
+    expect(formatCurrency(1234.56, { symbol: '$' })).toBe('$1,234.56');
   });
 
   describe('compact notation', () => {
     it('formats thousands with K suffix', () => {
-      expect(formatCurrency(1500, { compact: true })).toBe('$1.50K');
-      expect(formatCurrency(99999, { compact: true })).toBe('$100.00K');
+      expect(formatCurrency(1500, { compact: true })).toBe('1.50K');
+      expect(formatCurrency(99999, { compact: true })).toBe('100.00K');
     });
 
     it('formats millions with M suffix', () => {
-      expect(formatCurrency(1500000, { compact: true })).toBe('$1.50M');
-      expect(formatCurrency(2994773, { compact: true })).toBe('$2.99M');
+      expect(formatCurrency(1500000, { compact: true })).toBe('1.50M');
+      expect(formatCurrency(2994773, { compact: true })).toBe('2.99M');
     });
 
     it('formats billions with B suffix', () => {
-      expect(formatCurrency(1500000000, { compact: true })).toBe('$1.50B');
+      expect(formatCurrency(1500000000, { compact: true })).toBe('1.50B');
     });
 
     it('formats trillions with T suffix', () => {
-      expect(formatCurrency(1500000000000, { compact: true })).toBe('$1.50T');
+      expect(formatCurrency(1500000000000, { compact: true })).toBe('1.50T');
     });
 
     it('handles negative values', () => {
-      expect(formatCurrency(-1500000, { compact: true })).toBe('-$1.50M');
+      expect(formatCurrency(-1500000, { compact: true })).toBe('-1.50M');
     });
 
     it('handles values below 1000 without suffix', () => {
-      expect(formatCurrency(500, { compact: true })).toBe('$500.00');
+      expect(formatCurrency(500, { compact: true })).toBe('500.00');
+    });
+
+    it('formats with custom symbol in compact mode', () => {
+      expect(formatCurrency(1500000, { compact: true, symbol: '$' })).toBe('$1.50M');
+      expect(formatCurrency(-1500000, { compact: true, symbol: '$' })).toBe('-$1.50M');
     });
   });
 
   describe('minDisplay threshold', () => {
     it('shows < symbol for values below threshold', () => {
-      expect(formatCurrency(0.005, { minDisplay: 0.01 })).toBe('$<0.01');
+      expect(formatCurrency(0.005, { minDisplay: 0.01 })).toBe('<0.01');
     });
 
     it('shows normal value at or above threshold', () => {
-      expect(formatCurrency(0.01, { minDisplay: 0.01 })).toBe('$0.01');
-      expect(formatCurrency(0.02, { minDisplay: 0.01 })).toBe('$0.02');
+      expect(formatCurrency(0.01, { minDisplay: 0.01 })).toBe('0.01');
+      expect(formatCurrency(0.02, { minDisplay: 0.01 })).toBe('0.02');
     });
 
     it('shows zero as zero, not as < threshold', () => {
-      expect(formatCurrency(0, { minDisplay: 0.01 })).toBe('$0.00');
+      expect(formatCurrency(0, { minDisplay: 0.01 })).toBe('0.00');
     });
 
     it('respects showSymbol option with minDisplay', () => {
       expect(formatCurrency(0.005, { minDisplay: 0.01, showSymbol: false })).toBe('<0.01');
+    });
+
+    it('shows symbol with minDisplay when provided', () => {
+      expect(formatCurrency(0.005, { minDisplay: 0.01, symbol: '$' })).toBe('$<0.01');
+      expect(formatCurrency(0.01, { minDisplay: 0.01, symbol: '$' })).toBe('$0.01');
     });
   });
 });
