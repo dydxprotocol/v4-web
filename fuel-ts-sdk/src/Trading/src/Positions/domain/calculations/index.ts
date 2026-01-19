@@ -5,6 +5,7 @@ export * from './calculatePositionHealth';
 export * from './calculatePositionLeverage';
 export * from './calculateTotalCollateral';
 export * from './calculateTotalExposure';
+export * from './calculateTotalSize';
 export * from './calculateUnrealizedPnL';
 export * from './filterClosedPositions';
 export * from './filterOpenPositions';
