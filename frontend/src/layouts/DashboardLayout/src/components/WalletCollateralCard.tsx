@@ -38,7 +38,7 @@ export const WalletCollateralCard: FC = () => {
   const content = (
     <div css={$.collateralContainer}>
       <div css={$.collateralContent}>
-        <span css={$.collateralLabel}>Collateral</span>
+        <span css={$.collateralLabel}>Avail. Collateral</span>
         <div css={$.collateralValue}>
           {isLoading ? (
             <>
