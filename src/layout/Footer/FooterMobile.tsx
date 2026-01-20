@@ -44,7 +44,7 @@ export const FooterMobile = () => {
           },
         ]}
         orientation="horizontal"
-        itemOrientation="vertical"
+        itemOrientation="horizontal"
       />
     </$MobileNav>
   );

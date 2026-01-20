@@ -58,7 +58,7 @@ const TradePage = () => {
   ) : canAccountTrade ? (
     <>
       <Button
-        tw="flex-1 bg-color-negative text-color-layer-0"
+        tw="flex-1 rounded-1 bg-color-negative text-color-layer-0"
         shape={ButtonShape.Pill}
         size={ButtonSize.Large}
         onClick={() => {
@@ -70,7 +70,7 @@ const TradePage = () => {
       </Button>
 
       <Button
-        tw="flex-1 bg-color-positive text-color-layer-0"
+        tw="flex-1 rounded-1 bg-color-positive text-color-layer-0"
         shape={ButtonShape.Pill}
         size={ButtonSize.Large}
         onClick={() => {

@@ -105,12 +105,7 @@ const CloseTradeForm = ({ market }: Props) => {
     onLastOrderIndexed,
   });
 
-  const {
-    shouldPromptUserToPlaceLimitOrder,
-    isErrorShownInOrderStatusToast,
-    primaryAlert,
-    shortAlertKey,
-  } = useTradeErrors({
+  const { isErrorShownInOrderStatusToast, primaryAlert, shortAlertKey } = useTradeErrors({
     placeOrderError: closePositionError,
     isClosingPosition: true,
   });
@@ -129,7 +124,6 @@ const CloseTradeForm = ({ market }: Props) => {
       //   return;
       // }
 
-      console.log(tradeType);
       dispatch(closePositionFormActions.setOrderType(tradeType));
     },
     [dispatch, side]
@@ -139,9 +133,6 @@ const CloseTradeForm = ({ market }: Props) => {
     dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
     dispatch(closePositionFormActions.reset());
   };
-
-  const formattedPositionSize =
-    (positionSize?.toNumber() ?? 0) / 10 ** (stepSizeDecimals ?? TOKEN_DECIMALS);
 
   const midMarketPriceButton = (
     <$MidPriceButton onClick={setLimitPriceToMidPrice} size={ButtonSize.XSmall}>
@@ -187,6 +178,7 @@ const CloseTradeForm = ({ market }: Props) => {
       <div tw="w-full text-medium">Close {displayableAsset} Position</div>
       <MobileDropdownMenu
         withPortal={false}
+        align="end"
         items={[
           {
             value: TradeFormType.MARKET,
@@ -273,7 +265,7 @@ const CloseTradeForm = ({ market }: Props) => {
       />
 
       <div
-        tw="w-[calc(100vw - 64px)] flexColumn gap-1 py-1.25"
+        tw="flexColumn w-full gap-1 py-1.25"
         css={{
           background:
             'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',
@@ -308,80 +300,6 @@ const CloseTradeForm = ({ market }: Props) => {
 };
 
 export default CloseTradeForm;
-
-const StyledButton = styled(Button)<{ $isActive?: boolean }>`
-  ${({ $isActive }) =>
-    $isActive
-      ? `--button-textColor: var(--color-text-2);`
-      : `--button-textColor: var(--color-text-0);`}
-`;
-
-const LongButton = styled(Button)<{ $isLong?: boolean }>`
-  ${({ $isLong }) =>
-    $isLong ? `background-color: var(--color-gradient-positive);` : 'background-color: transparent'}
-`;
-
-const ShortButton = styled(Button)<{ $isShort?: boolean }>`
-  ${({ $isShort }) =>
-    $isShort
-      ? `background-color: var(--color-gradient-negative);`
-      : 'background-color: transparent'}
-`;
-
-const $InputsColumn = styled.div`
-  ${formMixins.inputsColumn}
-
-  width: 100%;
-`;
-
-const AvailableRow = styled.div`
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  padding: 8 px 4 px;
-
-  margin-bottom: 8 px;
-
-  width: 100%;
-`;
-const AvailableLabel = styled.span`
-  color: #6b7280;
-
-  font-size: 15 px;
-`;
-const AvailableValue = styled.div`
-  display: flex;
-
-  align-items: center;
-
-  gap: 8 px;
-
-  color: #6b7280;
-
-  font-size: 15 px;
-`;
-
-const ToggleRow = styled.div`
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  padding: 0px 0px;
-
-  width: 100%;
-`;
-const ToggleLabel = styled.span`
-  color: #9ca3af;
-
-  font-size: 16 px;
-
-  font-weight: 400;
-`;
 
 const $PlaceOrderButtonAndReceipt = styled(PlaceOrderButtonAndReceipt)`
   --withReceipt-backgroundColor: transparent;

@@ -226,7 +226,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     () => ({
       asChild: true,
       value: InfoSection.Orders,
-      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS_HEADER }),
+      label: stringGetter({ key: isTablet ? STRING_KEYS.ORDERS : STRING_KEYS.OPEN_ORDERS_HEADER }),
 
       slotRight:
         areOrdersLoading || isWaitingForOrderToIndex ? (
@@ -283,7 +283,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     () => ({
       asChild: true,
       value: InfoSection.OrderHistory,
-      label: stringGetter({ key: STRING_KEYS.ORDER_HISTORY_HEADER }),
+      label: stringGetter({
+        key: isTablet ? STRING_KEYS.HISTORY : STRING_KEYS.ORDER_HISTORY_HEADER,
+      }),
 
       slotRight: areOrdersLoading ? (
         <LoadingSpinner tw="[--spinner-width:1rem]" />
@@ -394,7 +396,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     () => ({
       asChild: true,
       value: InfoSection.Payments,
-      label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS }),
+      label: stringGetter({
+        key: isTablet ? STRING_KEYS.FUNDING_PAYMENTS_SHORT : STRING_KEYS.FUNDING_PAYMENTS,
+      }),
 
       content: (
         <FundingPaymentsTable

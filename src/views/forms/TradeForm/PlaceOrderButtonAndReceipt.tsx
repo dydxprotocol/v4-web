@@ -388,6 +388,7 @@ const $Footer = styled.footer`
   ${formMixins.footer}
   padding-bottom: var(--dialog-content-paddingBottom);
   ${layoutMixins.column}
+  width: 100%;
 `;
 
 const $WithSeparators = styled(WithSeparators)`

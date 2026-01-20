@@ -243,6 +243,7 @@ const RegularTradeForm = () => {
       </div>
       <MobileDropdownMenu
         withPortal={false}
+        align="end"
         items={[
           {
             value: TradeFormType.MARKET,
@@ -331,7 +332,7 @@ const RegularTradeForm = () => {
         />
       </ToggleRow>
       <div
-        tw="w-[calc(100vw - 64px)] flexColumn gap-1 py-1.25"
+        tw="flexColumn w-full gap-1 py-1.25"
         css={{
           background:
             'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',

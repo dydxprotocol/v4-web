@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -40,6 +41,12 @@ const TabButton = ({ value, label }: { value: Tab; label: string }) => (
   </Trigger>
 );
 
+enum HeightMode {
+  Short = 'Short',
+  Normal = 'Normal',
+  Mobile = 'Mobile',
+}
+
 export const MobileTopPanel = ({
   isViewingUnlaunchedMarket,
 }: {
@@ -47,6 +54,7 @@ export const MobileTopPanel = ({
 }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { isTablet } = useBreakpoints();
 
   const [value, setValue] = useState(Tab.Price);
 
@@ -81,7 +89,9 @@ export const MobileTopPanel = ({
   return (
     <$Tabs
       value={value}
-      $shortMode={value === Tab.Account}
+      $heightMode={
+        isTablet ? HeightMode.Mobile : value === Tab.Account ? HeightMode.Short : HeightMode.Normal
+      }
       onValueChange={setValue}
       items={items.map((item) => ({
         ...item,
@@ -92,11 +102,16 @@ export const MobileTopPanel = ({
   );
 };
 
-type TabsStyleProps = { $shortMode?: boolean };
+type TabsStyleProps = { $heightMode?: HeightMode };
 const TabsTypeTemp = getSimpleStyledOutputType(Tabs, {} as TabsStyleProps);
 
 const $Tabs = styled(Tabs)<TabsStyleProps>`
-  --scrollArea-height: ${({ $shortMode }) => ($shortMode ? '19rem' : '27rem')};
+  --scrollArea-height: ${({ $heightMode }) =>
+    $heightMode === HeightMode.Mobile
+      ? '23rem'
+      : $heightMode === HeightMode.Short
+        ? '19rem'
+        : '27rem'};
   --stickyArea0-background: var(--color-layer-2);
   --tabContent-height: calc(var(--scrollArea-height) - 2rem - var(--tabs-currentHeight));
 
@@ -105,7 +120,7 @@ const $Tabs = styled(Tabs)<TabsStyleProps>`
   gap: var(--border-width);
 
   > div > header {
-    padding: 1rem 1.25rem;
+    ${({ $heightMode }) => ($heightMode !== HeightMode.Mobile ? 'padding: 1rem 1.25rem;' : '')}
 
     > [role='tablist'] {
       margin: auto;
