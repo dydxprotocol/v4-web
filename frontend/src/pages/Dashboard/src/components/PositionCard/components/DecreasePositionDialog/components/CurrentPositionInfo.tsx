@@ -2,14 +2,14 @@ import type { FC } from 'react';
 import { $decimalValue } from 'fuel-ts-sdk';
 import type { PositionSize } from 'fuel-ts-sdk/trading';
 import { formatCurrency } from '@/lib/formatCurrency';
-import * as $ from './CurrenPositionInfo.css';
+import * as $ from './CurrentPositionInfo.css';
 
-export interface CurrenPositionInfoProps {
+export interface CurrentPositionInfoProps {
   currentSize: PositionSize;
   assetSymbol: string;
 }
 
-export const CurrenPositionInfo: FC<CurrenPositionInfoProps> = ({ currentSize, assetSymbol }) => {
+export const CurrentPositionInfo: FC<CurrentPositionInfoProps> = ({ currentSize, assetSymbol }) => {
   return (
     <div css={$.positionInfo}>
       <div>

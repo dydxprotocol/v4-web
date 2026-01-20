@@ -14,7 +14,7 @@ import {
   isValidDecreaseAmount,
 } from './DecreasePositionDialog.utils';
 import { Actions } from './components/Actions';
-import { CurrenPositionInfo } from './components/CurrenPositionInfo';
+import { CurrentPositionInfo } from './components/CurrentPositionInfo';
 import { SizeInput } from './components/SizeInput';
 import { SizeSlider } from './components/SizeSlider';
 import { Summary } from './components/Summary';
@@ -34,7 +34,9 @@ export const DecreasePositionDialog = memo(
     const assetSymbol = tradingSdk.getWatchedAsset()?.name ?? '...';
 
     const position = tradingSdk.getPositionById(positionId);
-    if (!position) throw new Error('Position not found');
+    if (!position) {
+      throw new Error('Position not found');
+    }
 
     const totalPositionSize = position.size;
 
@@ -56,7 +58,10 @@ export const DecreasePositionDialog = memo(
 
     const submitPositionChange = useCallback(async () => {
       const userWallet = await wallet.getUserWalletReference();
-      if (!userWallet) throw new Error('Wallet not connected');
+      if (!userWallet) {
+        toast.error('Wallet not connected');
+        return;
+      }
 
       const sizeDelta = PositionSize.fromDecimalString(sizeToDecrease);
 
@@ -84,7 +89,7 @@ export const DecreasePositionDialog = memo(
         <Dialog.Content className={styles.dialogContent}>
           <Dialog.Title className={styles.dialogTitle}>Decrease Position</Dialog.Title>
 
-          <CurrenPositionInfo assetSymbol={assetSymbol} currentSize={totalPositionSize} />
+          <CurrentPositionInfo assetSymbol={assetSymbol} currentSize={totalPositionSize} />
 
           <div className={styles.inputSection}>
             <SizeInput

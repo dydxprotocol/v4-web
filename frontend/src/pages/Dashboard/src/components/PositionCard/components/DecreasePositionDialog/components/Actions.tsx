@@ -15,8 +15,11 @@ export const Actions: FC<ActionsProps> = (props) => {
 
   const handleClick = async () => {
     isLocked.setTrue();
-    await props.onSubmit();
-    isLocked.setFalse();
+    try {
+      await props.onSubmit();
+    } finally {
+      isLocked.setFalse();
+    }
   };
 
   const isInteractive = isLocked.value === false && props.submittable;

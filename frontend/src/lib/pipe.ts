@@ -4,10 +4,33 @@ function pipe<TOut, TIn>(this: TIn, predicate: (value: TIn) => TOut): TOut {
   return predicate(this);
 }
 
-Array.prototype.pipe = pipe;
-String.prototype.pipe = pipe;
-Number.prototype.pipe = pipe;
-Boolean.prototype.pipe = pipe;
+Object.defineProperty(Array.prototype, 'pipe', {
+  value: pipe,
+  writable: true,
+  enumerable: false,
+  configurable: true,
+});
+
+Object.defineProperty(String.prototype, 'pipe', {
+  value: pipe,
+  writable: true,
+  enumerable: false,
+  configurable: true,
+});
+
+Object.defineProperty(Number.prototype, 'pipe', {
+  value: pipe,
+  writable: true,
+  enumerable: false,
+  configurable: true,
+});
+
+Object.defineProperty(Boolean.prototype, 'pipe', {
+  value: pipe,
+  writable: true,
+  enumerable: false,
+  configurable: true,
+});
 
 Object.defineProperty(Object.prototype, 'pipe', {
   value: pipe,
@@ -124,18 +147,3 @@ declare global {
     pipe<TOut>(this: Object, predicate: (value: this) => TOut): TOut;
   }
 }
-
-/**
- * A utility method that enables pipeline-style function composition on objects.
- * Applies a transformation function to the object and returns the result.
- *
- * @template TOut - The return type of the transformation function
- * @param {(value: this) => TOut} predicate - A function that takes the object and returns a transformed value
- * @returns {TOut} The result of applying the predicate function to this object
- *
- * @example
- * const result = { x: 1, y: 2 }
- *   .pipe(obj => obj.x + obj.y)
- *   .pipe(sum => sum * 2);
- * // Returns: 6
- */

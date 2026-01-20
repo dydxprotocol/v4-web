@@ -42,7 +42,7 @@
     "*.context.ts": "$(capture).provider.tsx",
     "*.context.tsx": "$(capture).provider.tsx",
     "*.tsx": "$(capture).css.ts, $(capture).styles.ts, $(capture).test.tsx, $(capture).spec.tsx, $(capture).utils.ts",
-    "*.ts": "$(capture).test.ts, $(capture).spec.ts, $(capture).utils.ts,",
+    "*.ts": "$(capture).test.ts, $(capture).spec.ts, $(capture).utils.ts",
     "*.entity.ts": "$(capture).schemas.ts, $(capture).port.ts, $(capture).calculations.ts, $(capture).decimals.ts",
     "*.slice.ts": "$(capture).actions.ts, $(capture).selectors.ts, $(capture).thunks.ts, $(capture).types.ts"
   },

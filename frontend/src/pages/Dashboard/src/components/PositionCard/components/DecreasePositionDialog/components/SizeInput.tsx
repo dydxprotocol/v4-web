@@ -17,9 +17,12 @@ export const SizeInput: FC<SizeInputProps> = ({ amountToDecrease, onChange, asse
 
   return (
     <>
-      <label className={$.inputLabel}>Amount to Decrease</label>
+      <label htmlFor="decrease-amount-input" className={$.inputLabel}>
+        Amount to Decrease
+      </label>
       <div className={$.inputWrapper}>
         <input
+          id="decrease-amount-input"
           type="text"
           inputMode="decimal"
           className={$.input}
