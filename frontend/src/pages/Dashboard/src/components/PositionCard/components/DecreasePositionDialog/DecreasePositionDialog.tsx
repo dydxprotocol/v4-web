@@ -1,12 +1,18 @@
 import { memo, useCallback, useState } from 'react';
 import { Dialog } from '@radix-ui/themes';
-import { $decimalValue, DecimalCalculator, type PositionStableId, RatioOutput } from 'fuel-ts-sdk';
+import { type PositionStableId } from 'fuel-ts-sdk';
 import { PositionSize } from 'fuel-ts-sdk/trading';
 import { toast } from 'react-toastify';
 import { WalletContext } from '@/contexts/WalletContext';
 import { useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import * as styles from './DecreasePositionDialog.css';
+import {
+  calculateSizeFromPercentage,
+  calculateSliderPercentage,
+  getPositionAction,
+  isValidDecreaseAmount,
+} from './DecreasePositionDialog.utils';
 import { Actions } from './components/Actions';
 import { CurrenPositionInfo } from './components/CurrenPositionInfo';
 import { SizeInput } from './components/SizeInput';
@@ -32,33 +38,11 @@ export const DecreasePositionDialog = memo(
 
     const totalPositionSize = position.size;
 
-    const sliderPercentage = (() => {
-      if (!sizeToDecrease || totalPositionSize.value === '0') return 0;
-
-      const percentage = Math.round(
-        $decimalValue(
-          DecimalCalculator.value(PositionSize.fromDecimalString(sizeToDecrease))
-            .divideBy(totalPositionSize)
-            .calculate()
-        ).toFloat() * 100
-      );
-
-      return Math.min(100, Math.max(0, Number(percentage)));
-    })();
+    const sliderPercentage = calculateSliderPercentage(sizeToDecrease, totalPositionSize);
 
     const handlePercentageChange = (valueInPercents: number) => {
-      if (valueInPercents === 0) {
-        setSizeToDecrease('');
-        return;
-      }
-
-      const nextPercentageValue = RatioOutput.fromFloat(valueInPercents);
-      const nextSizeToDecrease = DecimalCalculator.value(totalPositionSize)
-        .multiplyBy(nextPercentageValue)
-        .divideBy(RatioOutput.fromFloat(100))
-        .calculate();
-
-      updateSize($decimalValue(nextSizeToDecrease).toDecimalString());
+      const newSize = calculateSizeFromPercentage(valueInPercents, totalPositionSize);
+      setSizeToDecrease(newSize);
     };
 
     const updateSize = (nextValue: number | string) => {
@@ -76,8 +60,8 @@ export const DecreasePositionDialog = memo(
 
       const sizeDelta = PositionSize.fromDecimalString(sizeToDecrease);
 
-      const isClosing = sliderPercentage === 100;
-      const action = isClosing ? 'closed' : 'decreased';
+      const action = getPositionAction(sliderPercentage);
+      const actionPastTense = action === 'close' ? 'closed' : 'decreased';
 
       try {
         await tradingSdk.decreasePosition({
@@ -85,18 +69,15 @@ export const DecreasePositionDialog = memo(
           wallet: userWallet,
           sizeDelta,
         });
-        toast.success(`Position ${action} successfully`);
+        toast.success(`Position ${actionPastTense} successfully`);
         onOpenChange?.(false);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        toast.error(`Failed to ${isClosing ? 'close' : 'decrease'} position: ${message}`);
+        toast.error(`Failed to ${action} position: ${message}`);
       }
     }, [wallet, sizeToDecrease, tradingSdk, positionId, sliderPercentage, onOpenChange]);
 
-    const isValidDecrease =
-      sizeToDecrease !== '' &&
-      Number(sizeToDecrease) > 0 &&
-      Number(sizeToDecrease) <= Number($decimalValue(totalPositionSize).toDecimalString());
+    const isValidDecrease = isValidDecreaseAmount(sizeToDecrease, totalPositionSize);
 
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>

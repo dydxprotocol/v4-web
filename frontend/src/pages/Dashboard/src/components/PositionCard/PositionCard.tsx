@@ -6,6 +6,14 @@ import { type PositionEntity, calculatePositionLeverage } from 'fuel-ts-sdk/trad
 import { useBoolean } from 'usehooks-ts';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import * as styles from './PositionCard.css';
+import {
+  calculatePnlPercent,
+  formatPercent,
+  formatPnl,
+  formatPrice,
+  formatUsd,
+  isProfitable,
+} from './PositionCard.utils';
 import { DecreasePositionDialog } from './components/DecreasePositionDialog';
 
 type PositionCardProps = {
@@ -25,32 +33,16 @@ export const PositionCard: FC<PositionCardProps> = ({ position }) => {
   const leverageValue = $decimalValue(leverage).toFloat();
 
   const pnlValue = $decimalValue(position.pnlDelta).toFloat();
-  const isProfitable = pnlValue >= 0;
-  const pnlPercent = (pnlValue / $decimalValue(position.collateralAmount).toFloat()) * 100;
+  const profitable = isProfitable(pnlValue);
+  const collateralValue = $decimalValue(position.collateralAmount).toFloat();
+  const pnlPercent = calculatePnlPercent(pnlValue, collateralValue);
 
   const sizeValue = $decimalValue(position.size).toFloat();
-  const collateralValue = $decimalValue(position.collateralAmount).toFloat();
   const realizedPnlValue = $decimalValue(position.realizedPnl).toFloat();
   const accruedFundingValue = $decimalValue(position.fundingRate).toFloat();
   const positionFeeValue = $decimalValue(position.positionFee).toFloat();
 
   const modalOpenBoolean = useBoolean();
-
-  const formatUsd = (value: number) =>
-    value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  const formatPrice = (value: number) =>
-    value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  const formatPnl = (value: number) => {
-    const formatted = formatUsd(Math.abs(value));
-    return value >= 0 ? `+$${formatted}` : `-$${formatted}`;
-  };
-
-  const formatPercent = (value: number) => {
-    const sign = value >= 0 ? '+' : '';
-    return `${sign}${value.toFixed(2)}%`;
-  };
 
   return (
     <div css={styles.positionCard}>
@@ -71,10 +63,10 @@ export const PositionCard: FC<PositionCardProps> = ({ position }) => {
 
         <div css={styles.headerActions}>
           <div css={styles.pnlContainer}>
-            <span css={[styles.pnlDisplay, isProfitable ? styles.pnlPositive : styles.pnlNegative]}>
+            <span css={[styles.pnlDisplay, profitable ? styles.pnlPositive : styles.pnlNegative]}>
               {formatPnl(pnlValue)}
             </span>
-            <span css={[styles.pnlPercent, isProfitable ? styles.pnlPositive : styles.pnlNegative]}>
+            <span css={[styles.pnlPercent, profitable ? styles.pnlPositive : styles.pnlNegative]}>
               ({formatPercent(pnlPercent)})
             </span>
           </div>

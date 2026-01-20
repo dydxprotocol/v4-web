@@ -106,6 +106,13 @@ describe('DecimalValue', () => {
 
       expect($decimalValue(value).toDecimalString()).toBe('0.001');
     });
+
+    it('should handle zero decimals schema without adding decimal point', () => {
+      const ZeroDecimalSchema = createDecimalValueSchema(0, 'ZeroDecimal');
+      const value = ZeroDecimalSchema.fromBigInt(12345n);
+
+      expect($decimalValue(value).toDecimalString()).toBe('12345');
+    });
   });
 
   describe('fromDecimalString', () => {
