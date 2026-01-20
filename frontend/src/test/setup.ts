@@ -6,14 +6,20 @@ import { afterEach, beforeAll, expect, vi } from 'vitest';
 expect.extend(matchers);
 
 // Mock environment variables for tests
-vi.stubEnv('VITE_VAULT_CONTRACT_IDS', JSON.stringify({
-  local: '0x0000000000000000000000000000000000000000000000000000000000000000',
-  testnet: '0x0000000000000000000000000000000000000000000000000000000000000000',
-}));
-vi.stubEnv('VITE_INDEXER_URLS', JSON.stringify({
-  local: 'http://localhost:8080',
-  testnet: 'https://testnet.example.com',
-}));
+vi.stubEnv(
+  'VITE_VAULT_CONTRACT_IDS',
+  JSON.stringify({
+    local: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    testnet: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  })
+);
+vi.stubEnv(
+  'VITE_INDEXER_URLS',
+  JSON.stringify({
+    local: 'http://localhost:8080',
+    testnet: 'https://testnet.example.com',
+  })
+);
 vi.stubEnv('VITE_DEFAULT_ENVIRONMENT', 'local');
 
 // Mock ResizeObserver
