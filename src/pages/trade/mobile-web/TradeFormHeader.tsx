@@ -23,9 +23,9 @@ export const TradeFormHeaderMobile = ({ launchableMarketId }: { launchableMarket
     : undefined;
 
   const assetPrice = launchableAsset ? (
-    <Output tw="font-medium-bold" type={OutputType.Fiat} value={launchableAsset?.price} />
+    <Output tw="font-base-bold" type={OutputType.Fiat} value={launchableAsset?.price} />
   ) : (
-    <MidMarketPrice tw="font-medium-bold" richColor={false} />
+    <MidMarketPrice tw="font-base-bold" richColor={false} />
   );
 
   return (
@@ -36,7 +36,7 @@ export const TradeFormHeaderMobile = ({ launchableMarketId }: { launchableMarket
         <div tw="flexColumn items-end justify-end gap-0.125">
           {assetPrice}
           <Output
-            tw="font-small-medium"
+            tw="font-mini-medium"
             css={{
               color: MustBigNumber(percentChange24h).isZero()
                 ? undefined
@@ -66,12 +66,14 @@ const $Header = styled.div`
 
   color: var(--color-text-2);
   background-color: var(--color-layer-2);
-  padding-top: 1rem;
+  height: 60px;
+
+  padding-left: 0.4rem;
+  padding-right: 1rem;
 
   border-bottom: 1px solid var(--color-border);
 
   width: 100%;
-  padding-bottom: 1rem;
 `;
 
 const $Right = styled.div`

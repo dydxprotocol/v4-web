@@ -24,7 +24,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
 
   return (
     <$TopHeader>
-      <div tw="flex w-full items-center justify-between gap-1 border border-b border-solid border-color-border pb-1 pl-1 pr-1.5 pt-1">
+      <div tw="flex h-[60px] w-full items-center justify-between gap-1 border border-b border-solid border-color-border px-1">
         {id && <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />}
 
         <MobileTradeAssetSelector launchableMarketId={launchableMarketId} />

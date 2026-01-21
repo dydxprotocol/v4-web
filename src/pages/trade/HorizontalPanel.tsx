@@ -48,6 +48,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import MarketStats from './MarketStats';
 import { TradeTableSettings } from './TradeTableSettings';
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
 import { MarketTypeFilter, PanelView } from './types';
@@ -142,7 +143,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       label: stringGetter({
         key: STRING_KEYS.DETAILS,
       }),
-      content: null,
+      content: <MarketStats />,
     }),
     [stringGetter]
   );

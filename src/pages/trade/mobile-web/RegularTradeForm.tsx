@@ -182,192 +182,192 @@ const RegularTradeForm = () => {
   }[side];
 
   return (
-    <form tw="flexColumn items-center gap-[0.75em] px-1 pb-[12.5rem] pt-0" onSubmit={onSubmit}>
+    <form tw="flexColumn items-center gap-[0.75em] pb-[12.5rem] pt-0" onSubmit={onSubmit}>
       <TradeFormHeaderMobile />
-      <div tw="flex h-3 w-full items-center justify-between">
-        <div tw="flex h-3">
-          <StyledButton
-            buttonStyle={ButtonStyle.WithoutBackground}
-            $isActive={marginMode === MarginMode.CROSS}
-            onClick={() => setMarginMode(MarginMode.CROSS)}
-            disabled={!needsMarginMode && marginMode !== MarginMode.CROSS}
-          >
-            {stringGetter({
-              key: STRING_KEYS.CROSS,
-            })}
-          </StyledButton>
-          <VerticalSeparator />
-          <StyledButton
-            buttonStyle={ButtonStyle.WithoutBackground}
-            $isActive={marginMode === MarginMode.ISOLATED}
-            onClick={() => setMarginMode(MarginMode.ISOLATED)}
-            disabled={!needsMarginMode && marginMode !== MarginMode.ISOLATED}
-          >
-            {stringGetter({
-              key: STRING_KEYS.ISOLATED,
-            })}
-          </StyledButton>
-        </div>
+      <div tw="flexColumn w-full items-center gap-0.75 px-1">
+        <div tw="flex h-3 w-full items-center justify-between">
+          <div tw="flex h-3">
+            <StyledButton
+              buttonStyle={ButtonStyle.WithoutBackground}
+              $isActive={marginMode === MarginMode.CROSS}
+              onClick={() => setMarginMode(MarginMode.CROSS)}
+              disabled={!needsMarginMode && marginMode !== MarginMode.CROSS}
+            >
+              {stringGetter({
+                key: STRING_KEYS.CROSS,
+              })}
+            </StyledButton>
+            <VerticalSeparator />
+            <StyledButton
+              buttonStyle={ButtonStyle.WithoutBackground}
+              $isActive={marginMode === MarginMode.ISOLATED}
+              onClick={() => setMarginMode(MarginMode.ISOLATED)}
+              disabled={!needsMarginMode && marginMode !== MarginMode.ISOLATED}
+            >
+              {stringGetter({
+                key: STRING_KEYS.ISOLATED,
+              })}
+            </StyledButton>
+          </div>
 
-        <Button
-          size={ButtonSize.XSmall}
-          action={ButtonAction.SimpleSecondary}
-          buttonStyle={ButtonStyle.WithoutBackground}
-          slotRight={<Icon iconName={IconName.Caret} size="0.75em" tw="text-color-text-0" />}
-          onClick={openLeverageDialog}
-        >
-          <Output
-            type={OutputType.Multiple}
-            value={effectiveSelectedLeverage}
-            fractionDigits={0}
-            showSign={ShowSign.None}
-            tw="text-color-text-2 font-base-medium"
-          />
-        </Button>
-      </div>
-      <div tw="flex w-full gap-1 rounded-[0.5em] bg-[#181819] p-[4px]">
-        <LongButton
-          $isLong={side === OrderSide.BUY}
-          onClick={() => setTradeSide(OrderSide.BUY)}
-          tw="w-full border-0"
-        >
-          {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
-        </LongButton>
-        <ShortButton
-          $isShort={side === OrderSide.SELL}
-          onClick={() => setTradeSide(OrderSide.SELL)}
-          tw="w-full border-0"
-        >
-          {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
-        </ShortButton>
-      </div>
-      <MobileDropdownMenu
-        withPortal={false}
-        align="end"
-        items={[
-          {
-            value: TradeFormType.MARKET,
-            active: selectedTradeType === TradeFormType.MARKET,
-            label: stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT }),
-            onSelect: () => onTradeTypeChange(TradeFormType.MARKET),
-          },
-          {
-            value: TradeFormType.LIMIT,
-            active: selectedTradeType === TradeFormType.LIMIT,
-            label: stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT }),
-            onSelect: () => onTradeTypeChange(TradeFormType.LIMIT),
-          },
-        ]}
-      >
-        <DropdownMenuTrigger
-          tw="w-full bg-[var(--simpleUi-dialog-secondaryColor)]"
-          shape={ButtonShape.Pill}
-          size={ButtonSize.Base}
-        >
-          {selectedTradeType === TradeFormType.MARKET
-            ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
-            : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
-        </DropdownMenuTrigger>
-      </MobileDropdownMenu>
-      <AvailableRow>
-        <AvailableLabel> Available </AvailableLabel>
-        <AvailableValue>
-          {availableBalance.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{' '}
-          USDC
-        </AvailableValue>
-      </AvailableRow>
-      <$InputsColumn>
-        <TradeFormInputs />
-        <TradeSizeInputs />
-      </$InputsColumn>
-      <ToggleRow>
-        <ToggleLabel>Triggers</ToggleLabel>
-        <Switch
-          name="triggers"
-          checked={triggerOrdersChecked}
-          onCheckedChange={(checked) =>
-            dispatch(checked ? tradeFormActions.showTriggers() : tradeFormActions.hideTriggers())
-          }
-          tw="font-mini-book"
-        />
-      </ToggleRow>
-      {triggerOrdersChecked && (
-        <div tw="max-w-[calc(100vw - 4rem)] column gap-0.5">
-          <TradeTriggerOrderInputs
-            stringKeys={{
-              header: STRING_KEYS.TAKE_PROFIT,
-              headerDiff: STRING_KEYS.PROFIT_COLON,
-              price: STRING_KEYS.TP_PRICE,
-              output: STRING_KEYS.GAIN,
-            }}
-            inputState={takeProfitOrder ?? {}}
-            summaryState={takeProfitSummary ?? {}}
-            isStopLoss={false}
-            tickSizeDecimals={tickSizeDecimals}
-          />
-          <TradeTriggerOrderInputs
-            stringKeys={{
-              header: STRING_KEYS.STOP_LOSS,
-              headerDiff: STRING_KEYS.LOSS_COLON,
-              price: STRING_KEYS.SL_PRICE,
-              output: STRING_KEYS.LOSS,
-            }}
-            inputState={stopLossOrder ?? {}}
-            summaryState={stopLossSummary ?? {}}
-            isStopLoss
-            tickSizeDecimals={tickSizeDecimals}
-          />
+          <Button
+            size={ButtonSize.XSmall}
+            action={ButtonAction.SimpleSecondary}
+            buttonStyle={ButtonStyle.WithoutBackground}
+            slotRight={<Icon iconName={IconName.Caret} size="0.75em" tw="text-color-text-0" />}
+            onClick={openLeverageDialog}
+            tw="h-[37px] w-[66px]"
+          >
+            <Output
+              type={OutputType.Multiple}
+              value={effectiveSelectedLeverage}
+              fractionDigits={0}
+              showSign={ShowSign.None}
+              tw="text-color-text-2 font-base-medium"
+            />
+          </Button>
         </div>
-      )}
-      <ToggleRow>
-        <ToggleLabel>{stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}</ToggleLabel>
-        <Switch
-          name="reduce-only"
-          checked={!!reduceOnly}
-          onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
-          tw="font-mini-book"
-        />
-      </ToggleRow>
-      <div
-        tw="flexColumn w-full gap-1 py-1.25"
-        css={{
-          background:
-            'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',
-        }}
-      >
-        <TradeFormMessages
-          isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
-          placeOrderError={placeOrderError}
-          primaryAlert={primaryAlert}
-          shouldPromptUserToPlaceLimitOrder={false}
-        />
-        {/* {receiptArea} */}
-        <$PlaceOrderButtonAndReceipt
-          summary={summary}
-          actionStringKey={shortAlertKey}
-          confirmButtonConfig={{
-            stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
-            buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
-            buttonAction: orderSideAction as ButtonAction,
+        <div tw="flex w-full gap-0.25 rounded-[0.5em] bg-[#181819] p-[4px]">
+          <LongButton
+            $isLong={side === OrderSide.BUY}
+            onClick={() => setTradeSide(OrderSide.BUY)}
+            tw="w-full border-0"
+          >
+            {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
+          </LongButton>
+          <ShortButton
+            $isShort={side === OrderSide.SELL}
+            onClick={() => setTradeSide(OrderSide.SELL)}
+            tw="w-full border-0"
+          >
+            {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
+          </ShortButton>
+        </div>
+        <MobileDropdownMenu
+          withPortal={false}
+          align="end"
+          items={[
+            {
+              value: TradeFormType.MARKET,
+              active: selectedTradeType === TradeFormType.MARKET,
+              label: stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT }),
+              onSelect: () => onTradeTypeChange(TradeFormType.MARKET),
+            },
+            {
+              value: TradeFormType.LIMIT,
+              active: selectedTradeType === TradeFormType.LIMIT,
+              label: stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT }),
+              onSelect: () => onTradeTypeChange(TradeFormType.LIMIT),
+            },
+          ]}
+        >
+          <DropdownMenuTrigger
+            tw="w-full bg-[var(--simpleUi-dialog-secondaryColor)]"
+            shape={ButtonShape.Pill}
+            size={ButtonSize.Base}
+          >
+            {selectedTradeType === TradeFormType.MARKET
+              ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
+              : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
+          </DropdownMenuTrigger>
+        </MobileDropdownMenu>
+        <AvailableRow>
+          <AvailableLabel> Available </AvailableLabel>
+          <AvailableValue>
+            {availableBalance.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{' '}
+            USDC
+          </AvailableValue>
+        </AvailableRow>
+        <$InputsColumn>
+          <TradeFormInputs />
+          <TradeSizeInputs />
+        </$InputsColumn>
+        <ToggleRow>
+          <ToggleLabel>Triggers</ToggleLabel>
+          <Switch
+            name="triggers"
+            checked={triggerOrdersChecked}
+            onCheckedChange={(checked) =>
+              dispatch(checked ? tradeFormActions.showTriggers() : tradeFormActions.hideTriggers())
+            }
+            tw="font-mini-book"
+          />
+        </ToggleRow>
+        {triggerOrdersChecked && (
+          <div tw="max-w-[calc(100vw - 4rem)] column gap-0.5">
+            <TradeTriggerOrderInputs
+              stringKeys={{
+                header: STRING_KEYS.TAKE_PROFIT,
+                headerDiff: STRING_KEYS.PROFIT_COLON,
+                price: STRING_KEYS.TP_PRICE,
+                output: STRING_KEYS.GAIN,
+              }}
+              inputState={takeProfitOrder ?? {}}
+              summaryState={takeProfitSummary ?? {}}
+              isStopLoss={false}
+              tickSizeDecimals={tickSizeDecimals}
+            />
+            <TradeTriggerOrderInputs
+              stringKeys={{
+                header: STRING_KEYS.STOP_LOSS,
+                headerDiff: STRING_KEYS.LOSS_COLON,
+                price: STRING_KEYS.SL_PRICE,
+                output: STRING_KEYS.LOSS,
+              }}
+              inputState={stopLossOrder ?? {}}
+              summaryState={stopLossSummary ?? {}}
+              isStopLoss
+              tickSizeDecimals={tickSizeDecimals}
+            />
+          </div>
+        )}
+        <ToggleRow>
+          <ToggleLabel>{stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}</ToggleLabel>
+          <Switch
+            name="reduce-only"
+            checked={!!reduceOnly}
+            onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
+            tw="font-mini-book"
+          />
+        </ToggleRow>
+        <div
+          tw="flexColumn w-full max-w-[calc(100vw-2rem)] gap-1 py-1.25"
+          css={{
+            background:
+              'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',
           }}
-          currentStep={currentStep}
-          hasInput={
-            isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)
-          }
-          hasValidationErrors={hasValidationErrors}
-          onClearInputs={() => dispatch(tradeFormActions.resetPrimaryInputs())}
-          shouldEnableTrade={shouldEnableTrade}
-          showDeposit={false}
-          tradingUnavailable={tradingUnavailable}
-        />
-
-        {/* <$StyledWithDetailsReceipt detailItems={items} hideReceipt={!isReceiptOpen}>
-          {placeOrderButton}
-        </$StyledWithDetailsReceipt> */}
+        >
+          <TradeFormMessages
+            isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
+            placeOrderError={placeOrderError}
+            primaryAlert={primaryAlert}
+            shouldPromptUserToPlaceLimitOrder={false}
+          />
+          {/* {receiptArea} */}
+          <$PlaceOrderButtonAndReceipt
+            summary={summary}
+            actionStringKey={shortAlertKey}
+            confirmButtonConfig={{
+              stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
+              buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
+              buttonAction: orderSideAction as ButtonAction,
+            }}
+            currentStep={currentStep}
+            hasInput={
+              isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)
+            }
+            hasValidationErrors={hasValidationErrors}
+            onClearInputs={() => dispatch(tradeFormActions.resetPrimaryInputs())}
+            shouldEnableTrade={shouldEnableTrade}
+            showDeposit={false}
+            tradingUnavailable={tradingUnavailable}
+          />
+        </div>
       </div>
+
       <MarketsMenuDialog />
     </form>
   );
@@ -384,14 +384,20 @@ const StyledButton = styled(Button)<{ $isActive?: boolean }>`
 
 const LongButton = styled(Button)<{ $isLong?: boolean }>`
   ${({ $isLong }) =>
-    $isLong ? `background-color: var(--color-gradient-positive);` : 'background-color: transparent'}
+    $isLong
+      ? `--button-textColor: var(--color-green); --button-backgroundColor: var(--color-gradient-positive);`
+      : '--button-backgroundColor: transparent'}
+
+  border-radius: 0.375rem;
 `;
 
 const ShortButton = styled(Button)<{ $isShort?: boolean }>`
   ${({ $isShort }) =>
     $isShort
-      ? `background-color: var(--color-gradient-negative);`
-      : 'background-color: transparent'}
+      ? `--button-textColor: var(--color-red); --button-backgroundColor: var(--color-gradient-negative);`
+      : '--button-backgroundColor: transparent'}
+
+  border-radius: 0.375rem;
 `;
 
 const $InputsColumn = styled.div`

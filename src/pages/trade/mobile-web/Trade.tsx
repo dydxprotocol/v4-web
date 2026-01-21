@@ -45,46 +45,6 @@ const TradePage = () => {
 
   const isDisabled = complianceState !== ComplianceStates.FULL_ACCESS;
 
-  const footerContent = isDisabled ? (
-    <Button
-      tw="flex-1 border border-solid border-color-layer-6"
-      shape={ButtonShape.Pill}
-      size={ButtonSize.Large}
-      state={ButtonState.Disabled}
-      action={ButtonAction.SimpleSecondary}
-    >
-      {stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
-    </Button>
-  ) : canAccountTrade ? (
-    <>
-      <Button
-        tw="flex-1 rounded-1 bg-color-negative text-color-layer-0"
-        shape={ButtonShape.Pill}
-        size={ButtonSize.Large}
-        onClick={() => {
-          navigate(`${AppRoute.TradeForm}`);
-          dispatch(tradeFormActions.setSide(OrderSide.SELL));
-        }}
-      >
-        {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
-      </Button>
-
-      <Button
-        tw="flex-1 rounded-1 bg-color-positive text-color-layer-0"
-        shape={ButtonShape.Pill}
-        size={ButtonSize.Large}
-        onClick={() => {
-          navigate(`${AppRoute.TradeForm}`);
-          dispatch(tradeFormActions.setSide(OrderSide.BUY));
-        }}
-      >
-        {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
-      </Button>
-    </>
-  ) : (
-    <OnboardingTriggerButton tw="flex-1" shape={ButtonShape.Pill} size={ButtonSize.Base} />
-  );
-
   return (
     <div tw="flexColumn items-center gap-[0.75em]">
       <TradeHeaderMobile />
@@ -104,12 +64,52 @@ const TradePage = () => {
       </$MobileContent>
 
       <div
-        tw="row fixed bottom-4 left-0 right-0 gap-1.25 px-1.25 py-1.25"
+        tw="row fixed bottom-3 left-0 right-0 gap-1.25 px-1.25 py-1.25"
         css={{
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',
         }}
       >
-        {footerContent}
+        {isDisabled ? (
+          <Button
+            tw="flex-1 border border-solid border-color-layer-6"
+            shape={ButtonShape.Pill}
+            size={ButtonSize.Medium}
+            state={ButtonState.Disabled}
+            action={ButtonAction.SimpleSecondary}
+          >
+            {stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
+          </Button>
+        ) : canAccountTrade ? (
+          <>
+            <Button
+              tw="flex-1 rounded-1 bg-color-negative text-color-layer-0"
+              shape={ButtonShape.Pill}
+              size={ButtonSize.Medium}
+              onClick={() => {
+                navigate(`${AppRoute.TradeForm}`);
+                dispatch(tradeFormActions.setIsClosingPosition(false));
+                dispatch(tradeFormActions.setSide(OrderSide.SELL));
+              }}
+            >
+              {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
+            </Button>
+
+            <Button
+              tw="flex-1 rounded-1 bg-color-positive text-color-layer-0"
+              shape={ButtonShape.Pill}
+              size={ButtonSize.Medium}
+              onClick={() => {
+                navigate(`${AppRoute.TradeForm}`);
+                dispatch(tradeFormActions.setIsClosingPosition(false));
+                dispatch(tradeFormActions.setSide(OrderSide.BUY));
+              }}
+            >
+              {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
+            </Button>
+          </>
+        ) : (
+          <OnboardingTriggerButton tw="flex-1" shape={ButtonShape.Pill} size={ButtonSize.Base} />
+        )}
       </div>
 
       <UserMenuDialog />

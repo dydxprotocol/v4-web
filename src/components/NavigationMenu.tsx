@@ -70,7 +70,7 @@ const NavItemWithRef = <MenuItemValue extends string>(
   const children = (
     <>
       {slotBefore}
-      <span>
+      <span css={isTablet ? { fontSize: 16 } : undefined}>
         {label}
         {tag && (
           <>

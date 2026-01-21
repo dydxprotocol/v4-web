@@ -6,7 +6,7 @@ import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { MarketsIcon, PortfolioIcon, TradeIcon } from '@/icons';
+import { Bar3Icon, ProfileIcon, TradeIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon } from '@/components/Icon';
@@ -25,7 +25,7 @@ export const FooterMobile = () => {
               {
                 value: 'trade',
                 label: stringGetter({ key: STRING_KEYS.MARKETS }),
-                slotBefore: <$Icon size="0.75em" iconComponent={MarketsIcon as any} />,
+                slotBefore: <$Icon size="0.75em" iconComponent={Bar3Icon as any} />,
                 href: AppRoute.Trade,
               },
               {
@@ -36,8 +36,8 @@ export const FooterMobile = () => {
               },
               {
                 value: 'portfolio',
-                label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
-                slotBefore: <$Icon size="0.75em" iconComponent={PortfolioIcon as any} />,
+                label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
+                slotBefore: <$Icon size="0.75em" iconComponent={ProfileIcon as any} />,
                 href: AppRoute.Portfolio,
               },
             ],

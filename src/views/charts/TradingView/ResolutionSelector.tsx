@@ -8,6 +8,7 @@ import {
   RESOLUTION_STRING_TO_LABEL,
 } from '@/constants/candles';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { objectKeys } from '@/lib/objectHelpers';
@@ -21,6 +22,7 @@ export const ResolutionSelector = ({
   onResolutionChange: (resolution: ResolutionString) => void;
   currentResolution?: ResolutionString;
 }) => {
+  const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
   const getLabel = useCallback(
@@ -42,10 +44,11 @@ export const ResolutionSelector = ({
       {objectKeys(isLaunchable ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS : RESOLUTION_MAP).map(
         (resolution) => (
           <button
-            tw="size-2.75 max-w-2.75 flex-1 border-b-0 border-l-0 border-r-0 border-t-2 border-solid border-color-accent"
+            tw="w-2.75 max-w-2.75 flex-1 border-b-0 border-l-0 border-r-0 border-t-2 border-solid border-color-accent"
             type="button"
             css={{
               borderColor: currentResolution !== resolution ? 'transparent' : 'var(--color-accent)',
+              height: isTablet ? '2rem' : '2.75rem',
             }}
             key={resolution}
             onClick={() => onResolutionChange(resolution)}
