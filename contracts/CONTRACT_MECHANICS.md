@@ -15,7 +15,7 @@ Note that the reserves are shared with all markets (assets).
 
 ## PnL
 
-If a profit P is accounted, then
+If a profit **P** is accounted, then
 
 ```text
 TR:=TR-P
@@ -122,7 +122,7 @@ TL:=TL+L
 LP total supply:= (LP total supply)+T
 ```
 
-If a liquidity provider removes **T** LP tokens, it receives **L** USDC
+If a liquidity provider removes **T** LP tokens, it removes **L** USDC from liquidity
 
 ```text
 L=TL*T/(LP total supply)
@@ -135,6 +135,10 @@ TR:=TR-L
 TL:=TL-L
 LP total supply:=(LP total supply)-T
 ```
+
+Note that the liquidity provider does not receive **L** exactly, it is still charged with the liquidity fees.
+
+Note that if **TR**<**TL**, then the redemption amount is decreased proportionally. For details for this case see the section below.
 
 ## Cases of insufficient funds
 
@@ -187,7 +191,7 @@ Unpaid amounts are lost.
 
 The case with an insufficient collateral is possible only when a position is liquidated.
 
-If there is not enough collateral to cover all fees, losses and funding rates to be paid by the user, the payments are capped and executed with the priorities until the collateral depletes: the fees, the funding rates, PnL.
+If there is not enough collateral to cover all fees, losses and funding rates to be paid by the user, then the payments are capped and executed with the priorities until the collateral depletes: the fees, the funding rates, PnL.
 
 Unpaid amounts are lost.
 
