@@ -104,6 +104,7 @@ export const useTradeForm = ({
   const tradingUnavailable =
     closeOnlyTradingUnavailable ||
     complianceState === ComplianceStates.READ_ONLY ||
+    complianceState === ComplianceStates.SPOT_ONLY ||
     connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
 
   const shouldEnableTrade =
