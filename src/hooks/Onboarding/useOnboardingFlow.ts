@@ -9,7 +9,7 @@ import { forceOpenDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
 
-import { usePerpetualsComplianceState } from '../usePerpetualsComplianceState';
+import { useComplianceState } from '../useComplianceState';
 import { useAutoconnectMobileWalletBrowser } from './useAutoconnectMobileWalletBrowser';
 
 const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
@@ -35,7 +35,7 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
     }
   };
 
-  const { disableConnectButton } = usePerpetualsComplianceState();
+  const { disableConnectButton } = useComplianceState();
   const onboardingState = useAppSelector(getOnboardingState);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 

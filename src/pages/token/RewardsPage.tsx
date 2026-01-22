@@ -12,7 +12,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -26,10 +26,10 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { CompetitionIncentivesPanel } from './CompetitionIncentivesPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { RebatesIncetivesPanel } from './RebatesIncetivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
@@ -45,7 +45,7 @@ const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const { isTablet } = useBreakpoints();
 
   const { usdcDenom } = useTokenConfigs();
@@ -117,7 +117,7 @@ const RewardsPage = () => {
                 {
                   content: (
                     <div tw="flexColumn gap-1.5">
-                      <CompetitionIncentivesPanel />
+                      <RebatesIncetivesPanel />
                       <CompetitionLeaderboardPanel />
                     </div>
                   ),

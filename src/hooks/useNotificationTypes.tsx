@@ -8,7 +8,10 @@ import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { CHAIN_INFO } from '@/constants/chains';
-import { TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2 } from '@/constants/clc';
+import {
+  LOSS_REBATE_DETAILS_DECEMBER,
+  TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2,
+} from '@/constants/clc';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
@@ -693,6 +696,73 @@ export const notificationTypes: NotificationTypeConfig[] = [
         dydxAddress,
         stringGetter,
         trigger,
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      ]);
+
+      const qualifyForDecLossRebate = useMemo(() => {
+        return (
+          LOSS_REBATE_DETAILS_DECEMBER.estimatedWalletRebates[dydxAddress?.toLowerCase() ?? ''] !=
+            null &&
+          Date.now() < new Date(LOSS_REBATE_DETAILS_DECEMBER.claimDeadline).getTime() &&
+          Date.now() > new Date(LOSS_REBATE_DETAILS_DECEMBER.claimStartTime).getTime()
+        );
+      }, [dydxAddress]);
+
+      useEffect(() => {
+        if (!qualifyForDecLossRebate) {
+          return;
+        }
+
+        const usdRebateAmount =
+          LOSS_REBATE_DETAILS_DECEMBER.estimatedWalletRebates[dydxAddress?.toLowerCase() ?? ''] ??
+          0;
+        const formattedRebateAmount = formatNumberOutput(usdRebateAmount, OutputType.Fiat, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+          fractionDigits: USD_DECIMALS,
+          minimumFractionDigits: USD_DECIMALS,
+        });
+
+        trigger({
+          id: `dec-2025-loss-rebate-claim`,
+          displayData: {
+            icon: <Icon iconName={IconName.Sparkles} />,
+            title: stringGetter({
+              key: STRING_KEYS.TRADING_LOSS_REBATE_CLAIM_TITLE,
+            }),
+            body: stringGetter({
+              key: STRING_KEYS.TRADING_LOSS_REBATE_CLAIM_BODY,
+              params: {
+                REBATE_AMOUNT: formattedRebateAmount,
+                CLAIM_DEADLINE: new Date(
+                  LOSS_REBATE_DETAILS_DECEMBER.claimDeadline
+                ).toLocaleDateString(selectedLocale, { month: 'short', day: 'numeric' }),
+                HERE_LINK: (
+                  <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent isInline>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.RewardsProgramUpdates,
+            actionAltText: stringGetter({ key: STRING_KEYS.CLAIM }),
+            renderActionSlot: () => (
+              <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent>
+                {stringGetter({ key: STRING_KEYS.CLAIM })} →
+              </Link>
+            ),
+          },
+          updateKey: [`jan-2026-trading-league-rewards-round-2`, dydxAddress],
+        });
+      }, [
+        qualifyForDecLossRebate,
+        trigger,
+        stringGetter,
+        dydxAddress,
         decimalSeparator,
         groupSeparator,
         selectedLocale,
