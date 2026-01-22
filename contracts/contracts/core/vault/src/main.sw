@@ -398,7 +398,18 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
+    fn get_position_liquidation_price(account: Identity, index_asset: b256, is_long: bool) -> u256 {
+        _get_position_liquidation_price(account, index_asset, is_long)
+    }
+
+    #[storage(read)]
     fn get_position_by_key(position_key: b256) -> Position {
+        _get_position_by_key(position_key)
+    }
+
+    #[storage(read)]
+    fn get_position(account: Identity, index_asset: b256, is_long: bool) -> Position {
+        let position_key = _get_position_key(account, index_asset, is_long);
         _get_position_by_key(position_key)
     }
 
@@ -753,7 +764,8 @@ fn _validate_liquidation(
     }
 
     let remaining_collateral = available_collateral - losses_and_fees;
-    let max_leverage = storage::vault.max_leverage.get(index_asset).try_read().unwrap_or(0);
+    // must be set and not zero
+    let max_leverage = storage::vault.max_leverage.get(index_asset).read();
     let val1 = remaining_collateral * max_leverage;
     let val2 = position.size * BASIS_POINTS_DIVISOR.as_u256();
     if val1 < val2 {
@@ -792,6 +804,90 @@ fn _get_pnl(
     // overflow safe
     let delta = size * price_delta / average_price;
     (has_profit, delta)
+}
+
+/// calculates the liquidation price of a position
+/// it is the limit that a long position is liquidated when the price falls below
+/// and a short position is liquidated when the price rises above
+#[storage(read)]
+fn _get_position_liquidation_price(account: Identity, index_asset: b256, is_long: bool) -> u256 {
+    let position_key = _get_position_key(account, index_asset, is_long);
+
+    let position = _get_position_by_key(position_key);
+
+    require(position.size > 0, Error::VaultEmptyPosition);
+
+    let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
+
+    let liquidation_fee = _get_liquidation_fee(account, index_asset, is_long, position.size);
+
+    let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
+        index_asset,
+        position
+            .size,
+        is_long,
+        position
+            .cumulative_funding_rate,
+    );
+
+    let mut available_collateral = position.collateral;
+    let mut losses_and_fees = position_fee + liquidation_fee;
+
+    if funding_rate_has_profit {
+        available_collateral = available_collateral + funding_rate;
+    } else {
+        losses_and_fees = losses_and_fees + funding_rate;
+    }
+
+    // must be set and not zero
+    let max_leverage = storage::vault.max_leverage.get(index_asset).read();
+    // rounds up
+    // ensure the condition minimal_collateral_after_all * max_leverage >= position.size * BASIS_POINTS_DIVISOR
+    let minimal_collateral_after_all = (position.size * BASIS_POINTS_DIVISOR.as_u256() + max_leverage - 1) / max_leverage;
+    let minimal_collateral_before_pnl = minimal_collateral_after_all + losses_and_fees;
+
+    // calculate the limit pnl that can be realized without liquidation
+    // less profit or more loss triggers liquidation
+    let (has_profit, pnl_delta) = if available_collateral > minimal_collateral_before_pnl {
+        (false, available_collateral - minimal_collateral_before_pnl)
+    } else {
+        (true, minimal_collateral_before_pnl - available_collateral)
+    };
+
+    let average_price = position.average_price;
+
+    // pnl_delta = size * price_delta / average_price;
+    let price_delta = if has_profit {
+        // rounds down
+        pnl_delta * average_price / position.size
+    } else {
+        // rounds up
+        (pnl_delta * average_price + position.size - 1) / position.size
+    };
+
+    if has_profit {
+        if is_long {
+            average_price + price_delta
+        } else {
+            // in extreme cases, average_price - price_delta may underflow
+            if price_delta > average_price {
+                0
+            } else {
+                average_price - price_delta
+            }
+        }
+    } else {
+        if is_long {
+            // in extreme cases, average_price - price_delta may underflow
+            if price_delta > average_price {
+                0
+            } else {
+                average_price - price_delta
+            }
+        } else {
+            average_price + price_delta
+        }
+    }
 }
 
 #[storage(read)]

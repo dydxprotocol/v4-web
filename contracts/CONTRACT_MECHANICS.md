@@ -281,6 +281,24 @@ Decreasing and closing existing positions follow the same rules.
 
 4. If the position is to be closed, there is no validation. Otherwise, at the end, the position is validated - checked if it is eligible for liquidation.
 
+### Liquidate Position
+
+The procedure to decide if a position should be liquidated.
+
+1. Simulate closing the position - calculate the collateral but do not change the size.
+
+2. Additionally charge the liquidation fee - subtract from the remaining collateral.
+
+3. Ignore the reserves, i.e. do not apply the rules for when the reserves are insufficient to cover the funding rates and/or profits.
+
+4. If the remaining collateral is not positive or it gives the leverage exceeding the max allowed leverage for the asset, then the position is to be liquidated.
+
+If the position is to be liquidated, then the process is the same as closing the position with the following differences.
+
+1. The liquidation fee is charged.
+
+2. The remaining collateral is added to the reserves, it is not returned to the trader.
+
 ### Others
 
 If a trader increases or decreases existing position, and after adding the funding rate and pnl it turns out that the collateral is greater than the size, an error is thrown (an alternative would be to return the surplus collateral to the trader).

@@ -72,7 +72,11 @@ abi Vault {
         is_long: bool,
     ) -> (bool, u256);
     #[storage(read)]
+    fn get_position_liquidation_price(account: Identity, index_asset: b256, is_long: bool) -> u256;
+    #[storage(read)]
     fn get_position_by_key(position_key: b256) -> Position;
+    #[storage(read)]
+    fn get_position(account: Identity, index_asset: b256, is_long: bool) -> Position;
     #[storage(read)]
     fn get_price(asset: b256, is_long: bool, is_increase: bool) -> u256;
     #[storage(read)]
