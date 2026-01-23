@@ -38,7 +38,7 @@ export const MobileDropdownMenu = forwardRefFn(
         align={align}
         side={side}
         sideOffset={sideOffset}
-        tw="z-1 w-fit overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4"
+        tw="z-20 w-fit overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4"
       >
         {slotTop && (
           <>
