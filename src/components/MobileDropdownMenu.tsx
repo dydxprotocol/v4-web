@@ -103,6 +103,7 @@ const DropdownMenuButton = styled(Button)`
   align-items: center;
   border-radius: 8px;
   border-width: 1.5px;
+  border-color: var(--color-layer-4);
 
   &[data-state='open'] {
     svg {
