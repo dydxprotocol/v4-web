@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useCallback } from 'react';
 
 import {
   ExecutionType,
@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
@@ -52,8 +52,6 @@ const RegularTradeForm = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>();
-
   const rawInput = useAppSelector(getTradeFormRawState);
   const tradeValues = useAppSelector(getTradeFormValues);
   const fullFormSummary = useAppSelector(getTradeFormSummary);
@@ -85,11 +83,7 @@ const RegularTradeForm = () => {
     summary.accountDetailsBefore?.account?.freeCollateral ?? BigNumber(0)
   ).toNumber();
 
-  const onLastOrderIndexed = useCallback(() => {
-    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-      setCurrentStep(MobilePlaceOrderSteps.Confirmation);
-    }
-  }, [currentStep, setCurrentStep]);
+  const onLastOrderIndexed = useCallback(() => {}, []);
 
   const {
     placeOrderError,
@@ -152,28 +146,11 @@ const RegularTradeForm = () => {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    switch (currentStep) {
-      case MobilePlaceOrderSteps.EditOrder: {
-        setCurrentStep?.(MobilePlaceOrderSteps.PreviewOrder);
-        break;
-      }
-      case MobilePlaceOrderSteps.PlacingOrder:
-      case MobilePlaceOrderSteps.PlaceOrderFailed:
-      case MobilePlaceOrderSteps.Confirmation: {
-        break;
-      }
-      case MobilePlaceOrderSteps.PreviewOrder:
-      default: {
-        placeOrder({
-          onPlaceOrder: () => {
-            dispatch(tradeFormActions.resetPrimaryInputs());
-          },
-        });
-        setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
-        break;
-      }
-    }
+    placeOrder({
+      onPlaceOrder: () => {
+        dispatch(tradeFormActions.resetPrimaryInputs());
+      },
+    });
   };
 
   const orderSideAction = {
@@ -355,10 +332,7 @@ const RegularTradeForm = () => {
               buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
               buttonAction: orderSideAction as ButtonAction,
             }}
-            currentStep={currentStep}
-            hasInput={
-              isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)
-            }
+            hasInput={isInputFilled}
             hasValidationErrors={hasValidationErrors}
             onClearInputs={() => dispatch(tradeFormActions.resetPrimaryInputs())}
             shouldEnableTrade={shouldEnableTrade}

@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect } from 'react';
 
 import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
@@ -51,8 +50,6 @@ const CloseTradeForm = ({ market }: Props) => {
   const isFirstRender = useIsFirstRender();
   const stringGetter = useStringGetter();
 
-  const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>();
-
   const { stepSizeDecimals, tickSizeDecimals, displayableAsset } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -80,18 +77,9 @@ const CloseTradeForm = ({ market }: Props) => {
   useEffect(() => {
     dispatch(closePositionFormActions.setMarketId(market));
     dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
-  }, [market, currentStep, dispatch]);
+  }, [market, dispatch]);
 
-  const onLastOrderIndexed = useCallback(() => {
-    // if (!isFirstRender) {
-    //   dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
-    //   dispatch(closePositionFormActions.reset());
-    //   dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
-    //   if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-    //     setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
-    //   }
-    // }
-  }, [currentStep, dispatch, isFirstRender, setCurrentStep]);
+  const onLastOrderIndexed = useCallback(() => {}, []);
 
   const {
     placeOrderError: closePositionError,
@@ -142,31 +130,11 @@ const CloseTradeForm = ({ market }: Props) => {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-
-    switch (currentStep) {
-      case MobilePlaceOrderSteps.EditOrder: {
-        setCurrentStep?.(MobilePlaceOrderSteps.PreviewOrder);
-        break;
-      }
-      case MobilePlaceOrderSteps.PlacingOrder:
-      case MobilePlaceOrderSteps.PlaceOrderFailed:
-      case MobilePlaceOrderSteps.Confirmation: {
-        break;
-      }
-      case MobilePlaceOrderSteps.PreviewOrder:
-      default: {
-        placeOrder({
-          onFailure: () => {
-            setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
-          },
-          onPlaceOrder: () => {
-            onClearInputs();
-          },
-        });
-        setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
-        break;
-      }
-    }
+    placeOrder({
+      onPlaceOrder: () => {
+        onClearInputs();
+      },
+    });
   };
 
   return (
@@ -279,7 +247,6 @@ const CloseTradeForm = ({ market }: Props) => {
           <$PlaceOrderButtonAndReceipt
             summary={summary}
             actionStringKey={shortAlertKey}
-            currentStep={currentStep}
             hasInput={!!amountInput}
             hasValidationErrors={hasValidationErrors}
             onClearInputs={onClearInputs}

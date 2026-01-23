@@ -256,7 +256,7 @@ const Content = () => {
 
         {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        <NotificationsToastArea tw="z-[2] [grid-area:Main]" />
+        <NotificationsToastArea tw="z-[2000] [grid-area:Main]" />
 
         <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
