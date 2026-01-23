@@ -62,8 +62,10 @@ const $NavigationMenu = styled(NavigationMenu)`
   --navigationMenu-item-radius: 0;
 
   --navigationMenu-item-checked-backgroundColor: transparent;
-  --navigationMenu-item-highlighted-backgroundColor: transparent;
-  --navigationMenu-item-highlighted-textColor: var(--color-text-2);
+  --navigationMenu-item-highlighted-backgroundColor: var(--color-layer-2);
+  --navigationMenu-tab-item-highlighted-backgroundColor: var(--color-layer-2);
+  --navigationMenu-item-checked-textColor: var(--color-accent);
+  --navigationMenu-item-highlighted-textColor: var(--color-accent);
   --navigationMenu-item-radius: 0px;
   --navigationMenu-item-padding: 0px;
 
