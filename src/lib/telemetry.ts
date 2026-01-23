@@ -4,6 +4,8 @@ import { isDev } from '@/constants/networks';
 import { track } from './analytics/analytics';
 import { dd } from './analytics/datadog';
 
+const FRONTEND = 'bonk';
+
 let lastLogTime = Date.now();
 
 export function getDurationSinceLastLogMs() {
@@ -11,17 +13,18 @@ export function getDurationSinceLastLogMs() {
 }
 
 export const log = (location: string, error?: Error, metadata?: object) => {
+  const modifiedMetadata = { ...metadata, frontend: FRONTEND };
   lastLogTime = Date.now();
   if (isDev) {
     // eslint-disable-next-line no-console
-    console.warn('telemetry/log:', { location, error, metadata });
+    console.warn('telemetry/log:', { location, error, metadata: modifiedMetadata });
   }
 
   const customEvent = new CustomEvent('dydx:log', {
     detail: {
       location,
       error,
-      metadata,
+      metadata: modifiedMetadata,
     },
   });
 
@@ -29,24 +32,25 @@ export const log = (location: string, error?: Error, metadata?: object) => {
     AnalyticsEvents.Error({
       location,
       error,
-      metadata,
+      metadata: modifiedMetadata,
     })
   );
 
-  dd.error(`[Error] ${location}`, metadata, error);
+  dd.error(`[Error] ${location}`, { ...metadata, frontend: FRONTEND }, error);
 
   globalThis.dispatchEvent(customEvent);
 };
 
 export const logInfo = (location: string, metadata?: object) => {
   lastLogTime = Date.now();
+  const modifiedMetadata = { ...metadata, frontend: FRONTEND };
 
   if (isDev) {
     // eslint-disable-next-line no-console
-    console.log('telemetry/logInfo:', { location, metadata });
+    console.log('telemetry/logInfo:', { location, metadata: modifiedMetadata });
   }
 
-  dd.info(`[Info] ${location}`, metadata);
+  dd.info(`[Info] ${location}`, { ...metadata, frontend: FRONTEND });
 };
 
 // Log rejected Promises without a .catch() handler

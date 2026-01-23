@@ -27,6 +27,7 @@ async function inject(fileName) {
     (function() {
       var BUGSNAG_API_KEY = '${BUGSNAG_API_KEY}';
       var walletType;
+      var frontend = 'bonk';
 
       if (BUGSNAG_API_KEY) {
         Bugsnag.start(BUGSNAG_API_KEY);
@@ -39,6 +40,9 @@ async function inject(fileName) {
         switch (property) {
           case 'walletType':
             walletType = value;
+            break;
+          case 'frontend':
+            frontend = value;
             break;
           default:
             break;
@@ -58,6 +62,9 @@ async function inject(fileName) {
             }
             if (walletType) {
               event.addMetadata('walletType', walletType);
+            }
+            if (frontend) {
+              event.addMetadata('frontend', frontend);
             }
           });
         } else {
