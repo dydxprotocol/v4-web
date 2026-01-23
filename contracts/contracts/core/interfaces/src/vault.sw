@@ -43,7 +43,8 @@ abi Vault {
     #[storage(read, write)]
     fn set_fees(
         liquidity_fee_basis_points: u64,
-        position_fee_basis_points: u64,
+        increase_position_fee_basis_points: u64,
+        decrease_position_fee_basis_points: u64,
         liquidation_fee_basis_points: u64,
     );
     #[storage(read, write)]
@@ -100,7 +101,9 @@ abi Vault {
     #[storage(read)]
     fn get_liquidity_fee_basis_points() -> u64;
     #[storage(read)]
-    fn get_position_fee_basis_points() -> u64;
+    fn get_increase_position_fee_basis_points() -> u64;
+    #[storage(read)]
+    fn get_decrease_position_fee_basis_points() -> u64;
     #[storage(read)]
     fn is_liquidator(account: Identity) -> bool;
     #[storage(read)]

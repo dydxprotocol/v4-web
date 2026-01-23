@@ -92,9 +92,12 @@ storage {
         /// charged when adding/removing liquidity
         /// 0.3% by default
         liquidity_fee_basis_points: u64 = 30,
-        /// applied to size of leveraged positions
+        /// applied to size of leveraged positions on a position increase
         /// 0.1% by default
-        position_fee_basis_points: u64 = 10,
+        increase_position_fee_basis_points: u64 = 10,
+        /// applied to size of leveraged positions on a position decrease
+        /// 0% by default
+        decrease_position_fee_basis_points: u64 = 0,
         // Misc
         approved_routers: StorageMap<Identity, StorageMap<Identity, bool>> = StorageMap {},
         is_liquidator: StorageMap<Identity, bool> = StorageMap {},
@@ -234,9 +237,15 @@ impl Vault for Contract {
             }
             _ => {}
         }
-        match storage::vault.position_fee_basis_points.try_read() {
+        match storage::vault.increase_position_fee_basis_points.try_read() {
             None => {
-                storage::vault.position_fee_basis_points.write(10);
+                storage::vault.increase_position_fee_basis_points.write(10);
+            }
+            _ => {}
+        }
+        match storage::vault.decrease_position_fee_basis_points.try_read() {
+            None => {
+                storage::vault.decrease_position_fee_basis_points.write(0);
             }
             _ => {}
         }
@@ -288,13 +297,14 @@ impl Vault for Contract {
     #[storage(read, write)]
     fn set_fees(
         liquidity_fee_basis_points: u64,
-        position_fee_basis_points: u64,
+        increase_position_fee_basis_points: u64,
+        decrease_position_fee_basis_points: u64,
         liquidation_fee_basis_points: u64,
     ) {
         only_owner();
 
         require(
-            liquidity_fee_basis_points <= MAX_FEE_BASIS_POINTS && position_fee_basis_points <= MAX_FEE_BASIS_POINTS && liquidation_fee_basis_points <= MAX_FEE_BASIS_POINTS,
+            liquidity_fee_basis_points <= MAX_FEE_BASIS_POINTS && increase_position_fee_basis_points <= MAX_FEE_BASIS_POINTS && decrease_position_fee_basis_points <= MAX_FEE_BASIS_POINTS && liquidation_fee_basis_points <= MAX_FEE_BASIS_POINTS,
             Error::VaultInvalidFeeBasisPoints,
         );
 
@@ -302,15 +312,19 @@ impl Vault for Contract {
             .liquidity_fee_basis_points
             .write(liquidity_fee_basis_points);
         storage::vault
-            .position_fee_basis_points
-            .write(position_fee_basis_points);
+            .increase_position_fee_basis_points
+            .write(increase_position_fee_basis_points);
+        storage::vault
+            .decrease_position_fee_basis_points
+            .write(decrease_position_fee_basis_points);
         storage::vault
             .liquidation_fee_basis_points
             .write(liquidation_fee_basis_points);
 
         log(SetFees {
             liquidity_fee_basis_points,
-            position_fee_basis_points,
+            increase_position_fee_basis_points,
+            decrease_position_fee_basis_points,
             liquidation_fee_basis_points,
         });
     }
@@ -483,8 +497,13 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_position_fee_basis_points() -> u64 {
-        storage::vault.position_fee_basis_points.try_read().unwrap_or(0)
+    fn get_increase_position_fee_basis_points() -> u64 {
+        storage::vault.increase_position_fee_basis_points.try_read().unwrap_or(0)
+    }
+
+    #[storage(read)]
+    fn get_decrease_position_fee_basis_points() -> u64 {
+        storage::vault.decrease_position_fee_basis_points.try_read().unwrap_or(0)
     }
 
     #[storage(read)]
@@ -718,7 +737,7 @@ fn _validate_liquidation(
     // the spread may be applied
     let price = _get_price(index_asset, is_long, false);
 
-    let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
+    let position_fee = _get_position_fee(account, index_asset, is_long, position.size, false);
 
     let liquidation_fee = _get_liquidation_fee(account, index_asset, is_long, position.size);
 
@@ -817,7 +836,7 @@ fn _get_position_liquidation_price(account: Identity, index_asset: b256, is_long
 
     require(position.size > 0, Error::VaultEmptyPosition);
 
-    let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
+    let position_fee = _get_position_fee(account, index_asset, is_long, position.size, false);
 
     let liquidation_fee = _get_liquidation_fee(account, index_asset, is_long, position.size);
 
@@ -896,12 +915,17 @@ fn _get_position_fee(
     _index_asset: b256,
     _is_long: bool,
     size_delta: u256,
+    is_increase: bool,
 ) -> u256 {
     if size_delta == 0 {
         return 0;
     }
 
-    let position_fee_basis_points = storage::vault.position_fee_basis_points.read();
+    let position_fee_basis_points = if is_increase {
+        storage::vault.increase_position_fee_basis_points.read()
+    } else {
+        storage::vault.decrease_position_fee_basis_points.read()
+    };
 
     size_delta * position_fee_basis_points.as_u256() / BASIS_POINTS_DIVISOR.as_u256()
 }
@@ -1170,7 +1194,7 @@ fn _increase_position(
 
     let total_reserves = storage::vault.total_reserves.read();
 
-    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
+    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta, true);
 
     let liquidity_fee = position_fee / 2;
     let protocol_fee = position_fee - liquidity_fee;
@@ -1313,7 +1337,7 @@ fn _decrease_position(
 
     let price = _get_price(index_asset, is_long, false);
 
-    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
+    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta, false);
 
     let liquidity_fee = position_fee / 2;
     let protocol_fee = position_fee - liquidity_fee;
@@ -1500,7 +1524,7 @@ fn _liquidate_position(
 
     let price = _get_price(index_asset, is_long, false);
 
-    let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
+    let position_fee = _get_position_fee(account, index_asset, is_long, position.size, false);
 
     let liquidity_fee = position_fee / 2;
     let protocol_fee = position_fee - liquidity_fee;

@@ -109,7 +109,8 @@ describe("Vault.total-liquidity", () => {
             vault.functions
                 .set_fees(
                     30, // liquidity_fee_basis_points
-                    10, // position_fee_basis_points
+                    10, // increase_position_fee_basis_points
+                    10, // decrease_position_fee_basis_points
                     10, // liquidation_fee_basis_points
                 )
                 .addContracts([vaultImpl]),
@@ -541,7 +542,8 @@ describe("Vault.total-liquidity", () => {
                 vault.functions
                     .set_fees(
                         0, // liquidity_fee_basis_points
-                        0, // position_fee_basis_points
+                        0, // increase_position_fee_basis_points
+                        0, // decrease_position_fee_basis_points
                         0, // liquidation_fee_basis_points
                     )
                     .addContracts([attachedContracts[1]]),

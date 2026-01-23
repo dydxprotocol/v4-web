@@ -94,7 +94,8 @@ describe("Vault.get_pnl", () => {
         await call(
             vaultExpose.functions.set_fees(
                 30, // liquidity_fee_basis_points
-                10, // position_fee_basis_points
+                10, // increase_position_fee_basis_points
+                10, // decrease_position_fee_basis_points
                 10, // liquidation_fee_basis_points
             ),
         )
