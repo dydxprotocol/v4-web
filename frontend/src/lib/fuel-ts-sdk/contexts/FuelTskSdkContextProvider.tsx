@@ -1,37 +1,64 @@
-import { type PropsWithChildren, useMemo } from 'react';
-import { type ContractId } from 'fuel-ts-sdk';
+import { type PropsWithChildren, useEffect, useMemo } from 'react';
 import { createStarboardClient } from 'fuel-ts-sdk/client';
 import type { AssetEntity } from 'fuel-ts-sdk/trading';
 import { Provider as ReduxProvider } from 'react-redux';
 import localAssets from '@/assets/local-assets.json';
 import testnetAssets from '@/assets/testnet-assets.json';
 import { NetworkSwitchContext } from '@/contexts/NetworkSwitchContext/NetworkSwitchContext';
-import { getEnv, getIndexerUrl } from '@/lib/env';
+import { WalletContext } from '@/contexts/WalletContext';
+import { envs } from '@/lib/env';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import type { Network } from '@/models/Network';
+import { useSdkQuery } from '../hooks';
+import { useAccountsSdk } from '../hooks/useAccountsSdk';
 import { FuelTsSdkContext } from './FuelTsSdkContext';
 
 interface FuelTsSdkProviderProps extends PropsWithChildren {}
 
 export function FuelTsSdkProvider({ children }: FuelTsSdkProviderProps) {
   const currentNetwork = useRequiredContext(NetworkSwitchContext).getCurrentNetwork();
-  const indexerUrl = getIndexerUrl(currentNetwork);
+  const indexerUrl = envs.getIndexerUrlByNetwork(currentNetwork);
   const assets = getNetworkAssets(currentNetwork);
+  const wallet = useRequiredContext(WalletContext);
 
   const client = useMemo(() => {
     const client = createStarboardClient({
       indexerUrl,
-      vaultAddress: VAULT_CONTRACT_IDS[currentNetwork],
+      vaultContractId: envs.getVaultContractIdByNetwork(currentNetwork),
+      accountGetter: wallet.getCurrentAccount,
     });
     client.trading.populateAssets(assets);
     return client;
-  }, [assets, currentNetwork, indexerUrl]);
+  }, [assets, currentNetwork, indexerUrl, wallet.getCurrentAccount]);
 
   return (
     <ReduxProvider store={client.store}>
-      <FuelTsSdkContext.Provider value={client}>{children}</FuelTsSdkContext.Provider>
+      <FuelTsSdkContext.Provider value={client}>
+        <WalletBalancesInitializer />
+        {children}
+      </FuelTsSdkContext.Provider>
     </ReduxProvider>
   );
+}
+
+function WalletBalancesInitializer() {
+  const wallet = useRequiredContext(WalletContext);
+  const accountsSdk = useAccountsSdk();
+  const userDataFetchStatus = useSdkQuery(accountsSdk.getCurrentUserDataFetchStatus);
+
+  const hasConnectivityChanged = wallet.isUserConnected();
+  useEffect(() => {
+    accountsSdk.invalidateCurrentUserData();
+  }, [hasConnectivityChanged, accountsSdk]);
+
+  useEffect(() => {
+    if (userDataFetchStatus === 'uninitialized') {
+      accountsSdk.fetchCurrentUserData();
+      return;
+    }
+  }, [accountsSdk, userDataFetchStatus]);
+
+  return null;
 }
 
 function getNetworkAssets(network: Network) {
@@ -39,8 +66,3 @@ function getNetworkAssets(network: Network) {
   if (network === 'testnet') return testnetAssets as AssetEntity[];
   throw new Error(`Unsupported Network:  ${network}`);
 }
-
-const VAULT_CONTRACT_IDS = JSON.parse(getEnv('VITE_VAULT_CONTRACT_IDS')) as Record<
-  Network,
-  ContractId
->;

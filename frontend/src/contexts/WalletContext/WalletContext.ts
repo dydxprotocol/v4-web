@@ -1,5 +1,4 @@
 import { createContext } from 'react';
-import type { Address, AssetId } from 'fuel-ts-sdk';
 import type { Account, Network as FuelsNetwork } from 'fuels';
 
 export type WalletContextType = {
@@ -7,15 +6,13 @@ export type WalletContextType = {
   disconnect: () => Promise<void>;
   isUserConnected: () => boolean;
 
-  getUserAddress: () => Promise<Address | undefined>;
-  getUserBalances: () => Promise<Record<AssetId, bigint>>;
+  getCurrentAccount: () => Promise<Account | null>;
 
   getCurrentNetwork: () => Promise<FuelsNetwork>;
   changeNetwork: (network: FuelsNetwork) => Promise<void>;
+
   registerNetworkChangeObserver: (listener: (network: FuelsNetwork) => void) => void;
   unregisterNetworkChangeObserver: (listener: (network: FuelsNetwork) => void) => void;
-
-  getUserWalletReference: () => Promise<Account | undefined>;
 };
 
 export const WalletContext = createContext<WalletContextType | null>(null);

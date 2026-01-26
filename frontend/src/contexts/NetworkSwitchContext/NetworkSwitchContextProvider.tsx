@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Network as FuelNetwork } from 'fuels';
-import { getEnv, getDefaultNetwork as getFallbackNetwork } from '@/lib/env';
+import { envs } from '@/lib/env';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import type { Network } from '@/models/Network';
 import { WalletContext } from '../WalletContext/WalletContext';
@@ -28,7 +28,7 @@ export const NetworkSwitchContextProvider: FC<NetworkSwitchContextProviderProps>
   );
 
   const getCurrentNetwork = useCallback(
-    () => currentNetwork ?? getFallbackNetwork(),
+    () => currentNetwork ?? envs.getFallbackNetwork(),
     [currentNetwork]
   );
 
@@ -70,7 +70,7 @@ export const NetworkSwitchContextProvider: FC<NetworkSwitchContextProviderProps>
 };
 
 function getNetworkByRpcUrl(url: string) {
-  const network = Object.entries(RPC_URLS)
+  const network = Object.entries(envs.getAllRpcUrls())
     .flatMap(([network, networkUrl]) => {
       if (networkUrl !== url) return [];
       return network;
@@ -84,10 +84,7 @@ function getNetworkByRpcUrl(url: string) {
 
 function getNetworkRpcInfo(network: Network): FuelNetwork {
   return {
-    chainId: +CHAIN_IDS[network],
-    url: RPC_URLS[network],
+    chainId: envs.getChainIdByNetwork(network),
+    url: envs.getRpcUrlByNetwork(network),
   };
 }
-
-const CHAIN_IDS = JSON.parse(getEnv('VITE_CHAIN_IDS')) as Record<Network, string>;
-const RPC_URLS = JSON.parse(getEnv('VITE_RPC_URLS')) as Record<Network, string>;

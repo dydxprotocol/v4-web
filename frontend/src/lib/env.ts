@@ -1,38 +1,39 @@
-import { NETWORKS, type Network, type NetworkConfig } from '@/models/Network';
+import type { Network } from '@/models/Network';
+import { EnvConfigSchema } from './env.schema';
 
-export function getEnv<K extends keyof ImportMetaEnv>(key: K): ImportMetaEnv[K] {
-  const value = import.meta.env[key];
-  if (value === undefined) {
-    throw new Error(`Environment variable ${key} is not defined`);
-  }
-  return value;
-}
+export const envs = {
+  getChainIdByNetwork(network: Network) {
+    return ENV.chainIds[network];
+  },
+  getAllRpcUrls() {
+    return ENV.rpcUrls;
+  },
+  getRpcUrlByNetwork(network: Network) {
+    return ENV.rpcUrls[network];
+  },
+  getFallbackNetwork() {
+    return ENV.defaultNetwork;
+  },
+  getIndexerUrlByNetwork(network: Network) {
+    return ENV.indexerUrls[network];
+  },
+  getVaultContractIdByNetwork(network: Network) {
+    return ENV.vaultContractIds[network];
+  },
+  getDefaultNetwork() {
+    return ENV.defaultNetwork;
+  },
 
-export function getAllNetworkConfigs(): NetworkConfig {
-  return parseNetworkUrls(getEnv('VITE_INDEXER_URLS'));
-}
+  isDev() {
+    return ENV.env === 'dev';
+  },
+};
 
-export function getDefaultNetwork(): Network {
-  const defaultNetwork = getEnv('VITE_DEFAULT_ENVIRONMENT');
-  if (!NETWORKS.includes(defaultNetwork as Network)) {
-    throw new Error(`Invalid VITE_DEFAULT_ENVIRONMENT: ${defaultNetwork}`);
-  }
-  return defaultNetwork as Network;
-}
-
-export function getIndexerUrl(network: Network): string {
-  const networks = getAllNetworkConfigs();
-  const url = networks[network];
-  if (!url) {
-    throw new Error(`No indexer URL found for network: ${network}`);
-  }
-  return url;
-}
-
-function parseNetworkUrls(jsonString: string): NetworkConfig {
-  try {
-    return JSON.parse(jsonString) as NetworkConfig;
-  } catch (error) {
-    throw new Error(`Failed to parse VITE_INDEXER_URLS: ${error}`);
-  }
-}
+const ENV = EnvConfigSchema.parse({
+  indexerUrls: import.meta.env.VITE_INDEXER_URLS,
+  vaultContractIds: import.meta.env.VITE_VAULT_CONTRACT_IDS,
+  rpcUrls: import.meta.env.VITE_RPC_URLS,
+  chainIds: import.meta.env.VITE_CHAIN_IDS,
+  defaultNetwork: import.meta.env.VITE_DEFAULT_ENVIRONMENT,
+  env: import.meta.env.VITE_ENV,
+});
