@@ -98,7 +98,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects leverage below minimum', () => {
+    it('rejects leverage below minimum', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '50000',
@@ -109,7 +109,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects leverage above maximum', () => {
+    it('rejects leverage above maximum', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '50000',
@@ -120,7 +120,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects leverage exceeding initial margin fraction limit', () => {
+    it('rejects leverage exceeding initial margin fraction limit', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '550000',
@@ -144,7 +144,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(true);
     });
 
-    it.skip('rejects empty collateral', () => {
+    it('rejects empty collateral', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '50000',
@@ -155,7 +155,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects zero collateral', () => {
+    it('rejects zero collateral', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '50000',
@@ -166,7 +166,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects collateral exceeding user balance', () => {
+    it('rejects collateral exceeding user balance', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '550000',
@@ -177,7 +177,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects collateral below minimum', () => {
+    it('rejects collateral below minimum', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '50',
@@ -212,7 +212,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects zero position size', () => {
+    it('rejects zero position size', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '0',
@@ -223,7 +223,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects negative position size', () => {
+    it('rejects negative position size', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '-1000',
@@ -234,7 +234,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
-    it.skip('rejects position size below minimum', () => {
+    it('rejects position size below minimum', () => {
       const result = schema.safeParse({
         orderSide: 'long',
         positionSize: '0.0005',
@@ -258,6 +258,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(true);
     });
 
+    // TODO: Schema doesn't validate positionSize = collateralSize × leverage relationship
     it.skip('rejects position with insufficient collateral', () => {
       const result = schema.safeParse({
         orderSide: 'long',
@@ -269,6 +270,7 @@ describe('orderEntryFormSchema', () => {
       expect(result.success).toBe(false);
     });
 
+    // TODO: Schema doesn't validate positionSize = collateralSize × leverage relationship
     it.skip('validates position size matches leverage relationship', () => {
       const result = schema.safeParse({
         orderSide: 'long',

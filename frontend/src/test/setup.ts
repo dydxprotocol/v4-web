@@ -21,6 +21,21 @@ vi.stubEnv(
   })
 );
 vi.stubEnv('VITE_DEFAULT_ENVIRONMENT', 'local');
+vi.stubEnv(
+  'VITE_RPC_URLS',
+  JSON.stringify({
+    local: 'http://localhost:4000/v1/graphql',
+    testnet: 'https://testnet.fuel.network/v1/graphql',
+  })
+);
+vi.stubEnv(
+  'VITE_CHAIN_IDS',
+  JSON.stringify({
+    local: 0,
+    testnet: 0,
+  })
+);
+vi.stubEnv('VITE_ENV', 'dev');
 
 // Mock ResizeObserver
 beforeAll(() => {
