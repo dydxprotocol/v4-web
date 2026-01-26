@@ -1,10 +1,7 @@
 import { type FC, type ReactNode, useCallback, useMemo } from 'react';
 import { $decimalValue } from 'fuel-ts-sdk';
 import type { AssetEntity } from 'fuel-ts-sdk/trading';
-import { WalletContext } from '@/contexts/WalletContext';
 import { useSdkQuery, useSdkQuerySignal, useTradingSdk } from '@/lib/fuel-ts-sdk';
-import { useAwaited } from '@/lib/useAwaited';
-import { useRequiredContext } from '@/lib/useRequiredContext';
 import { OrderEntryFormMetaContext } from '@/modules/OrderEntryForm';
 
 type DashboardOrderFormMetaProviderProps = {
@@ -15,9 +12,8 @@ export const DashboardOrderFormMetaProvider: FC<DashboardOrderFormMetaProviderPr
   children,
 }) => {
   const tradingSdk = useTradingSdk();
-  const wallet = useRequiredContext(WalletContext);
   const allAssets = useSdkQuery(tradingSdk.getAllAssets);
-  const userBalances = useAwaited(useMemo(() => wallet.getUserBalances(), [wallet]));
+  const userBalances = useSdkQuery((sdk) => sdk.accounts.getCurrentUserBalances());
 
   const baseAsset = allAssets.find((asset) => asset.symbol === 'USDC');
   const quoteAsset = useSdkQuery(tradingSdk.getWatchedAsset);
@@ -39,12 +35,7 @@ export const DashboardOrderFormMetaProvider: FC<DashboardOrderFormMetaProviderPr
       if (!assetId) return 0;
       if (!userBalances) return 0;
       if (!(assetId in userBalances)) return 0;
-      const bigintBalance = userBalances[assetId];
-
-      return $decimalValue({
-        value: bigintBalance.toString(),
-        decimals: asset.decimals,
-      }).toFloat();
+      return $decimalValue(userBalances[assetId]!).toFloat();
     },
     [userBalances]
   );

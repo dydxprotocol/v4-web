@@ -38,22 +38,20 @@ export const DashboardOrderEntryForm: FC = () => {
 
   const processOrder = useCallback(
     async (formData: OrderEntryFormModel) => {
-      const userWallet = await wallet.getUserWalletReference();
-      if (!userWallet || !baseAsset || !quoteAsset)
+      if (!baseAsset || !quoteAsset)
         throw new Error(
-          `Form is not ready for submission. All variables must be defined: userWallet (${userWallet}), baseAsset (${baseAsset}), quoteAsset (${quoteAsset})`
+          `Form is not ready for submission. All variables must be defined: baseAsset (${baseAsset}), quoteAsset (${quoteAsset})`
         );
 
       await tradingSdk.submitOrder({
         collateralAssetId: baseAsset?.assetId,
         indexAsset: quoteAsset.assetId,
-        wallet: userWallet,
         leverage: DecimalValue.fromDecimalString(formData.leverage),
         collateralAmount: CollateralAmount.fromDecimalString(formData.collateralSize),
         isLong: formData.orderSide === 'long',
       });
     },
-    [wallet, baseAsset, quoteAsset, tradingSdk]
+    [baseAsset, quoteAsset, tradingSdk]
   );
 
   const handleOrderSubmission = useCallback(

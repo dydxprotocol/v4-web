@@ -14,7 +14,7 @@ export const MintButton: FC = () => {
   const mint = async () => {
     if (!baseAsset?.contractId) throw new Error('No base asset contract loaded');
 
-    const walletRef = await wallet.getUserWalletReference();
+    const walletRef = await wallet.getCurrentAccount();
     if (!walletRef) throw new Error('Wallet not connected');
 
     setIsMinting(true);

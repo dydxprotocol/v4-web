@@ -1,35 +1,20 @@
-import { type FC, useMemo } from 'react';
+import { type FC } from 'react';
 import { Tooltip } from '@radix-ui/themes';
-import { $decimalValue, Usdc } from 'fuel-ts-sdk';
-import { WalletContext } from '@/contexts/WalletContext';
+import { $decimalValue, zero } from 'fuel-ts-sdk';
 import { formatCurrency } from '@/lib/formatCurrency';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
-import { usePromise } from '@/lib/usePromise';
-import { useRequiredContext } from '@/lib/useRequiredContext';
 import * as $ from './WalletCollateralCard.css';
 
 export const WalletCollateralCard: FC = () => {
-  const wallet = useRequiredContext(WalletContext);
   const trading = useTradingSdk();
 
   const baseAsset = useSdkQuery(() => trading.getBaseAsset());
-
-  const collateralPromise = usePromise<bigint | undefined>(
-    useMemo(
-      () =>
-        baseAsset
-          ? wallet.getUserBalances().then((a) => a[baseAsset.assetId])
-          : Promise.resolve(0n),
-      [baseAsset, wallet]
-    ),
-    true
+  const collateral = useSdkQuery(
+    (sdk) => sdk.accounts.getCurrentUserAssetBalance(baseAsset?.assetId) ?? zero()
   );
-
-  const isLoading = collateralPromise.status === 'pending';
-  const amount =
-    collateralPromise.status === 'fulfilled' && !!collateralPromise.data
-      ? $decimalValue(Usdc.fromBigInt(collateralPromise.data)).toFloat()
-      : 0;
+  const amount = $decimalValue(collateral).toFloat();
+  const collateralFetchStatus = useSdkQuery((sdk) => sdk.accounts.getCurrentUserDataFetchStatus());
+  const isLoading = collateralFetchStatus === 'pending';
 
   const shouldCompact = amount >= COMPACT_THRESHOLD;
   const displayValue = formatCurrency(amount, { compact: shouldCompact });

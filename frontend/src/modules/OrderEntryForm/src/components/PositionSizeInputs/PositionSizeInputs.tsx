@@ -47,23 +47,23 @@ export const PositionSizeInputs: FC = () => {
     const quoteAssetPriceDv = DecimalValue.fromFloat(currentQuoteAssetPrice.value);
 
     if (focusedField === 'collateralSize' || !focusedField) {
-      const sizeDv = DecimalValue.fromDecimalString(collateralSize.field.value);
+      const collateralSizeDv = DecimalValue.fromDecimalString(collateralSize.field.value);
 
       const nextPositionSize = $decimalValue(
-        DecimalCalculator.value(sizeDv)
-          .multiplyBy(quoteAssetPriceDv)
-          .multiplyBy(leverageDv)
+        DecimalCalculator.inNumerator((d) => d.value(collateralSizeDv).multiplyBy(leverageDv))
+          .inDenominator((n) => n.value(quoteAssetPriceDv))
           .calculate()
       ).toDecimalString();
 
       updatePositionSize(nextPositionSize);
     }
     if (focusedField === 'positionSize') {
-      const sizeDv = DecimalValue.fromDecimalString(positionSize.field.value);
-
+      const positionSizeDv = DecimalValue.fromDecimalString(positionSize.field.value);
       const nextCollateralSize = $decimalValue(
-        DecimalCalculator.inNumerator((calc) => calc.value(sizeDv))
-          .inDenominator((calc) => calc.value(quoteAssetPriceDv).multiplyBy(leverageDv))
+        DecimalCalculator.inNumerator((calc) =>
+          calc.value(positionSizeDv).multiplyBy(quoteAssetPriceDv)
+        )
+          .inDenominator((calc) => calc.value(leverageDv))
           .calculate(DecimalValue)
       ).toDecimalString();
       updateCollateralSize(nextCollateralSize);

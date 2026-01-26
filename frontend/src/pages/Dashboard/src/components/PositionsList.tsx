@@ -1,18 +1,14 @@
-import { type FC, useCallback, useMemo } from 'react';
+import { type FC, useCallback } from 'react';
 import { $decimalValue } from 'fuel-ts-sdk';
 import { calculateTotalExposure } from 'fuel-ts-sdk/trading';
-import { WalletContext } from '@/contexts/WalletContext';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
-import { useAwaited } from '@/lib/useAwaited';
 import { usePolling } from '@/lib/usePolling';
-import { useRequiredContext } from '@/lib/useRequiredContext';
 import { PositionCard } from './PositionCard';
 import * as styles from './PositionsList.css';
 
 export const PositionsList: FC = () => {
   const trading = useTradingSdk();
-  const { getUserAddress } = useRequiredContext(WalletContext);
-  const userAddress = useAwaited(useMemo(() => getUserAddress(), [getUserAddress]));
+  const userAddress = useSdkQuery((sdk) => sdk.accounts.getCurrentUserAddress());
   const positions = useSdkQuery(() => trading.getAccountOpenPositions(userAddress));
 
   const totalExposure = calculateTotalExposure(positions);

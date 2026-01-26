@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router';
 import logoStarboard from '@/assets/logo-starboard.png';
 import { WalletContext } from '@/contexts/WalletContext/WalletContext';
-import { getEnv } from '@/lib/env';
+import { envs } from '@/lib/env';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import { WalletCollateralCard } from '../../components/WalletCollateralCard';
 import * as styles from './DashboardLayout.css';
@@ -27,7 +27,7 @@ export function DashboardLayout() {
         </div>
 
         <div css={styles.headerRight}>
-          {getEnv('VITE_ENV') === 'dev' && <MintButton />}
+          {envs.isDev() && <MintButton />}
           {isWalletConnected && <WalletCollateralCard />}
           <button
             onClick={connectOrDisconnectWallet}

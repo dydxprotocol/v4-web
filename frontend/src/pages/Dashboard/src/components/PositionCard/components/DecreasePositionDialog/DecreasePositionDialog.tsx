@@ -3,9 +3,7 @@ import { Dialog } from '@radix-ui/themes';
 import { type PositionStableId } from 'fuel-ts-sdk';
 import { PositionSize } from 'fuel-ts-sdk/trading';
 import { toast } from 'react-toastify';
-import { WalletContext } from '@/contexts/WalletContext';
 import { useTradingSdk } from '@/lib/fuel-ts-sdk';
-import { useRequiredContext } from '@/lib/useRequiredContext';
 import * as styles from './DecreasePositionDialog.css';
 import {
   calculateSizeFromPercentage,
@@ -28,7 +26,6 @@ type DecreasePositionDialogProps = {
 export const DecreasePositionDialog = memo(
   ({ open, onOpenChange, positionId }: DecreasePositionDialogProps) => {
     const tradingSdk = useTradingSdk();
-    const wallet = useRequiredContext(WalletContext);
     const [sizeToDecrease, setSizeToDecrease] = useState('');
 
     const assetSymbol = tradingSdk.getWatchedAsset()?.name ?? '...';
@@ -57,12 +54,6 @@ export const DecreasePositionDialog = memo(
     };
 
     const submitPositionChange = useCallback(async () => {
-      const userWallet = await wallet.getUserWalletReference();
-      if (!userWallet) {
-        toast.error('Wallet not connected');
-        return;
-      }
-
       const sizeDelta = PositionSize.fromDecimalString(sizeToDecrease);
 
       const action = getPositionAction(sliderPercentage);
@@ -71,7 +62,6 @@ export const DecreasePositionDialog = memo(
       try {
         await tradingSdk.decreasePosition({
           positionId,
-          wallet: userWallet,
           sizeDelta,
         });
         toast.success(`Position ${actionPastTense} successfully`);
@@ -80,7 +70,7 @@ export const DecreasePositionDialog = memo(
         const message = error instanceof Error ? error.message : 'Unknown error';
         toast.error(`Failed to ${action} position: ${message}`);
       }
-    }, [wallet, sizeToDecrease, tradingSdk, positionId, sliderPercentage, onOpenChange]);
+    }, [sizeToDecrease, tradingSdk, positionId, sliderPercentage, onOpenChange]);
 
     const isValidDecrease = isValidDecreaseAmount(sizeToDecrease, totalPositionSize);
 
