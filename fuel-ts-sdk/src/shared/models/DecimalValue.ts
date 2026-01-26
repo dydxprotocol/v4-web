@@ -7,7 +7,7 @@ export interface DecimalValueInstance<
   readonly __brand?: TBrand;
 }
 
-export const DecimalValue = createDecimalValueSchema(6);
+export const DecimalValue = createDecimalValueSchema(9);
 
 export interface DecimalValueSchema<TDecimals extends number, TBrand extends string = string> {
   decimals: TDecimals;
@@ -102,4 +102,16 @@ export function $decimalValue<T extends DecimalValueInstance<number, string>>(dv
       return BigInt(dv.value);
     },
   };
+}
+
+export function isDecimalValue<TDecimals extends number = number, TBrand extends string = string>(
+  v: unknown,
+  precision?: TDecimals
+): v is DecimalValueInstance<TDecimals, TBrand> {
+  if (!v) return false;
+  if (typeof v !== 'object') return false;
+  if (!('decimals' in v)) return false;
+  if (!('value' in v)) return false;
+  if (precision && v.decimals !== precision) return false;
+  return true;
 }
