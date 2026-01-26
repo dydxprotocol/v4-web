@@ -1,18 +1,18 @@
+import { selectCurrentUserState } from '@sdk/Accounts/src/Wallet/infrastructure/redux/CurrentUser/selectors';
 import {
   currentUserActions,
   reducer,
 } from '@sdk/Accounts/src/Wallet/infrastructure/redux/CurrentUser/slice';
-import { selectCurrentUserState } from '@sdk/Accounts/src/Wallet/infrastructure/redux/CurrentUser/selectors';
 import {
-  nullCurrentUserState,
   type CurrentUserState,
+  nullCurrentUserState,
 } from '@sdk/Accounts/src/Wallet/infrastructure/redux/CurrentUser/types';
 import type { RootState } from '@sdk/shared/lib/redux';
 import { describe, expect, it } from 'vitest';
 import {
+  TEST_ADDRESS,
   createTestCurrentUserState,
   createTestWalletEntity,
-  TEST_ADDRESS,
 } from '../test-fixtures/wallet';
 
 describe('CurrentUser Redux Slice', () => {

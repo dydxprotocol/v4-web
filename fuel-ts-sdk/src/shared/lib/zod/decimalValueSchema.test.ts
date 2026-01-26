@@ -1,4 +1,8 @@
-import { createDecimalValueSchema, DecimalValue, isDecimalValue } from '@sdk/shared/models/DecimalValue';
+import {
+  DecimalValue,
+  createDecimalValueSchema,
+  isDecimalValue,
+} from '@sdk/shared/models/DecimalValue';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { zodDecimalValueSchema } from './decimalValueSchema';

@@ -5,11 +5,11 @@ import {
 import { DecimalValue } from '@sdk/shared/models/DecimalValue';
 import { describe, expect, it } from 'vitest';
 import {
-  createTestWalletBalances,
-  createTestWalletEntity,
   TEST_ADDRESS,
   TEST_BTC_ASSET_ID,
   TEST_USDC_ASSET_ID,
+  createTestWalletBalances,
+  createTestWalletEntity,
 } from '../test-fixtures/wallet';
 
 describe('WalletEntity Schema', () => {

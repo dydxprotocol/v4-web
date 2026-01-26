@@ -7,15 +7,15 @@ import type { RootState } from '@sdk/shared/lib/redux';
 import { DecimalValue } from '@sdk/shared/models/DecimalValue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  TEST_ADDRESS,
+  TEST_BTC_ASSET_ID,
+  TEST_ETH_ASSET_ID,
+  TEST_USDC_ASSET_ID,
   createRejectedCurrentUserState,
   createTestCurrentUserState,
   createTestWalletBalances,
   createTestWalletEntity,
   createUninitializedCurrentUserState,
-  TEST_ADDRESS,
-  TEST_BTC_ASSET_ID,
-  TEST_ETH_ASSET_ID,
-  TEST_USDC_ASSET_ID,
 } from '../test-fixtures/wallet';
 
 function createMockStoreService(currentUserState = createTestCurrentUserState()): StoreService {
@@ -46,9 +46,7 @@ describe('Wallet Queries', () => {
     });
 
     it('should return undefined when user data is null', () => {
-      const mockStoreService = createMockStoreService(
-        createTestCurrentUserState({ data: null })
-      );
+      const mockStoreService = createMockStoreService(createTestCurrentUserState({ data: null }));
       const query = createGetCurrentUserAddressQuery({ storeService: mockStoreService });
 
       const result = query();
