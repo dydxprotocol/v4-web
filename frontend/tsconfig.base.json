@@ -12,6 +12,7 @@
       "fuel-ts-sdk": ["../fuel-ts-sdk/src/index.ts"],
       "fuel-ts-sdk/client": ["../fuel-ts-sdk/src/client.ts"],
       "fuel-ts-sdk/trading": ["../fuel-ts-sdk/src/Trading/index.ts"],
+      "fuel-ts-sdk/accounts": ["../fuel-ts-sdk/src/Accounts/index.ts"],
       "@sdk/*": ["../fuel-ts-sdk/src/*"]
     },
     "strict": true,

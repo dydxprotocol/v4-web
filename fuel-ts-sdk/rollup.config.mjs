@@ -25,6 +25,7 @@ export default [
       index: 'src/index.ts',
       client: 'src/client.ts',
       'trading/index': 'src/Trading/index.ts',
+      'accounts/index': 'src/Accounts/index.ts',
     },
     output: {
       dir: 'dist',
@@ -51,6 +52,7 @@ export default [
       index: 'src/index.ts',
       client: 'src/client.ts',
       'trading/index': 'src/Trading/index.ts',
+      'accounts/index': 'src/Accounts/index.ts',
     },
     output: {
       dir: 'dist',
