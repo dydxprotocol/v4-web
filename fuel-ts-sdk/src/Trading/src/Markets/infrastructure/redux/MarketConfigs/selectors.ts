@@ -3,7 +3,7 @@ import type { RootState } from '@sdk/shared/lib/redux';
 import { type AssetId } from '@sdk/shared/types';
 import { marketConfigsAdapter } from './types';
 
-export const selectMarketConfigsState = (state: RootState) => state.markets.marketConfigs;
+export const selectMarketConfigsState = (state: RootState) => state.trading.markets.marketConfigs;
 
 const selectors = marketConfigsAdapter.getSelectors(selectMarketConfigsState);
 
