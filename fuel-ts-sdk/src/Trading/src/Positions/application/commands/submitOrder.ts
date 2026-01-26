@@ -1,40 +1,41 @@
-import type { SdkConfig } from '@sdk/shared/lib/SdkConfig';
+import type { ContractsService } from '@sdk/Accounts';
 import type { DecimalValueInstance } from '@sdk/shared/models/DecimalValue';
 import { CollateralAmount } from '@sdk/shared/models/decimals';
 import type { AssetId } from '@sdk/shared/types';
 import { DecimalCalculator } from '@sdk/shared/utils/DecimalCalculator';
-import { vaultAbi } from '@starboard/indexer/abis';
-import type { Account } from 'fuels';
-import { Contract } from 'fuels';
 
 export interface SubmitOrderParams {
   isLong: boolean;
-  wallet: Account;
   indexAsset: AssetId;
   collateralAssetId: AssetId;
   leverage: DecimalValueInstance;
   collateralAmount: CollateralAmount;
 }
 
-export const createSubmitOrder = (sdkConfig: SdkConfig) => async (params: SubmitOrderParams) => {
-  const { wallet, indexAsset, leverage, isLong, collateralAmount, collateralAssetId } = params;
+export interface SubmitOrderDependencies {
+  contractsService: ContractsService;
+}
 
-  const vault = new Contract(sdkConfig.vaultAddress, vaultAbi, wallet);
+export const createSubmitOrder =
+  (deps: SubmitOrderDependencies) => async (params: SubmitOrderParams) => {
+    const { indexAsset, leverage, isLong, collateralAmount, collateralAssetId } = params;
 
-  const size = DecimalCalculator.value(collateralAmount)
-    .multiplyBy(leverage)
-    .calculate(CollateralAmount)
-    .value.toString();
+    const vault = await deps.contractsService.getVaultContract();
 
-  const account = { Address: { bits: wallet.address.toB256() } };
+    const size = DecimalCalculator.value(collateralAmount)
+      .multiplyBy(leverage)
+      .calculate(CollateralAmount)
+      .value.toString();
 
-  return vault.functions
-    .increase_position(account, indexAsset, size, isLong)
-    .callParams({
-      forward: {
-        amount: collateralAmount.value.toString(),
-        assetId: collateralAssetId,
-      },
-    })
-    .call();
-};
+    const account = await deps.contractsService.getB256Account();
+
+    return vault.functions
+      .increase_position(account, indexAsset, size, isLong)
+      .callParams({
+        forward: {
+          amount: collateralAmount.value.toString(),
+          assetId: collateralAssetId,
+        },
+      })
+      .call();
+  };

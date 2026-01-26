@@ -1,10 +1,10 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { RootState } from '@sdk/client';
+import type { RootState } from '@sdk/shared/lib/redux';
 import type { AssetId } from '@sdk/shared/types';
 import type { AssetEntity } from '../../../domain';
 import type { AssetsState } from './types';
 
-const selectAssetsState = (state: RootState): AssetsState => state.markets.assets;
+const selectAssetsState = (state: RootState): AssetsState => state.trading.markets.assets;
 
 export const selectAllAssets = createSelector(
   selectAssetsState,

@@ -1,6 +1,11 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { marketsMiddleware, positionsMiddleware } from '@sdk/Trading';
-import { type TradingThunkExtras, tradingReducer } from '@sdk/Trading/di';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { type AccountsThunkExtras, accountsReducer } from '@sdk/Accounts/di';
+import {
+  type TradingThunkExtras,
+  tradingApis,
+  tradingMiddleware,
+  tradingReducer,
+} from '@sdk/Trading/di';
 
 export type RequestStatus = 'uninitialized' | 'pending' | 'fulfilled' | 'rejected';
 
@@ -28,7 +33,7 @@ export interface LoadableState<T> {
   error: string | null;
 }
 
-export type StoreThunkExtraArgument = TradingThunkExtras;
+export type StoreThunkExtraArgument = TradingThunkExtras & AccountsThunkExtras;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const serializeForDevTools = (state: any): any => {
@@ -43,16 +48,17 @@ const serializeForDevTools = (state: any): any => {
 
 export const createStore = (extraArgument: StoreThunkExtraArgument) => {
   return configureStore({
-    reducer: tradingReducer,
+    reducer: combineReducers({
+      trading: tradingReducer,
+      accounts: accountsReducer,
+      ...tradingApis,
+    }),
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         thunk: {
           extraArgument,
         },
-        // serializableCheck: false,
-      })
-        .concat(marketsMiddleware)
-        .concat(positionsMiddleware),
+      }).concat(tradingMiddleware),
     devTools: {
       name: 'Starboard',
       trace: true,

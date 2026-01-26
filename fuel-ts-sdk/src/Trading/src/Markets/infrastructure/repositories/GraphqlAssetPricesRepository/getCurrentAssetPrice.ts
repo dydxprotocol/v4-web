@@ -1,5 +1,3 @@
-import { OraclePrice } from '@sdk/shared/models/decimals';
-import { assetId, assetPriceId } from '@sdk/shared/types';
 import type { GraphQLClient } from 'graphql-request';
 import { type AssetPriceEntity, AssetPriceEntitySchema } from '../../../domain';
 import { GET_CURRENT_ASSET_PRICES_QUERY } from './getCurrentAssetPrice.gql';
@@ -27,9 +25,9 @@ export const getCurrentAssetPrice =
 
 function toDomainAssetPrice(gql: GraphQLCurrentPrice): AssetPriceEntity {
   return AssetPriceEntitySchema.parse({
-    id: assetPriceId(`${gql.asset}-${gql.timestamp}`),
-    assetId: assetId(gql.asset),
-    value: OraclePrice.fromBigInt(BigInt(gql.price)).value,
+    id: `${gql.asset}-${gql.timestamp}`,
+    assetId: gql.asset,
+    value: gql.price,
     timestamp: gql.timestamp,
   });
 }

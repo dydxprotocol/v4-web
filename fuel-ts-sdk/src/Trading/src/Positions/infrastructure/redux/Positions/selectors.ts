@@ -3,7 +3,7 @@ import type { RootState } from '@sdk/shared/lib/redux';
 import type { Address, PositionStableId } from '@sdk/shared/types';
 import { positionsAdapter } from './slice';
 
-const selectPositionsState = (state: RootState) => state.trading.positions;
+const selectPositionsState = (state: RootState) => state.trading.positions.positions;
 
 const adapterSelectors = positionsAdapter.getSelectors(selectPositionsState);
 

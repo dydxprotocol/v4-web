@@ -1,23 +1,24 @@
-import type { SdkConfig } from '@sdk/shared/lib/SdkConfig';
+import type { ContractsService } from '@sdk/Accounts';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { PositionStableId } from '@sdk/shared/types';
-import { vaultAbi } from '@starboard/indexer/abis';
-import type { Account } from 'fuels';
-import { Contract } from 'fuels';
 import type { PositionSize } from '../../domain/positionsDecimals';
 import { selectLatestPositionByKeyId } from '../../infrastructure';
 
+export interface DecreasePositionDependencies {
+  contractsService: ContractsService;
+  storeService: StoreService;
+}
+
 export interface DecreasePositionParams {
   positionId: PositionStableId;
-  wallet: Account;
   sizeDelta: PositionSize;
 }
 
 export const createDecreasePositionCommand =
-  (storeService: StoreService, sdkConfig: SdkConfig) => async (params: DecreasePositionParams) => {
-    const { positionId, wallet, sizeDelta } = params;
+  (deps: DecreasePositionDependencies) => async (params: DecreasePositionParams) => {
+    const { positionId, sizeDelta } = params;
 
-    const position = selectLatestPositionByKeyId(storeService.getState(), positionId);
+    const position = selectLatestPositionByKeyId(deps.storeService.getState(), positionId);
 
     if (!position) {
       throw new Error(`Position not found: ${positionId}`);
@@ -26,8 +27,8 @@ export const createDecreasePositionCommand =
     const isFullClose = sizeDelta.value === position.size.value;
     const collateralDelta = isFullClose ? position.collateralAmount.value : '0';
 
-    const vault = new Contract(sdkConfig.vaultAddress, vaultAbi, wallet);
-    const account = { Address: { bits: wallet.address.toB256() } };
+    const vault = await deps.contractsService.getVaultContract();
+    const account = await deps.contractsService.getB256Account();
 
     await vault.functions
       .decrease_position(

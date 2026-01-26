@@ -1,2 +1,2 @@
 export * from './redux';
-export * from './repositories';
+export * as adapters from './repositories';

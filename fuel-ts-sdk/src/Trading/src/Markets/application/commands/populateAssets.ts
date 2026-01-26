@@ -1,6 +1,6 @@
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { AssetEntity } from '../../domain';
-import { assetsActions } from '../../infrastructure/redux/Assets/slice';
+import { assetsActions } from '../../infrastructure';
 
 export const createPopulateAssetsCommand =
   (storeService: StoreService) => (asset: AssetEntity[]) => {

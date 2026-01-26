@@ -4,12 +4,13 @@ import * as assets from './Assets';
 import * as candles from './Candles';
 import * as marketConfigs from './MarketConfigs';
 
-export const marketsReducer = {
-  markets: combineReducers({
-    assetPrices: assetPrices.slice.assetPricesReducer,
-    marketConfigs: marketConfigs.slice.marketConfigsReducer,
-    assets: assets.slice.assetsReducer,
-  }),
+export const marketsReducer = combineReducers({
+  assetPrices: assetPrices.slice.assetPricesReducer,
+  marketConfigs: marketConfigs.slice.marketConfigsReducer,
+  assets: assets.slice.assetsReducer,
+});
+
+export const marketsApis = {
   [candles.api.candlesApi.reducerPath]: candles.api.candlesApi.reducer,
 };
 
