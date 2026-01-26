@@ -13,6 +13,7 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableLiquidationRebates } from '@/hooks/useEnableLiquidationRebates';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -29,6 +30,8 @@ import { orEmptyObj } from '@/lib/typeUtils';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { LiquidationRebatesHeader } from './LiquidationRebatesHeader';
+import { LiquidationRebatesPanel } from './LiquidationRebatesPanel';
 import { RebatesIncetivesPanel } from './RebatesIncetivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
@@ -38,6 +41,7 @@ import { UnbondingPanels } from './UnbondingPanels';
 
 enum Tab {
   Rewards = 'Rewards',
+  LiquidationRebates = 'LiquidationRebates',
   Competition = 'Competition',
 }
 
@@ -47,10 +51,13 @@ const RewardsPage = () => {
 
   const { complianceState } = useComplianceState();
   const { isTablet } = useBreakpoints();
+  const enableLiquidationRebates = useEnableLiquidationRebates();
 
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(Tab.Rewards);
+  const [value, setValue] = useState(
+    enableLiquidationRebates ? Tab.LiquidationRebates : Tab.Rewards
+  );
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -103,28 +110,43 @@ const RewardsPage = () => {
                 setValue(v);
               }}
               tw="flex-[2]"
-              items={[
-                {
-                  content: (
-                    <div tw="flexColumn gap-1.5">
-                      <LaunchIncentivesPanel />
-                      <RewardsLeaderboardPanel />
-                    </div>
-                  ),
-                  label: stringGetter({ key: STRING_KEYS.REWARDS }),
-                  value: Tab.Rewards,
-                },
-                {
-                  content: (
-                    <div tw="flexColumn gap-1.5">
-                      <RebatesIncetivesPanel />
-                      <CompetitionLeaderboardPanel />
-                    </div>
-                  ),
-                  label: stringGetter({ key: STRING_KEYS.REBATES }),
-                  value: Tab.Competition,
-                },
-              ]}
+              items={
+                enableLiquidationRebates
+                  ? [
+                      {
+                        content: (
+                          <div tw="flexColumn gap-1.5">
+                            <LiquidationRebatesHeader />
+                            <LiquidationRebatesPanel />
+                          </div>
+                        ),
+                        label: stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES }),
+                        value: Tab.LiquidationRebates,
+                      },
+                    ]
+                  : [
+                      {
+                        content: (
+                          <div tw="flexColumn gap-1.5">
+                            <LaunchIncentivesPanel />
+                            <RewardsLeaderboardPanel />
+                          </div>
+                        ),
+                        label: stringGetter({ key: STRING_KEYS.REWARDS }),
+                        value: Tab.Rewards,
+                      },
+                      {
+                        content: (
+                          <div tw="flexColumn gap-1.5">
+                            <RebatesIncetivesPanel />
+                            <CompetitionLeaderboardPanel />
+                          </div>
+                        ),
+                        label: stringGetter({ key: STRING_KEYS.REBATES }),
+                        value: Tab.Competition,
+                      },
+                    ]
+              }
               withTransitions={false}
             />
             <div tw="flexColumn flex-1 gap-1.5">
