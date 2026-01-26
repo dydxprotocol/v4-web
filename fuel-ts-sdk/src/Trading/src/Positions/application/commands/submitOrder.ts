@@ -28,6 +28,9 @@ export const createSubmitOrder =
       .value.toString();
 
     const account = await deps.contractsService.getB256Account();
+    if (!account) {
+      throw new Error('Wallet is not connected');
+    }
 
     return vault.functions
       .increase_position(account, indexAsset, size, isLong)

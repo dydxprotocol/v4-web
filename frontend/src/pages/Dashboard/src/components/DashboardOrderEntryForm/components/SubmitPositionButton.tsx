@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { getPositionSide } from 'fuel-ts-sdk/trading';
 import { useFormState, useWatch } from 'react-hook-form';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
-import { useAccountsSdk } from '@/lib/fuel-ts-sdk/hooks/useAccountsSdk';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import { OrderEntryFormApiContext } from '@/modules/OrderEntryForm';
 import * as $ from './SubmitPositionButton.css';
@@ -14,8 +13,7 @@ export const SubmitPositionButton: FC = () => {
 
   const formState = useFormState({ control });
 
-  const accountsSdk = useAccountsSdk();
-  const userAddress = useSdkQuery(accountsSdk.getCurrentUserAddress);
+  const userAddress = useSdkQuery((sdk) => sdk.accounts.getCurrentUserAddress());
 
   const hasPositions = useSdkQuery(
     () =>

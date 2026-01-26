@@ -4,8 +4,7 @@ import { createGetCurrentUserBalancesQuery } from '@sdk/Accounts/src/Wallet/appl
 import { createGetCurrentUserDataFetchStatusQuery } from '@sdk/Accounts/src/Wallet/application/queries/getCurrentUserDataFetchStatus';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { RootState } from '@sdk/shared/lib/redux';
-import { DecimalValue } from '@sdk/shared/models/DecimalValue';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   TEST_ADDRESS,
   TEST_BTC_ASSET_ID,
@@ -13,7 +12,6 @@ import {
   TEST_USDC_ASSET_ID,
   createRejectedCurrentUserState,
   createTestCurrentUserState,
-  createTestWalletBalances,
   createTestWalletEntity,
   createUninitializedCurrentUserState,
 } from '../test-fixtures/wallet';

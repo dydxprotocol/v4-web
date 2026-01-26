@@ -112,6 +112,6 @@ export function isDecimalValue<TDecimals extends number = number, TBrand extends
   if (typeof v !== 'object') return false;
   if (!('decimals' in v)) return false;
   if (!('value' in v)) return false;
-  if (precision && v.decimals !== precision) return false;
+  if (precision !== undefined && v.decimals !== precision) return false;
   return true;
 }

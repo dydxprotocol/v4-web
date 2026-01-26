@@ -47,6 +47,10 @@ export const PositionSizeInputs: FC = () => {
     const quoteAssetPriceDv = DecimalValue.fromFloat(currentQuoteAssetPrice.value);
 
     if (focusedField === 'collateralSize' || !focusedField) {
+      if (!collateralSize.field.value) {
+        updatePositionSize('');
+        return;
+      }
       const collateralSizeDv = DecimalValue.fromDecimalString(collateralSize.field.value);
 
       const nextPositionSize = $decimalValue(
@@ -58,6 +62,10 @@ export const PositionSizeInputs: FC = () => {
       updatePositionSize(nextPositionSize);
     }
     if (focusedField === 'positionSize') {
+      if (!positionSize.field.value) {
+        updateCollateralSize('');
+        return;
+      }
       const positionSizeDv = DecimalValue.fromDecimalString(positionSize.field.value);
       const nextCollateralSize = $decimalValue(
         DecimalCalculator.inNumerator((calc) =>

@@ -26,7 +26,7 @@ export const asyncFetchCurrentUserBalancesThunk = createAsyncThunk<
       (acc, curr) => {
         const precision = selectAssetPrecision(getState() as RootState, curr.assetId);
 
-        if (!precision) {
+        if (precision == null) {
           acc[curr.assetId] = DecimalValue.fromBigIntString(curr.amount.toString());
           return acc;
         }

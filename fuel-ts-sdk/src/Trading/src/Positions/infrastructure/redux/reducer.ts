@@ -8,7 +8,7 @@ export const positionsReducer = combineReducers({
 });
 
 export const positionsApis = {
-  [positionsApi.reducerPath]: positionsApi.reducer,
+  positionsApi: positionsApi.reducer,
 };
 
 export const positionsMiddleware = [positionsApi.middleware];

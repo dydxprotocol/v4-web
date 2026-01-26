@@ -19,7 +19,7 @@ const currentUserSlice = createSlice({
       },
       rejected: (state, action) => {
         state.data = null;
-        state.error = action.error.message;
+        state.error = action.payload ?? 'An unknown error occurred';
         state.status = 'rejected';
       },
       pending: (state) => {

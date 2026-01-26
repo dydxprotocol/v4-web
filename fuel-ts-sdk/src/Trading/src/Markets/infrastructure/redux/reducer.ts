@@ -11,7 +11,7 @@ export const marketsReducer = combineReducers({
 });
 
 export const marketsApis = {
-  [candles.api.candlesApi.reducerPath]: candles.api.candlesApi.reducer,
+  candlesApi: candles.api.candlesApi.reducer,
 };
 
 export const marketsMiddleware = [candles.api.candlesApi.middleware];
