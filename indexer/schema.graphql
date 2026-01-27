@@ -33,6 +33,7 @@ enum PositionChange {
 
 type Position @entity {
   id: ID!
+  openId: String!
   positionKey: PositionKey!
   change: PositionChange!
   timestamp: Int!

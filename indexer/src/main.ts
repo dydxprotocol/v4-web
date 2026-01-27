@@ -272,9 +272,12 @@ async function handleIncreasePosition(
   const outPnlDeltaRawStr = log.out_pnl_delta.toString();
   const outPnlDelta = pnlDeltaHasProfit ? BigInt(outPnlDeltaRawStr) : -BigInt(outPnlDeltaRawStr);
 
+  const id = generateId(receipt, block);
+
   const currentPosition: Position | null = await ctx.store.findOne(Position, {
     where: { positionKey: positionKeyRecord, latest: true },
   });
+  let openId = id;
   let collateral = BigInt(0);
   let size = BigInt(0);
   let realizedFundingRate = BigInt(0);
@@ -284,6 +287,7 @@ async function handleIncreasePosition(
     await ctx.store.upsert(currentPosition);
     // LIQUIDATE and CLOSE are final statuses, so we don't need to aggregate values
     if (currentPosition.change !== PositionChange.LIQUIDATE && currentPosition.change !== PositionChange.CLOSE) {
+        openId = currentPosition.openId;
         collateral = currentPosition.collateral;
         size = currentPosition.size;
         realizedFundingRate = currentPosition.realizedFundingRate;
@@ -296,7 +300,8 @@ async function handleIncreasePosition(
   realizedFundingRate = realizedFundingRate + outFundingRate;
   realizedPnl = realizedPnl + outPnlDelta;
   const position: Position = new Position({
-    id: generateId(receipt, block),
+    id,
+    openId,
     positionKey: positionKeyRecord,
     collateral,
     size,
@@ -370,6 +375,7 @@ async function handleDecreasePosition(
 
   const position: Position = new Position({
     id: generateId(receipt, block),
+    openId: currentPosition.openId,
     positionKey: positionKeyRecord,
     collateral,
     size,
@@ -470,6 +476,7 @@ async function handleLiquidatePosition(
 
   const position: Position = new Position({
     id: generateId(receipt, block),
+    openId: currentPosition.openId,
     positionKey: positionKeyRecord,
     collateral: BigInt(0),
     size: BigInt(0),
