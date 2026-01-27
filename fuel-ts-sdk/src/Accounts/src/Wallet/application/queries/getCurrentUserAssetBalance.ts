@@ -28,5 +28,5 @@ export const createGetCurrentUserAssetBalanceQuery = (
     }
   );
 
-  return (assetId: AssetId) => memoized(assetId, userBalancesGetter());
+  return (assetId: AssetId | null | undefined) => memoized(assetId, userBalancesGetter());
 };
