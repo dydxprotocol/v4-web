@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { getPositionSide } from 'fuel-ts-sdk/trading';
 import { useFormState, useWatch } from 'react-hook-form';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { useRequiredContext } from '@/lib/useRequiredContext';
@@ -13,13 +12,10 @@ export const SubmitPositionButton: FC = () => {
 
   const formState = useFormState({ control });
 
-  const userAddress = useSdkQuery((sdk) => sdk.accounts.getCurrentUserAddress());
-
   const hasPositions = useSdkQuery(
     () =>
-      tradingSdk
-        .getAccountWatchedAssetOpenPositions(userAddress)
-        .filter((p) => getPositionSide(p) === orderSide.toUpperCase()).length > 0
+      tradingSdk.getCurrentAccountOpenPositions().filter((p) => p.side === orderSide.toUpperCase())
+        .length > 0
   );
 
   return (

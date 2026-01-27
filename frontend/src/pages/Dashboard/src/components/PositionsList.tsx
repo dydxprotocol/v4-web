@@ -1,6 +1,5 @@
 import { type FC, useCallback } from 'react';
 import { $decimalValue } from 'fuel-ts-sdk';
-import { calculateTotalExposure } from 'fuel-ts-sdk/trading';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import { usePolling } from '@/lib/usePolling';
 import { PositionCard } from './PositionCard';
@@ -9,9 +8,9 @@ import * as styles from './PositionsList.css';
 export const PositionsList: FC = () => {
   const trading = useTradingSdk();
   const userAddress = useSdkQuery((sdk) => sdk.accounts.getCurrentUserAddress());
-  const positions = useSdkQuery(() => trading.getAccountOpenPositions(userAddress));
+  const positions = useSdkQuery(() => trading.getCurrentAccountOpenPositions());
 
-  const totalExposure = calculateTotalExposure(positions);
+  const totalExposure = useSdkQuery(trading.getCurrentAccountTotalExposure);
 
   usePolling(
     useCallback(() => {

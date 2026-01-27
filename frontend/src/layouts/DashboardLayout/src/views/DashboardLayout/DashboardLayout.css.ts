@@ -112,10 +112,14 @@ export const buttonSecondary = style({
 });
 
 export const walletButton = style({
-  padding: '0.5rem 1.25rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '2.5rem',
+  padding: '0 1.25rem',
   backgroundColor: colors.liquidLava,
   color: colors.snow,
-  borderRadius: '0.375rem',
+  borderRadius: '0.5rem',
   border: 'none',
   fontSize: '0.875rem',
   fontWeight: '600',
@@ -128,10 +132,14 @@ export const walletButton = style({
 });
 
 export const walletConnected = style({
-  padding: '0.5rem 1.25rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '2.5rem',
+  padding: '0 1.25rem',
   backgroundColor: colors.liquidLava,
   color: colors.snow,
-  borderRadius: '0.375rem',
+  borderRadius: '0.5rem',
   border: `1px solid ${colors.liquidLava}`,
   fontSize: '0.875rem',
   fontWeight: '600',

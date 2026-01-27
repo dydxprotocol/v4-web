@@ -27,7 +27,7 @@ export function DashboardLayout() {
         </div>
 
         <div css={styles.headerRight}>
-          {envs.isDev() && <MintButton />}
+          {envs.isDev() && isWalletConnected && <MintButton />}
           {isWalletConnected && <WalletCollateralCard />}
           <button
             onClick={connectOrDisconnectWallet}

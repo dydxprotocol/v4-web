@@ -2,10 +2,14 @@ import { style } from '@vanilla-extract/css';
 import { colors } from '../../../../../../styles/colors';
 
 export const mintButton = style({
-  padding: '0.5rem 1rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '2.5rem',
+  padding: '0 1rem',
   backgroundColor: 'transparent',
   color: colors.snow,
-  borderRadius: '0.375rem',
+  borderRadius: '0.5rem',
   border: `1px solid ${colors.whiteAlpha[20]}`,
   fontSize: '0.875rem',
   fontWeight: '500',

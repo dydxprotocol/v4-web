@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 import { Tooltip } from '@radix-ui/themes';
-import { $decimalValue, zero } from 'fuel-ts-sdk';
+import { $decimalValue } from 'fuel-ts-sdk';
 import { formatCurrency } from '@/lib/formatCurrency';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import * as $ from './WalletCollateralCard.css';
@@ -9,8 +9,8 @@ export const WalletCollateralCard: FC = () => {
   const trading = useTradingSdk();
 
   const baseAsset = useSdkQuery(() => trading.getBaseAsset());
-  const collateral = useSdkQuery(
-    (sdk) => sdk.accounts.getCurrentUserAssetBalance(baseAsset?.assetId) ?? zero()
+  const collateral = useSdkQuery((sdk) =>
+    sdk.accounts.getCurrentUserAssetBalance(baseAsset?.assetId)
   );
   const amount = $decimalValue(collateral).toFloat();
   const collateralFetchStatus = useSdkQuery((sdk) => sdk.accounts.getCurrentUserDataFetchStatus());

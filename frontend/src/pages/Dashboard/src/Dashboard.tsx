@@ -34,7 +34,7 @@ export function Dashboard() {
 const BackgroundPricesPolling = () => {
   const trading = useTradingSdk();
 
-  usePolling(trading.workflows.fetchLatestBaseAndWatchedAssetsPrices);
+  usePolling(trading.workflows.fetchLatestAccountTrackedAssetPrices);
 
   return null;
 };
