@@ -1,12 +1,18 @@
-import type { StoreService } from '@sdk/shared/lib/StoreService';
-import { calculateUnrealizedPnlPercent } from './calculateUnrealizedPnLPercent';
-import { createGetAccountWatchedAssetPositions } from './getAccountPositions';
-import { createGetPositionById } from './getPositionsById';
+import type { GetAllPositionsQueryDependencies } from './getAllPositions';
+import { createGetAllLatestPositionsQuery } from './getAllPositions';
+import type { GetPositionByIdQueryDependencies } from './getPositionsById';
+import { createGetPositionByIdQuery } from './getPositionsById';
+import type { IsPositionOpenQueryDependencies } from './isPositionOpen';
+import { createIsPositionOpenQuery } from './isPositionOpen';
 
-export const createPositionQueries = (storeService: StoreService) => ({
-  calculateUnrealizedPnlPercent,
-  getAccountPositions: createGetAccountWatchedAssetPositions(storeService),
-  getPositionById: createGetPositionById(storeService),
+export type PositionsQueriesDependencies = GetAllPositionsQueryDependencies &
+  GetPositionByIdQueryDependencies &
+  IsPositionOpenQueryDependencies;
+
+export const createPositionQueries = (deps: PositionsQueriesDependencies) => ({
+  getPositionById: createGetPositionByIdQuery(deps),
+  isPositionOpen: createIsPositionOpenQuery(deps),
+  getAllLatestPositions: createGetAllLatestPositionsQuery(deps),
 });
 
 export type PositionsQueries = ReturnType<typeof createPositionQueries>;

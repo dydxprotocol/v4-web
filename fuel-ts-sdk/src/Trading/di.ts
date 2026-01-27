@@ -1,5 +1,5 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import type { ContractsService } from '@sdk/Accounts';
+import type { ContractsService, WalletQueries } from '@sdk/Accounts';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { GraphQLClient } from 'graphql-request';
 import * as Markets from './src/Markets';
@@ -15,24 +15,29 @@ export const createTradingModule = ({ graphqlClient }: TradingModuleConfig) => {
     getThunkExtras: (): TradingThunkExtras => ({
       assetPriceRepository:
         Markets.marketsAdapters.createGraphQLAssetPriceRepository(graphqlClient),
-      marketConfigRepository:
-        Markets.marketsAdapters.createGraphQLMarketConfigRepository(graphqlClient),
       candleRepository: Markets.marketsAdapters.createGraphQLCandleRepository(graphqlClient),
       positionRepository:
         Positions.positionsAdapters.createGraphQLPositionRepository(graphqlClient),
     }),
-    createCommandsAndQueries: (storeService: StoreService, contractsService: ContractsService) => {
+    createCommandsAndQueries: (
+      storeService: StoreService,
+      contractsService: ContractsService,
+      walletQueries: WalletQueries
+    ) => {
       const positionCommands = Positions.createPositionCommands({ contractsService, storeService });
-      const positionsQueries = Positions.createPositionQueries(storeService);
+      const positionsQueries = Positions.createPositionQueries({ storeService });
       const marketCommands = Markets.createMarketCommands(storeService);
       const marketQueries = Markets.createMarketQueries(storeService);
       const tradingQueries = ApplicationServices.createTradingQueries({
         marketQueries,
         positionsQueries,
+        walletQueries,
       });
       const tradingWorkflows = ApplicationServices.createTradingWorkflows({
         marketCommands,
         marketQueries,
+        positionsQueries,
+        walletQueries,
       });
 
       return {

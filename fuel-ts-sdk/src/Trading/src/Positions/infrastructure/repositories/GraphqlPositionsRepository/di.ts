@@ -1,9 +1,7 @@
 import type { GraphQLClient } from 'graphql-request';
 import type { PositionRepository } from '../../../domain';
-import { getPositionsByAccount } from './getPositionsByAccount';
-import { getPositionsByStableId } from './getPositionsByKeyId';
+import { createGetPositionsByAccountAction } from './getPositionsByAccount';
 
 export const createGraphQLPositionRepository = (client: GraphQLClient): PositionRepository => ({
-  getPositionsByStableId: getPositionsByStableId(client),
-  getPositionsByAccount: getPositionsByAccount(client),
+  getPositionsByAccount: createGetPositionsByAccountAction(client),
 });

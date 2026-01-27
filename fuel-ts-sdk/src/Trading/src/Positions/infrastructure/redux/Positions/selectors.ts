@@ -13,20 +13,20 @@ export const selectPositionById = adapterSelectors.selectById;
 
 export const selectPositionsByAccount = createSelector(
   [selectAllPositions, (_state: RootState, account?: Address) => account],
-  (positions, account) => positions.filter((p) => p.positionKey.account === account)
+  (positions, account) => positions.filter((p) => p.accountAddress === account)
 );
 
-export const selectPositionsByKeyId = createSelector(
+export const selectPositionsByStableId = createSelector(
   [selectAllPositions, (_state: RootState, keyId?: PositionStableId) => keyId],
-  (positions, keyId) => positions.filter((p) => p.positionKey.id === keyId)
+  (positions, keyId) => positions.filter((p) => p.stableId === keyId)
 );
 
-export const selectLatestPositionByKeyId = createSelector(
+export const selectLatestPositionByStableId = createSelector(
   [selectAllPositions, (_state: RootState, keyId?: PositionStableId) => keyId],
-  (positions, keyId) => positions.filter((p) => p.positionKey.id === keyId).find((p) => p.latest)
+  (positions, keyId) => positions.find((p) => p.stableId === keyId && p.isLatest)
 );
 
 export const selectLatestPositionsByAccount = createSelector(
   [selectAllPositions, (_state: RootState, account?: Address) => account],
-  (positions, account) => positions.filter((p) => p.positionKey.account === account && p.latest)
+  (positions, account) => positions.filter((p) => p.accountAddress === account && p.isLatest)
 );

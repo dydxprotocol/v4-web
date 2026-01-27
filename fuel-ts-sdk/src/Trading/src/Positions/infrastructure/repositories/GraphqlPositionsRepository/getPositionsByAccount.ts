@@ -2,13 +2,13 @@ import type { Address } from '@sdk/shared/types';
 import type { GraphQLClient } from 'graphql-request';
 import type { PositionEntity } from '../../../domain';
 import { GET_POSITIONS_BY_ACCOUNT_QUERY } from './getPositionsByAccount.gql';
-import { type NestedPositionKeyResponse, toDomainPosition } from './mappers';
+import { type PositionKeyResponse, toDomainPosition } from './mappers';
 
-export const getPositionsByAccount =
+export const createGetPositionsByAccountAction =
   (client: GraphQLClient) =>
-  async (account?: Address, latestOnly = true): Promise<PositionEntity[]> => {
+  async (account?: Address, latestOnly?: boolean): Promise<PositionEntity[]> => {
     const data = await client.request<{
-      positionKeys: { nodes: NestedPositionKeyResponse[] };
+      positionKeys: { nodes: PositionKeyResponse[] };
     }>(GET_POSITIONS_BY_ACCOUNT_QUERY, {
       account,
       latestOnly,

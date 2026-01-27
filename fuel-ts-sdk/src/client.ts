@@ -29,12 +29,16 @@ export const createStarboardClient = (config: StarboardClientConfig) => {
   });
   const storeService = createStoreService(starboardStore);
 
+  const accountsCommandsAndQueries = accountsModule.createCommandsAndQueries({ storeService });
+  const tradingCommandsAndQueries = tradingModule.createCommandsAndQueries(
+    storeService,
+    accountsModule.services.contractsService,
+    accountsCommandsAndQueries
+  );
+
   return {
-    accounts: accountsModule.createCommandsAndQueries({ storeService }),
-    trading: tradingModule.createCommandsAndQueries(
-      storeService,
-      accountsModule.services.contractsService
-    ),
+    accounts: accountsCommandsAndQueries,
+    trading: tradingCommandsAndQueries,
     store: starboardStore,
   };
 };

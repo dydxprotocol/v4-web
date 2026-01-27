@@ -1,16 +1,18 @@
-import type { CalculateRiskMetricsDependencies } from './calculateRiskMetrics';
-import { createGetAccountOpenPositions } from './getAccountOpenPositions';
-import {
-  type GetAccountWatchedAssetOpenPositionsDeps,
-  createGetAccountWatchedAssetOpenPositions,
-} from './getAccountWatchedAssetOpenPositions';
+import type { GetAccountOpenPositionsQueryDeps } from './getCurrentAccountOpenPositions';
+import { createGetCurrentAccountOpenPositionsQuery } from './getCurrentAccountOpenPositions';
+import type { GetCurrentAccountTotalExposureQueryDependencies } from './getCurrentAccountTotalExposure';
+import { createGetCurrentAccountTotalExposureQuery } from './getCurrentAccountTotalExposure';
+import type { GetPositionLiquidationPriceApproxQueryDependencies } from './getPositionLiquidationPriceApprox';
+import { createGetPositionLiquidationPriceApproxQuery } from './getPositionLiquidationPriceApprox';
 
-export type TradingQueriesDependencies = CalculateRiskMetricsDependencies &
-  GetAccountWatchedAssetOpenPositionsDeps;
+export type TradingQueriesDependencies = GetAccountOpenPositionsQueryDeps &
+  GetCurrentAccountTotalExposureQueryDependencies &
+  GetPositionLiquidationPriceApproxQueryDependencies;
 
 export function createTradingQueries(deps: TradingQueriesDependencies) {
   return {
-    getAccountWatchedAssetOpenPositions: createGetAccountWatchedAssetOpenPositions(deps),
-    getAccountOpenPositions: createGetAccountOpenPositions(deps),
+    getCurrentAccountOpenPositions: createGetCurrentAccountOpenPositionsQuery(deps),
+    getCurrentAccountTotalExposure: createGetCurrentAccountTotalExposureQuery(deps),
+    getPositionLiquidationPriceApprox: createGetPositionLiquidationPriceApproxQuery(deps),
   };
 }

@@ -4,6 +4,7 @@ export interface FetchLatestBaseAndWatchedAssetsPricesDeps {
   marketCommands: MarketCommands;
   marketQueries: MarketQueries;
 }
+
 export const createFetchLatestBaseAndWatchedAssetsPricesWorkflow =
   (deps: FetchLatestBaseAndWatchedAssetsPricesDeps) => async () => {
     const watchedAsset = deps.marketQueries.getWatchedAsset();

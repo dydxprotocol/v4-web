@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query';
-import type { Address, PositionStableId } from '@sdk/shared/types';
+import type { Address } from '@sdk/shared/types';
 import type { PositionRepository } from '../../../domain';
 
 export const positionsApi = createApi({
@@ -23,23 +23,6 @@ export const positionsApi = createApi({
         }
       },
       providesTags: (_result, _error, arg) => [{ type: 'positions-by-address', id: arg }],
-    }),
-    getPositionsByStableId: builder.query({
-      async queryFn(stableId: PositionStableId, api) {
-        try {
-          const { positionRepository } = api.extra as PositionsThunkExtra;
-          const result = await positionRepository.getPositionsByStableId(stableId);
-          return { data: result ?? [] };
-        } catch (error) {
-          return {
-            error: {
-              status: 'CUSTOM_ERROR',
-              error: error instanceof Error ? error.message : 'Unknown error',
-            },
-          };
-        }
-      },
-      providesTags: (_result, _error, arg) => [{ type: 'positions-by-stable-id', id: arg }],
     }),
   }),
 });
