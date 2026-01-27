@@ -257,6 +257,7 @@ async function handleIncreasePosition(
   }
   const collateralDelta = BigInt(log.collateral_delta.toString());
   const sizeDelta = BigInt(log.size_delta.toString());
+  const price = BigInt(log.price.toString());
   const outAveragePrice = BigInt(log.out_average_price.toString());
   const outLiquidityFee = BigInt(log.out_liquidity_fee.toString());
   const outProtocolFee = BigInt(log.out_protocol_fee.toString());
@@ -304,6 +305,7 @@ async function handleIncreasePosition(
     change: PositionChange.INCREASE,
     collateralDelta,
     sizeDelta,
+    price,
     outAveragePrice,
     outLiquidityFee,
     outProtocolFee,
@@ -335,6 +337,7 @@ async function handleDecreasePosition(
   }
   const collateralDelta = BigInt(log.collateral_delta.toString());
   const sizeDelta = BigInt(log.size_delta.toString());
+  const price = BigInt(log.price.toString());
   const outAveragePrice = BigInt(log.out_average_price.toString());
   const outLiquidityFee = BigInt(log.out_liquidity_fee.toString());
   const outProtocolFee = BigInt(log.out_protocol_fee.toString());
@@ -375,6 +378,7 @@ async function handleDecreasePosition(
     change: PositionChange.DECREASE,
     collateralDelta,
     sizeDelta,
+    price,
     outAveragePrice,
     outLiquidityFee,
     outProtocolFee,
@@ -432,6 +436,7 @@ async function handleLiquidatePosition(
     throw new Error('Position key not found');
   }
 
+  const price = BigInt(log.price.toString());
   const outLiquidityFee = BigInt(log.out_liquidity_fee.toString());
   const outProtocolFee = BigInt(log.out_protocol_fee.toString());
   const outLiquidationFee = BigInt(log.out_liquidation_fee.toString());
@@ -473,6 +478,7 @@ async function handleLiquidatePosition(
     change: PositionChange.LIQUIDATE,
     collateralDelta,
     sizeDelta: currentPosition.size,
+    price,
     outAveragePrice,
     outLiquidityFee,
     outProtocolFee,

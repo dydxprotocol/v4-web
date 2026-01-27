@@ -70,7 +70,8 @@ async function populateEvents() {
   await call(
     vaultDeployer.functions.set_fees(
       30, // liquidity_fee_basis_points
-      10, // position_fee_basis_points
+      10, // increase_position_fee_basis_points
+      0, // decrease_position_fee_basis_points
       10 // liquidation_fee_basis_points
     )
   );

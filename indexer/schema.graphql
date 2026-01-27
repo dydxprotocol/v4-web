@@ -39,6 +39,7 @@ type Position @entity {
   latest: Boolean!
   collateral: BigInt!
   size: BigInt!
+  price: BigInt!
   outAveragePrice: BigInt!
   realizedFundingRate: BigInt!
   realizedPnl: BigInt!

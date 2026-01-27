@@ -31,6 +31,9 @@ export class Position {
     size!: bigint
 
     @BigIntColumn_({nullable: false})
+    price!: bigint
+
+    @BigIntColumn_({nullable: false})
     outAveragePrice!: bigint
 
     @BigIntColumn_({nullable: false})
