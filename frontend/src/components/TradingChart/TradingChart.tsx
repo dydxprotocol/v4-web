@@ -127,6 +127,7 @@ export function TradingChart({ symbol, candlesGetter }: TradingChartProps) {
       disabled_features: [
         'trading_account_manager' as ChartingLibraryFeatureset,
         'use_localstorage_for_settings' as ChartingLibraryFeatureset,
+        'show_right_widgets_panel_by_default' as ChartingLibraryFeatureset,
       ],
       enabled_features: ['iframe_loading_same_origin' as ChartingLibraryFeatureset],
       load_last_chart: false,
