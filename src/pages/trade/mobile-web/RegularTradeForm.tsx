@@ -360,7 +360,7 @@ const LongButton = styled(Button)<{ $isLong?: boolean }>`
   ${({ $isLong }) =>
     $isLong
       ? `--button-textColor: var(--color-green); --button-backgroundColor: var(--color-gradient-positive);`
-      : '--button-backgroundColor: transparent'}
+      : '--button-textColor: var(--color-layer-7); --button-backgroundColor: transparent'}
 
   border-radius: 0.375rem;
 `;
@@ -369,7 +369,7 @@ const ShortButton = styled(Button)<{ $isShort?: boolean }>`
   ${({ $isShort }) =>
     $isShort
       ? `--button-textColor: var(--color-red); --button-backgroundColor: var(--color-gradient-negative);`
-      : '--button-backgroundColor: transparent'}
+      : '--button-textColor: var(--color-layer-7); --button-backgroundColor: transparent'}
 
   border-radius: 0.375rem;
 `;
