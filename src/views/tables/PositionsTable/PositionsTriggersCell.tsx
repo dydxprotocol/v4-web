@@ -10,8 +10,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -62,7 +62,7 @@ export const PositionsTriggersCell = ({
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
   const { isTablet } = useBreakpoints();
 
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
 
   const onViewOrders = () => onViewOrdersClick(marketId);
 

@@ -12,7 +12,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -45,7 +45,7 @@ const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const { isTablet } = useBreakpoints();
 
   const { usdcDenom } = useTokenConfigs();

@@ -10,8 +10,8 @@ import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -49,7 +49,7 @@ export const HeaderDesktop = () => {
   const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const isSpotEnabled = useEnableSpot();
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
@@ -197,7 +197,7 @@ export const HeaderDesktop = () => {
 
       <$NavAfter>
         {onboardingState === OnboardingState.AccountConnected &&
-          complianceState === ComplianceStates.FULL_ACCESS && (
+          complianceState !== ComplianceStates.READ_ONLY && (
             <Button
               tw="mr-[0.5em]"
               shape={ButtonShape.Pill}

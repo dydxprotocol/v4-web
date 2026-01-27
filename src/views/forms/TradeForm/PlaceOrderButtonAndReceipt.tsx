@@ -13,7 +13,7 @@ import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -79,7 +79,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
