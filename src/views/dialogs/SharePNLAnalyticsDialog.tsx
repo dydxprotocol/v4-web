@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
@@ -53,8 +54,8 @@ export const SharePNLAnalyticsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const symbol = getDisplayableAssetFromBaseAsset(assetId);
-  const isCopying = useRef(false);
-  const isSharing = useRef(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
   const getPnlImage = useSharePnlImage({
@@ -70,31 +71,44 @@ export const SharePNLAnalyticsDialog = ({
   const pnlImage = useMemo(() => getPnlImage.data ?? undefined, [getPnlImage.data]);
 
   const copyPnlImage = async () => {
-    if (isCopying.current || !pnlImage) return;
-    isCopying.current = true;
-    await copyBlobToClipboard(pnlImage);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-    isCopying.current = false;
+    if (isCopying || isCopied || !pnlImage) return;
+    setIsCopying(true);
+    try {
+      await copyBlobToClipboard(pnlImage);
+      track(AnalyticsEvents.SharePnlCopied({ asset: assetId }));
+      setIsCopying(false);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      logBonsaiError('SharePNLAnalyticsDialog/copyPnlImage', 'Failed to copy PNL image', { error });
+    } finally {
+      setIsCopying(false);
+    }
   };
 
   const sharePnlImage = async () => {
-    if (isSharing.current || !pnlImage) return;
-    isSharing.current = true;
-    await copyBlobToClipboard(pnlImage);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-
-    triggerTwitterIntent({
-      text: `${stringGetter({
-        key: STRING_KEYS.TWEET_MARKET_POSITION,
-        params: {
-          MARKET: symbol,
-        },
-      })}\n\n#bonk_trade #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
-      related: 'bonk_inu',
-    });
-    isSharing.current = false;
+    if (isSharing || !pnlImage) return;
+    setIsSharing(true);
+    try {
+      await copyBlobToClipboard(pnlImage);
+      triggerTwitterIntent({
+        text: `${stringGetter({
+          key: STRING_KEYS.TWEET_MARKET_POSITION,
+          params: {
+            MARKET: symbol,
+          },
+        })}\n\n#bonk_trade #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+        related: 'bonk_inu',
+      });
+      track(AnalyticsEvents.SharePnlShared({ asset: assetId }));
+      setIsSharing(false);
+    } catch (error) {
+      logBonsaiError('SharePNLAnalyticsDialog/sharePnlImage', 'Failed to share PNL image', {
+        error,
+      });
+    } finally {
+      setIsSharing(false);
+    }
 
     dispatch(closeDialog());
   };
@@ -118,12 +132,9 @@ export const SharePNLAnalyticsDialog = ({
           <$Action
             action={ButtonAction.Secondary}
             slotLeft={<Icon iconName={isCopied ? IconName.Check : IconName.Copy} />}
-            onClick={() => {
-              track(AnalyticsEvents.SharePnlCopied({ asset: assetId }));
-              copyPnlImage();
-            }}
+            onClick={() => copyPnlImage()}
             state={{
-              isLoading: !!isCopying.current,
+              isLoading: !!isCopying,
             }}
           >
             {stringGetter({ key: isCopied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
@@ -131,12 +142,9 @@ export const SharePNLAnalyticsDialog = ({
           <$Action
             action={ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.SocialX} />}
-            onClick={() => {
-              track(AnalyticsEvents.SharePnlShared({ asset: assetId }));
-              sharePnlImage();
-            }}
+            onClick={() => sharePnlImage()}
             state={{
-              isLoading: !!isSharing.current,
+              isLoading: !!isSharing,
             }}
           >
             {stringGetter({ key: STRING_KEYS.SHARE })}
