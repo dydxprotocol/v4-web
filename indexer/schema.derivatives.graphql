@@ -76,7 +76,8 @@ type CurrentPosition @entity {
   collateral: BigInt!
   size: BigInt!
   outAveragePrice: BigInt!
-  position_key_id: String!
+  positionOpenId: String!
+  positionKeyId: String!
 }
 
 type OpenInterest @entity {
