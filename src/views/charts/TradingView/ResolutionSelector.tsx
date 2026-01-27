@@ -49,6 +49,11 @@ export const ResolutionSelector = ({
             css={{
               borderColor: currentResolution !== resolution ? 'transparent' : 'var(--color-accent)',
               height: isTablet ? '2rem' : '2.75rem',
+              ...(currentResolution !== resolution
+                ? {
+                    color: 'var(--color-layer-7)',
+                  }
+                : {}),
             }}
             key={resolution}
             onClick={() => onResolutionChange(resolution)}

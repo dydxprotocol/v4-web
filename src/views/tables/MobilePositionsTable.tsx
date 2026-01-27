@@ -183,7 +183,7 @@ export const MobilePositionsTable = forwardRef(
                         <div tw="font-semibold">
                           {position.marginMode === MarginMode.CROSS ? 'Cross' : 'Isolated'}
                         </div>
-                        <div tw="rounded-0.5 border-solid border-color-layer-3 px-0.5 py-0.25 text-mini">
+                        <div tw="rounded-0.5 border-solid border-color-layer-3 px-0.25 py-[3px] text-mini">
                           {Math.round(position.effectiveSelectedLeverage.toNumber())}x
                         </div>
                       </div>
@@ -285,10 +285,10 @@ export const MobilePositionsTable = forwardRef(
                     </div>
                     <div tw="flex flex-[0.6] flex-col gap-0.125">
                       <Button
-                        tw="border-none bg-color-border-red px-1 text-red"
+                        tw="h-[34px] rounded-[8px] border-none bg-color-border-red px-1 text-mini text-red"
                         onClick={() => onCloseButtonToggle(position.market)}
                       >
-                        <Icon iconName={IconName.Close} tw="size-0.25" />
+                        <Icon iconName={IconName.Close} size="12px" />
                         Close
                       </Button>
                     </div>
