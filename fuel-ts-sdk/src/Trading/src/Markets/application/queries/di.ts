@@ -6,12 +6,10 @@ import { createGetBaseAssetQuery } from './getBaseAsset';
 import { createGetBaseAssetLatestPriceQuery } from './getBaseAssetLatestPrice';
 import { createGetCandles } from './getCandles';
 import { createGetCandlesStatus } from './getCandlesStatus';
-import { createGetMarketConfigById } from './getMarketConfigById';
 import { createGetWatchedAssetQuery } from './getWatchedAsset';
 import { createGetWatchedAssetLatestPriceQuery } from './getWatchedAssetLatestPrice';
 
 export const createMarketQueries = (storeService: StoreService) => ({
-  getMarketConfigById: createGetMarketConfigById(storeService),
   getCandles: createGetCandles(storeService),
   getCandlesStatus: createGetCandlesStatus(storeService),
   getAllAssets: createGetAllAssetsQuery(storeService),
