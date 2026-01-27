@@ -28,7 +28,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm codegen && rollup -c",
+    "build": "pnpm codegen && pnpm typecheck && rollup -c",
     "dev": "rollup -c --watch",
     "typecheck": "pnpm tsc --noEmit",
     "test": "vitest run",
@@ -49,6 +49,7 @@
     "graphql-ws": "^6.0.6",
     "immer": "^11.1.3",
     "lodash": "^4.17.21",
+    "micro-memoize": "^5.1.1",
     "reselect": "^5.1.1",
     "zod": "^3.24.1"
   },
