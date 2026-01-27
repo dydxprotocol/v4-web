@@ -51,14 +51,14 @@ const TradePage = () => {
     },
     [dispatch]
   );
-  const { panelHeight: horizontalPanelHeight, isDragging } = useResizablePanel(
-    horizontalPanelHeightPxBase,
-    setPanelHeight,
-    {
-      min: HORIZONTAL_PANEL_MIN_HEIGHT,
-      max: HORIZONTAL_PANEL_MAX_HEIGHT,
-    }
-  );
+  const {
+    panelHeight: horizontalPanelHeight,
+    isDragging,
+    handleMouseDown,
+  } = useResizablePanel(horizontalPanelHeightPxBase, setPanelHeight, {
+    min: HORIZONTAL_PANEL_MIN_HEIGHT,
+    max: HORIZONTAL_PANEL_MAX_HEIGHT,
+  });
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();
@@ -73,7 +73,7 @@ const TradePage = () => {
 
       <div>
         <DetachedSection>
-          <HorizontalPanel />
+          <HorizontalPanel handleStartResize={handleMouseDown} />
         </DetachedSection>
 
         <DetachedSection>
@@ -109,7 +109,11 @@ const TradePage = () => {
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">
-        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
+        <HorizontalPanel
+          isOpen={isHorizontalPanelOpen}
+          setIsOpen={setIsHorizontalPanelOpen}
+          handleStartResize={handleMouseDown}
+        />
       </$GridSection>
     </$TradeLayout>
   );

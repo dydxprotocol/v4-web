@@ -54,6 +54,7 @@ import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useMobileWebEnabled } from './hooks/useMobileWebEnabled';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
@@ -115,6 +116,7 @@ const Content = () => {
   const isShowingFooter = useShouldShowFooter();
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
   const isSimpleUi = useSimpleUiEnabled();
+  const isMobileWebEnabled = useMobileWebEnabled();
   const { showComplianceBanner } = useComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
 
@@ -132,7 +134,9 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
-  if (isSimpleUi) {
+  const showMobileWeb = isMobileWebEnabled && isTablet;
+
+  if (isSimpleUi && !showMobileWeb) {
     const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
     const backgroundColor =
       matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-layer-1)' : 'transparent';
@@ -207,10 +211,13 @@ const Content = () => {
               <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
 
               <Route path={AppRoute.Trade}>
-                <Route path=":market" element={isTablet ? <MobileWebTradePage /> : <TradePage />} />
+                <Route
+                  path=":market"
+                  element={showMobileWeb ? <MobileWebTradePage /> : <TradePage />}
+                />
                 <Route
                   path={AppRoute.Trade}
-                  element={isTablet ? <MobileWebTradePage /> : <TradePage />}
+                  element={showMobileWeb ? <MobileWebTradePage /> : <TradePage />}
                 />
               </Route>
 
@@ -254,7 +261,7 @@ const Content = () => {
           </Suspense>
         </$Main>
 
-        {isTablet ? <FooterMobile /> : <FooterDesktop />}
+        {showMobileWeb ? <FooterMobile /> : <FooterDesktop />}
 
         <NotificationsToastArea tw="z-[2000] [grid-area:Main]" />
 

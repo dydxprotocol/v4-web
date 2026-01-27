@@ -65,9 +65,10 @@ enum InfoSection {
 type ElementProps = {
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
+  handleStartResize?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
+export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }: ElementProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -461,6 +462,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   return (
     <>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <$DragHandle onMouseDown={handleStartResize} />
       {isTablet && (
         <div tw="mx-1.5 mb-1 mt-0.5">
           <div
