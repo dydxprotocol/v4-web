@@ -23,12 +23,20 @@ export const MarketStats: FC = () => {
     changeStyles.push(change24h >= 0 ? styles.priceChangePositive : styles.priceChangeNegative);
   }
 
+  const getAssetPriceFormatted = (priceValue: string, currentDecimal = 0) => {
+    if (currentDecimal === 9) return formatCurrency(0);
+    const nextPriceValue = formatCurrency(Number(priceValue), { decimals: currentDecimal });
+    if (Number(nextPriceValue) === 0) return getAssetPriceFormatted(priceValue, currentDecimal + 1);
+
+    return formatCurrency(Number(priceValue), { decimals: currentDecimal + 2 });
+  };
+
   return (
     <div css={styles.container}>
       <div css={styles.assetSection}>
         <AssetSelect />
         <div css={styles.priceDisplay}>
-          <span css={styles.price}>{formatCurrency(priceValue, { symbol: '$', decimals: 2 })}</span>
+          <span css={styles.price}>${getAssetPriceFormatted(priceValue.toString())}</span>
           {change24h !== null && (
             <span css={changeStyles}>
               {formatPercentage(change24h, { decimals: 2, signDisplay: 'always' })}

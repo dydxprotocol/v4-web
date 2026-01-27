@@ -1,4 +1,6 @@
 import type { ContractsService } from '@sdk/Accounts';
+import { UserBalancesChangedEvent } from '@sdk/shared/events/UserBalancesChanged';
+import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { DecimalValueInstance } from '@sdk/shared/models/DecimalValue';
 import { CollateralAmount } from '@sdk/shared/models/decimals';
 import type { AssetId } from '@sdk/shared/types';
@@ -14,6 +16,7 @@ export interface SubmitOrderParams {
 
 export interface SubmitOrderDependencies {
   contractsService: ContractsService;
+  storeService: StoreService;
 }
 
 export const createSubmitOrder =
@@ -32,7 +35,7 @@ export const createSubmitOrder =
       throw new Error('Wallet is not connected');
     }
 
-    return vault.functions
+    const { waitForResult } = await vault.functions
       .increase_position(account, indexAsset, size, isLong)
       .callParams({
         forward: {
@@ -41,4 +44,7 @@ export const createSubmitOrder =
         },
       })
       .call();
+
+    await waitForResult();
+    deps.storeService.dispatch(UserBalancesChangedEvent());
   };

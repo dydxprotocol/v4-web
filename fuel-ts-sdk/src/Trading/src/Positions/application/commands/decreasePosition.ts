@@ -1,4 +1,5 @@
 import type { ContractsService } from '@sdk/Accounts';
+import { UserBalancesChangedEvent } from '@sdk/shared/events/UserBalancesChanged';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { PositionStableId } from '@sdk/shared/types';
 import { PositionSide } from '../../domain';
@@ -31,7 +32,7 @@ export const createDecreasePositionCommand =
     const vault = await deps.contractsService.getVaultContract();
     const account = await deps.contractsService.getB256Account();
 
-    await vault.functions
+    const { waitForResult } = await vault.functions
       .decrease_position(
         account,
         position.assetId,
@@ -41,4 +42,7 @@ export const createDecreasePositionCommand =
         account
       )
       .call();
+
+    await waitForResult();
+    deps.storeService.dispatch(UserBalancesChangedEvent());
   };

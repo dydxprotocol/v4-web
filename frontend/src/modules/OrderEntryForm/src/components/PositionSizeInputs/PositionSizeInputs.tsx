@@ -29,14 +29,14 @@ export const PositionSizeInputs: FC = () => {
   const updateCollateralSize = useCallback(
     (val: string) => {
       if (isNaN(+val)) return;
-      collateralSize.field.onChange(String(val));
+      collateralSize.field.onChange(String(val.trim()));
     },
     [collateralSize.field]
   );
   const updatePositionSize = useCallback(
     (val: string) => {
       if (isNaN(+val)) return;
-      positionSize.field.onChange(String(val));
+      positionSize.field.onChange(String(val.trim()));
     },
     [positionSize.field]
   );

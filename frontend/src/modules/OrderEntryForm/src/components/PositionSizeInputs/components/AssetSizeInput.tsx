@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import { OrderEntryFormMetaContext } from '../../../contexts';
 import * as $ from './AssetSizeInput.css';
@@ -46,7 +47,7 @@ export const AssetSizeInput: FC<VolatileInputProps> = ({
         <div className={$.assetBadge}>{assetName}</div>
       </div>
       <div className={$.footer}>
-        <span className={$.usdValue}>${usdPrice.toFixed(2)}</span>
+        <span className={$.usdValue}>${formatCurrency(usdPrice)}</span>
         {leverage && <span className={$.leverage}>Leverage: {leverage}x</span>}
         {(onHalf || onMax) && userBalanceInBaseAsset > 0 && (
           <div className={$.quickActions}>
