@@ -29,7 +29,6 @@ const currentUserSlice = createSlice({
         },
       })
       .addMatcher(UserBalancesChangedEvent.match, (state) => {
-        console.log('poof!');
         state.status = 'uninitialized';
       }),
 });

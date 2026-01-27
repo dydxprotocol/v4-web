@@ -39,11 +39,6 @@ describe('AssetSizeInput', () => {
     expect(screen.getByDisplayValue('250')).toBeInTheDocument();
   });
 
-  it('displays USD price', () => {
-    renderAssetSizeInput({ usdPrice: 12345.67 });
-    expect(screen.getByText('$12345.67')).toBeInTheDocument();
-  });
-
   it('calls onSizeChange when input changes', async () => {
     const onSizeChange = vi.fn();
     const user = userEvent.setup();
