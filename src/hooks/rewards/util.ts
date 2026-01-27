@@ -23,6 +23,17 @@ export function feesToEstimatedDollarRewards(totalFees?: number): number {
   return totalFees * CURRENT_SURGE_REWARDS_DETAILS.rebateFraction;
 }
 
+export function positionToBonkRewards(position: number | undefined) {
+  if (!position) return 0;
+  if (position === 1) return 25000;
+  if (position === 2) return 15000;
+  if (position === 3) return 10000;
+  if (position === 4 || position === 5) return 5000;
+  if (position >= 6 || position <= 10) return 4000;
+  if (position >= 11 || position <= 20) return 2000;
+  return 0;
+}
+
 export const CURRENT_SURGE_REWARDS_DETAILS = {
   season: 10,
   rewardAmount: '',
@@ -31,6 +42,10 @@ export const CURRENT_SURGE_REWARDS_DETAILS = {
   rebatePercentNumeric: '50',
   rebateFraction: 0.5,
   endTime: '2026-01-31T23:59:59.000Z', // end of jan 2026
+};
+
+export const CURRENT_BONK_REWARDS_DETAILS = {
+  endTime: '2026-02-28T23:59:59.000Z', // end of february 2026
 };
 
 export const DEC_2025_COMPETITION_DETAILS = {

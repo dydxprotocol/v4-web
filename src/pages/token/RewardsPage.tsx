@@ -27,13 +27,13 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { BonkIncentivesPanel } from './BonkIncentivesPanel';
 import { BonkPnlPanel } from './BonkPnlPanel';
 import { CompetitionIncentivesPanel } from './CompetitionIncentivesPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
-import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
 import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
@@ -84,24 +84,15 @@ const RewardsPage = () => {
           {
             content: (
               <div tw="flexColumn gap-1.5">
+                <BonkIncentivesPanel />
                 <BonkPnlPanel />
               </div>
             ),
-            label: 'Bonk PNL',
+            label: 'BONKuary',
             value: Tab.BonkPnl,
           },
         ]
       : []),
-    {
-      content: (
-        <div tw="flexColumn gap-1.5">
-          <LaunchIncentivesPanel />
-          <RewardsLeaderboardPanel />
-        </div>
-      ),
-      label: stringGetter({ key: STRING_KEYS.REWARDS }),
-      value: Tab.Rewards,
-    },
     {
       content: (
         <div tw="flexColumn gap-1.5">

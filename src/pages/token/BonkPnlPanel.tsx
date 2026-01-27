@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { BonkPnlItem, useBonkPnlDistribution } from '@/hooks/rewards/hooks';
+import { positionToBonkRewards } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -24,6 +25,7 @@ export enum BonkPnlTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
   PNL = 'PNL',
+  Rewards = 'Estimated Rewards',
 }
 
 export const BonkPnlPanel = () => {
@@ -76,7 +78,9 @@ export const BonkPnlPanel = () => {
     <$Panel>
       <div tw="flex flex-col gap-1">
         <div tw="flex items-center justify-between">
-          <div tw="font-medium-bold">Bonk PNL Leaderboard</div>
+          <div tw="font-medium-bold">
+            {stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE })}
+          </div>
           <button
             onClick={onDownload}
             type="button"
@@ -88,7 +92,7 @@ export const BonkPnlPanel = () => {
 
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
-            label="Bonk PNL Leaderboard"
+            label={stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE })}
             data={data}
             tableId="bonk-pnl"
             getRowKey={getRowKey}
@@ -126,50 +130,6 @@ export const BonkPnlPanel = () => {
     </$Panel>
   );
 };
-
-const $Panel = styled(Panel)`
-  --panel-content-paddingY: 1.5rem;
-  --panel-content-paddingX: 1.5rem;
-`;
-
-const $Table = styled(Table)`
-  --tableCell-padding: 0.25rem;
-  font: var(--font-mini-book);
-  --stickyArea-background: transparent;
-
-  table {
-    --stickyArea-background: transparent;
-  }
-
-  thead,
-  tbody {
-    --stickyArea-background: transparent;
-    tr {
-      td:first-of-type,
-      th:first-of-type {
-        --tableCell-padding: 0.5rem 0.25rem 0.5rem 1rem;
-      }
-      td:last-of-type,
-      th:last-of-type {
-        --tableCell-padding: 0.5rem 1rem 0.5rem 0.25rem;
-      }
-    }
-  }
-
-  tbody {
-    font: var(--font-small-book);
-  }
-
-  tfoot {
-    --stickyArea-background: transparent;
-    --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
-  }
-
-  min-width: 1px;
-  tbody {
-    font: var(--font-small-book);
-  }
-` as typeof Table;
 
 const getTraderLink = (address: string) => {
   return `https://community.chaoslabs.xyz/dydx-v4/risk/accounts/${address}/subAccount/0/overview`;
@@ -257,6 +217,69 @@ const getBonkPnlTableColumnDef = ({
           />
         ),
       },
+      [BonkPnlTableColumns.Rewards]: {
+        columnKey: BonkPnlTableColumns.Rewards,
+        getCellValue: (row) => row.position,
+        label: (
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
+          </div>
+        ),
+        renderCell: ({ position }) => {
+          return (
+            <Output
+              tw="text-small font-medium"
+              type={OutputType.Fiat}
+              fractionDigits={0}
+              value={positionToBonkRewards(position)}
+            />
+          );
+        },
+      },
     } satisfies Record<BonkPnlTableColumns, ColumnDef<BonkPnlItem>>
   )[key],
 });
+
+const $Panel = styled(Panel)`
+  --panel-content-paddingY: 1.5rem;
+  --panel-content-paddingX: 1.5rem;
+`;
+
+const $Table = styled(Table)`
+  --tableCell-padding: 0.25rem;
+  font: var(--font-mini-book);
+  --stickyArea-background: transparent;
+
+  table {
+    --stickyArea-background: transparent;
+  }
+
+  thead,
+  tbody {
+    --stickyArea-background: transparent;
+    tr {
+      td:first-of-type,
+      th:first-of-type {
+        --tableCell-padding: 0.5rem 0.25rem 0.5rem 1rem;
+      }
+      td:last-of-type,
+      th:last-of-type {
+        --tableCell-padding: 0.5rem 1rem 0.5rem 0.25rem;
+      }
+    }
+  }
+
+  tbody {
+    font: var(--font-small-book);
+  }
+
+  tfoot {
+    --stickyArea-background: transparent;
+    --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
+  }
+
+  min-width: 1px;
+  tbody {
+    font: var(--font-small-book);
+  }
+` as typeof Table;
