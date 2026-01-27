@@ -68,6 +68,7 @@ const $NavigationMenu = styled(NavigationMenu)`
   --navigationMenu-item-highlighted-textColor: var(--color-accent);
   --navigationMenu-item-radius: 0px;
   --navigationMenu-item-padding: 0px;
+  --hover-filter-base: none;
 
   font: var(--font-tiny-book);
 
