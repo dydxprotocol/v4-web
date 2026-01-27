@@ -78,3 +78,16 @@ type CurrentPosition @entity {
   outAveragePrice: BigInt!
   position_key_id: String!
 }
+
+type OpenInterest @entity {
+  id: ID!
+  indexAssetId: String!
+  openInterestLong: BigInt!
+  openInterestShort: BigInt!
+}
+
+type TradeVolume24h @entity {
+  id: ID!
+  indexAssetId: String!
+  tradeVolume: BigInt!
+}
