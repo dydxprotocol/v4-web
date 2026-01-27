@@ -73,40 +73,40 @@ describe('Wallet Queries', () => {
       expect(result?.decimals).toBe(9);
     });
 
-    it('should return undefined for non-existent asset', () => {
+    it('should return zero for non-existent asset', () => {
       const mockStoreService = createMockStoreService();
       const query = createGetCurrentUserAssetBalanceQuery({ storeService: mockStoreService });
 
       const result = query(TEST_ETH_ASSET_ID);
 
-      expect(result).toBeUndefined();
+      expect(result.value).toBe('0');
     });
 
-    it('should return undefined when assetId is null', () => {
+    it('should return zero when assetId is null', () => {
       const mockStoreService = createMockStoreService();
       const query = createGetCurrentUserAssetBalanceQuery({ storeService: mockStoreService });
 
       const result = query(null);
 
-      expect(result).toBeUndefined();
+      expect(result.value).toBe('0');
     });
 
-    it('should return undefined when assetId is undefined', () => {
+    it('should return zero when assetId is undefined', () => {
       const mockStoreService = createMockStoreService();
       const query = createGetCurrentUserAssetBalanceQuery({ storeService: mockStoreService });
 
       const result = query(undefined);
 
-      expect(result).toBeUndefined();
+      expect(result.value).toBe('0');
     });
 
-    it('should return undefined when user data is not available', () => {
+    it('should return zero when user data is not available', () => {
       const mockStoreService = createMockStoreService(createUninitializedCurrentUserState());
       const query = createGetCurrentUserAssetBalanceQuery({ storeService: mockStoreService });
 
       const result = query(TEST_USDC_ASSET_ID);
 
-      expect(result).toBeUndefined();
+      expect(result.value).toBe('0');
     });
   });
 

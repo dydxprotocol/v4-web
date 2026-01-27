@@ -1,84 +1,114 @@
-import { calculateUnrealizedPnl } from '@sdk/Trading/src/Positions/domain/calculations/calculateUnrealizedPnL';
-import { PositionSize } from '@sdk/Trading/src/Positions/domain/positionsDecimals';
 import { $decimalValue } from '@sdk/shared/models/DecimalValue';
-import { CollateralAmount, OraclePrice } from '@sdk/shared/models/decimals';
+import { OraclePrice } from '@sdk/shared/models/decimals';
 import { describe, expect, it } from 'vitest';
-import { createOpenLongPosition, createOpenShortPosition } from '../test-fixtures/positions';
+import { PositionSide } from '../../src/Positions/domain/PositionsEntity';
+import { calculateUnrealizedPnl } from '../../src/Positions/domain/calculations/calculateUnrealizedPnl';
+import { PositionSize } from '../../src/Positions/domain/positionsDecimals';
+import { createMinimalPosition } from './helpers/createMinimalPosition';
 
 describe('calculateUnrealizedPnl', () => {
   describe('long positions', () => {
-    it('should calculate PnL from position history', () => {
-      const history = [
-        createOpenLongPosition({
-          size: PositionSize.fromFloat(1), // 1 BTC
-          collateralAmount: CollateralAmount.fromFloat(50000), // Cost basis $50k
-          latest: true,
-        }),
-      ];
+    it('should return positive PnL when price increases', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.LONG,
+        size: PositionSize.fromFloat(10000), // $10,000 position
+        entryPrice: OraclePrice.fromFloat(50000), // entered at $50,000
+      });
+      const markPrice = OraclePrice.fromFloat(55000); // now at $55,000 (10% up)
 
-      const currentPrice = OraclePrice.fromFloat(55000); // Current at $55k
+      const pnl = calculateUnrealizedPnl(position, markPrice);
 
-      const pnl = calculateUnrealizedPnl(history, currentPrice);
-
-      // For long: PnL = (size * currentPrice) - costBasis = (1 * 55000) - 50000 = 5000
-      expect($decimalValue(pnl).toFloat()).toBeCloseTo(5000, 0);
+      // Size at current price = 10000 * 55000 / 50000 = 11000
+      // PnL = 11000 - 10000 = 1000
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(1000, 0);
     });
 
-    it('should return zero for no latest position', () => {
-      const history = [
-        createOpenLongPosition({
-          latest: false,
-        }),
-      ];
+    it('should return negative PnL when price decreases', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.LONG,
+        size: PositionSize.fromFloat(10000),
+        entryPrice: OraclePrice.fromFloat(50000),
+      });
+      const markPrice = OraclePrice.fromFloat(45000); // 10% down
 
-      const currentPrice = OraclePrice.fromFloat(55000);
+      const pnl = calculateUnrealizedPnl(position, markPrice);
 
-      const pnl = calculateUnrealizedPnl(history, currentPrice);
+      // Size at current price = 10000 * 45000 / 50000 = 9000
+      // PnL = 9000 - 10000 = -1000
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(-1000, 0);
+    });
 
-      expect($decimalValue(pnl).toFloat()).toBe(0);
+    it('should return zero PnL when price unchanged', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.LONG,
+        size: PositionSize.fromFloat(10000),
+        entryPrice: OraclePrice.fromFloat(50000),
+      });
+      const markPrice = OraclePrice.fromFloat(50000);
+
+      const pnl = calculateUnrealizedPnl(position, markPrice);
+
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(0, 0);
     });
   });
 
   describe('short positions', () => {
-    it('should calculate PnL for short position', () => {
-      const history = [
-        createOpenShortPosition({
-          size: PositionSize.fromFloat(-1), // -1 BTC (short)
-          collateralAmount: CollateralAmount.fromFloat(50000), // Cost basis $50k
-          latest: true,
-        }),
-      ];
+    it('should return positive PnL when price decreases', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.SHORT,
+        size: PositionSize.fromFloat(10000),
+        entryPrice: OraclePrice.fromFloat(50000),
+      });
+      const markPrice = OraclePrice.fromFloat(45000); // 10% down
 
-      const currentPrice = OraclePrice.fromFloat(45000); // Price decreased to $45k
+      const pnl = calculateUnrealizedPnl(position, markPrice);
 
-      const pnl = calculateUnrealizedPnl(history, currentPrice);
+      // Size at current price = 10000 * 45000 / 50000 = 9000
+      // PnL = 10000 - 9000 = 1000 (short profits when price drops)
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(1000, 0);
+    });
 
-      // For short: PnL = costBasis - (|size| * currentPrice) = 50000 - (1 * 45000) = 5000
-      expect($decimalValue(pnl).toFloat()).toBeCloseTo(5000, 0);
+    it('should return negative PnL when price increases', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.SHORT,
+        size: PositionSize.fromFloat(10000),
+        entryPrice: OraclePrice.fromFloat(50000),
+      });
+      const markPrice = OraclePrice.fromFloat(55000); // 10% up
+
+      const pnl = calculateUnrealizedPnl(position, markPrice);
+
+      // Size at current price = 10000 * 55000 / 50000 = 11000
+      // PnL = 10000 - 11000 = -1000 (short loses when price rises)
+      expect($decimalValue(pnl).toFloat()).toBeCloseTo(-1000, 0);
     });
   });
 
   describe('edge cases', () => {
-    it('should handle empty position history', () => {
-      const pnl = calculateUnrealizedPnl([], OraclePrice.fromFloat(50000));
+    it('should return zero when position size is zero', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.LONG,
+        size: PositionSize.fromFloat(0),
+        entryPrice: OraclePrice.fromFloat(50000),
+      });
+      const markPrice = OraclePrice.fromFloat(55000);
 
-      expect($decimalValue(pnl).toFloat()).toBe(0);
+      const pnl = calculateUnrealizedPnl(position, markPrice);
+
+      expect(pnl.value).toBe('0');
     });
 
-    it('should use absolute value of size', () => {
-      const history = [
-        createOpenLongPosition({
-          size: PositionSize.fromFloat(1),
-          collateralAmount: CollateralAmount.fromFloat(50000),
-          latest: true,
-        }),
-      ];
+    it('should return zero when entry price is zero', () => {
+      const position = createMinimalPosition({
+        side: PositionSide.LONG,
+        size: PositionSize.fromFloat(10000),
+        entryPrice: OraclePrice.fromFloat(0),
+      });
+      const markPrice = OraclePrice.fromFloat(55000);
 
-      const currentPrice = OraclePrice.fromFloat(60000);
+      const pnl = calculateUnrealizedPnl(position, markPrice);
 
-      const pnl = calculateUnrealizedPnl(history, currentPrice);
-
-      expect($decimalValue(pnl).toFloat()).toBeCloseTo(10000, 0);
+      expect(pnl.value).toBe('0');
     });
   });
 });
