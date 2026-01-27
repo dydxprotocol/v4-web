@@ -7,9 +7,9 @@ import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -32,7 +32,7 @@ import { TradeHeaderMobile } from './TradeHeader';
 const TradePage = () => {
   const dispatch = useAppDispatch();
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
