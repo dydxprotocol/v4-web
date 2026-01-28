@@ -159,30 +159,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       tag: showCurrentMarket ? null : shortenNumberForDisplay(numTotalPositions),
 
       content: isTablet ? (
-        <MobilePositionsTable
-          marketTypeFilter={viewIsolated}
-          columnKeys={[
-            PositionsTableColumnKey.Market,
-            PositionsTableColumnKey.Leverage,
-            PositionsTableColumnKey.Type,
-            PositionsTableColumnKey.Size,
-            PositionsTableColumnKey.Value,
-            PositionsTableColumnKey.PnL,
-            PositionsTableColumnKey.Margin,
-            PositionsTableColumnKey.AverageOpen,
-            PositionsTableColumnKey.Oracle,
-            PositionsTableColumnKey.Liquidation,
-            PositionsTableColumnKey.NetFunding,
-            shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-            shouldRenderActions && PositionsTableColumnKey.Actions,
-          ].filter(isTruthy)}
-          columnWidths={{
-            [PositionsTableColumnKey.Actions]: 80,
-          }}
-          showClosePositionAction={shouldRenderActions}
-          initialPageSize={initialPageSize}
-          navigateToOrders={onViewOrders}
-        />
+        <MobilePositionsTable marketTypeFilter={viewIsolated} navigateToOrders={onViewOrders} />
       ) : (
         <PositionsTable
           currentMarket={showCurrentMarket ? currentMarketId : undefined}
