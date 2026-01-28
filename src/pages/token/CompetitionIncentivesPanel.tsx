@@ -44,7 +44,7 @@ const September2025RewardsPanel = () => {
         <div tw="flex flex-col gap-1.5">
           <div tw="flex flex-col gap-0.5">
             <div tw="flex items-center gap-0.5">
-              <div tw="font-medium-bold">
+              <div tw="mb-0.25 font-medium-bold">
                 <span tw="font-bold">
                   {stringGetter({
                     key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025_UPDATE_1,
@@ -53,10 +53,12 @@ const September2025RewardsPanel = () => {
                     },
                   })}
                 </span>
+                <span tw="ml-0.5">
+                  <SuccessTag size={TagSize.Medium}>
+                    {stringGetter({ key: STRING_KEYS.ACTIVE })}
+                  </SuccessTag>
+                </span>
               </div>
-              <SuccessTag size={TagSize.Medium}>
-                {stringGetter({ key: STRING_KEYS.ACTIVE })}
-              </SuccessTag>
             </div>
             <div>
               <p tw="mb-0.5 text-color-text-0">

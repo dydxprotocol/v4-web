@@ -54,7 +54,7 @@ const RewardsPage = () => {
 
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(enableBonkPnlLeaderboard ? Tab.BonkPnl : Tab.Rewards);
+  const [value, setValue] = useState(enableBonkPnlLeaderboard ? Tab.BonkPnl : Tab.Competition);
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
