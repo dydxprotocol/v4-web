@@ -132,9 +132,9 @@ export const SharePNLAnalyticsDialog = ({
           <$Action
             action={ButtonAction.Secondary}
             slotLeft={<Icon iconName={isCopied ? IconName.Check : IconName.Copy} />}
-            onClick={() => copyPnlImage()}
+            onClick={copyPnlImage}
             state={{
-              isLoading: !!isCopying,
+              isLoading: isCopying,
             }}
           >
             {stringGetter({ key: isCopied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
@@ -142,9 +142,9 @@ export const SharePNLAnalyticsDialog = ({
           <$Action
             action={ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.SocialX} />}
-            onClick={() => sharePnlImage()}
+            onClick={sharePnlImage}
             state={{
-              isLoading: !!isSharing,
+              isLoading: isSharing,
             }}
           >
             {stringGetter({ key: STRING_KEYS.SHARE })}
