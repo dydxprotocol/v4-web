@@ -12,7 +12,6 @@ import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
 import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
-import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -47,7 +46,6 @@ type Props = {
 
 const CloseTradeForm = ({ market }: Props) => {
   const dispatch = useAppDispatch();
-  const isFirstRender = useIsFirstRender();
   const stringGetter = useStringGetter();
 
   const { stepSizeDecimals, tickSizeDecimals, displayableAsset } = orEmptyObj(

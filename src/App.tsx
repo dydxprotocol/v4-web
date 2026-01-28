@@ -80,7 +80,6 @@ import breakpoints from './styles/breakpoints';
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
 const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
-const ProfilePage = lazy(() => import('@/pages/Profile'));
 const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
 const SpotPage = lazy(() => import('@/pages/spot/Spot'));
