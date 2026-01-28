@@ -25,7 +25,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   const selector = createAppSelector(
     [selectTxAuthorizedCloseOnlyAccount, selectOrphanedTriggerOrders],
     (txAuthorizedAccount, orphanedTriggerOrders) => {
-      if (!txAuthorizedAccount || orphanedTriggerOrders == null) {
+      if (!txAuthorizedAccount || orphanedTriggerOrders?.ordersToCancel == null) {
         return undefined;
       }
 
@@ -35,7 +35,8 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         localDydxWallet,
         sourceAccount,
         parentSubaccountInfo,
-        ordersToCancel: orphanedTriggerOrders,
+        ordersToCancel: orphanedTriggerOrders.ordersToCancel,
+        groupedPositions: orphanedTriggerOrders.groupedPositions,
       };
     }
   );
@@ -51,7 +52,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
 
       runFn(async () => {
         try {
-          const { ordersToCancel: ordersToCancelRaw } = data;
+          const { ordersToCancel: ordersToCancelRaw, groupedPositions } = data;
           const ordersToCancel = ordersToCancelRaw.filter((o) => !cancelingOrderIds.has(o.id));
 
           // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
@@ -67,6 +68,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
             `Cancelling ${ordersToCancel.length} trigger orders`,
             {
               ordersToCancel,
+              groupedPositions,
             }
           );
 
