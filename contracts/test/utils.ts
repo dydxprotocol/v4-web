@@ -103,3 +103,34 @@ export async function moveBlockchainTime(launchedNode: LaunchTestNodeReturn<Depl
     // Produce 3 new blocks, setting the timestamp to latest + seconds * 1000ms
     await providerWithCustomTimestamp.produceBlocks(3, latestBlockTimestamp + seconds * 1000)
 }
+
+const FUNDING_RATE_FACTOR_BASE: bigint = BigInt("1000000000")
+export const FUNDING_RATE_PRECISION: bigint = FUNDING_RATE_FACTOR_BASE * FUNDING_RATE_FACTOR_BASE
+const FUNDING_RATE_INTERVAL: bigint = BigInt(1) // 1 second
+const FUNDING_RATE_FACTOR: bigint = BigInt(23) // 23 / 1_000_000_000 gives 2 promiles a day
+export const CUMULATIVE_FUNDING_RATE_NEUTRAL = "57896044618658097711785492504343953926634992332820282019728792003956564819968" // 2 ** 255
+
+// typescript implementation of _calculate_cumulative_funding_rate
+// returns deltas instead of aggregated values
+// all returned values are in FUNDING_RATE_PRECISION precision
+// totalFundingRateDelta is the total flow in timeDelta
+// positive means that longs are in excess and pay shorts
+// negative means that shorts are in excess and pay longs
+// longCumulativeFundingRateDelta is the rate per 1 asset amount
+// positive means that longs pay, negative means that longs receive
+// shortCumulativeFundingRateDelta is the rate per 1 asset amount
+// positive means that shorts pay, negative means that shorts receive
+// the special case: if a side, longs or shorts, has no size, the rate of this side is 0
+export function calculateTotalFundingRateDelta(totalLongSizes: bigint, totalShortSizes: bigint, timeDelta: bigint) {
+    const intervals = timeDelta / FUNDING_RATE_INTERVAL
+    const sizeDelta = totalLongSizes - totalShortSizes
+    const totalFundingRateDelta =
+        (intervals * sizeDelta * FUNDING_RATE_PRECISION * FUNDING_RATE_FACTOR) / FUNDING_RATE_FACTOR_BASE
+    const longCumulativeFundingRateDelta = totalLongSizes === BigInt(0) ? BigInt(0) : totalFundingRateDelta / totalLongSizes
+    const shortCumulativeFundingRateDelta = totalShortSizes === BigInt(0) ? BigInt(0) : -totalFundingRateDelta / totalShortSizes
+    return {
+        totalFundingRateDelta,
+        longCumulativeFundingRateDelta,
+        shortCumulativeFundingRateDelta,
+    }
+}

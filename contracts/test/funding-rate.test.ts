@@ -1,4 +1,4 @@
-import { WalletUnlocked } from "fuels"
+import { WalletUnlocked, DateTime } from "fuels"
 import { launchNode, getNodeWallets } from "./node.js"
 import {
     call,
@@ -11,6 +11,8 @@ import {
     getBtcConfig,
     getAssetId,
     moveBlockchainTime,
+    CUMULATIVE_FUNDING_RATE_NEUTRAL,
+    calculateTotalFundingRateDelta,
 } from "./utils.js"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
@@ -511,6 +513,52 @@ describe("Vault.funding_rate", () => {
             const fundingInfo = (await vaultExpose.functions.get_funding_info(BTC_ASSET).get()).value
             expect(fundingInfo.total_long_sizes.toString()).toBe(longSize)
             expect(fundingInfo.total_short_sizes.toString()).toBe(shortSize)
+        })
+    })
+
+    describe("calculate_cumulative_funding_rate", () => {
+        async function testCalculateCumulativeFundingRate(totalShortSizes: string, totalLongSizes: string, timeDelta: bigint) {
+            const now = BigInt(DateTime.fromUnixMilliseconds(DateTime.now()).toTai64())
+            const fundingInfo = {
+                total_short_sizes: totalShortSizes,
+                total_long_sizes: totalLongSizes,
+                long_cumulative_funding_rate: CUMULATIVE_FUNDING_RATE_NEUTRAL,
+                short_cumulative_funding_rate: CUMULATIVE_FUNDING_RATE_NEUTRAL,
+                last_funding_time: (now - timeDelta).toString(),
+            }
+            const {
+                longCumulativeFundingRateDelta: expectedLongCumulativeFundingRateDelta,
+                shortCumulativeFundingRateDelta: expectedShortCumulativeFundingRateDelta,
+            } = calculateTotalFundingRateDelta(BigInt(totalLongSizes), BigInt(totalShortSizes), timeDelta)
+            const response = (await vaultExpose.functions.calculate_cumulative_funding_rate(fundingInfo, now.toString()).get())
+                .value
+            const longCumulativeFundingRateDelta = BigInt(response[0].toString()) - BigInt(CUMULATIVE_FUNDING_RATE_NEUTRAL)
+            const shortCumulativeFundingRateDelta = BigInt(response[1].toString()) - BigInt(CUMULATIVE_FUNDING_RATE_NEUTRAL)
+
+            expect(longCumulativeFundingRateDelta.toString()).toBe(expectedLongCumulativeFundingRateDelta.toString())
+            expect(shortCumulativeFundingRateDelta.toString()).toBe(expectedShortCumulativeFundingRateDelta.toString())
+        }
+
+        it("compare to javascript implementation", async () => {
+            // short sizes, long sizes, time delta in seconds
+            await testCalculateCumulativeFundingRate("0", "0", BigInt(0))
+            await testCalculateCumulativeFundingRate("0", "0", BigInt(3600))
+            await testCalculateCumulativeFundingRate("10000000000", "0", BigInt(3600))
+            await testCalculateCumulativeFundingRate("0", "10000000000", BigInt(3600))
+            await testCalculateCumulativeFundingRate("10000000000", "20000000000", BigInt(0))
+            await testCalculateCumulativeFundingRate("20000000000", "10000000000", BigInt(0))
+
+            await testCalculateCumulativeFundingRate("10000000000", "10000000000", BigInt(1))
+            await testCalculateCumulativeFundingRate("20000000000", "10000000000", BigInt(1))
+            await testCalculateCumulativeFundingRate("10000000000", "20000000000", BigInt(1))
+
+            await testCalculateCumulativeFundingRate("10000000000", "10000000000", BigInt(3600))
+            await testCalculateCumulativeFundingRate("20000000000", "10000000000", BigInt(3600))
+            await testCalculateCumulativeFundingRate("10000000000", "20000000000", BigInt(3600))
+
+            await testCalculateCumulativeFundingRate("1000000000000000000", "1000000000000000000", BigInt(3600))
+            await testCalculateCumulativeFundingRate("2000000000000000000", "1000000000000000000", BigInt(3600))
+            await testCalculateCumulativeFundingRate("1000000000000000000", "2000000000000000000", BigInt(3600))
         })
     })
 
