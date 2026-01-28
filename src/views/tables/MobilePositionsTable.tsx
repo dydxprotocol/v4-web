@@ -8,7 +8,6 @@ import {
   SubaccountPosition,
 } from '@/bonsai/types/summaryTypes';
 import { Trigger } from '@radix-ui/react-collapsible';
-import type { ColumnSize } from '@react-types/table';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -25,7 +24,6 @@ import { Button } from '@/components/Button';
 import { Collapsible } from '@/components/Collapsible';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { PageSize } from '@/components/Table/TablePaginationRow';
 import { marginModeMatchesFilter, MarketTypeFilter } from '@/pages/trade/types';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -67,30 +65,16 @@ type PositionTableRow = {
 } & SubaccountPosition;
 
 type ElementProps = {
-  columnKeys: PositionsTableColumnKey[];
-  columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
   marketTypeFilter?: MarketTypeFilter;
-  showClosePositionAction: boolean;
-  initialPageSize?: PageSize;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
 
-type StyleProps = {
-  withOuterBorder?: boolean;
-};
-
 export const MobilePositionsTable = forwardRef(
   (
-    {
-      currentRoute,
-      currentMarket,
-      marketTypeFilter,
-      onNavigate,
-      navigateToOrders,
-    }: ElementProps & StyleProps,
+    { currentRoute, currentMarket, marketTypeFilter, onNavigate, navigateToOrders }: ElementProps,
     _ref
   ) => {
     const dispatch = useAppDispatch();
