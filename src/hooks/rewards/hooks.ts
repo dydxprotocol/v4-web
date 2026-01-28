@@ -115,3 +115,40 @@ async function getDydxFeeLeaderboard({ address }: { address?: string }) {
     addressEntry: data.addressEntry,
   };
 }
+
+export type LiquidationLeaderboardItem = {
+  address: string;
+  total_liquidation_losses: string;
+  rank: number;
+};
+
+type LiquidationLeaderboardResponse = {
+  success: boolean;
+  data: LiquidationLeaderboardItem[];
+  pagination?: {
+    total: number;
+    totalPages: number;
+    page: number;
+    perPage: number;
+  };
+};
+
+async function getLiquidationLeaderboard() {
+  const res = await fetch(
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-liquidation-leaderboard?perPage=1000`
+  );
+
+  const data = (await res.json()) as LiquidationLeaderboardResponse;
+  return data.data;
+}
+
+export function useLiquidationLeaderboard() {
+  return useQuery({
+    queryKey: ['dydx-liquidation-leaderboard'],
+    queryFn: wrapAndLogError(
+      () => getLiquidationLeaderboard(),
+      'LaunchIncentives/fetchLiquidationLeaderboard',
+      true
+    ),
+  });
+}
