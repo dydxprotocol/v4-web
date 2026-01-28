@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-internal-modules
+import { selectRawParentSubaccountData } from '@/bonsai/selectors/base';
+
 import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -69,6 +72,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
             {
               ordersToCancel,
               groupedPositions,
+              bonsaiParentSubaccountData: selectRawParentSubaccountData(store.getState()),
             }
           );
 
