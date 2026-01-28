@@ -17,11 +17,13 @@ import { Dialog } from '@/components/Dialog';
 import { selectOrphanedTriggerOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { orEmptyObj } from '@/lib/typeUtils';
+
 export const CancelOrphanedTriggerOrdersDialog = ({
   setIsOpen,
 }: DialogProps<CancelOrphanedTriggersDialogProps>) => {
   const stringGetter = useStringGetter();
-  const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
+  const { ordersToCancel } = orEmptyObj(useAppSelector(selectOrphanedTriggerOrders));
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const markets: Record<string, SubaccountOrder[]> = useMemo(() => {
