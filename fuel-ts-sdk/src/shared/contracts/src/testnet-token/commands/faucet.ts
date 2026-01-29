@@ -1,6 +1,6 @@
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { TestnetTokenContractPort } from '../TestnetTokenContractPort';
-import { BaseTokenFauceted } from '../events/LiquidityAddedEvent';
+import { BaseTokenFauceted } from '../events/BaseTokenFaucetedEvent';
 
 export interface FaucetDependencies {
   testnetTokenContractPort: TestnetTokenContractPort;

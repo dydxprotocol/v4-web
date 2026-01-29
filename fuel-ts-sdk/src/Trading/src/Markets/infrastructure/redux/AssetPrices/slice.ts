@@ -9,6 +9,10 @@ export const assetPricesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(asyncFetchCurrentAssetPricesThunk.pending, (state) => {
+        state.fetchStatus = 'pending';
+        state.error = null;
+      })
       .addCase(asyncFetchCurrentAssetPricesThunk.fulfilled, (state, action) => {
         if (action.payload) assetPricesAdapter.upsertOne(state, action.payload);
         state.fetchStatus = 'fulfilled';

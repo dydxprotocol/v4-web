@@ -1,1 +1,1 @@
-export * from './LiquidityAddedEvent';
+export * from './BaseTokenFaucetedEvent';

@@ -20,6 +20,17 @@ export const PositionSize: FC = () => {
 
   const size = useSdkQuery((sdk) => sdk.trading.getPositionSizeInQuoteAsset(position.stableId));
 
+  if (size == null) {
+    return (
+      <_PositionStatsBase
+        label={baseAsset ? `Size (${baseAsset})` : 'Size'}
+        value="$--"
+        prefix=""
+        secondaryValue={`${leverage.toFixed(1)}x`}
+      />
+    );
+  }
+
   return (
     <_PositionStatsBase
       label={baseAsset ? `Size (${baseAsset})` : 'Size'}

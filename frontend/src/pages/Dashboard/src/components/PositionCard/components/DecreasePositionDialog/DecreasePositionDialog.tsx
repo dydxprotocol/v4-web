@@ -82,7 +82,11 @@ export const DecreasePositionDialog = memo(
         <Dialog.Content className={styles.dialogContent}>
           <Dialog.Title className={styles.dialogTitle}>Decrease Position</Dialog.Title>
 
-          <CurrentPositionInfo assetSymbol={assetSymbol} currentSize={totalPositionSize} />
+          <CurrentPositionInfo
+            assetSymbol={assetSymbol}
+            currentSize={totalPositionSize}
+            quoteAssetSymbol="USDC"
+          />
 
           <div className={styles.inputSection}>
             <SizeInput

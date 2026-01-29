@@ -7,15 +7,20 @@ import * as $ from './CurrentPositionInfo.css';
 export interface CurrentPositionInfoProps {
   currentSize: PositionSize;
   assetSymbol: string;
+  quoteAssetSymbol: string;
 }
 
-export const CurrentPositionInfo: FC<CurrentPositionInfoProps> = ({ currentSize, assetSymbol }) => {
+export const CurrentPositionInfo: FC<CurrentPositionInfoProps> = ({
+  currentSize,
+  assetSymbol,
+  quoteAssetSymbol,
+}) => {
   return (
     <div css={$.positionInfo}>
       <div>
         <div css={$.positionInfoLabel}>Current Size</div>
         <div css={$.positionInfoValue}>
-          {formatNumber($decimalValue(currentSize).toDecimalString())}
+          {formatNumber($decimalValue(currentSize).toDecimalString())} {quoteAssetSymbol}
         </div>
       </div>
       <div tw="text-right">

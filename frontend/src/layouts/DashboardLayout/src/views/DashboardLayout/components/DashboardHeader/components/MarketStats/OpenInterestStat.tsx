@@ -12,6 +12,11 @@ export const OpenInterestStat: FC = () => {
 
   const longValue = $decimalValue(openInterest.openInterestLong).toFloat();
   const shortValue = $decimalValue(openInterest.openInterestShort).toFloat();
+
+  if (!Number.isFinite(longValue) || !Number.isFinite(shortValue)) {
+    return <_OpenInterestStat value="$--" />;
+  }
+
   const total = longValue + shortValue;
 
   if (total === 0) return <_OpenInterestStat value="$0" />;
