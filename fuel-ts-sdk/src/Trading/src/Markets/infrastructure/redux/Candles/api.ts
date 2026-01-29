@@ -42,5 +42,3 @@ export const candlesApi = createApi({
 });
 
 export type CandlesThunkExtra = { candleRepository: CandleRepository };
-
-export const { endpoints, reducer: candlesApiReducer } = candlesApi;

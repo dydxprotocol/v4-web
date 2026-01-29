@@ -1,2 +1,2 @@
-export * as selectors from './selectors';
-export * as slice from './slice';
+export * from './selectors';
+export * from './slice';

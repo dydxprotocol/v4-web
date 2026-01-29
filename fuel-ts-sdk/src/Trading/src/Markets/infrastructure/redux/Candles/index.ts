@@ -1,2 +1,2 @@
-export * as api from './api';
-export * as selectors from './selectors';
+export * from './api';
+export * from './selectors';

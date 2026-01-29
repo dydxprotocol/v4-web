@@ -58,7 +58,8 @@ export function createDecimalValueSchema<
 
     fromDecimalString(str: string): DecimalValueInstance<TDecimals, TBrand> {
       const [integerPart = '0', decimalPart = ''] = str.split('.');
-      const paddedDecimal = decimalPart.padEnd(Number(this.decimals), '0');
+      const truncatedDecimal = decimalPart.slice(0, Number(this.decimals));
+      const paddedDecimal = truncatedDecimal.padEnd(Number(this.decimals), '0');
       const value = BigInt(integerPart + paddedDecimal);
       return createInstance(value);
     },

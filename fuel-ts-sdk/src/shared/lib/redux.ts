@@ -15,7 +15,7 @@ export type RequestStatus = 'uninitialized' | 'pending' | 'fulfilled' | 'rejecte
  */
 export interface LoadableMixin {
   fetchStatus: RequestStatus;
-  error: string | null;
+  error: string | null | undefined;
 }
 export interface Loadable<T> {
   data: T;

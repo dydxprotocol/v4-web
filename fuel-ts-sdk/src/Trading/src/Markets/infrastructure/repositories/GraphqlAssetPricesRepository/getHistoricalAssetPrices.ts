@@ -34,16 +34,21 @@ export const getHistoricalAssetPrices =
   };
 
 interface AssetPriceWhereClause {
-  asset_eq?: AssetId;
+  asset?: { equalTo: AssetId };
+  timestamp?: { lessThanOrEqualTo: number };
 }
 
 function buildWhereClause(options: GetAssetPricesOptions) {
-  const { asset } = options;
+  const { asset, timestampLte } = options;
 
   const where: AssetPriceWhereClause = {};
 
   if (asset) {
-    where.asset_eq = asset;
+    where.asset = { equalTo: asset };
+  }
+
+  if (timestampLte !== undefined) {
+    where.timestamp = { lessThanOrEqualTo: timestampLte };
   }
 
   return Object.keys(where).length > 0 ? where : undefined;
