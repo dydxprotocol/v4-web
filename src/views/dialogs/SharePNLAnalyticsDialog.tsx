@@ -59,13 +59,13 @@ export const SharePNLAnalyticsDialog = ({
   const [isCopied, setIsCopied] = useState(false);
 
   const getPnlImage = useSharePnlImage({
+    assetId,
     marketId,
     side,
     leverage,
     oraclePrice,
     entryPrice,
     unrealizedPnl,
-    type: 'open',
   });
 
   const pnlImage = useMemo(() => getPnlImage.data ?? undefined, [getPnlImage.data]);
