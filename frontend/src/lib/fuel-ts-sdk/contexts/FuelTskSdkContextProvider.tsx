@@ -25,6 +25,7 @@ export function FuelTsSdkProvider({ children }: FuelTsSdkProviderProps) {
     const client = createStarboardClient({
       indexerUrl,
       vaultContractId: envs.getVaultContractIdByNetwork(currentNetwork),
+      testnetTokenContractId: envs.getTestnetTokenContractIdByNetwork(currentNetwork),
       accountGetter: wallet.getCurrentAccount,
     });
     client.trading.populateAssets(assets);
