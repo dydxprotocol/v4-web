@@ -2,51 +2,41 @@ import { render, screen } from '@testing-library/react';
 import { $decimalValue, OraclePrice, assetId, assetPriceId, candleId } from 'fuel-ts-sdk';
 import type { AssetPriceEntity, Candle } from 'fuel-ts-sdk/trading';
 import { describe, expect, it } from 'vitest';
-import {
-  FundingRateStat,
-  OpenInterestStat,
-  VolumeStat,
-} from '../../src/views/DashboardLayout/components/MarketStats';
+import { MarketStat } from '../../src/views/DashboardLayout/components/DashboardHeader/components/MarketStats/_MarketStatsBase';
 
-// Test the exported stat components (propified versions of MarketStat)
-describe('MarketStat components', () => {
-  describe('OpenInterestStat', () => {
-    it('renders with Open Interest label', () => {
-      render(<OpenInterestStat value="$1,234.56" />);
+// Test the base MarketStat component
+describe('MarketStat component', () => {
+  it('renders with Open Interest label and value', () => {
+    render(<MarketStat label="Open Interest" value="$1,234.56" />);
 
-      expect(screen.getByText('Open Interest')).toBeInTheDocument();
-      expect(screen.getByText('$1,234.56')).toBeInTheDocument();
-    });
-
-    it('displays placeholder value', () => {
-      render(<OpenInterestStat value="$--" />);
-
-      expect(screen.getByText('$--')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Open Interest')).toBeInTheDocument();
+    expect(screen.getByText('$1,234.56')).toBeInTheDocument();
   });
 
-  describe('VolumeStat', () => {
-    it('renders with 24h Volume label', () => {
-      render(<VolumeStat value="$5,000.00" />);
+  it('renders with 24h Volume label and value', () => {
+    render(<MarketStat label="24h Volume" value="$5,000.00" />);
 
-      expect(screen.getByText('24h Volume')).toBeInTheDocument();
-      expect(screen.getByText('$5,000.00')).toBeInTheDocument();
-    });
+    expect(screen.getByText('24h Volume')).toBeInTheDocument();
+    expect(screen.getByText('$5,000.00')).toBeInTheDocument();
   });
 
-  describe('FundingRateStat', () => {
-    it('renders with Funding / 1h label', () => {
-      render(<FundingRateStat value="0.01%" />);
+  it('renders with Funding / 1h label and value', () => {
+    render(<MarketStat label="Funding / 1h" value="0.01%" />);
 
-      expect(screen.getByText('Funding / 1h')).toBeInTheDocument();
-      expect(screen.getByText('0.01%')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Funding / 1h')).toBeInTheDocument();
+    expect(screen.getByText('0.01%')).toBeInTheDocument();
+  });
 
-    it('displays placeholder when no data', () => {
-      render(<FundingRateStat value="--" />);
+  it('displays placeholder value', () => {
+    render(<MarketStat label="Open Interest" value="$--" />);
 
-      expect(screen.getByText('--')).toBeInTheDocument();
-    });
+    expect(screen.getByText('$--')).toBeInTheDocument();
+  });
+
+  it('displays placeholder when no data', () => {
+    render(<MarketStat label="Funding / 1h" value="--" />);
+
+    expect(screen.getByText('--')).toBeInTheDocument();
   });
 });
 

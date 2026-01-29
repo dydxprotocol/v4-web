@@ -5,8 +5,8 @@ import { envs } from '@/lib/env';
 import { useRequiredContext } from '@/lib/useRequiredContext';
 import { WalletCollateralCard } from '../../components/WalletCollateralCard';
 import * as styles from './DashboardLayout.css';
-import { MarketStats } from './components/MarketStats';
-import { MintButton } from './components/MintButton';
+import { DashboardHeader } from './components/DashboardHeader';
+import { MintButton } from './components/DashboardHeader/components/MintButton';
 
 export function DashboardLayout() {
   const wallet = useRequiredContext(WalletContext);
@@ -23,7 +23,7 @@ export function DashboardLayout() {
         <div css={styles.headerLeft}>
           <img src={logoStarboard} alt="Starboard" css={styles.logo} />
 
-          <MarketStats />
+          <DashboardHeader />
         </div>
 
         <div css={styles.headerRight}>

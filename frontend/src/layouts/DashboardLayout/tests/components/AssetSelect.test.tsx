@@ -4,7 +4,7 @@ import { assetId } from 'fuel-ts-sdk';
 import type { AssetEntity } from 'fuel-ts-sdk/trading';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Import after mocking
-import { AssetSelect } from '../../src/views/DashboardLayout/components/AssetSelect';
+import { AssetSelect } from '../../src/views/DashboardLayout/components/DashboardHeader/components/AssetSelect';
 
 // Mock the SDK hooks
 const mockWatchAsset = vi.fn();

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { colors } from '../../../../../../styles/colors';
+import { colors } from '../../../../../../../../styles/colors';
 
 export const mintButton = style({
   display: 'flex',
