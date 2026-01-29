@@ -2,7 +2,7 @@ import { logBonsaiError } from '@/bonsai/logs';
 import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
@@ -15,16 +15,18 @@ import { truncateAddress } from '@/lib/wallet';
 import { useEndpointsConfig } from './useEndpointsConfig';
 
 export type SharePnlImageParams = {
+  assetId: string;
   marketId: string;
   side: Nullable<IndexerPositionSide>;
   leverage: Nullable<number>;
   oraclePrice: Nullable<number>;
   entryPrice: Nullable<number>;
   unrealizedPnl: Nullable<number>;
-  type?: 'open' | 'closed' | 'liquidated' | undefined;
+  type?: 'open' | 'close' | 'liquidated' | undefined;
 };
 
 export const useSharePnlImage = ({
+  assetId,
   marketId,
   side,
   leverage,
@@ -34,35 +36,39 @@ export const useSharePnlImage = ({
   type = 'open',
 }: SharePnlImageParams) => {
   const { pnlImageApi } = useEndpointsConfig();
-
-  // Get user wallet address for username
   const { dydxAddress } = useAccounts();
-
-  // Get full position data from state
   const openPositions = useAppSelector(getOpenPositions);
+
   const position = openPositions?.find((p) => p.market === marketId);
+
+  const positionType =
+    position?.status === IndexerPerpetualPositionStatus.CLOSED
+      ? 'close'
+      : position?.status === IndexerPerpetualPositionStatus.LIQUIDATED
+        ? 'liquidated'
+        : 'open';
+
+  const pnl = (position?.realizedPnl.toNumber() ?? 0) + (unrealizedPnl ?? 0);
 
   const queryFn = async (): Promise<Blob | undefined> => {
     if (!dydxAddress) {
       return undefined;
     }
 
-    // Build the request body matching the API's zod schema
     const requestBody = {
-      brand: 'dydx',
-      ticker: marketId,
-      type,
+      ticker: assetId,
+      type: positionType,
       leverage: leverage ?? 0,
       username: truncateAddress(dydxAddress),
       isLong: side === IndexerPositionSide.LONG,
       isCross: position?.marginMode === 'CROSS',
       // Optional fields - include if available
-      size: position?.unsignedSize.toNumber(),
-      userImage: 'https://dydx.trade/hedgie-profile.png',
-      pnl: position?.realizedPnl.toNumber(),
+      size: position?.value.toNumber(),
+      pnl,
       uPnl: unrealizedPnl ?? undefined,
       pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber(),
       entryPx: entryPrice ?? undefined,
+      exitPx: position?.exitPrice?.toNumber(),
       liquidationPx: position?.liquidationPrice?.toNumber(),
       markPx: oraclePrice ?? undefined,
     };
@@ -104,7 +110,7 @@ export const useSharePnlImage = ({
     refetchOnReconnect: false,
     staleTime: 2 * timeUnits.minute, // 2 minutes
     retry: 2,
-    retryDelay: 1 * timeUnits.second,
+    retryDelay: 1 * timeUnits.second, // 1 second
     retryOnMount: true,
   });
 };
