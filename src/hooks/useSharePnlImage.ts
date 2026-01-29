@@ -36,12 +36,9 @@ export const useSharePnlImage = ({
   type = 'open',
 }: SharePnlImageParams) => {
   const { pnlImageApi } = useEndpointsConfig();
-
-  // Get user wallet address for username
   const { dydxAddress } = useAccounts();
-
-  // Get full position data from state
   const openPositions = useAppSelector(getOpenPositions);
+
   const position = openPositions?.find((p) => p.market === marketId);
 
   const positionType =
@@ -58,7 +55,6 @@ export const useSharePnlImage = ({
       return undefined;
     }
 
-    // Build the request body matching the API's zod schema
     const requestBody = {
       ticker: assetId,
       type: positionType,
@@ -67,10 +63,10 @@ export const useSharePnlImage = ({
       isLong: side === IndexerPositionSide.LONG,
       isCross: position?.marginMode === 'CROSS',
       // Optional fields - include if available
-      size: position?.value.toNumber(), // position?.unsignedSize.toNumber(),
+      size: position?.value.toNumber(),
       pnl,
       uPnl: unrealizedPnl ?? undefined,
-      pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber(), // make this pnl + uPnl
+      pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber(),
       entryPx: entryPrice ?? undefined,
       exitPx: position?.exitPrice?.toNumber(),
       liquidationPx: position?.liquidationPrice?.toNumber(),
@@ -114,7 +110,7 @@ export const useSharePnlImage = ({
     refetchOnReconnect: false,
     staleTime: 2 * timeUnits.minute, // 2 minutes
     retry: 2,
-    retryDelay: 1 * timeUnits.second,
+    retryDelay: 1 * timeUnits.second, // 1 second
     retryOnMount: true,
   });
 };
