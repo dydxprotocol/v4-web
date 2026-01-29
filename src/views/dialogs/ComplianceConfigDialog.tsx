@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { loadableLoaded } from '@/bonsai/lib/loadable';
-import { ComplianceResponse, ComplianceStatus, GeoState } from '@/bonsai/types/summaryTypes';
+import { ComplianceResponse, ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -17,7 +17,7 @@ import { Switch } from '@/components/Switch';
 
 import { getComplianceStatus, getGeo } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setComplianceGeoRaw, setLocalAddressScreenV2Raw } from '@/state/raw';
+import { setComplianceGeoHeadersRaw, setLocalAddressScreenV2Raw } from '@/state/raw';
 
 const complianceStatusOptions = [
   { status: ComplianceStatus.COMPLIANT, label: 'Compliant' },
@@ -29,14 +29,12 @@ const complianceStatusOptions = [
 
 const setCompliance = (payload: ComplianceResponse) =>
   setLocalAddressScreenV2Raw(loadableLoaded(payload));
-const setGeo = (payload: GeoState) => setComplianceGeoRaw(loadableLoaded(payload));
 
 const usePreferenceMenu = () => {
   const dispatch = useAppDispatch();
-
   const complianceStatus = useAppSelector(getComplianceStatus);
   const geo = useAppSelector(getGeo);
-  const geoRestricted = geo.currentlyGeoBlocked;
+  const { isPerpetualsGeoBlocked } = geo;
   const notificationSection = useMemo(
     (): MenuGroup<string, string> => ({
       group: 'status',
@@ -63,39 +61,30 @@ const usePreferenceMenu = () => {
       items: [
         {
           value: 'RestrictGeo',
-          label: 'Simulate Restricted Geo',
+          label: 'Simulate Restricted Perps Geo',
           slotAfter: (
-            <Switch name="RestrictGeo" checked={geoRestricted} onCheckedChange={() => null} />
+            <Switch
+              name="RestrictGeo"
+              checked={isPerpetualsGeoBlocked}
+              onCheckedChange={() => null}
+            />
           ),
           onSelect: () => {
             dispatch(
-              geoRestricted
-                ? setGeo({
-                    country: 'JP',
-                    region: 'Tokyo',
-                    regionCode: '13',
-                    city: 'Tokyo',
-                    timezone: 'Asia/Tokyo',
-                    ll: [35.6762, 139.6503],
-                    blocked: false,
-                    whitelisted: false,
-                  })
-                : setGeo({
-                    country: 'US',
-                    region: 'California',
-                    regionCode: 'CA',
-                    city: 'Los Angeles',
-                    timezone: 'America/Los_Angeles',
-                    ll: [34.0522, -118.2437],
-                    blocked: true,
-                    whitelisted: false,
-                  })
+              setComplianceGeoHeadersRaw({
+                ...loadableLoaded(
+                  isPerpetualsGeoBlocked
+                    ? { status: undefined, country: 'JP', region: 'Tokyo' }
+                    : { status: 'restricted', country: 'US', region: 'California' }
+                ),
+                force: true,
+              })
             );
           },
         },
       ],
     }),
-    [dispatch, geoRestricted]
+    [dispatch, isPerpetualsGeoBlocked]
   );
 
   return [otherSection, notificationSection];
@@ -108,16 +97,17 @@ export const ComplianceConfigDialog = ({ setIsOpen }: DialogProps<ComplianceConf
   const { dydxAddress } = useAccounts();
   const { compositeClient } = useDydxClient();
 
-  const submit = async () => {
+  const submit = () => {
     const endpoint = `${compositeClient?.indexerClient.config.restEndpoint}/v4/compliance/setStatus`;
     if (dydxAddress) {
-      await fetch(endpoint, {
+      fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ address: dydxAddress, status: complianceStatus }),
       });
+      setIsOpen(false);
     }
   };
 

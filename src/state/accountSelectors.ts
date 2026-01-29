@@ -484,11 +484,12 @@ export const selectOrphanedTriggerOrders = createAppSelector(
       return undefined;
     }
 
+    const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
+
     const ordersToCancel = calc(() => {
       if (ordersLoading !== 'success' || positionsLoading !== 'success') {
         return [];
       }
-      const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
 
       const filteredOrders = openOrders.filter((o) => {
         const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
@@ -511,7 +512,7 @@ export const selectOrphanedTriggerOrders = createAppSelector(
       return cancelOrders;
     });
 
-    return ordersToCancel;
+    return { ordersToCancel, groupedPositions };
   }
 );
 

@@ -8,6 +8,10 @@ import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { CHAIN_INFO } from '@/constants/chains';
+import {
+  LOSS_REBATE_DETAILS_DECEMBER,
+  TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2,
+} from '@/constants/clc';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
@@ -72,7 +76,7 @@ import {
 } from '@/lib/enumToStringKeyHelpers';
 import { BIG_NUMBERS, MaybeBigNumber, MustNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
-import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
+import { isPresent, orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { DEC_2025_COMPETITION_DETAILS } from './rewards/util';
 import { useAccounts } from './useAccounts';
@@ -611,6 +615,157 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
         }
       }, [decimalSeparator, dydxAddress, groupSeparator, selectedLocale, stringGetter, trigger]);
+
+      const qualifiedForRound2 = useMemo(() => {
+        return (
+          Date.now() < new Date(TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.claimDeadline).getTime() &&
+          Date.now() > new Date(TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.claimStartTime).getTime() &&
+          TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.estimatedWalletRewards[
+            dydxAddress?.toLowerCase() ?? ''
+          ] != null
+        );
+      }, [dydxAddress]);
+
+      const tokenRewardPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
+
+      useEffect(() => {
+        if (qualifiedForRound2 && dydxAddress != null && tokenRewardPrice != null) {
+          const estimatedUsdRewardAmount =
+            TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.estimatedWalletRewards[
+              dydxAddress.toLowerCase()
+            ] ?? 0;
+
+          const adjustedUsdRewardAmount =
+            (estimatedUsdRewardAmount / TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.assumedPrice) *
+            tokenRewardPrice;
+
+          const formattedRewardAmount = formatNumberOutput(
+            adjustedUsdRewardAmount,
+            OutputType.Number,
+            {
+              decimalSeparator,
+              groupSeparator,
+              selectedLocale,
+              fractionDigits: USD_DECIMALS,
+              minimumFractionDigits: USD_DECIMALS,
+            }
+          );
+
+          trigger({
+            id: `jan-2026-trading-league-rewards-round-2`,
+            displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: stringGetter({
+                key: STRING_KEYS.TRADING_LEAGUE_REWARD_CLAIM_TITLE,
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.TRADING_LEAGUE_REWARD_CLAIM_BODY,
+                params: {
+                  REWARD_AMOUNT: formattedRewardAmount,
+                  CLAIM_DEADLINE: new Date(
+                    TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.claimDeadline
+                  ).toLocaleDateString(selectedLocale, { month: 'short', day: 'numeric' }),
+                  LEARN_MORE_LINK: (
+                    <Link
+                      href="https://dydx.forum/t/dydx-trading-leagues-pilot-program-request-1m-in-dydx-from-the-community-treasury/4613/24"
+                      isAccent
+                      isInline
+                    >
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.CLAIM }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/trading-league-rewards" isAccent>
+                  {stringGetter({ key: STRING_KEYS.CLAIM })} →
+                </Link>
+              ),
+            },
+            updateKey: [`jan-2026-trading-league-rewards-round-2`, dydxAddress],
+          });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [
+        Boolean(tokenRewardPrice),
+        qualifiedForRound2,
+        dydxAddress,
+        stringGetter,
+        trigger,
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      ]);
+
+      const qualifyForDecLossRebate = useMemo(() => {
+        return (
+          LOSS_REBATE_DETAILS_DECEMBER.estimatedWalletRebates[dydxAddress?.toLowerCase() ?? ''] !=
+            null &&
+          Date.now() < new Date(LOSS_REBATE_DETAILS_DECEMBER.claimDeadline).getTime() &&
+          Date.now() > new Date(LOSS_REBATE_DETAILS_DECEMBER.claimStartTime).getTime()
+        );
+      }, [dydxAddress]);
+
+      useEffect(() => {
+        if (!qualifyForDecLossRebate) {
+          return;
+        }
+
+        const usdRebateAmount =
+          LOSS_REBATE_DETAILS_DECEMBER.estimatedWalletRebates[dydxAddress?.toLowerCase() ?? ''] ??
+          0;
+        const formattedRebateAmount = formatNumberOutput(usdRebateAmount, OutputType.Fiat, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+          fractionDigits: USD_DECIMALS,
+          minimumFractionDigits: USD_DECIMALS,
+        });
+
+        trigger({
+          id: `dec-2025-loss-rebate-claim`,
+          displayData: {
+            icon: <Icon iconName={IconName.Sparkles} />,
+            title: stringGetter({
+              key: STRING_KEYS.TRADING_LOSS_REBATE_CLAIM_TITLE,
+            }),
+            body: stringGetter({
+              key: STRING_KEYS.TRADING_LOSS_REBATE_CLAIM_BODY,
+              params: {
+                REBATE_AMOUNT: formattedRebateAmount,
+                CLAIM_DEADLINE: new Date(
+                  LOSS_REBATE_DETAILS_DECEMBER.claimDeadline
+                ).toLocaleDateString(selectedLocale, { month: 'short', day: 'numeric' }),
+                HERE_LINK: (
+                  <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent isInline>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.RewardsProgramUpdates,
+            actionAltText: stringGetter({ key: STRING_KEYS.CLAIM }),
+            renderActionSlot: () => (
+              <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent>
+                {stringGetter({ key: STRING_KEYS.CLAIM })} →
+              </Link>
+            ),
+          },
+          updateKey: [`jan-2026-trading-league-rewards-round-2`, dydxAddress],
+        });
+      }, [
+        qualifyForDecLossRebate,
+        trigger,
+        stringGetter,
+        dydxAddress,
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      ]);
     },
   },
   {
@@ -1077,7 +1232,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const isKeplr = useAppSelector(selectIsKeplrConnected);
       const reclaimableChildSubaccountFunds = useAppSelector(selectReclaimableChildSubaccountFunds);
-      const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
+      const { ordersToCancel } = orEmptyObj(useAppSelector(selectOrphanedTriggerOrders));
       const maybeRebalanceAction = useAppSelector(selectShouldAccountRebalanceUsdc);
 
       useEffect(() => {

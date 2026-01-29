@@ -1,10 +1,18 @@
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
-import { getUserSourceWalletAddress, getUserWalletAddress } from '@/state/accountInfoSelectors';
+import {
+  getUserSolanaWalletAddress,
+  getUserSourceWalletAddress,
+  getUserWalletAddress,
+} from '@/state/accountInfoSelectors';
 import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
-import { setLocalAddressScreenV2Raw, setSourceAddressScreenV2Raw } from '@/state/raw';
+import {
+  setLocalAddressScreenV2Raw,
+  setSolanaAddressScreenRaw,
+  setSourceAddressScreenV2Raw,
+} from '@/state/raw';
 import { getHdKeyNonce } from '@/state/walletSelectors';
 
 import { loadableIdle } from '../lib/loadable';
@@ -101,5 +109,28 @@ export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
   return () => {
     cleanupEffect();
     store.dispatch(setLocalAddressScreenV2Raw(loadableIdle()));
+  };
+}
+
+export function setUpIndexerSolanaAddressScreenQuery(store: RootStore) {
+  const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'solanaAddressScreen',
+    selector: getUserSolanaWalletAddress,
+    getQueryKey: (address) => ['screenSolanaWallet', address],
+    getQueryFn: (indexerClient, address) => {
+      if (address == null) {
+        return null;
+      }
+      return () => indexerClient.utility.complianceScreen(address);
+    },
+    onResult: (screen) => {
+      store.dispatch(setSolanaAddressScreenRaw(queryResultToLoadable(screen)));
+    },
+    onNoQuery: () => store.dispatch(setSolanaAddressScreenRaw(loadableIdle())),
+    ...pollingOptions,
+  });
+  return () => {
+    cleanupEffect();
+    store.dispatch(setSolanaAddressScreenRaw(loadableIdle()));
   };
 }

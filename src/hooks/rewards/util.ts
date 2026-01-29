@@ -44,6 +44,11 @@ export const CURRENT_SURGE_REWARDS_DETAILS = {
   endTime: '2026-01-31T23:59:59.000Z', // end of jan 2026
 };
 
+export const LIQUIDATION_REBATES_DETAILS = {
+  rebateAmount: '$1M',
+  rebateAmountUsd: 1_000_000,
+};
+
 export const CURRENT_BONK_REWARDS_DETAILS = {
   startTime: '2026-02-01T00:00:00.000Z', // start of february 2026
   endTime: '2026-02-28T23:59:59.000Z', // end of february 2026

@@ -19,6 +19,7 @@ export interface EndpointsConfig {
   affiliates?: string;
   spotApi: string;
   geoV2: string;
+  pnlImageApi: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -38,5 +39,6 @@ export const useEndpointsConfig = () => {
     affiliatesBaseUrl: endpointsConfig.affiliates,
     spotApi: endpointsConfig.spotApi,
     geoV2: endpointsConfig.geoV2,
+    pnlImageApi: endpointsConfig.pnlImageApi,
   };
 };

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { IncentiveCompetitionItem, useClcPnlDistribution } from '@/hooks/rewards/hooks';
+import { useLiquidationLeaderboard } from '@/hooks/rewards/hooks';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,41 +23,40 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { exportCSV } from '@/lib/csv';
 import { truncateAddress } from '@/lib/wallet';
 
-export enum RewardsLeaderboardTableColumns {
+export enum LiquidationLeaderboardTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
-  PNL = 'PNL',
-  EstimatedPrize = 'EstimatedPrize',
+  TotalLosses = 'TotalLosses',
 }
 
-export const CompetitionLeaderboardPanel = () => {
+type LiquidationLeaderboardItem = {
+  rank: number;
+  account: string;
+  totalLosses: number;
+};
+
+export const LiquidationRebatesPanel = () => {
   const stringGetter = useStringGetter();
-  const { data: topPnls, isLoading } = useClcPnlDistribution();
+  const { data: leaderboardData, isLoading } = useLiquidationLeaderboard();
   const { dydxAddress } = useAccounts();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const getRowKey = useCallback((row: IncentiveCompetitionItem) => row.rank, []);
+  const getRowKey = useCallback((row: LiquidationLeaderboardItem) => row.rank, []);
 
-  const columns = Object.values(RewardsLeaderboardTableColumns).map(
-    (key: RewardsLeaderboardTableColumns) =>
-      getRewardsLeaderboardTableColumnDef({
+  const columns = Object.values(LiquidationLeaderboardTableColumns).map(
+    (key: LiquidationLeaderboardTableColumns) =>
+      getLiquidationLeaderboardTableColumnDef({
         key,
         stringGetter,
         dydxAddress,
       })
   );
 
-  const data = (topPnls ?? []).reduce((acc, entry) => {
-    return [
-      ...acc,
-      {
-        rank: entry.position,
-        account: entry.address,
-        dollarReward: entry.dollarReward,
-        pnl: +entry.pnl,
-      },
-    ];
-  }, [] as IncentiveCompetitionItem[]);
+  const data = (leaderboardData ?? []).map((entry) => ({
+    rank: entry.rank,
+    account: entry.address,
+    totalLosses: parseFloat(entry.total_liquidation_losses),
+  }));
 
   const onDownload = () => {
     if (data.length === 0) return;
@@ -65,12 +64,11 @@ export const CompetitionLeaderboardPanel = () => {
     const csvRows = data.map((item) => ({
       rank: item.rank,
       address: item.account,
-      pnl: item.pnl,
-      dollarRewards: item.dollarReward,
+      totalLiquidationLosses: item.totalLosses,
     }));
 
     exportCSV(csvRows, {
-      filename: `loss-rebates-leaderboard-${new Date().toLocaleDateString(selectedLocale, { month: 'short', year: 'numeric' })}`,
+      filename: `liquidation-leaderboard-${new Date().toLocaleDateString(selectedLocale, { month: 'short', year: 'numeric' })}`,
       columnHeaders: [
         {
           key: 'rank',
@@ -81,8 +79,8 @@ export const CompetitionLeaderboardPanel = () => {
           displayLabel: stringGetter({ key: STRING_KEYS.TRADER }),
         },
         {
-          key: 'pnl',
-          displayLabel: stringGetter({ key: STRING_KEYS.PNL }),
+          key: 'totalLiquidationLosses',
+          displayLabel: stringGetter({ key: STRING_KEYS.LIQUIDATION_LOSSES }),
         },
       ],
     });
@@ -93,7 +91,8 @@ export const CompetitionLeaderboardPanel = () => {
       <div tw="flex flex-col gap-1">
         <div tw="flex items-center justify-between">
           <div tw="font-medium-bold">
-            {stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE })}
+            {/* {stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE })} */}
+            Liquidation Rebates
           </div>
           <button
             onClick={onDownload}
@@ -112,7 +111,7 @@ export const CompetitionLeaderboardPanel = () => {
             getRowKey={getRowKey}
             columns={columns}
             defaultSortDescriptor={{
-              column: RewardsLeaderboardTableColumns.Rank,
+              column: LiquidationLeaderboardTableColumns.Rank,
               direction: 'ascending',
             }}
             getIsRowPinned={(row) => {
@@ -189,19 +188,19 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const getRewardsLeaderboardTableColumnDef = ({
+const getLiquidationLeaderboardTableColumnDef = ({
   key,
   stringGetter,
   dydxAddress,
 }: {
-  key: RewardsLeaderboardTableColumns;
+  key: LiquidationLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<IncentiveCompetitionItem> => ({
+}): ColumnDef<LiquidationLeaderboardItem> => ({
   ...(
     {
-      [RewardsLeaderboardTableColumns.Rank]: {
-        columnKey: RewardsLeaderboardTableColumns.Rank,
+      [LiquidationLeaderboardTableColumns.Rank]: {
+        columnKey: LiquidationLeaderboardTableColumns.Rank,
         getCellValue: (row) => row.rank,
         label: (
           <div tw="py-0.375 text-base font-medium text-color-text-0">
@@ -228,8 +227,8 @@ const getRewardsLeaderboardTableColumnDef = ({
           </div>
         ),
       },
-      [RewardsLeaderboardTableColumns.Trader]: {
-        columnKey: RewardsLeaderboardTableColumns.Trader,
+      [LiquidationLeaderboardTableColumns.Trader]: {
+        columnKey: LiquidationLeaderboardTableColumns.Trader,
         getCellValue: (row) => row.account,
         label: (
           <div tw="py-0.375 text-base font-medium text-color-text-0">
@@ -247,35 +246,20 @@ const getRewardsLeaderboardTableColumnDef = ({
           </CopyButton>
         ),
       },
-      [RewardsLeaderboardTableColumns.PNL]: {
-        columnKey: RewardsLeaderboardTableColumns.PNL,
-        getCellValue: (row) => row.pnl,
+      [LiquidationLeaderboardTableColumns.TotalLosses]: {
+        columnKey: LiquidationLeaderboardTableColumns.TotalLosses,
+        getCellValue: (row) => row.totalLosses,
         label: (
-          <div tw="py-0.375 text-base font-medium text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.PNL })}
-          </div>
+          <div tw="py-0.375 text-base font-medium text-color-text-0">Total Liquidation Losses</div>
         ),
-        renderCell: ({ pnl }) => (
+        renderCell: ({ totalLosses }) => (
           <Output
-            css={{ color: pnl >= 0 ? 'var(--color-positive)' : 'var(--color-negative)' }}
-            tw="text-small font-medium"
+            tw="text-small font-medium text-color-negative"
             type={OutputType.Fiat}
-            value={pnl}
+            value={totalLosses}
           />
         ),
       },
-      [RewardsLeaderboardTableColumns.EstimatedPrize]: {
-        columnKey: RewardsLeaderboardTableColumns.EstimatedPrize,
-        getCellValue: (row) => row.dollarReward,
-        label: (
-          <div tw="py-0.375 text-base font-medium text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.ESTIMATED_PRIZE })}
-          </div>
-        ),
-        renderCell: ({ dollarReward }) => (
-          <Output tw="text-small font-medium" type={OutputType.Fiat} value={dollarReward} />
-        ),
-      },
-    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<IncentiveCompetitionItem>>
+    } satisfies Record<LiquidationLeaderboardTableColumns, ColumnDef<LiquidationLeaderboardItem>>
   )[key],
 });

@@ -81,6 +81,7 @@ export type ComplianceState = {
   geo: Loadable<GeoState | undefined>;
   sourceAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
   localAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
+  solanaAddressScreen: Loadable<ComplianceResponse & ComplianceErrors>;
 };
 
 export interface RawDataState {
@@ -161,6 +162,7 @@ const initialState: RawDataState = {
     geo: loadableIdle(),
     localAddressScreenV2: loadableIdle(),
     sourceAddressScreenV2: loadableIdle(),
+    solanaAddressScreen: loadableIdle(),
   },
   rewards: {
     data: loadableIdle(),
@@ -249,13 +251,16 @@ export const rawSlice = createSlice({
       },
       setComplianceGeoHeadersRaw: (
         state,
-        action: PayloadAction<Loadable<Omit<GeoHeaders, 'lastUpdated'> | undefined>>
+        action: PayloadAction<
+          Loadable<Omit<GeoHeaders, 'lastUpdated'> | undefined> & { force?: boolean }
+        >
       ) => {
         const now = Date.now();
         const lastUpdated = state.compliance.geoHeaders.data?.lastUpdated;
 
-        // Update if no data exists or if it's been more than an hour since last update
+        // Update if forced, no data exists, or if it's been more than an hour since last update
         const shouldUpdate =
+          action.payload.force === true ||
           !state.compliance.geoHeaders.data ||
           !lastUpdated ||
           now - new Date(lastUpdated).getTime() > timeUnits.hour;
@@ -283,6 +288,12 @@ export const rawSlice = createSlice({
         action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
       ) => {
         state.compliance.sourceAddressScreenV2 = action.payload;
+      },
+      setSolanaAddressScreenRaw: (
+        state,
+        action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
+      ) => {
+        state.compliance.solanaAddressScreen = action.payload;
       },
       setRewardsParams: (state, action: PayloadAction<Loadable<RewardsParams | undefined>>) => {
         state.rewards.data = action.payload;
@@ -422,6 +433,7 @@ export const {
   setComplianceGeoHeadersRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
+  setSolanaAddressScreenRaw,
   setRewardsParams,
   setRewardsTokenPrice,
   setSelectedMarketLeverage,
