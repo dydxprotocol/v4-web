@@ -12,6 +12,10 @@ export interface GetAssetPricesOptions {
    */
   asset?: AssetId;
   /**
+   * Filter by timestamp less than or equal to this value (unix seconds).
+   */
+  timestampLte?: number;
+  /**
    * Default ordering is by timestamp descending.
    */
   orderBy?: 'TIMESTAMP_ASC' | 'TIMESTAMP_DESC';

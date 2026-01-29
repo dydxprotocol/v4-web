@@ -1,10 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import 'immer';
-import {
-  fetchAssetPricesByIds,
-  fetchCurrentAssetPrices,
-  fetchHistoricalAssetPrices,
-} from './thunks';
+import { asyncFetchCurrentAssetPricesThunk } from './thunks';
 import { assetPricesAdapter, assetPricesInitialState } from './types';
 
 export const assetPricesSlice = createSlice({
@@ -13,38 +9,13 @@ export const assetPricesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAssetPricesByIds.pending, (state) => {
-        state.fetchStatus = 'pending';
-        state.error = null;
-      })
-      .addCase(fetchAssetPricesByIds.fulfilled, (state, action) => {
-        assetPricesAdapter.upsertMany(state, action.payload);
-      })
-      .addCase(fetchAssetPricesByIds.rejected, (state, action) => {
-        state.fetchStatus = 'rejected';
-        state.error = action.payload ?? 'Failed to fetch asset prices by IDs';
-      })
-
-      .addCase(fetchCurrentAssetPrices.fulfilled, (state, action) => {
+      .addCase(asyncFetchCurrentAssetPricesThunk.fulfilled, (state, action) => {
         if (action.payload) assetPricesAdapter.upsertOne(state, action.payload);
         state.fetchStatus = 'fulfilled';
       })
-      .addCase(fetchCurrentAssetPrices.rejected, (state, action) => {
+      .addCase(asyncFetchCurrentAssetPricesThunk.rejected, (state, action) => {
         state.fetchStatus = 'rejected';
         state.error = action.payload ?? 'Failed to fetch current asset prices';
-      })
-
-      .addCase(fetchHistoricalAssetPrices.pending, (state) => {
-        state.fetchStatus = 'pending';
-        state.error = null;
-      })
-      .addCase(fetchHistoricalAssetPrices.fulfilled, (state, action) => {
-        assetPricesAdapter.upsertMany(state, action.payload);
-        state.fetchStatus = 'fulfilled';
-      })
-      .addCase(fetchHistoricalAssetPrices.rejected, (state, action) => {
-        state.fetchStatus = 'rejected';
-        state.error = action.payload ?? 'Failed to fetch historical asset prices';
       });
   },
 });

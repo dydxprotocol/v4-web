@@ -1,4 +1,4 @@
-export * as selectors from './selectors';
-export * as slice from './slice';
-export * as thunks from './thunks';
-export * as types from './types';
+export * from './selectors';
+export * from './slice';
+export * from './thunks';
+export * from './types';
