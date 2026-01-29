@@ -6,3 +6,6 @@ export type { Candle, CandleInterval } from './CandleEntity';
 export { CandleEntitySchema } from './CandleEntity.schema';
 export type { CandleRepository, GetCandlesOptions } from './CandlesPort';
 export * from './consts';
+export * from './MarketStats';
+export * from './MarketStats.schema';
+export * from './MarketStatsPort';

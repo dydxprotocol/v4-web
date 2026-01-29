@@ -1,20 +1,22 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import * as assetPrices from './AssetPrices';
-import * as assets from './Assets';
-import * as candles from './Candles';
+import type { AssetPricesThunkExtra } from './AssetPrices';
+import { assetPricesReducer } from './AssetPrices';
+import { assetsReducer } from './Assets';
+import type { CandlesThunkExtra } from './Candles';
+import { candlesApi } from './Candles';
+import type { MarketStatsThunkExtra } from './MarketStats';
+import { marketStatsReducer } from './MarketStats';
 
 export const marketsReducer = combineReducers({
-  assetPrices: assetPrices.slice.assetPricesReducer,
-  assets: assets.slice.assetsReducer,
+  assetPrices: assetPricesReducer,
+  assets: assetsReducer,
+  marketStats: marketStatsReducer,
 });
 
 export const marketsApis = {
-  candlesApi: candles.api.candlesApi.reducer,
+  candlesApi: candlesApi.reducer,
 };
 
-export const marketsMiddleware = [candles.api.candlesApi.middleware];
+export const marketsMiddleware = [candlesApi.middleware];
 
-export type MarketsThunkExtra = assetPrices.thunks.AssetPricesThunkExtra &
-  candles.api.CandlesThunkExtra;
-
-export { assetPrices, assets, candles };
+export type MarketsThunkExtra = AssetPricesThunkExtra & CandlesThunkExtra & MarketStatsThunkExtra;
