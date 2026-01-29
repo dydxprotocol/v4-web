@@ -97,8 +97,8 @@ export const SharePNLAnalyticsDialog = ({
           params: {
             MARKET: symbol,
           },
-        })}\n\n#bonk_trade #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
-        related: 'bonk_inu',
+        })}\n\n#dydx #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+        related: 'dYdX',
       });
       track(AnalyticsEvents.SharePnlShared({ asset: assetId }));
       setIsSharing(false);
