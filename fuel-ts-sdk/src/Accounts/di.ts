@@ -6,6 +6,7 @@ import { type WalletGetterFn, createContractsService } from './src/application';
 export type AccountsModuleDependencies = {
   walletGetter: WalletGetterFn;
   vaultContractId: ContractId;
+  testnetTokenContractId?: ContractId;
 };
 
 export const createAccountsModule = (deps: AccountsModuleDependencies) => {
@@ -21,6 +22,7 @@ export const createAccountsModule = (deps: AccountsModuleDependencies) => {
       contractsService: createContractsService({
         walletGetter: deps.walletGetter,
         vaultContractId: deps.vaultContractId,
+        testnetTokenContractId: deps.testnetTokenContractId,
       }),
     },
   };

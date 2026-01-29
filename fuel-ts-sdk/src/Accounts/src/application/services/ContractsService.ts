@@ -1,20 +1,24 @@
+import type { B256Account } from '@sdk/shared/contracts';
 import type { ContractId } from '@sdk/shared/types';
-import { vaultAbi } from '@starboard/indexer/abis';
-import type { Account, B256Address } from 'fuels';
+import { testnetTokenAbi, vaultAbi } from '@starboard/indexer/abis';
+import type { Account } from 'fuels';
 import { Contract } from 'fuels';
 
 export interface ContractsService {
   getVaultContract: () => Promise<Contract>;
+  getTestnetTokenContract: () => Promise<Contract>;
   getB256Account: () => Promise<B256Account | null>;
 }
 
 export interface ContractsServiceDependencies {
   walletGetter: WalletGetterFn;
   vaultContractId: ContractId;
+  testnetTokenContractId?: ContractId;
 }
 
 export const createContractsService = ({
   vaultContractId,
+  testnetTokenContractId,
   walletGetter,
 }: ContractsServiceDependencies): ContractsService => {
   return {
@@ -29,12 +33,13 @@ export const createContractsService = ({
 
       return new Contract(vaultContractId, vaultAbi, wallet);
     },
-  };
-};
+    async getTestnetTokenContract() {
+      const wallet = await walletGetter();
+      if (!wallet) throw new Error('Wallet is not connected');
+      if (!testnetTokenContractId) throw new Error('Testnet token contract ID is not configured');
 
-export type B256Account = {
-  Address: {
-    bits: B256Address;
+      return new Contract(testnetTokenContractId, testnetTokenAbi, wallet);
+    },
   };
 };
 

@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UserBalancesChangedEvent } from '@sdk/shared/events/UserBalancesChanged';
+import {
+  BaseTokenFauceted,
+  LiquidityAddedEvent,
+  LiquidityRemovedEvent,
+  PositionDecreasedEvent,
+  PositionIncreasedEvent,
+} from '@sdk/shared/contracts';
 import { asyncFetchCurrentUserBalancesThunk } from './thunks';
 import { nullCurrentUserState } from './types';
 
@@ -28,7 +34,19 @@ const currentUserSlice = createSlice({
           state.status = 'pending';
         },
       })
-      .addMatcher(UserBalancesChangedEvent.match, (state) => {
+      .addMatcher(PositionIncreasedEvent.match, (state) => {
+        state.status = 'uninitialized';
+      })
+      .addMatcher(LiquidityAddedEvent.match, (state) => {
+        state.status = 'uninitialized';
+      })
+      .addMatcher(LiquidityRemovedEvent.match, (state) => {
+        state.status = 'uninitialized';
+      })
+      .addMatcher(PositionDecreasedEvent.match, (state) => {
+        state.status = 'uninitialized';
+      })
+      .addMatcher(BaseTokenFauceted.match, (state) => {
         state.status = 'uninitialized';
       }),
 });
