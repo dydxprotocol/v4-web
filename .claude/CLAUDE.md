@@ -50,6 +50,17 @@ perf(api/web): optimize database queries for user data
 - SDK: Use dependency injection with in-memory fake services
 - Indexer: Define events in memory for unit tests
 
+### Indexer API Reference
+
+When exploring indexer GraphQL schema or available queries, read from local files - do NOT fetch from live API:
+
+- `indexer/schema.graphql` - main entity definitions
+- `indexer/schema.derivatives.graphql` - derived entities (candles, prices, aggregates)
+- `indexer/db/migrations/` - SQL views for computed data (open interest, volume)
+- `indexer/src/model/generated/` - TypeScript models
+
+For contract constants (decimals, precision), check `contracts/contracts/core/vault/src/main.sw`.
+
 ## Code Organization
 
 ### Working with Forked/Legacy Code
