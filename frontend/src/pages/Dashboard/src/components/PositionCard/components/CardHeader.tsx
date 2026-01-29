@@ -33,11 +33,13 @@ export const CardHeader: FC = () => {
         </Tooltip>
       </div>
 
-      <DecreasePositionDialog
-        positionId={position.stableId}
-        open={modalOpenBoolean.value}
-        onOpenChange={modalOpenBoolean.setValue}
-      />
+      {modalOpenBoolean && (
+        <DecreasePositionDialog
+          positionId={position.stableId}
+          open={modalOpenBoolean.value}
+          onOpenChange={modalOpenBoolean.setValue}
+        />
+      )}
     </div>
   );
 };

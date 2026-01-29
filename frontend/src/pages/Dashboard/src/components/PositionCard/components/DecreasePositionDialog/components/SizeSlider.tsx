@@ -3,29 +3,29 @@ import { Slider } from 'radix-ui';
 import * as $ from './SizeSlider.css';
 
 export interface SizeSliderProps {
-  valueInPercents: number;
-  onValueChange: (nextValInPercents: number) => void;
+  valueInPercents: string;
+  onValueChange: (nextValInPercents: string) => void;
 }
 
 export const SizeSlider: FC<SizeSliderProps> = ({ onValueChange, valueInPercents }) => {
   const handlePercentageClick = (percentage: number) => {
-    onValueChange(percentage);
+    onValueChange(String(percentage));
   };
 
   const handleSliderSlide = ([value]: number[]) => {
-    onValueChange(value);
+    onValueChange(String(value));
   };
 
   return (
     <>
       <div className={$.sliderHeader}>
         <span className={$.sliderLabel}>Percentage</span>
-        <span className={$.sliderValue}>{valueInPercents.toFixed(0)}%</span>
+        <span className={$.sliderValue}>{Number(valueInPercents).toFixed(0)}%</span>
       </div>
 
       <Slider.Root
         className={$.sliderRoot}
-        value={[valueInPercents]}
+        value={[Number(valueInPercents)]}
         onValueChange={handleSliderSlide}
         min={0}
         max={100}
@@ -43,7 +43,7 @@ export const SizeSlider: FC<SizeSliderProps> = ({ onValueChange, valueInPercents
             key={mark}
             type="button"
             className={`${$.percentageMark} ${
-              valueInPercents === mark ? $.percentageMarkActive : ''
+              Number(valueInPercents) === mark ? $.percentageMarkActive : ''
             }`}
             onClick={() => handlePercentageClick(mark)}
           >

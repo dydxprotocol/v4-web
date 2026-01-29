@@ -35,11 +35,11 @@ export const DecreasePositionDialog = memo(
       throw new Error('Position not found');
     }
 
-    const totalPositionSize = position.size;
+    const totalPositionSize = tradingSdk.getPositionSizeInQuoteAsset(position.stableId);
 
     const sliderPercentage = calculateSliderPercentage(sizeToDecrease, totalPositionSize);
 
-    const handlePercentageChange = (valueInPercents: number) => {
+    const handlePercentageChange = (valueInPercents: string) => {
       const newSize = calculateSizeFromPercentage(valueInPercents, totalPositionSize);
       setSizeToDecrease(newSize);
     };
@@ -54,7 +54,10 @@ export const DecreasePositionDialog = memo(
     };
 
     const submitPositionChange = useCallback(async () => {
-      const sizeDelta = PositionSize.fromDecimalString(sizeToDecrease);
+      const sizeUsdc = position.size;
+      const sizeDeltaUsdc = PositionSize.fromDecimalString(
+        calculateSizeFromPercentage(sliderPercentage, sizeUsdc)
+      );
 
       const action = getPositionAction(sliderPercentage);
       const actionPastTense = action === 'close' ? 'closed' : 'decreased';
@@ -62,7 +65,7 @@ export const DecreasePositionDialog = memo(
       try {
         await tradingSdk.decreasePosition({
           positionId,
-          sizeDelta,
+          sizeDelta: sizeDeltaUsdc,
         });
         toast.success(`Position ${actionPastTense} successfully`);
         onOpenChange?.(false);
@@ -70,7 +73,7 @@ export const DecreasePositionDialog = memo(
         const message = error instanceof Error ? error.message : 'Unknown error';
         toast.error(`Failed to ${action} position: ${message}`);
       }
-    }, [sizeToDecrease, tradingSdk, positionId, sliderPercentage, onOpenChange]);
+    }, [position.size, sliderPercentage, tradingSdk, positionId, onOpenChange]);
 
     const isValidDecrease = isValidDecreaseAmount(sizeToDecrease, totalPositionSize);
 
@@ -94,12 +97,16 @@ export const DecreasePositionDialog = memo(
           </div>
 
           <div css={styles.summarySection}>
-            <Summary decreaseAmount={sizeToDecrease} totalPositionSize={totalPositionSize} />
+            <Summary
+              assetSymbol={assetSymbol}
+              decreaseAmount={sizeToDecrease}
+              totalPositionSize={totalPositionSize}
+            />
           </div>
 
           <Actions
             onSubmit={submitPositionChange}
-            submitTitle={` ${sliderPercentage === 100 ? 'Close' : 'Decrease'} Position`}
+            submitTitle={`${sliderPercentage === '100' ? 'Close' : 'Decrease'} Position`}
             submittable={isValidDecrease}
           />
         </Dialog.Content>

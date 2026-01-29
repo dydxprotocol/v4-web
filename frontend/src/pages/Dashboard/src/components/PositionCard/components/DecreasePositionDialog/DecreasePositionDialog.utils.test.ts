@@ -11,88 +11,88 @@ describe('DecreasePositionDialog.utils', () => {
   describe('calculateSliderPercentage', () => {
     it('returns 0 for empty size string', () => {
       const result = calculateSliderPercentage('', PositionSize.fromFloat(1000));
-      expect(result).toBe(0);
+      expect(result).toBe('0');
     });
 
     it('returns 0 for zero total position size', () => {
       const result = calculateSliderPercentage('100', PositionSize.fromFloat(0));
-      expect(result).toBe(0);
+      expect(result).toBe('0');
     });
 
     it('calculates 50% correctly', () => {
       const result = calculateSliderPercentage('500', PositionSize.fromFloat(1000));
-      expect(result).toBe(50);
+      expect(result).toBe('50');
     });
 
     it('calculates 100% correctly', () => {
       const result = calculateSliderPercentage('1000', PositionSize.fromFloat(1000));
-      expect(result).toBe(100);
+      expect(result).toBe('100');
     });
 
     it('calculates 25% correctly', () => {
       const result = calculateSliderPercentage('250', PositionSize.fromFloat(1000));
-      expect(result).toBe(25);
+      expect(result).toBe('25');
     });
 
     it('clamps values above 100% to 100', () => {
       const result = calculateSliderPercentage('1500', PositionSize.fromFloat(1000));
-      expect(result).toBe(100);
+      expect(result).toBe('100');
     });
 
     it('clamps negative values to 0', () => {
       const result = calculateSliderPercentage('-100', PositionSize.fromFloat(1000));
-      expect(result).toBe(0);
+      expect(result).toBe('0');
     });
 
-    it('rounds to nearest integer', () => {
+    it('returns decimal percentage string', () => {
       const result = calculateSliderPercentage('333', PositionSize.fromFloat(1000));
-      expect(result).toBe(33);
+      expect(result).toBe('33.3');
     });
 
     it('handles decimal input values', () => {
       const result = calculateSliderPercentage('100.5', PositionSize.fromFloat(1000));
-      expect(result).toBe(10);
+      expect(result).toBe('10.05');
     });
 
     it('handles small position sizes', () => {
       const result = calculateSliderPercentage('0.5', PositionSize.fromFloat(1));
-      expect(result).toBe(50);
+      expect(result).toBe('50');
     });
   });
 
   describe('calculateSizeFromPercentage', () => {
-    it('returns empty string for 0%', () => {
-      const result = calculateSizeFromPercentage(0, PositionSize.fromFloat(1000));
-      expect(result).toBe('');
+    it('returns "0" for 0%', () => {
+      const result = calculateSizeFromPercentage('0', PositionSize.fromFloat(1000));
+      expect(result).toBe('0');
     });
 
     it('calculates 50% of position size', () => {
-      const result = calculateSizeFromPercentage(50, PositionSize.fromFloat(1000));
+      const result = calculateSizeFromPercentage('50', PositionSize.fromFloat(1000));
       expect(Number(result)).toBeCloseTo(500, 2);
     });
 
     it('calculates 100% of position size', () => {
-      const result = calculateSizeFromPercentage(100, PositionSize.fromFloat(1000));
+      const result = calculateSizeFromPercentage('100', PositionSize.fromFloat(1000));
       expect(Number(result)).toBeCloseTo(1000, 2);
     });
 
     it('calculates 25% of position size', () => {
-      const result = calculateSizeFromPercentage(25, PositionSize.fromFloat(1000));
+      const result = calculateSizeFromPercentage('25', PositionSize.fromFloat(1000));
       expect(Number(result)).toBeCloseTo(250, 2);
     });
 
     it('handles decimal percentages', () => {
-      const result = calculateSizeFromPercentage(33.33, PositionSize.fromFloat(1000));
+      const result = calculateSizeFromPercentage('33.33', PositionSize.fromFloat(1000));
       expect(Number(result)).toBeCloseTo(333.3, 1);
     });
 
     it('handles small position sizes', () => {
-      const result = calculateSizeFromPercentage(50, PositionSize.fromFloat(0.1));
+      const result = calculateSizeFromPercentage('50', PositionSize.fromFloat(0.1));
       expect(Number(result)).toBeCloseTo(0.05, 4);
     });
 
     it('handles large position sizes', () => {
-      const result = calculateSizeFromPercentage(10, PositionSize.fromFloat(1000000));
+      const result = calculateSizeFromPercentage('10', PositionSize.fromFloat(1000000));
       expect(Number(result)).toBeCloseTo(100000, 0);
     });
   });
@@ -146,27 +146,27 @@ describe('DecreasePositionDialog.utils', () => {
 
   describe('getPositionAction', () => {
     it('returns "close" for 100%', () => {
-      const result = getPositionAction(100);
+      const result = getPositionAction('100');
       expect(result).toBe('close');
     });
 
     it('returns "decrease" for 99%', () => {
-      const result = getPositionAction(99);
+      const result = getPositionAction('99');
       expect(result).toBe('decrease');
     });
 
     it('returns "decrease" for 50%', () => {
-      const result = getPositionAction(50);
+      const result = getPositionAction('50');
       expect(result).toBe('decrease');
     });
 
     it('returns "decrease" for 0%', () => {
-      const result = getPositionAction(0);
+      const result = getPositionAction('0');
       expect(result).toBe('decrease');
     });
 
     it('returns "decrease" for 1%', () => {
-      const result = getPositionAction(1);
+      const result = getPositionAction('1');
       expect(result).toBe('decrease');
     });
   });

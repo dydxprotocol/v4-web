@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { $decimalValue } from 'fuel-ts-sdk';
 import type { PositionSize } from 'fuel-ts-sdk/trading';
-import { formatCurrency } from '@/lib/formatCurrency';
+import { formatNumber } from '@/lib/formatCurrency';
 import * as $ from './CurrentPositionInfo.css';
 
 export interface CurrentPositionInfoProps {
@@ -15,7 +15,7 @@ export const CurrentPositionInfo: FC<CurrentPositionInfoProps> = ({ currentSize,
       <div>
         <div css={$.positionInfoLabel}>Current Size</div>
         <div css={$.positionInfoValue}>
-          {formatCurrency($decimalValue(currentSize).toFloat())} USDC
+          {formatNumber($decimalValue(currentSize).toDecimalString())}
         </div>
       </div>
       <div tw="text-right">

@@ -4,34 +4,37 @@ import { PositionSize } from 'fuel-ts-sdk/trading';
 export function calculateSliderPercentage(
   sizeToDecrease: string,
   totalPositionSize: PositionSize
-): number {
-  if (!sizeToDecrease || totalPositionSize.value === '0') return 0;
+): string {
+  if (!sizeToDecrease || totalPositionSize.value === '0') return '0';
 
-  const percentage = Math.round(
-    $decimalValue(
-      DecimalCalculator.value(PositionSize.fromDecimalString(sizeToDecrease))
-        .divideBy(totalPositionSize)
-        .calculate()
-    ).toFloat() * 100
-  );
+  const percentage = $decimalValue(
+    DecimalCalculator.value(PositionSize.fromDecimalString(sizeToDecrease))
+      .multiplyBy(RatioOutput.fromFloat(100))
+      .divideBy(totalPositionSize)
+      .calculate()
+  ).toDecimalString();
 
-  return Math.min(100, Math.max(0, Number(percentage)));
+  const percentageNum = Number(percentage);
+  if (percentageNum <= 0) return '0';
+  if (percentageNum >= 100) return '100';
+
+  return percentage;
 }
 
 export function calculateSizeFromPercentage(
-  percentage: number,
+  percentage: string,
   totalPositionSize: PositionSize
 ): string {
-  if (percentage === 0) return '';
+  if (percentage === '0') return '0';
 
-  const nextPercentageValue = RatioOutput.fromFloat(percentage);
+  const nextPercentageValue = RatioOutput.fromDecimalString(percentage);
   const nextSizeToDecrease = DecimalCalculator.value(totalPositionSize)
     .multiplyBy(nextPercentageValue)
     .divideBy(RatioOutput.fromFloat(100))
     .calculate();
 
   const result = $decimalValue(nextSizeToDecrease).toDecimalString();
-  return result === '0' ? '' : result;
+  return result === '0' ? '0' : result;
 }
 
 export function isValidDecreaseAmount(amount: string, totalPositionSize: PositionSize): boolean {
@@ -44,6 +47,6 @@ export function isValidDecreaseAmount(amount: string, totalPositionSize: Positio
   return amountValue <= totalSizeValue;
 }
 
-export function getPositionAction(sliderPercentage: number): 'close' | 'decrease' {
-  return sliderPercentage === 100 ? 'close' : 'decrease';
+export function getPositionAction(sliderPercentage: string): 'close' | 'decrease' {
+  return sliderPercentage === '100' ? 'close' : 'decrease';
 }
