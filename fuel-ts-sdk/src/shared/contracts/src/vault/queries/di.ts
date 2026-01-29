@@ -11,4 +11,4 @@ export const createVaultQueries = (deps: VaultQueriesDependencies) => ({
 
 export type VaultQueries = ReturnType<typeof createVaultQueries>;
 
-export { FundingInfo } from './getFundingInfo';
+export type { FundingInfo } from './getFundingInfo';
