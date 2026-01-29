@@ -18,6 +18,27 @@ function getUserLocale(): string {
   return 'en-US';
 }
 
+/**
+ * Calculates adaptive decimals for tiny numbers that would round to 0.
+ * Returns the original decimals if the value wouldn't be zero, or
+ * finds the minimum decimals needed to show significant digits + 2 for precision.
+ */
+function getAdaptiveDecimals(value: number, requestedDecimals: number, maxDecimals = 9): number {
+  if (value === 0) return requestedDecimals;
+
+  const wouldBeZero = Math.round(value * 10 ** requestedDecimals) / 10 ** requestedDecimals === 0;
+  if (!wouldBeZero) return requestedDecimals;
+
+  for (let d = requestedDecimals + 1; d <= maxDecimals; d++) {
+    const testValue = Math.round(value * 10 ** d) / 10 ** d;
+    if (testValue !== 0) {
+      return Math.min(d + 2, maxDecimals); // Add 2 for precision
+    }
+  }
+
+  return maxDecimals;
+}
+
 type FormatCurrencyOptions = {
   /** Number of decimal places (default: 2) */
   decimals?: number;
@@ -47,7 +68,7 @@ type FormatCurrencyOptions = {
  * formatCurrency(1234.56, { locale: 'fr-FR' }) // "$1 234,56"
  */
 export function formatCurrency(
-  value: number | bigint,
+  value: string | number | bigint,
   options: FormatCurrencyOptions = {}
 ): string {
   const {
@@ -59,7 +80,7 @@ export function formatCurrency(
     locale,
   } = options;
 
-  const numValue = typeof value === 'bigint' ? Number(value) : value;
+  const numValue = Number(value);
 
   // Handle minimum display threshold
   if (minDisplay !== undefined && numValue > 0 && numValue < minDisplay) {
@@ -70,9 +91,11 @@ export function formatCurrency(
     return formatCompactCurrency(numValue, { showSymbol, symbol, decimals, locale });
   }
 
+  const effectiveDecimals = getAdaptiveDecimals(numValue, decimals);
+
   const formatted = new Intl.NumberFormat(locale ?? getUserLocale(), {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
+    minimumFractionDigits: effectiveDecimals,
+    maximumFractionDigits: effectiveDecimals,
   }).format(numValue);
 
   return showSymbol ? `${symbol}${formatted}` : formatted;
@@ -141,10 +164,13 @@ type FormatNumberOptions = {
  * // With de-DE locale
  * formatNumber(1234567.89, { locale: 'de-DE' }) // "1.234.567,89"
  */
-export function formatNumber(value: number | bigint, options: FormatNumberOptions = {}): string {
+export function formatNumber(
+  value: string | number | bigint,
+  options: FormatNumberOptions = {}
+): string {
   const { decimals, useGrouping = true, signDisplay = 'auto', locale } = options;
 
-  const numValue = typeof value === 'bigint' ? Number(value) : value;
+  const numValue = Number(value);
 
   const formatOptions: Intl.NumberFormatOptions = {
     useGrouping,
@@ -152,8 +178,11 @@ export function formatNumber(value: number | bigint, options: FormatNumberOption
   };
 
   if (decimals !== undefined) {
-    formatOptions.minimumFractionDigits = decimals;
-    formatOptions.maximumFractionDigits = decimals;
+    const effectiveDecimals = getAdaptiveDecimals(numValue, decimals);
+    formatOptions.minimumFractionDigits = effectiveDecimals;
+    formatOptions.maximumFractionDigits = effectiveDecimals;
+  } else {
+    formatOptions.maximumFractionDigits = 20; // Preserve precision when decimals not specified
   }
 
   return new Intl.NumberFormat(locale ?? getUserLocale(), formatOptions).format(numValue);
@@ -172,7 +201,7 @@ export function formatNumber(value: number | bigint, options: FormatNumberOption
  * formatPercentage(0.1234, { locale: 'de-DE' }) // "12,34 %"
  */
 export function formatPercentage(
-  value: number,
+  value: string | number | bigint,
   options: { decimals?: number; signDisplay?: 'auto' | 'always' | 'never'; locale?: string } = {}
 ): string {
   const { decimals = 2, signDisplay = 'auto', locale } = options;
@@ -182,7 +211,7 @@ export function formatPercentage(
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
     signDisplay,
-  }).format(value);
+  }).format(Number(value));
 }
 
 /**
