@@ -1,5 +1,4 @@
-import type { ContractsService } from '@sdk/Accounts';
-import { UserBalancesChangedEvent } from '@sdk/shared/events/UserBalancesChanged';
+import type { VaultCommands } from '@sdk/shared/contracts';
 import type { StoreService } from '@sdk/shared/lib/StoreService';
 import type { PositionStableId } from '@sdk/shared/types';
 import { PositionSide } from '../../domain';
@@ -7,7 +6,7 @@ import type { PositionSize } from '../../domain/positionsDecimals';
 import { selectLatestPositionByStableId } from '../../infrastructure';
 
 export interface DecreasePositionDependencies {
-  contractsService: ContractsService;
+  vaultCommands: VaultCommands;
   storeService: StoreService;
 }
 
@@ -29,20 +28,11 @@ export const createDecreasePositionCommand =
     const isFullClose = sizeDelta.value === position.size.value;
     const collateralDelta = isFullClose ? position.collateral.value : '0';
 
-    const vault = await deps.contractsService.getVaultContract();
-    const account = await deps.contractsService.getB256Account();
-
-    const { waitForResult } = await vault.functions
-      .decrease_position(
-        account,
-        position.assetId,
-        collateralDelta,
-        sizeDelta.value.toString(),
-        position.side === PositionSide.LONG,
-        account
-      )
-      .call();
-
-    await waitForResult();
-    deps.storeService.dispatch(UserBalancesChangedEvent());
+    await deps.vaultCommands.decreasePosition({
+      indexAsset: position.assetId,
+      collateralDelta,
+      sizeDelta: sizeDelta.value.toString(),
+      isLong: position.side === PositionSide.LONG,
+      isFullClose,
+    });
   };
