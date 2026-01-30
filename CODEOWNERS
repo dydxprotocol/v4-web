@@ -1,0 +1,6 @@
+# repo default
+* @dydxprotocol/web-code-owners
+
+# global security policy
+/.github/   @dydxprotocol/security
+/CODEOWNERS @dydxprotocol/security
