@@ -5,7 +5,7 @@ import { candlesApi } from '../../infrastructure';
 
 export const createFetchCandlesCommand =
   (store: StoreService) =>
-  async (asset: AssetId, interval: CandleInterval, limit = 100) => {
+  async (asset: AssetId, interval: CandleInterval, limit = 1000) => {
     await store.dispatch(
       candlesApi.endpoints.getCandles.initiate({ asset, interval, limit }, { forceRefetch: true })
     );

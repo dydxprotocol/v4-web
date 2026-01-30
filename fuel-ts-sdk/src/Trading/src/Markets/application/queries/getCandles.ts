@@ -5,5 +5,5 @@ import { selectCandlesByAssetAndInterval } from '../../infrastructure';
 
 export const createGetCandles =
   (storeService: StoreService) =>
-  (asset: AssetId, interval: CandleInterval, limit = 100): Candle[] =>
+  (asset: AssetId, interval: CandleInterval, limit = 1000): Candle[] =>
     selectCandlesByAssetAndInterval(storeService.getState(), asset, interval, limit);

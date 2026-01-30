@@ -6,7 +6,7 @@ import type { CandleInterval } from '../../../domain';
 import { candlesApi } from './api';
 
 const selectGetCandlesEndpointState = memoize(
-  (state: RootState, asset: AssetId, interval: CandleInterval, limit = 100) =>
+  (state: RootState, asset: AssetId, interval: CandleInterval, limit = 1000) =>
     candlesApi.endpoints.getCandles.select({ asset, interval, limit })(state)
 );
 
