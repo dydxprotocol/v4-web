@@ -1,3 +1,4 @@
+import { ASSET_ICON_MAP } from '@/constants/assets';
 import { DEFAULT_QUOTE_ASSET } from '@/constants/markets';
 
 import { Nullable } from '@/lib/typeUtils';
@@ -81,3 +82,13 @@ export const getAssetDescriptionStringKeys = (assetId: string) => ({
   primary: `APP.__ASSETS.${assetId}.PRIMARY`,
   secondary: `APP.__ASSETS.${assetId}.SECONDARY`,
 });
+
+type AssetIconMapKey = keyof typeof ASSET_ICON_MAP;
+
+/**
+ * @param assetId
+ * @returns checks if the assetId is a valid key in the ASSET_ICON_MAP
+ */
+export const isAssetIconMapKey = (key: string): key is AssetIconMapKey => {
+  return key in ASSET_ICON_MAP;
+};

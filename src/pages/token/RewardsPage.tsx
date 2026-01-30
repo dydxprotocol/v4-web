@@ -12,8 +12,9 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableBonkPnlLeaderboard } from '@/hooks/useEnableBonkPnlLeaderboard';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
+import { useEnableLiquidationRebates } from '@/hooks/useEnableLiquidationRebates';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -29,10 +30,12 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { BonkIncentivesPanel } from './BonkIncentivesPanel';
 import { BonkPnlPanel } from './BonkPnlPanel';
-import { CompetitionIncentivesPanel } from './CompetitionIncentivesPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { LiquidationRebatesHeader } from './LiquidationRebatesHeader';
+import { LiquidationRebatesPanel } from './LiquidationRebatesPanel';
+import { RebatesIncetivesPanel } from './RebatesIncetivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
 import { SwapAndStakingPanel } from './SwapAndStakingPanel';
@@ -41,6 +44,7 @@ import { UnbondingPanels } from './UnbondingPanels';
 enum Tab {
   BonkPnl = 'BonkPnl',
   Rewards = 'Rewards',
+  LiquidationRebates = 'LiquidationRebates',
   Competition = 'Competition',
 }
 
@@ -49,12 +53,19 @@ const RewardsPage = () => {
   const navigate = useNavigate();
   const enableBonkPnlLeaderboard = useEnableBonkPnlLeaderboard();
 
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const { isTablet } = useBreakpoints();
+  const enableLiquidationRebates = useEnableLiquidationRebates();
 
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(enableBonkPnlLeaderboard ? Tab.BonkPnl : Tab.Competition);
+  const [value, setValue] = useState(
+    enableBonkPnlLeaderboard
+      ? Tab.BonkPnl
+      : enableLiquidationRebates
+        ? Tab.LiquidationRebates
+        : Tab.Competition
+  );
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -93,16 +104,31 @@ const RewardsPage = () => {
           },
         ]
       : []),
-    {
-      content: (
-        <div tw="flexColumn gap-1.5">
-          <CompetitionIncentivesPanel />
-          <CompetitionLeaderboardPanel />
-        </div>
-      ),
-      label: stringGetter({ key: STRING_KEYS.REBATES }),
-      value: Tab.Competition,
-    },
+    ...(enableLiquidationRebates
+      ? [
+          {
+            content: (
+              <div tw="flexColumn gap-1.5">
+                <LiquidationRebatesHeader />
+                <LiquidationRebatesPanel />
+              </div>
+            ),
+            label: stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES }),
+            value: Tab.LiquidationRebates,
+          },
+        ]
+      : [
+          {
+            content: (
+              <div tw="flexColumn gap-1.5">
+                <RebatesIncetivesPanel />
+                <CompetitionLeaderboardPanel />
+              </div>
+            ),
+            label: stringGetter({ key: STRING_KEYS.REBATES }),
+            value: Tab.Competition,
+          },
+        ]),
   ];
 
   return (

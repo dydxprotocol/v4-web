@@ -9,7 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -50,7 +50,7 @@ export const AccountInfoSection = () => {
   const dispatch = useAppDispatch();
 
   const { isTablet } = useBreakpoints();
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
   const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));

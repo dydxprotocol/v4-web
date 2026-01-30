@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import styled from 'styled-components';
 import { avalanche, mainnet, polygon } from 'viem/chains';
@@ -6,12 +6,14 @@ import { avalanche, mainnet, polygon } from 'viem/chains';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
+import { ComplianceStates } from '@/constants/compliance';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDepositAddress } from '@/hooks/useDepositAddress';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
@@ -54,6 +56,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
   const isSpotEnabled = useEnableSpot();
+  const { complianceState } = useComplianceState();
 
   const { dydxAddress, solanaAddress } = useAccounts();
   const { isUploadingAddress } = useTurnkeyAuth();
@@ -179,9 +182,21 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     });
   };
 
-  const handleTabChange = (newTab: 'perps' | 'spot') => {
-    setSelectedTab(newTab === 'perps' ? 'perpetuals' : 'spot');
-  };
+  const handleTabChange = useCallback(
+    (newTab: 'perps' | 'spot') => {
+      if (newTab === selectedTab) return;
+      setSelectedTab(newTab === 'perps' ? 'perpetuals' : 'spot');
+    },
+    [selectedTab]
+  );
+
+  useLayoutEffect(() => {
+    if (complianceState === ComplianceStates.READ_ONLY) {
+      setIsOpen(false);
+    } else if (complianceState !== ComplianceStates.FULL_ACCESS) {
+      handleTabChange('spot');
+    }
+  }, [complianceState, handleTabChange, setIsOpen]);
 
   const perpetualsContent = (
     <div tw="flexColumn gap-1">
@@ -255,6 +270,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       value: 'perps',
       label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
       content: perpetualsContent,
+      disabled: complianceState !== ComplianceStates.FULL_ACCESS,
     },
     {
       value: 'spot',

@@ -21,11 +21,11 @@ import { Panel } from '@/components/Panel';
 import { SuccessTag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
-export const CompetitionIncentivesPanel = () => {
-  return <September2025RewardsPanel />;
+export const RebatesIncetivesPanel = () => {
+  return <LossRebatesPanel />;
 };
 
-const September2025RewardsPanel = () => {
+const LossRebatesPanel = () => {
   const stringGetter = useStringGetter();
   const now = new Date();
   // December 2025 is the first month (Month 1)
@@ -101,13 +101,13 @@ const September2025RewardsPanel = () => {
             </div>
           </div>
         </div>
-        <Sept2025RewardsPanel />
+        <EstimatedRewards />
       </div>
     </$Panel>
   );
 };
 
-const Sept2025RewardsPanel = () => {
+const EstimatedRewards = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
   const { data: topPnls, isLoading } = useClcPnlDistribution();
@@ -145,6 +145,18 @@ const Sept2025RewardsPanel = () => {
           </$Points>
         </div>
         <img src="/rewards-stars.svg" alt="reward-stars" tw="h-auto w-2 self-start" />
+      </div>
+
+      <div tw="flex items-center gap-[0.5em] self-end font-tiny-medium">
+        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })}{' '}
+        <Link
+          href="https://cryptolearningclub.org/"
+          isAccent
+          tw="font-small-bold"
+          title="Crypto Learning Club"
+        >
+          CLC
+        </Link>
       </div>
     </div>
   );
