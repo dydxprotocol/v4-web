@@ -38,6 +38,11 @@ export const LIQUIDATION_REBATES_DETAILS = {
   rebateAmountUsd: 1_000_000,
 };
 
+export const FEB_2026_COMPETITION_DETAILS = {
+  rewardAmount: '$1M',
+  rewardAmountUsd: 1_000_000,
+};
+
 export const DEC_2025_COMPETITION_DETAILS = {
   rewardAmount: '$1M',
   rewardAmountUsd: 1_000_000,
