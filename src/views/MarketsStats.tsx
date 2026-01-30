@@ -5,7 +5,7 @@ import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
-import { DEC_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
+import { FEB_2026_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -55,8 +55,8 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         <div tw="z-[1] flex max-w-[65%] flex-col gap-2">
           <span tw="text-white font-extra-bold">
             {stringGetter({
-              key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025_UPDATE_1,
-              params: { REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount },
+              key: STRING_KEYS.COMPETITION_HEADLINE_FEB_2026,
+              params: { REWARD_AMOUNT: FEB_2026_COMPETITION_DETAILS.rewardAmount },
             })}
           </span>
           <Button
