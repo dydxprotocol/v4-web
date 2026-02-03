@@ -1,6 +1,12 @@
 {
   "headers": [
     {
+      "source": "/entry-points/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+      ]
+    },
+    {
       "source": "/currencies/(.*\\.png)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, s-maxage=31536000, immutable" }
@@ -21,7 +27,7 @@
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!.*\\.[^/]+$).*)",
       "destination": "/entry-points/index.html"
     }
   ]
