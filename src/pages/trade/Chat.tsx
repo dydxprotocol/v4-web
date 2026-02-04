@@ -352,7 +352,6 @@ export const Chat = ({ className }: ElementProps) => {
                   {message.market && <$DetailItem>{message.market}</$DetailItem>}
                   {message.side && <$DetailItem $side={message.side}>{message.side.toUpperCase()}</$DetailItem>}
                   {message.amount && <$DetailItem $highlight>${message.amount.toLocaleString()}</$DetailItem>}
-                  {message.content && <$LiquidationMessage>"{message.content}"</$LiquidationMessage>}
                 </$LiquidationMessageRow>
               );
             }
