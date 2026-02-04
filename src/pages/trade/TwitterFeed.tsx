@@ -134,7 +134,6 @@ export const TwitterFeed = ({ className }: ElementProps) => {
             leading to over $240 million in Bitcoin positions liquidated in one day.
           </$AISummaryText>
         </$AISummarySection>
-        <$FeedList>
         <$FeedList ref={scrollContainerRef}>
           {messages.map((message) => {
             const TweetCardContent = (
