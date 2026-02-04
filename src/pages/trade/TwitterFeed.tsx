@@ -310,14 +310,14 @@ const $AISummaryButton = styled.button`
 const $AISummaryCallout = styled.div`
   position: absolute;
   top: 0.75rem;
-  right: 0.75rem;
-  width: calc(100% - 1.5rem);
-  max-width: 24rem;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 10;
   background-color: var(--color-accent);
   border: 1px solid var(--color-accent);
   border-radius: 0.5rem;
-  padding: 0.875rem;
+  padding: 0.875rem 1rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   animation: slideDown 0.2s ease-out;
   backdrop-filter: blur(8px);
