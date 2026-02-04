@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import xLogo from '@/assets/x-logo.png';
 import { io, Socket } from 'socket.io-client';
 import styled from 'styled-components';
 
@@ -39,6 +40,7 @@ const truncateAddress = (address: string) => {
 export const TwitterFeed = ({ className }: ElementProps) => {
   const [messages, setMessages] = useState<FeedMessage[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const userColorMapRef = useRef<Map<string, string>>(new Map());
@@ -50,8 +52,15 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   const isAtBottom = () => {
     const container = scrollContainerRef.current;
     if (!container) return true;
-    const threshold = 100; // pixels from bottom to consider "at bottom"
+    const threshold = 150; // pixels from bottom to consider "at bottom"
     return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  };
+
+  const handleScroll = () => {
+    const atBottom = isAtBottom();
+    if (atBottom !== shouldAutoScroll) {
+      setShouldAutoScroll(atBottom);
+    }
   };
 
   // Get user color for a username
@@ -117,10 +126,20 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   }, []);
 
   useEffect(() => {
-    if (isAtBottom()) {
+    if (shouldAutoScroll) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, shouldAutoScroll]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [shouldAutoScroll]);
 
   return (
       <$FeedContainer>
@@ -157,8 +176,8 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                         minute: '2-digit',
                       })}
                     </$Timestamp>
+                    <$XLogo src={xLogo} alt="X" />
                   </$TweetHeader>
-                  {/* <$XLogo src={xLogo} alt="X" /> */}
                   <$TweetContent>{message.content}</$TweetContent>
                 </$TweetBody>
               </$TweetRow>
@@ -345,7 +364,6 @@ const $TweetHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  margin-bottom: 0.5rem;
   position: relative;
 `;
 
