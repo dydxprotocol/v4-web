@@ -86,15 +86,15 @@ export const Chat = ({ className }: ElementProps) => {
 
     socketInstance.on('connect', () => {
       console.log('Connected to chat server');
-      const generateDummyEthAddress = () => {
-        const chars = '0123456789abcdef';
-        let address = '0x';
-        for (let i = 0; i < 40; i++) {
+      const generateDummyDydxAddress = () => {
+        const chars = '0123456789abcdefghjkmnpqrstuvwxyz'; // bech32 charset (excluding 1, b, i, o)
+        let address = 'dydx1';
+        for (let i = 0; i < 38; i++) {
           address += chars[Math.floor(Math.random() * chars.length)];
         }
         return address;
       };
-      const usernameToUse = dydxAddress || generateDummyEthAddress();
+      const usernameToUse = dydxAddress || generateDummyDydxAddress();
       socketInstance.emit('setUsername', usernameToUse);
       setUsername(usernameToUse);
     });
@@ -455,7 +455,7 @@ const $Container = styled.div`
   height: 100%;
   background-color: var(--color-layer-2);
   position: relative;
-  width: 70%;
+  width: 60%;
 `;
 
 const $FilterButton = styled.button<{ $isActive: boolean }>`
@@ -912,7 +912,7 @@ const $CloseMessageRow = styled.div<{ $isProfit: boolean }>`
   animation: closePulse 0.3s ease-out;
   flex-wrap: wrap;
   line-height: 1.4;
-  font-size: 0.8125rem;
+  font-size: 1rem;
 
   &:hover {
     background: linear-gradient(

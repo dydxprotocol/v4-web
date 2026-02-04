@@ -126,7 +126,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                   </$Avatar>
                   <$TweetMeta>
                     <$Username $color={message.userColor}>
-                      {truncateAddress(message.username)}
+                      {message.username}
                     </$Username>
                     <$Timestamp>
                       {message.timestamp.toLocaleTimeString([], {
