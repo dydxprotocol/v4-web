@@ -277,26 +277,28 @@ const $FeedTitle = styled.h2`
 const $AISummaryButton = styled.button`
   position: absolute;
   top: 0.75rem;
-  left: 0.75rem;
+  right: 0.75rem;
   z-index: 5;
   display: flex;
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background-color: var(--color-accent);
   border: none;
   border-radius: 0.375rem;
   color: #fff;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
+  opacity: 1;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
   &:hover {
-    background: linear-gradient(135deg, #8b4cf7 0%, #6d28d9 100%);
+    opacity: 1;
+    filter: brightness(1.1);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 4px 12px rgba(105, 102, 255, 0.4);
   }
 
   &:active {
@@ -307,16 +309,12 @@ const $AISummaryButton = styled.button`
 const $AISummaryCallout = styled.div`
   position: absolute;
   top: 0.75rem;
-  left: 0.75rem;
+  right: 0.75rem;
   width: calc(100% - 1.5rem);
   max-width: 24rem;
   z-index: 10;
-  background: linear-gradient(
-    135deg,
-    #7c3aed 0%,
-    #5b21b6 100%
-  );
-  border: 1px solid rgba(124, 58, 237, 0.6);
+  background-color: var(--color-accent);
+  border: 1px solid var(--color-accent);
   border-radius: 0.5rem;
   padding: 0.875rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
