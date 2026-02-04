@@ -41,6 +41,8 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   const [messages, setMessages] = useState<FeedMessage[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [showAISummary, setShowAISummary] = useState(false);
+  const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const userColorMapRef = useRef<Map<string, string>>(new Map());
@@ -69,6 +71,16 @@ export const TwitterFeed = ({ className }: ElementProps) => {
       userColorMapRef.current.set(user, getRandomColor());
     }
     return userColorMapRef.current.get(user) || getRandomColor();
+  };
+
+  // Handle AI Summary button click
+  const handleAISummaryClick = () => {
+    setShowAISummary(true);
+    setIsLoadingSummary(true);
+    // Simulate loading for 2 seconds
+    setTimeout(() => {
+      setIsLoadingSummary(false);
+    }, 2000);
   };
 
   // Initialize socket connection
@@ -143,16 +155,34 @@ export const TwitterFeed = ({ className }: ElementProps) => {
 
   return (
       <$FeedContainer>
-        <$AISummarySection>
-          <$AISummaryHeader>
-            <$AIIcon>🤖</$AIIcon>
-            AI Summary
-          </$AISummaryHeader>
-          <$AISummaryText>
-            Bitcoin fell below $75,000, triggering automated selling and liquidations across platforms,
-            leading to over $240 million in Bitcoin positions liquidated in one day.
-          </$AISummaryText>
-        </$AISummarySection>
+        <$AISummaryButton onClick={handleAISummaryClick}>
+          <$AIIcon>🤖</$AIIcon>
+          AI Summary
+        </$AISummaryButton>
+
+        {showAISummary && (
+          <$AISummaryCallout>
+            {isLoadingSummary ? (
+              <$LoadingContainer>
+                <$LoadingSpinner />
+                <$LoadingText>Generating AI Summary...</$LoadingText>
+              </$LoadingContainer>
+            ) : (
+              <>
+                <$AISummaryCalloutHeader>
+                  <$AIIcon>🤖</$AIIcon>
+                  AI Summary
+                  <$CloseButton onClick={() => setShowAISummary(false)}>×</$CloseButton>
+                </$AISummaryCalloutHeader>
+                <$AISummaryCalloutText>
+                  Bitcoin fell below $75,000, triggering automated selling and liquidations across platforms,
+                  leading to over $240 million in Bitcoin positions liquidated in one day.
+                </$AISummaryCalloutText>
+              </>
+            )}
+          </$AISummaryCallout>
+        )}
+
         <$FeedList ref={scrollContainerRef}>
           {messages.map((message) => {
             const TweetCardContent = (
@@ -225,6 +255,7 @@ const $FeedContainer = styled.div`
   height: 100%;
   min-height: 0;
   border-right: var(--border-width) solid var(--color-layer-6);
+  position: relative;
 `;
 
 const $FeedHeader = styled.div`
@@ -243,42 +274,139 @@ const $FeedTitle = styled.h2`
   gap: 0.5rem;
 `;
 
-const $AISummarySection = styled.div`
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(
-    180deg,
-    #7c3aed 0%,
-    #5b21b6 30%,
-    rgba(31, 15, 61, 0.65) 65%,
-    rgba(19, 20, 28, 0) 100%
-  );
-  border-bottom: var(--border-width) solid var(--color-layer-6);
+const $AISummaryButton = styled.button`
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  border: none;
+  border-radius: 0.375rem;
   color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #8b4cf7 0%, #6d28d9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
-const $AISummaryHeader = styled.div`
+const $AISummaryCallout = styled.div`
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  width: calc(100% - 1.5rem);
+  max-width: 24rem;
+  z-index: 10;
+  background: linear-gradient(
+    135deg,
+    #7c3aed 0%,
+    #5b21b6 100%
+  );
+  border: 1px solid rgba(124, 58, 237, 0.6);
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  animation: slideDown 0.2s ease-out;
+  backdrop-filter: blur(8px);
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const $AISummaryCalloutHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.625rem;
+`;
+
+const $AISummaryCalloutText = styled.p`
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.45;
+  margin: 0;
 `;
 
 const $AIIcon = styled.span`
   font-size: 1rem;
   line-height: 1;
-  color: #c7b5ff;
 `;
 
-const $AISummaryText = styled.p`
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.4;
+const $CloseButton = styled.button`
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 0.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+`;
+
+const $LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+`;
+
+const $LoadingSpinner = styled.div`
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const $LoadingText = styled.p`
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
 `;
 
