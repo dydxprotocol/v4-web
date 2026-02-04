@@ -15,6 +15,7 @@ export type FeedMessage = {
   retweets?: number;
   type?: string;
   link?: string;
+  profileImageUrl?: string;
 };
 
 type ElementProps = {
@@ -76,6 +77,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
       likes?: number;
       retweets?: number;
       link?: string;
+      profileImageUrl?: string;
     }) => {
       console.log('📱 Received feed message:', data);
       // Support both old and new format
@@ -91,6 +93,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
         retweets: data.retweets || 0,
         type: data.type,
         link: data.link,
+        profileImageUrl: data.profileImageUrl,
       };
       setMessages((prev) => [...prev, newMessage]);
     });
@@ -121,7 +124,11 @@ export const TwitterFeed = ({ className }: ElementProps) => {
             const TweetCardContent = (
               <$TweetRow>
                 <$Avatar $color={message.userColor}>
-                  {message.username.slice(0, 2).toUpperCase()}
+                  {message.profileImageUrl ? (
+                    <$AvatarImage src={message.profileImageUrl} alt={message.username} />
+                  ) : (
+                    message.username.slice(0, 2).toUpperCase()
+                  )}
                 </$Avatar>
 
                 <$TweetBody>
@@ -300,6 +307,7 @@ const $Avatar = styled.div<{ $color: string }>`
   font-size: 0.875rem;
   color: #fff;
   flex-shrink: 0;
+  overflow: hidden;
 `;
 
 const $TweetMeta = styled.div`
@@ -313,6 +321,12 @@ const $TweetBody = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+`;
+
+const $AvatarImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 const $Username = styled.span<{ $color: string }>`
