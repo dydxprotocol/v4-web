@@ -1,0 +1,306 @@
+import { useEffect, useRef, useState } from 'react';
+
+import { io, Socket } from 'socket.io-client';
+import styled from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+export type FeedMessage = {
+  id: string;
+  content: string;
+  timestamp: Date;
+  username: string;
+  userColor: string;
+  likes?: number;
+  retweets?: number;
+  type?: string;
+};
+
+type ElementProps = {
+  className?: string;
+};
+
+const USER_COLORS = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+  '#DFE6E9', '#74B9FF', '#A29BFE', '#FD79A8', '#FDCB6E',
+  '#6C5CE7', '#00B894', '#E17055', '#0984E3', '#B2BEC3',
+];
+
+const getRandomColor = () => USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)];
+
+const truncateAddress = (address: string) => {
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+export const TwitterFeed = ({ className }: ElementProps) => {
+  const [messages, setMessages] = useState<FeedMessage[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const userColorMapRef = useRef<Map<string, string>>(new Map());
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Get user color for a username
+  const getUserColor = (user: string) => {
+    if (!userColorMapRef.current.has(user)) {
+      userColorMapRef.current.set(user, getRandomColor());
+    }
+    return userColorMapRef.current.get(user) || getRandomColor();
+  };
+
+  // Initialize socket connection
+  useEffect(() => {
+    const SERVER_URL = 'wss://dydx-chat-1.onrender.com/';
+    const socketInstance = io(SERVER_URL);
+    setSocket(socketInstance);
+
+    socketInstance.on('connect', () => {
+      console.log('Connected to Twitter feed server');
+    });
+
+    socketInstance.on('disconnect', () => {
+      console.log('Disconnected from Twitter feed server');
+    });
+
+    socketInstance.on('message', (data: {
+      username?: string;
+      content: string;
+      timestamp: string;
+      type?: string;
+      likes?: number;
+      retweets?: number;
+    }) => {
+      console.log('📱 Received feed message:', data);
+      const messageUsername = data.username || 'Anonymous';
+      const newMessage: FeedMessage = {
+        id: `${messageUsername}-${Date.now()}`,
+        content: data.content,
+        timestamp: new Date(data.timestamp),
+        username: messageUsername,
+        userColor: getUserColor(messageUsername),
+        likes: data.likes || 0,
+        retweets: data.retweets || 0,
+        type: data.type,
+      };
+      setMessages((prev) => [...prev, newMessage]);
+    });
+
+    socketInstance.on('error', (data: { message: string }) => {
+      console.error('Socket error:', data.message);
+    });
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  return (
+      <$FeedContainer>
+        <$FeedList>
+          {messages.map((message) => (
+            <$TweetCard key={message.id}>
+              <$TweetHeader>
+                <$Avatar $color={message.userColor}>
+                  {message.username.slice(0, 2).toUpperCase()}
+                </$Avatar>
+                <$TweetMeta>
+                  <$Username $color={message.userColor}>
+                    {truncateAddress(message.username)}
+                  </$Username>
+                  <$Timestamp>
+                    {message.timestamp.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </$Timestamp>
+                </$TweetMeta>
+              </$TweetHeader>
+
+              <$TweetContent>{message.content}</$TweetContent>
+
+              <$TweetActions>
+                <$ActionButton>
+                  <$ActionIcon>💬</$ActionIcon>
+                </$ActionButton>
+                <$ActionButton>
+                  <$ActionIcon>🔄</$ActionIcon>
+                  {message.retweets ? <$ActionCount>{message.retweets}</$ActionCount> : null}
+                </$ActionButton>
+                <$ActionButton>
+                  <$ActionIcon>❤️</$ActionIcon>
+                  {message.likes ? <$ActionCount>{message.likes}</$ActionCount> : null}
+                </$ActionButton>
+                <$ActionButton>
+                  <$ActionIcon>📤</$ActionIcon>
+                </$ActionButton>
+              </$TweetActions>
+            </$TweetCard>
+          ))}
+          <div ref={messagesEndRef} />
+        </$FeedList>
+      </$FeedContainer>
+  );
+};
+
+const $Container = styled.div`
+  ${layoutMixins.contentContainer}
+  ${layoutMixins.scrollArea}
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-layer-2);
+`;
+
+const $FeedContainer = styled.div`
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+`;
+
+const $FeedList = styled.div`
+  ${layoutMixins.scrollArea}
+
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 0.375rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-layer-6);
+    border-radius: 0.25rem;
+
+    &:hover {
+      background: var(--color-layer-7);
+    }
+  }
+`;
+
+const $TweetCard = styled.div`
+  padding: 0.875rem 1rem;
+  border-bottom: var(--border-width) solid var(--color-layer-5);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-layer-3);
+  }
+
+  animation: fadeInSlide 0.3s ease-out;
+
+  @keyframes fadeInSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const $TweetHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.5rem;
+`;
+
+const $Avatar = styled.div<{ $color: string }>`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: ${({ $color }) => $color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #fff;
+  flex-shrink: 0;
+`;
+
+const $TweetMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+`;
+
+const $Username = styled.span<{ $color: string }>`
+  color: var(--color-text-1);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const $Timestamp = styled.span`
+  color: var(--color-text-0);
+  opacity: 0.6;
+  font-size: 0.75rem;
+`;
+
+const $TweetContent = styled.div`
+  color: var(--color-text-1);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+`;
+
+const $TweetActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 0.5rem;
+`;
+
+const $ActionButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: var(--color-text-0);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-accent);
+  }
+`;
+
+const $ActionIcon = styled.span`
+  font-size: 1rem;
+  line-height: 1;
+`;
+
+const $ActionCount = styled.span`
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-0);
+`;

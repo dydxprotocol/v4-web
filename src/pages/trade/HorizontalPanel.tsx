@@ -25,6 +25,7 @@ import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
+import { Chat } from './Chat';
 
 import {
   calculateIsAccountViewOnly,
@@ -45,6 +46,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
 import { TradeTableSettings } from './TradeTableSettings';
+import { TwitterFeed } from './TwitterFeed';
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
 import { MarketTypeFilter, PanelView } from './types';
 
@@ -54,6 +56,7 @@ enum InfoSection {
   OrderHistory = 'OrderHistory',
   Fills = 'Fills',
   Payments = 'Payments',
+  Chat = 'Chat'
 }
 
 type ElementProps = {
@@ -382,9 +385,20 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     [stringGetter, showCurrentMarket, isTablet, initialPageSize, currentMarketId]
   );
 
+  const chatTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.Chat,
+      label: 'Chat',
+
+      content: <div style={{display: "flex", flexDirection: "row"}}><Chat /><TwitterFeed/></div>,
+    }),
+    []
+  )
+
   const tabItems = useMemo(
-    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem]
+    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem, chatTabItem],
+    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem, chatTabItem]
   );
 
   const slotBottom = {
@@ -395,6 +409,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     [InfoSection.OrderHistory]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,
+    [InfoSection.Chat]: null,
   }[tab];
 
   return isTablet ? (
@@ -444,3 +459,4 @@ const $CollapsibleTabs = styled(CollapsibleTabs)`
 
   --trigger-active-underline-backgroundColor: var(--color-layer-2);
 ` as typeof CollapsibleTabs;
+

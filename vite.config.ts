@@ -83,6 +83,9 @@ export default defineConfig(({ mode }) => ({
     }),
   ],
   publicDir: 'public',
+  server: {
+    allowedHosts: ['devona-synaptical-unconcordantly.ngrok-free.dev'],
+  },
   test: {
     exclude: [
       '**/node_modules/**',
