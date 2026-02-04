@@ -63,11 +63,19 @@ export const Chat = ({ className }: ElementProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [username, setUsername] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const userColorMapRef = useRef<Map<string, string>>(new Map());
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const isAtBottom = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return true;
+    const threshold = 100; // pixels from bottom to consider "at bottom"
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
   };
 
   // Get user color for a username
@@ -272,7 +280,9 @@ export const Chat = ({ className }: ElementProps) => {
   }, [dydxAddress]);
 
   useEffect(() => {
-    scrollToBottom();
+    if (isAtBottom()) {
+      scrollToBottom();
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -343,7 +353,7 @@ export const Chat = ({ className }: ElementProps) => {
       )}
 
       <$MessagesContainer>
-        <$MessagesList>
+        <$MessagesList ref={scrollContainerRef}>
           {messages.map((message) => {
             if (message.type === 'liquidation') {
               return (
