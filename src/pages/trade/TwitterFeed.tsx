@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import xLogo from '@/assets/x-logo.png';
 import { io, Socket } from 'socket.io-client';
 import styled from 'styled-components';
 
@@ -147,8 +148,8 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                         minute: '2-digit',
                       })}
                     </$Timestamp>
+                    <$XLogo src={xLogo} alt="X" />
                   </$TweetHeader>
-                  {/* <$XLogo src={xLogo} alt="X" /> */}
                   <$TweetContent>{message.content}</$TweetContent>
                 </$TweetBody>
               </$TweetRow>
@@ -327,7 +328,6 @@ const $TweetHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  margin-bottom: 0.5rem;
   position: relative;
 `;
 
