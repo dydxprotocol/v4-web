@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import geminiLogo from '@/assets/gemini.png';
 import xLogo from '@/assets/x-logo.png';
 import { io, Socket } from 'socket.io-client';
 import styled from 'styled-components';
@@ -156,7 +157,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   return (
       <$FeedContainer>
         <$AISummaryButton onClick={handleAISummaryClick}>
-          <$AIIcon>🤖</$AIIcon>
+          <$AIIcon src={geminiLogo} alt="AI" />
           AI Summary
         </$AISummaryButton>
 
@@ -170,7 +171,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
             ) : (
               <>
                 <$AISummaryCalloutHeader>
-                  <$AIIcon>🤖</$AIIcon>
+                  <$AIIcon src={geminiLogo} alt="AI" />
                   AI Summary
                   <$CloseButton onClick={() => setShowAISummary(false)}>×</$CloseButton>
                 </$AISummaryCalloutHeader>
@@ -350,9 +351,10 @@ const $AISummaryCalloutText = styled.p`
   margin: 0;
 `;
 
-const $AIIcon = styled.span`
-  font-size: 1rem;
-  line-height: 1;
+const $AIIcon = styled.img`
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
 `;
 
 const $CloseButton = styled.button`
