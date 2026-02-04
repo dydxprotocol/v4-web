@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import xLogo from '@/assets/x-logo.png';
 
 export type FeedMessage = {
   id: string;
@@ -115,14 +114,15 @@ export const TwitterFeed = ({ className }: ElementProps) => {
         <$FeedList>
           {messages.map((message) => {
             const TweetCardContent = (
-              <>
-                <$TweetHeader>
-                  <$Avatar $color={message.userColor}>
-                    {message.username.slice(0, 2).toUpperCase()}
-                  </$Avatar>
-                  <$TweetMeta>
+              <$TweetRow>
+                <$Avatar $color={message.userColor}>
+                  {message.username.slice(0, 2).toUpperCase()}
+                </$Avatar>
+
+                <$TweetBody>
+                  <$TweetHeader>
                     <$Username $color={message.userColor}>
-                      {message.username}
+                      {truncateAddress(message.username)}
                     </$Username>
                     <$Timestamp>
                       {message.timestamp.toLocaleTimeString([], {
@@ -130,12 +130,11 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                         minute: '2-digit',
                       })}
                     </$Timestamp>
-                  </$TweetMeta>
+                  </$TweetHeader>
                   <$XLogo src={xLogo} alt="X" />
-                </$TweetHeader>
-
-                <$TweetContent>{message.content}</$TweetContent>
-              </>
+                  <$TweetContent>{message.content}</$TweetContent>
+                </$TweetBody>
+              </$TweetRow>
             );
 
             return message.link ? (
@@ -301,6 +300,12 @@ const $TweetCard = styled.div`
   }
 `;
 
+const $TweetRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+`;
+
 const $TweetHeader = styled.div`
   display: flex;
   align-items: center;
@@ -319,6 +324,9 @@ const $XLogo = styled.img`
   &:hover {
     opacity: 1;
   }
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
 `;
 
 const $Avatar = styled.div<{ $color: string }>`
@@ -339,6 +347,12 @@ const $TweetMeta = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+  flex: 1;
+`;
+
+const $TweetBody = styled.div`
+  display: flex;
+  flex-direction: column;
   flex: 1;
 `;
 
