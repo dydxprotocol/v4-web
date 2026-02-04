@@ -14,6 +14,7 @@ export type FeedMessage = {
   likes?: number;
   retweets?: number;
   type?: string;
+  link?: string;
 };
 
 type ElementProps = {
@@ -66,24 +67,30 @@ export const TwitterFeed = ({ className }: ElementProps) => {
     });
 
     socketInstance.on('message', (data: {
+      userName?: string;
       username?: string;
-      content: string;
-      timestamp: string;
+      tweet?: string;
+      content?: string;
+      timestamp?: string;
       type?: string;
       likes?: number;
       retweets?: number;
+      link?: string;
     }) => {
       console.log('📱 Received feed message:', data);
-      const messageUsername = data.username || 'Anonymous';
+      // Support both old and new format
+      const messageUsername = data.userName || data.username || 'Anonymous';
+      const messageContent = data.tweet || data.content || '';
       const newMessage: FeedMessage = {
         id: `${messageUsername}-${Date.now()}`,
-        content: data.content,
-        timestamp: new Date(data.timestamp),
+        content: messageContent,
+        timestamp: data.timestamp ? new Date(data.timestamp) : new Date(),
         username: messageUsername,
         userColor: getUserColor(messageUsername),
         likes: data.likes || 0,
         retweets: data.retweets || 0,
         type: data.type,
+        link: data.link,
       };
       setMessages((prev) => [...prev, newMessage]);
     });
@@ -104,45 +111,63 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   return (
       <$FeedContainer>
         <$FeedList>
-          {messages.map((message) => (
-            <$TweetCard key={message.id}>
-              <$TweetHeader>
-                <$Avatar $color={message.userColor}>
-                  {message.username.slice(0, 2).toUpperCase()}
-                </$Avatar>
-                <$TweetMeta>
-                  <$Username $color={message.userColor}>
-                    {truncateAddress(message.username)}
-                  </$Username>
-                  <$Timestamp>
-                    {message.timestamp.toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </$Timestamp>
-                </$TweetMeta>
-              </$TweetHeader>
+          {messages.map((message) => {
+            const TweetCardContent = (
+              <>
+                <$TweetHeader>
+                  <$Avatar $color={message.userColor}>
+                    {message.username.slice(0, 2).toUpperCase()}
+                  </$Avatar>
+                  <$TweetMeta>
+                    <$Username $color={message.userColor}>
+                      {truncateAddress(message.username)}
+                    </$Username>
+                    <$Timestamp>
+                      {message.timestamp.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </$Timestamp>
+                  </$TweetMeta>
+                </$TweetHeader>
 
-              <$TweetContent>{message.content}</$TweetContent>
+                <$TweetContent>{message.content}</$TweetContent>
 
-              <$TweetActions>
-                <$ActionButton>
-                  <$ActionIcon>💬</$ActionIcon>
-                </$ActionButton>
-                <$ActionButton>
-                  <$ActionIcon>🔄</$ActionIcon>
-                  {message.retweets ? <$ActionCount>{message.retweets}</$ActionCount> : null}
-                </$ActionButton>
-                <$ActionButton>
-                  <$ActionIcon>❤️</$ActionIcon>
-                  {message.likes ? <$ActionCount>{message.likes}</$ActionCount> : null}
-                </$ActionButton>
-                <$ActionButton>
-                  <$ActionIcon>📤</$ActionIcon>
-                </$ActionButton>
-              </$TweetActions>
-            </$TweetCard>
-          ))}
+                <$TweetActions>
+                  <$ActionButton>
+                    <$ActionIcon>💬</$ActionIcon>
+                  </$ActionButton>
+                  <$ActionButton>
+                    <$ActionIcon>🔄</$ActionIcon>
+                    {message.retweets ? <$ActionCount>{message.retweets}</$ActionCount> : null}
+                  </$ActionButton>
+                  <$ActionButton>
+                    <$ActionIcon>❤️</$ActionIcon>
+                    {message.likes ? <$ActionCount>{message.likes}</$ActionCount> : null}
+                  </$ActionButton>
+                  <$ActionButton>
+                    <$ActionIcon>📤</$ActionIcon>
+                  </$ActionButton>
+                </$TweetActions>
+              </>
+            );
+
+            return message.link ? (
+              <$TweetCard
+                key={message.id}
+                as="a"
+                href={message.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {TweetCardContent}
+              </$TweetCard>
+            ) : (
+              <$TweetCard key={message.id}>
+                {TweetCardContent}
+              </$TweetCard>
+            );
+          })}
           <div ref={messagesEndRef} />
         </$FeedList>
       </$FeedContainer>
@@ -199,6 +224,10 @@ const $TweetCard = styled.div`
   padding: 0.875rem 1rem;
   border-bottom: var(--border-width) solid var(--color-layer-5);
   transition: background-color 0.2s ease;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 
   &:hover {
     background-color: var(--color-layer-3);

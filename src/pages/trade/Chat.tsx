@@ -371,7 +371,6 @@ export const Chat = ({ className }: ElementProps) => {
                   {message.side && <$DetailItem $side={message.side}>{message.side.toUpperCase()}</$DetailItem>}
                   {message.amount && <$DetailItem>Amount: {message.amount}</$DetailItem>}
                   {message.price && <$DetailItem $highlight>${message.price.toLocaleString()}</$DetailItem>}
-                  {message.content && <$PositionMessage>"{message.content}"</$PositionMessage>}
                 </$PositionMessageRow>
               );
             }
@@ -396,7 +395,6 @@ export const Chat = ({ className }: ElementProps) => {
                   <$PnlItem $isProfit={isProfit}>
                     PnL: {isProfit ? '+' : ''}${pnl.toLocaleString()}
                   </$PnlItem>
-                  {message.content && <$CloseMessage>"{message.content}"</$CloseMessage>}
                 </$CloseMessageRow>
               );
             }
@@ -522,7 +520,7 @@ const $MessageRow = styled.div`
   gap: 0.375rem;
   padding: 0.25rem 0.375rem;
   line-height: 1.4;
-  font-size: 0.8125rem;
+  font-size: 1rem;
 
   &:hover {
     background-color: var(--color-layer-3);
@@ -727,7 +725,7 @@ const $LiquidationMessageRow = styled.div`
   animation: liquidationPulse 0.3s ease-out;
   flex-wrap: wrap;
   line-height: 1.4;
-  font-size: 0.8125rem;
+  font-size: 1rem;
 
   &:hover {
     background: linear-gradient(
@@ -804,7 +802,7 @@ const $LiquidationMessage = styled.span`
 
 const $PositionMessageRow = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 0.5rem;
   background: linear-gradient(
@@ -817,6 +815,8 @@ const $PositionMessageRow = styled.div`
   border-radius: 0.375rem;
   margin: 0.125rem 0;
   animation: positionPulse 0.3s ease-out;
+  font-size: 1rem;
+  line-height: 1.4;
 
   &:hover {
     background: linear-gradient(
@@ -906,7 +906,7 @@ const $CloseMessageRow = styled.div<{ $isProfit: boolean }>`
   animation: closePulse 0.3s ease-out;
   flex-wrap: wrap;
   line-height: 1.4;
-  font-size: 0.8125rem;
+  font-size: 1rem;
 
   &:hover {
     background: linear-gradient(
