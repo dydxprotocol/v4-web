@@ -125,6 +125,16 @@ export const TwitterFeed = ({ className }: ElementProps) => {
 
   return (
       <$FeedContainer>
+        <$AISummarySection>
+          <$AISummaryHeader>
+            <$AIIcon>🤖</$AIIcon>
+            AI Summary
+          </$AISummaryHeader>
+          <$AISummaryText>
+            Bitcoin fell below $75,000, triggering automated selling and liquidations across platforms,
+            leading to over $240 million in Bitcoin positions liquidated in one day.
+          </$AISummaryText>
+        </$AISummarySection>
         <$FeedList ref={scrollContainerRef}>
           {messages.map((message) => {
             const TweetCardContent = (
@@ -216,11 +226,19 @@ const $FeedTitle = styled.h2`
 `;
 
 const $AISummarySection = styled.div`
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: var(--color-layer-3);
-  border-radius: 0.5rem;
-  border: var(--border-width) solid var(--color-layer-5);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(
+    180deg,
+    #7c3aed 0%,
+    #5b21b6 30%,
+    rgba(31, 15, 61, 0.65) 65%,
+    rgba(19, 20, 28, 0) 100%
+  );
+  border-bottom: var(--border-width) solid var(--color-layer-6);
+  color: #fff;
 `;
 
 const $AISummaryHeader = styled.div`
@@ -229,19 +247,20 @@ const $AISummaryHeader = styled.div`
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--color-text-1);
-  margin-bottom: 0.5rem;
+  color: #fff;
+  margin-bottom: 0.4rem;
 `;
 
 const $AIIcon = styled.span`
   font-size: 1rem;
   line-height: 1;
+  color: #c7b5ff;
 `;
 
 const $AISummaryText = styled.p`
-  font-size: 0.8125rem;
-  color: var(--color-text-0);
-  line-height: 1.5;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
   margin: 0;
 `;
 
