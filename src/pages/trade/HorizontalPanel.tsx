@@ -391,7 +391,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       value: InfoSection.Chat,
       label: 'Chat',
 
-      content: <div style={{display: "flex", flexDirection: "row"}}><Chat /><TwitterFeed/></div>,
+      content: <$ChatWrapper><TwitterFeed/><Chat /></$ChatWrapper>,
     }),
     []
   )
@@ -459,4 +459,12 @@ const $CollapsibleTabs = styled(CollapsibleTabs)`
 
   --trigger-active-underline-backgroundColor: var(--color-layer-2);
 ` as typeof CollapsibleTabs;
+
+const $ChatWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+`;
 

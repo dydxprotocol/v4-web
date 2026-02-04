@@ -54,7 +54,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
 
   // Initialize socket connection
   useEffect(() => {
-    const SERVER_URL = 'wss://dydx-chat-1.onrender.com/';
+    const SERVER_URL = 'https://dydx-chat-1.onrender.com/';
     const socketInstance = io(SERVER_URL);
     setSocket(socketInstance);
 
@@ -66,7 +66,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
       console.log('Disconnected from Twitter feed server');
     });
 
-    socketInstance.on('message', (data: {
+    socketInstance.on('tweet', (data: {
       userName?: string;
       username?: string;
       tweet?: string;
@@ -110,6 +110,12 @@ export const TwitterFeed = ({ className }: ElementProps) => {
 
   return (
       <$FeedContainer>
+        <$FeedHeader>
+          <$FeedTitle>
+            <$LiveIndicator />
+            Live Feed
+          </$FeedTitle>
+        </$FeedHeader>
         <$FeedList>
           {messages.map((message) => {
             const TweetCardContent = (
@@ -132,23 +138,6 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                 </$TweetHeader>
 
                 <$TweetContent>{message.content}</$TweetContent>
-
-                <$TweetActions>
-                  <$ActionButton>
-                    <$ActionIcon>💬</$ActionIcon>
-                  </$ActionButton>
-                  <$ActionButton>
-                    <$ActionIcon>🔄</$ActionIcon>
-                    {message.retweets ? <$ActionCount>{message.retweets}</$ActionCount> : null}
-                  </$ActionButton>
-                  <$ActionButton>
-                    <$ActionIcon>❤️</$ActionIcon>
-                    {message.likes ? <$ActionCount>{message.likes}</$ActionCount> : null}
-                  </$ActionButton>
-                  <$ActionButton>
-                    <$ActionIcon>📤</$ActionIcon>
-                  </$ActionButton>
-                </$TweetActions>
               </>
             );
 
@@ -191,6 +180,44 @@ const $FeedContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 40%;
+  height: 100%;
+  min-height: 0;
+  border-right: var(--border-width) solid var(--color-layer-6);
+`;
+
+const $FeedHeader = styled.div`
+  padding: 1rem;
+  border-bottom: var(--border-width) solid var(--color-layer-6);
+  background-color: var(--color-layer-2);
+`;
+
+const $FeedTitle = styled.h2`
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-1);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const $LiveIndicator = styled.div`
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #22c55e;
+  animation: pulse 2s ease-in-out infinite;
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.2);
+    }
+  }
 `;
 
 const $FeedList = styled.div`

@@ -86,7 +86,15 @@ export const Chat = ({ className }: ElementProps) => {
 
     socketInstance.on('connect', () => {
       console.log('Connected to chat server');
-      const usernameToUse = dydxAddress || `Guest-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const generateDummyEthAddress = () => {
+        const chars = '0123456789abcdef';
+        let address = '0x';
+        for (let i = 0; i < 40; i++) {
+          address += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return address;
+      };
+      const usernameToUse = dydxAddress || generateDummyEthAddress();
       socketInstance.emit('setUsername', usernameToUse);
       setUsername(usernameToUse);
     });
@@ -815,8 +823,6 @@ const $PositionMessageRow = styled.div`
   border-radius: 0.375rem;
   margin: 0.125rem 0;
   animation: positionPulse 0.3s ease-out;
-  font-size: 1rem;
-  line-height: 1.4;
 
   &:hover {
     background: linear-gradient(
@@ -906,7 +912,7 @@ const $CloseMessageRow = styled.div<{ $isProfit: boolean }>`
   animation: closePulse 0.3s ease-out;
   flex-wrap: wrap;
   line-height: 1.4;
-  font-size: 1rem;
+  font-size: 0.8125rem;
 
   &:hover {
     background: linear-gradient(
