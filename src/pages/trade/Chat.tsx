@@ -62,6 +62,7 @@ export const Chat = ({ className }: ElementProps) => {
   const [inputValue, setInputValue] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
   const [username, setUsername] = useState<string>('');
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
@@ -74,8 +75,15 @@ export const Chat = ({ className }: ElementProps) => {
   const isAtBottom = () => {
     const container = scrollContainerRef.current;
     if (!container) return true;
-    const threshold = 100; // pixels from bottom to consider "at bottom"
+    const threshold = 150; // pixels from bottom to consider "at bottom"
     return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  };
+
+  const handleScroll = () => {
+    const atBottom = isAtBottom();
+    if (atBottom !== shouldAutoScroll) {
+      setShouldAutoScroll(atBottom);
+    }
   };
 
   // Get user color for a username
@@ -280,10 +288,20 @@ export const Chat = ({ className }: ElementProps) => {
   }, [dydxAddress]);
 
   useEffect(() => {
-    if (isAtBottom()) {
+    if (shouldAutoScroll) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, shouldAutoScroll]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [shouldAutoScroll]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
