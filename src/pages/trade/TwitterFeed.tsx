@@ -5,6 +5,8 @@ import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import xLogo from '@/assets/x-logo.png';
+
 export type FeedMessage = {
   id: string;
   content: string;
@@ -110,12 +112,6 @@ export const TwitterFeed = ({ className }: ElementProps) => {
 
   return (
       <$FeedContainer>
-        <$FeedHeader>
-          <$FeedTitle>
-            <$LiveIndicator />
-            Live Feed
-          </$FeedTitle>
-        </$FeedHeader>
         <$FeedList>
           {messages.map((message) => {
             const TweetCardContent = (
@@ -135,6 +131,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                       })}
                     </$Timestamp>
                   </$TweetMeta>
+                  <$XLogo src={xLogo} alt="X" />
                 </$TweetHeader>
 
                 <$TweetContent>{message.content}</$TweetContent>
@@ -199,6 +196,36 @@ const $FeedTitle = styled.h2`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+`;
+
+const $AISummarySection = styled.div`
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: var(--color-layer-3);
+  border-radius: 0.5rem;
+  border: var(--border-width) solid var(--color-layer-5);
+`;
+
+const $AISummaryHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-1);
+  margin-bottom: 0.5rem;
+`;
+
+const $AIIcon = styled.span`
+  font-size: 1rem;
+  line-height: 1;
+`;
+
+const $AISummaryText = styled.p`
+  font-size: 0.8125rem;
+  color: var(--color-text-0);
+  line-height: 1.5;
+  margin: 0;
 `;
 
 const $LiveIndicator = styled.div`
@@ -279,6 +306,19 @@ const $TweetHeader = styled.div`
   align-items: center;
   gap: 0.625rem;
   margin-bottom: 0.5rem;
+  position: relative;
+`;
+
+const $XLogo = styled.img`
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 const $Avatar = styled.div<{ $color: string }>`
