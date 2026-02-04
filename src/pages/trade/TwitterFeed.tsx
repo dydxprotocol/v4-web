@@ -231,12 +231,11 @@ const $AISummarySection = styled.div`
   padding: 0.75rem 1rem;
   background: linear-gradient(
     180deg,
-    #7c3aed 0%,
-    #5b21b6 30%,
-    rgba(31, 15, 61, 0.65) 65%,
+    rgba(124, 58, 237, 0.45) 0%,
+    rgba(90, 33, 182, 0.32) 35%,
+    rgba(31, 15, 61, 0.18) 65%,
     rgba(19, 20, 28, 0) 100%
   );
-  border-bottom: var(--border-width) solid var(--color-layer-6);
   color: #fff;
 `;
 
