@@ -138,7 +138,7 @@ export const TwitterFeed = ({ className }: ElementProps) => {
                       })}
                     </$Timestamp>
                   </$TweetHeader>
-                  <$XLogo src={xLogo} alt="X" />
+                  {/* <$XLogo src={xLogo} alt="X" /> */}
                   <$TweetContent>{message.content}</$TweetContent>
                 </$TweetBody>
               </$TweetRow>
