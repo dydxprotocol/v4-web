@@ -40,10 +40,18 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   const [messages, setMessages] = useState<FeedMessage[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const userColorMapRef = useRef<Map<string, string>>(new Map());
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const isAtBottom = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return true;
+    const threshold = 100; // pixels from bottom to consider "at bottom"
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
   };
 
   // Get user color for a username
@@ -109,12 +117,14 @@ export const TwitterFeed = ({ className }: ElementProps) => {
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
+    if (isAtBottom()) {
+      scrollToBottom();
+    }
   }, [messages]);
 
   return (
       <$FeedContainer>
-        <$FeedList>
+        <$FeedList ref={scrollContainerRef}>
           {messages.map((message) => {
             const TweetCardContent = (
               <$TweetRow>
