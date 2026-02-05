@@ -26,11 +26,12 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { mapIfPresent } from '@/lib/do';
-import { MustBigNumber } from '@/lib/numbers';
+import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { getHydratedFill } from '@/lib/orders';
 import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
@@ -39,6 +40,7 @@ import {
   getIndexerLiquidityStringKey,
   getIndexerOrderSideStringKey,
 } from '../../lib/enumToStringKeyHelpers';
+import { FillActionsCell } from './FillsTable/FillActionsCell';
 
 export enum FillsTableColumnKey {
   Time = 'Time',
@@ -53,6 +55,7 @@ export enum FillsTableColumnKey {
   Total = 'Total',
   Fee = 'Fee',
   ClosedPnl = 'ClosedPnl',
+  Actions = 'Actions',
 
   // Tablet Only
   TypeAmount = 'Type-Amount',
@@ -70,11 +73,13 @@ const getFillsTableColumnDef = ({
   stringGetter,
   symbol = '',
   width,
+  isAccountViewOnly,
 }: {
   key: FillsTableColumnKey;
   stringGetter: StringGetterFunction;
   symbol?: Nullable<string>;
   width?: ColumnSize;
+  isAccountViewOnly?: boolean;
 }): ColumnDef<FillTableRow> => ({
   width,
   ...(
@@ -258,7 +263,6 @@ const getFillsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.SIDE }),
         renderCell: ({ side }) => side && <OrderSideTag orderSide={side} size={TagSize.Medium} />,
       },
-
       [FillsTableColumnKey.AmountPrice]: {
         columnKey: 'sizePrice',
         getCellValue: (row) => row.size,
@@ -278,6 +282,20 @@ const getFillsTableColumnDef = ({
               fractionDigits={tickSizeDecimals}
             />
           </TableCell>
+        ),
+      },
+      [FillsTableColumnKey.Actions]: {
+        columnKey: 'actions',
+        label: '',
+        isActionable: true,
+        allowsSorting: false,
+        renderCell: ({ marketSummary, ...fill }: FillTableRow) => (
+          <FillActionsCell
+            fill={fill}
+            assetId={marketSummary?.assetId ?? ''}
+            oraclePrice={MaybeBigNumber(marketSummary?.oraclePrice)?.toNumber()}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
     } satisfies Record<FillsTableColumnKey, ColumnDef<FillTableRow>>
@@ -316,6 +334,7 @@ export const FillsTable = forwardRef(
     const fills = currentMarket ? marketFills : allFills;
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
     useViewPanel(currentMarket, 'fills');
 
@@ -352,6 +371,7 @@ export const FillsTable = forwardRef(
             stringGetter,
             symbol,
             width: columnWidths?.[key],
+            isAccountViewOnly,
           })
         )}
         slotEmpty={
