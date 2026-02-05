@@ -133,6 +133,7 @@ const PortfolioPage = () => {
                         FillsTableColumnKey.Fee,
                         FillsTableColumnKey.ClosedPnl,
                         FillsTableColumnKey.Liquidity,
+                        FillsTableColumnKey.Actions,
                       ]
                 }
                 withOuterBorder={isNotTablet}
