@@ -43,7 +43,7 @@ export const BonkPnlPanel = () => {
     })
   );
 
-  const data = bonkPnls ?? [];
+  const data = bonkPnls?.filter((item) => item.pnl > 0) ?? [];
 
   const onDownload = () => {
     if (data.length === 0) return;
