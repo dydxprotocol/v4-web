@@ -76,7 +76,7 @@ import {
 } from '@/lib/enumToStringKeyHelpers';
 import { BIG_NUMBERS, MaybeBigNumber, MustNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
-import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
+import { isPresent, orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { DEC_2025_COMPETITION_DETAILS } from './rewards/util';
 import { useAccounts } from './useAccounts';
@@ -1232,7 +1232,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const isKeplr = useAppSelector(selectIsKeplrConnected);
       const reclaimableChildSubaccountFunds = useAppSelector(selectReclaimableChildSubaccountFunds);
-      const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
+      const { ordersToCancel } = orEmptyObj(useAppSelector(selectOrphanedTriggerOrders));
       const maybeRebalanceAction = useAppSelector(selectShouldAccountRebalanceUsdc);
 
       useEffect(() => {
