@@ -240,6 +240,7 @@ const Content = () => {
                 <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
               </Route>
 
+              <Route path={AppRoute.Alerts} element={<AlertsPage />} />
               <Route path={AppRoute.Vault}>
                 <Route path={AppRoute.Vault} element={<VaultPage />} />
               </Route>

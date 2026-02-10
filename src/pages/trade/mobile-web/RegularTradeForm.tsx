@@ -9,7 +9,7 @@ import {
 } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -35,6 +35,7 @@ import { TradeFormInputs } from '@/views/forms/TradeForm/TradeFormInputs';
 import { TradeSizeInputs } from '@/views/forms/TradeForm/TradeSizeInputs';
 import { TradeTriggerOrderInputs } from '@/views/forms/TradeForm/TradeTriggerInput';
 
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { tradeFormActions } from '@/state/tradeForm';
@@ -56,12 +57,14 @@ const RegularTradeForm = () => {
   const tradeValues = useAppSelector(getTradeFormValues);
   const fullFormSummary = useAppSelector(getTradeFormSummary);
   const { summary } = fullFormSummary;
-  const { ticker, tickSizeDecimals } = orEmptyObj(
+  const { ticker, tickSizeDecimals, displayableAsset } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
   const effectiveSelectedLeverage = useAppSelector(
     BonsaiHelpers.currentMarket.effectiveSelectedLeverage
   );
+  const { signedSize: positionSize } = orEmptyObj(useAppSelector(getCurrentMarketPositionData));
+
   const { stopLossOrder: stopLossSummary, takeProfitOrder: takeProfitSummary } = orEmptyObj(
     summary.triggersSummary
   );
@@ -248,16 +251,32 @@ const RegularTradeForm = () => {
               : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
           </DropdownMenuTrigger>
         </MobileDropdownMenu>
-        <AvailableRow>
-          <AvailableLabel> Available </AvailableLabel>
-          <AvailableValue>
-            {availableBalance.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{' '}
-            USDC
-          </AvailableValue>
-        </AvailableRow>
+        <div tw="flex w-full flex-col gap-0.25">
+          {positionSize &&
+            !positionSize.eq(0) &&
+            ((positionSize.gt(0) && side === OrderSide.SELL) ||
+              (positionSize.lt(0) && side === OrderSide.BUY)) && (
+              <div tw="flex w-full items-center justify-between">
+                <p tw="text-small text-color-text-0">Current Position</p>
+                <$PositionSize
+                  tw="text-small"
+                  isLong={positionSize?.isGreaterThanOrEqualTo(0) ?? false}
+                >
+                  {Math.abs(positionSize?.toNumber() ?? 0)} {displayableAsset}
+                </$PositionSize>
+              </div>
+            )}
+          <AvailableRow>
+            <p tw="text-small text-color-text-0">Available</p>
+            <p tw="text-small text-color-text-0">
+              {availableBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{' '}
+              USDC
+            </p>
+          </AvailableRow>
+        </div>
         <$InputsColumn>
           <TradeFormInputs />
           <TradeSizeInputs />
@@ -393,22 +412,6 @@ const AvailableRow = styled.div`
 
   width: 100%;
 `;
-const AvailableLabel = styled.span`
-  color: #6b7280;
-
-  font-size: 15 px;
-`;
-const AvailableValue = styled.div`
-  display: flex;
-
-  align-items: center;
-
-  gap: 8 px;
-
-  color: #6b7280;
-
-  font-size: 15 px;
-`;
 
 const ToggleRow = styled.div`
   display: flex;
@@ -431,4 +434,15 @@ const ToggleLabel = styled.span`
 
 const $PlaceOrderButtonAndReceipt = styled(PlaceOrderButtonAndReceipt)`
   --withReceipt-backgroundColor: transparent;
+`;
+
+const $PositionSize = styled.div<{ isLong: boolean }>`
+  ${({ isLong }) =>
+    isLong
+      ? css`
+          color: var(--color-positive) !important;
+        `
+      : css`
+          color: var(--color-negative) !important;
+        `}
 `;

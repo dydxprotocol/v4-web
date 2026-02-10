@@ -32,6 +32,7 @@ import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
 import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
 import { FundingHistoryList } from '@/views/Lists/Transfers/FundingHistoryList';
 import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
+import { UserMenuDialog } from '@/views/dialogs/MobileUserMenuDialog';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
@@ -176,15 +177,18 @@ const PortfolioPage = () => {
       </Suspense>
     );
 
-  if (isSimpleUi) {
+  if (isSimpleUi && !isMobileWebEnabled) {
     return routesComponent;
   }
 
   return isTablet ? (
-    <$PortfolioMobile>
-      <PortfolioNavMobile />
-      <$MobileContent>{routesComponent}</$MobileContent>
-    </$PortfolioMobile>
+    <>
+      <$PortfolioMobile>
+        <PortfolioNavMobile />
+        <$MobileContent>{routesComponent}</$MobileContent>
+      </$PortfolioMobile>
+      <UserMenuDialog />
+    </>
   ) : (
     <WithSidebar
       sidebar={

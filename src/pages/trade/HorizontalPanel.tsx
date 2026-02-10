@@ -409,7 +409,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
 
   const tabItems = useMemo(
     () => [
-      detailsTabItem,
+      ...(isTablet ? [detailsTabItem] : []),
       positionTabItem,
       ordersTabItem,
       fillsTabItem,
@@ -423,6 +423,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       ordersTabItem,
       orderHistoryTabItem,
       paymentsTabItem,
+      isTablet,
     ]
   );
 

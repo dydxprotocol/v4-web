@@ -1,7 +1,9 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { AppRoute } from '@/constants/routes';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -16,6 +18,8 @@ import { setIsUserMenuOpen } from '@/state/dialogs';
 
 export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const openUserMenu = () => {
@@ -29,6 +33,16 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
 
         <MobileTradeAssetSelector launchableMarketId={launchableMarketId} />
 
+        <Button
+          tw="relative size-2.25 min-w-2.25 rounded-[50%] border border-solid border-[color:var(--color-border)]"
+          shape={ButtonShape.Circle}
+          size={ButtonSize.XSmall}
+          onClick={() => {
+            navigate(AppRoute.Alerts);
+          }}
+        >
+          <Icon iconName={IconName.BellStroked} />
+        </Button>
         <Button
           tw="size-2.25 min-w-2.25 rounded-[50%] border border-solid border-[color:var(--color-border)]"
           shape={ButtonShape.Circle}
