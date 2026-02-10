@@ -179,7 +179,12 @@ export const SpotTradesTable = ({
   const columns = useMemo(
     () =>
       columnKeys.map((key) =>
-        getColumnDef({ key, width: columnWidths?.[key], dateAgeMode, onDateAgeModeToggle: setDateAgeMode })
+        getColumnDef({
+          key,
+          width: columnWidths?.[key],
+          dateAgeMode,
+          onDateAgeModeToggle: setDateAgeMode,
+        })
       ),
     [columnKeys, columnWidths, dateAgeMode]
   );
