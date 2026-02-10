@@ -2,6 +2,10 @@ import { useCallback } from 'react';
 
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 
 export type DateAgeMode = 'date' | 'age';
@@ -12,6 +16,8 @@ type DateAgeToggleHeaderProps = {
 };
 
 export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps) => {
+  const stringGetter = useStringGetter();
+
   const handleDateClick = useCallback(
     (e: React.MouseEvent) => {
       if (mode === 'date') return;
@@ -33,38 +39,32 @@ export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps
   );
 
   return (
-    <TableColumnHeader>
-      <$Container>
-        <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button" tabIndex={0}>
-          Date
-        </$Label>
-        <$Separator>/</$Separator>
-        <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button" tabIndex={0}>
-          Age
-        </$Label>
-      </$Container>
-    </TableColumnHeader>
+    <$TableColumnHeader>
+      <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button" tabIndex={0}>
+        {stringGetter({ key: STRING_KEYS.DATE })}
+      </$Label>
+      <$Separator />
+      <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button" tabIndex={0}>
+        {stringGetter({ key: STRING_KEYS.AGE })}
+      </$Label>
+    </$TableColumnHeader>
   );
 };
 
-const $Container = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25em;
+const $TableColumnHeader = styled(TableColumnHeader)`
   user-select: none;
 `;
 
 const $Label = styled.span<{ $isActive: boolean }>`
   cursor: pointer;
-  color: ${({ $isActive }) => ($isActive ? 'var(--color-text-1)' : 'var(--color-text-0)')};
-  opacity: ${({ $isActive }) => ($isActive ? 1 : 0.5)};
+  color: ${({ $isActive }) => ($isActive ? 'var(--color-text-2)' : 'var(--color-text-0)')};
+  transition: color 0.2s ease-in-out;
 
   &:hover {
-    opacity: 0.8;
+    color: var(--color-text-1);
   }
 `;
 
 const $Separator = styled.span`
   color: var(--color-text-0);
-  opacity: 0.5;
 `;
