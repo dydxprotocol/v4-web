@@ -40,11 +40,11 @@ export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps
 
   return (
     <$TableColumnHeader>
-      <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button" tabIndex={0}>
+      <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button">
         {stringGetter({ key: STRING_KEYS.DATE })}
       </$Label>
       <$Separator />
-      <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button" tabIndex={0}>
+      <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button">
         {stringGetter({ key: STRING_KEYS.AGE })}
       </$Label>
     </$TableColumnHeader>
