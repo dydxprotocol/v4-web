@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
@@ -53,15 +53,16 @@ export function useWithdrawStep({
   const {
     dydxAddress,
     localDydxWallet,
-    localNobleWallet,
     nobleAddress,
-    osmosisAddress,
-    neutronAddress,
+    localNobleWallet,
+    getOsmosisAddress,
+    getNeutronAddress,
     sourceAccount,
   } = useAccounts();
   const [isLoading, setIsLoading] = useState(false);
 
-  const userAddresses: UserAddress[] | undefined = useMemo(() => {
+  // Derive user addresses on-demand when executing withdrawal
+  const getUserAddresses = useCallback(async (): Promise<UserAddress[] | undefined> => {
     const lastChainId = withdrawRoute?.requiredChainAddresses.at(-1);
 
     if (
@@ -72,6 +73,15 @@ export function useWithdrawStep({
       !isValidWithdrawalAddress(destinationAddress, lastChainId)
     ) {
       return undefined;
+    }
+
+    const [osmosisAddress, neutronAddress] = await Promise.all([
+      getOsmosisAddress(),
+      getNeutronAddress(),
+    ]);
+
+    if (!nobleAddress || !osmosisAddress || !neutronAddress) {
+      throw new Error('Failed to derive Cosmos addresses');
     }
 
     return getUserAddressesForRoute(
@@ -85,9 +95,8 @@ export function useWithdrawStep({
     );
   }, [
     dydxAddress,
-    neutronAddress,
-    nobleAddress,
-    osmosisAddress,
+    getOsmosisAddress,
+    getNeutronAddress,
     sourceAccount,
     withdrawRoute,
     destinationAddress,
@@ -114,6 +123,10 @@ export function useWithdrawStep({
     try {
       setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
+
+      // Derive user addresses and Noble wallet on-demand
+      const userAddresses = await getUserAddresses();
+
       if (!userAddresses) throw new Error('No user addresses found');
       if (!localDydxWallet || !localNobleWallet || !dydxAddress) {
         throw new Error('No local wallets found');

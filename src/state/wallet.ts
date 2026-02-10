@@ -7,7 +7,6 @@ import { TurnkeyEmailOnboardingData, TurnkeyWallet } from '@/types/turnkey';
 export type SourceAccount = {
   address?: string;
   chain?: WalletNetworkType;
-  encryptedSignature?: string;
   walletInfo?: WalletInfo;
 };
 
@@ -18,6 +17,9 @@ export interface WalletState {
     address?: string;
     solanaAddress?: string;
     subaccountNumber?: number;
+    // Indicates if wallet was directly imported (mnemonic) vs derived from source wallet
+    // When 'imported', sourceAccount is not required for AccountConnected state
+    walletSource?: 'imported' | 'derived';
   };
   turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
   turnkeyPrimaryWallet?: TurnkeyWallet;
@@ -27,12 +29,12 @@ const initialState: WalletState = {
   sourceAccount: {
     address: undefined,
     chain: undefined,
-    encryptedSignature: undefined,
     walletInfo: undefined,
   },
   localWallet: {
     address: undefined,
     subaccountNumber: 0,
+    walletSource: undefined,
   },
   turnkeyEmailOnboardingData: undefined,
   turnkeyPrimaryWallet: undefined,
@@ -47,36 +49,22 @@ export const walletSlice = createSlice({
       action: PayloadAction<{ address: string; chain: WalletNetworkType }>
     ) => {
       const { address, chain } = action.payload;
-      if (!state.sourceAccount) {
-        throw new Error('cannot set source address if source account is not defined');
-      }
-
-      // if the source wallet address has changed, clear the derived signature
-      if (state.sourceAccount.address !== address) {
-        state.sourceAccount.encryptedSignature = undefined;
-      }
-
       state.sourceAccount.address = address;
       state.sourceAccount.chain = chain;
     },
     setWalletInfo: (state, action: PayloadAction<WalletInfo>) => {
       state.sourceAccount.walletInfo = action.payload;
     },
-    setSavedEncryptedSignature: (state, action: PayloadAction<string>) => {
-      if (state.sourceAccount.chain === WalletNetworkType.Cosmos) {
-        throw new Error('cosmos wallets should not require signatures for derived addresses');
-      }
-
-      state.sourceAccount.encryptedSignature = action.payload;
-    },
-    clearSavedEncryptedSignature: (state) => {
-      state.sourceAccount.encryptedSignature = undefined;
-    },
     setLocalWallet: (
       state,
       {
         payload,
-      }: PayloadAction<{ address?: string; solanaAddress?: string; subaccountNumber?: number }>
+      }: PayloadAction<{
+        address?: string;
+        solanaAddress?: string;
+        subaccountNumber?: number;
+        walletSource?: 'imported' | 'derived';
+      }>
     ) => {
       state.localWallet = payload;
     },
@@ -96,7 +84,6 @@ export const walletSlice = createSlice({
       state.sourceAccount = {
         address: undefined,
         chain: undefined,
-        encryptedSignature: undefined,
         walletInfo: undefined,
       };
       state.turnkeyPrimaryWallet = undefined;
@@ -130,8 +117,6 @@ export const walletEphemeralSlice = createSlice({
 export const {
   setSourceAddress,
   setWalletInfo,
-  setSavedEncryptedSignature,
-  clearSavedEncryptedSignature,
   clearSourceAccount,
   setLocalWallet,
   setTurnkeyEmailOnboardingData,

@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { Erc20Approval, RouteResponse } from '@skip-go/client';
@@ -8,6 +10,7 @@ import { useChainId } from 'wagmi';
 import ERC20ABI from '@/abi/erc20.json';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { isEvmDepositChainId } from '@/constants/chains';
+import { OSMO_BECH32_PREFIX } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -19,6 +22,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
+import { convertBech32Address } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 import { sleep } from '@/lib/timeUtils';
 import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
@@ -59,7 +63,16 @@ export function useDepositSteps({
   const stringGetter = useStringGetter();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
-  const { nobleAddress, dydxAddress, osmosisAddress } = useAccounts();
+  const { dydxAddress, nobleAddress } = useAccounts();
+
+  const osmosisAddress = useMemo(() => {
+    if (!dydxAddress) return undefined;
+
+    return convertBech32Address({
+      address: dydxAddress as string,
+      bech32Prefix: OSMO_BECH32_PREFIX,
+    });
+  }, [dydxAddress]);
 
   async function getStepsQuery() {
     if (!depositRoute || !sourceAccount.address) return [];

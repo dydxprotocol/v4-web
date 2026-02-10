@@ -6,6 +6,7 @@ import { useCompositeClient, useIndexerClient } from '@/bonsai/rest/lib/useIndex
 import {
   BECH32_PREFIX,
   FaucetClient,
+  NOBLE_BECH32_PREFIX,
   PnlTickInterval,
   SelectedGasDenom,
   onboarding,
@@ -86,6 +87,7 @@ const useDydxClientContext = () => {
 
     return {
       wallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, BECH32_PREFIX),
+      nobleWallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, NOBLE_BECH32_PREFIX),
       mnemonic,
       privateKey,
       publicKey,

@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 
 import { log } from 'console';
-import { AES } from 'crypto-js';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
 import { AnalyticsEvents, AnalyticsUserProperties } from '@/constants/analytics';
 import { DydxAddress } from '@/constants/wallets';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { setSavedEncryptedSignature } from '@/state/wallet';
-
 import { identify, track } from '@/lib/analytics/analytics';
+import { onboardingManager } from '@/lib/onboarding/OnboardingSupervisor';
 import { parseWalletError } from '@/lib/wallet';
 
 import { useAccounts } from '../useAccounts';
@@ -28,9 +25,8 @@ type GenerateKeysProps = {
 
 export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
   const { status, setStatus, onKeysDerived } = generateKeysProps ?? {};
-  const { sourceAccount, setWalletFromSignature } = useAccounts();
+  const { sourceAccount } = useAccounts();
   const [derivationStatus, setDerivationStatus] = useState(
     status ?? EvmDerivedAccountStatus.NotDerived
   );
@@ -79,9 +75,10 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
     if (networkSwitched) await deriveKeys().then(onKeysDerived);
   };
 
-  // 2. Derive keys from EVM account
+  // 2. Derive keys from EVM account using OnboardingSupervisor
   const { getWalletFromSignature } = useDydxClient();
-  const { getSubaccounts } = useAccounts();
+
+  const { getSubaccounts, handleWalletConnectionResult } = useAccounts();
 
   const isDeriving = ![
     EvmDerivedAccountStatus.NotDerived,
@@ -90,74 +87,58 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
 
   const signMessageAsync = useSignForWalletDerivation(sourceAccount.walletInfo);
 
-  const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
-
   const deriveKeys = async () => {
     setError(undefined);
 
     try {
-      // 1. First signature
       setDerivationStatus(EvmDerivedAccountStatus.Deriving);
 
-      const signature = await signMessageAsync();
-      track(
-        AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
-          signatureNumber: 1,
-        })
-      );
-      const { wallet: dydxWallet } = await getWalletFromSignature({ signature });
+      // Track first signature request
+      const wrappedSignMessage = async (requestNumber: 1 | 2) => {
+        if (requestNumber === 2) {
+          setDerivationStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
+        }
 
-      // 2. Ensure signature is deterministic
-      // Check if subaccounts exist
-      const dydxAddress = dydxWallet.address as DydxAddress;
-      let hasPreviousTransactions = false;
+        const sig = await signMessageAsync();
 
-      try {
+        track(
+          AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({ signatureNumber: requestNumber })
+        );
+
+        return sig;
+      };
+
+      // Check for previous transactions
+      const checkPreviousTransactions = async (dydxAddress: DydxAddress) => {
         const subaccounts = await getSubaccounts({ dydxAddress });
-        hasPreviousTransactions = subaccounts.length > 0;
+        const hasPreviousTransactions = subaccounts.length > 0;
 
         track(AnalyticsEvents.OnboardingAccountDerived({ hasPreviousTransactions }));
+        identify(AnalyticsUserProperties.IsNewUser(!hasPreviousTransactions));
 
-        if (!hasPreviousTransactions) {
-          identify(AnalyticsUserProperties.IsNewUser(true));
-          setDerivationStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
+        return hasPreviousTransactions;
+      };
 
-          // Second signature
-          const additionalSignature = await signMessageAsync();
-          track(
-            AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
-              signatureNumber: 2,
-            })
-          );
+      // Derive with determinism check
+      const result = await onboardingManager.deriveKeysWithDeterminismCheck({
+        signMessageAsync: wrappedSignMessage,
+        getWalletFromSignature,
+        checkPreviousTransactions,
+        handleWalletConnectionResult,
+      });
 
-          if (signature !== additionalSignature) {
-            throw new Error(
-              'Your wallet does not support deterministic signing. Please switch to a different wallet provider.'
-            );
-          }
-        } else {
-          identify(AnalyticsUserProperties.IsNewUser(false));
-        }
-      } catch (err) {
+      if (!result.success) {
         setDerivationStatus(EvmDerivedAccountStatus.NotDerived);
-        const { message } = parseWalletError({ error: err, stringGetter });
 
-        if (message) {
+        if (result.isDeterminismError) {
           track(AnalyticsEvents.OnboardingWalletIsNonDeterministic());
-          setError(message);
         }
+
+        setError(result.error);
         return;
       }
 
-      await setWalletFromSignature(signature);
-
-      // 3: Remember me (encrypt and store signature)
-      if (staticEncryptionKey) {
-        const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
-        dispatch(setSavedEncryptedSignature(encryptedSignature));
-      }
-
-      // 4. Done
+      // Done - wallet is already persisted to SecureStorage by OnboardingSupervisor
       setDerivationStatus(EvmDerivedAccountStatus.Derived);
     } catch (err) {
       setDerivationStatus(EvmDerivedAccountStatus.NotDerived);

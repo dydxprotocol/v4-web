@@ -1,9 +1,5 @@
-import type { DydxAddress, EvmAddress } from './wallets';
-import { SolAddress } from './wallets';
-
 export enum OnboardingSteps {
   SignIn = 'SignIn',
-  ChooseWallet = 'ChooseWallet',
   KeyDerivation = 'KeyDerivation',
 }
 
@@ -47,24 +43,6 @@ export enum SpotWalletStatus {
   Unsupported = 'Unsupported',
   Connected = 'Connected',
 }
-
-export type EvmDerivedAddresses = {
-  version?: string;
-  [EvmAddress: EvmAddress]: {
-    encryptedSignature?: string;
-    dydxAddress?: DydxAddress;
-  };
-};
-
-export type SolDerivedAddresses = {
-  version?: string;
-} & Record<
-  SolAddress,
-  {
-    encryptedSignature?: string;
-    dydxAddress?: DydxAddress;
-  }
->;
 
 export type Hdkey = {
   mnemonic: string;

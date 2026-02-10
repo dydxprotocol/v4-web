@@ -216,7 +216,7 @@ export const HeaderDesktop = () => {
         {onboardingState === OnboardingState.AccountConnected ? (
           <$IconButton
             shape={ButtonShape.Rectangle}
-            iconName={IconName.Mobile}
+            iconName={IconName.DevicesStroke}
             onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
           />
         ) : (

@@ -31,6 +31,7 @@ import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletS
 
 import { identify, track } from '@/lib/analytics/analytics';
 import { parseTurnkeyError } from '@/lib/turnkey/turnkeyUtils';
+import { dydxPersistedWalletService } from '@/lib/wallet/dydxPersistedWalletService';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
@@ -70,7 +71,12 @@ const useTurnkeyAuthContext = () => {
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
-  const { dydxAddress: connectedDydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
+  const {
+    dydxAddress: connectedDydxAddress,
+    setWalletFromTurnkeySignature,
+    selectWallet,
+  } = useAccounts();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [emailToken, setEmailToken] = useState<string>();
   const [emailSignInError, setEmailSignInError] = useState<string>();
@@ -309,7 +315,7 @@ const useTurnkeyAuthContext = () => {
       await indexedDbClient?.loginWithSession(session);
       const derivedDydxAddress = await onboardDydx({
         salt,
-        setWalletFromSignature,
+        setWalletFromTurnkeySignature,
         tkClient: indexedDbClient,
       });
 
@@ -329,7 +335,7 @@ const useTurnkeyAuthContext = () => {
       setEmailSignInStatus('success');
       setEmailSignInError(undefined);
     },
-    [onboardDydx, indexedDbClient, setWalletFromSignature, uploadAddress]
+    [onboardDydx, indexedDbClient, setWalletFromTurnkeySignature, uploadAddress]
   );
 
   /* ----------------------------- Email Sign In ----------------------------- */
@@ -402,7 +408,7 @@ const useTurnkeyAuthContext = () => {
 
         await indexedDbClient.loginWithSession(session);
         const derivedDydxAddress = await onboardDydx({
-          setWalletFromSignature,
+          setWalletFromTurnkeySignature,
           tkClient: indexedDbClient,
         });
 
@@ -476,7 +482,7 @@ const useTurnkeyAuthContext = () => {
       targetPublicKeys,
       turnkeyEmailOnboardingData,
       onboardDydx,
-      setWalletFromSignature,
+      setWalletFromTurnkeySignature,
       searchParams,
       setSearchParams,
       stringGetter,
@@ -532,12 +538,12 @@ const useTurnkeyAuthContext = () => {
    */
   useEffect(() => {
     const turnkeyOnboardingToken = searchParams.get('token');
-    const hasEncryptedSignature = sourceAccount.encryptedSignature != null;
+    const hasStoredWallet = dydxPersistedWalletService.hasStoredWallet();
 
     if (turnkeyOnboardingToken && connectedDydxAddress != null) {
       searchParams.delete('token');
       setSearchParams(searchParams);
-    } else if (turnkeyOnboardingToken && !hasEncryptedSignature) {
+    } else if (turnkeyOnboardingToken && !hasStoredWallet) {
       setEmailToken(turnkeyOnboardingToken);
       dispatch(openDialog(DialogTypes.EmailSignInStatus({})));
     }
