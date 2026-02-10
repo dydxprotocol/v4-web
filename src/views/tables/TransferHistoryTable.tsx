@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { BonsaiCore } from '@/bonsai/ontology';
 import { SubaccountTransfer } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
@@ -17,6 +19,7 @@ import { CopyButton } from '@/components/CopyButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -44,27 +47,34 @@ const getTransferHistoryTableColumnDef = ({
   stringGetter,
   width,
   mintscanTxUrl,
+  dateAgeMode,
+  onDateAgeModeToggle,
 }: {
   key: TransferHistoryTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   mintscanTxUrl?: string;
+  dateAgeMode: DateAgeMode;
+  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<SubaccountTransfer> => ({
   width,
   ...(
     {
       [TransferHistoryTableColumnKey.Time]: {
-        columnKey: TransferHistoryTableColumnKey.Time,
+        columnKey: `time-${dateAgeMode}`,
         getCellValue: (row) => row.createdAt,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
-        renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt}
-            tw="text-color-text-0"
-          />
-        ),
+        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
+        renderCell: ({ createdAt }) =>
+          dateAgeMode === 'date' ? (
+            <Output type={OutputType.DateTime} value={createdAt} tw="text-color-text-0" />
+          ) : (
+            <Output
+              type={OutputType.RelativeTime}
+              relativeTimeOptions={{ format: 'singleCharacter' }}
+              value={createdAt}
+              tw="text-color-text-0"
+            />
+          ),
       },
       [TransferHistoryTableColumnKey.Action]: {
         columnKey: TransferHistoryTableColumnKey.Action,
@@ -141,6 +151,7 @@ export const TransferHistoryTable = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
+  const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
@@ -158,6 +169,8 @@ export const TransferHistoryTable = ({
           stringGetter,
           width: columnWidths?.[key],
           mintscanTxUrl,
+          dateAgeMode,
+          onDateAgeModeToggle: setDateAgeMode,
         })
       )}
       slotEmpty={

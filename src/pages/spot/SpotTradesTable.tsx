@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -14,6 +14,7 @@ import { IconButton } from '@/components/IconButton';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
 import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
@@ -44,20 +45,28 @@ export enum SpotTradesTableColumnKey {
 const getColumnDef = ({
   key,
   width,
+  dateAgeMode,
+  onDateAgeModeToggle,
 }: {
   key: SpotTradesTableColumnKey;
   width?: ColumnSize;
+  dateAgeMode: DateAgeMode;
+  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<SpotTradeItem> => ({
   width,
   ...(
     {
       [SpotTradesTableColumnKey.Time]: {
-        columnKey: 'time',
-        label: 'Time',
+        columnKey: `time-${dateAgeMode}`,
+        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
         getCellValue: (row) => row.createdAt,
         renderCell: ({ createdAt }) => (
           <TableCell>
-            <Output type={OutputType.RelativeTime} value={createdAt} tw="text-color-text-0" />
+            {dateAgeMode === 'date' ? (
+              <Output type={OutputType.DateTime} value={createdAt} tw="text-color-text-0" />
+            ) : (
+              <Output type={OutputType.RelativeTime} value={createdAt} tw="text-color-text-0" />
+            )}
           </TableCell>
         ),
       },
@@ -165,9 +174,14 @@ export const SpotTradesTable = ({
   ],
   columnWidths,
 }: SpotTradesTableProps) => {
+  const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
+
   const columns = useMemo(
-    () => columnKeys.map((key) => getColumnDef({ key, width: columnWidths?.[key] })),
-    [columnKeys, columnWidths]
+    () =>
+      columnKeys.map((key) =>
+        getColumnDef({ key, width: columnWidths?.[key], dateAgeMode, onDateAgeModeToggle: setDateAgeMode })
+      ),
+    [columnKeys, columnWidths, dateAgeMode]
   );
 
   return (

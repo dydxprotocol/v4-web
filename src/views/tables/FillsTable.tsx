@@ -1,4 +1,4 @@
-import { forwardRef, Key, useMemo } from 'react';
+import { forwardRef, Key, useMemo, useState } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { PerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
@@ -20,6 +20,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
@@ -70,11 +71,15 @@ const getFillsTableColumnDef = ({
   stringGetter,
   symbol = '',
   width,
+  dateAgeMode,
+  onDateAgeModeToggle,
 }: {
   key: FillsTableColumnKey;
   stringGetter: StringGetterFunction;
   symbol?: Nullable<string>;
   width?: ColumnSize;
+  dateAgeMode: DateAgeMode;
+  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<FillTableRow> => ({
   width,
   ...(
@@ -146,17 +151,24 @@ const getFillsTableColumnDef = ({
         ),
       },
       [FillsTableColumnKey.Time]: {
-        columnKey: 'time',
+        columnKey: `time-${dateAgeMode}`,
         getCellValue: (row) => row.createdAt,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
-        renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt != null ? new Date(createdAt).getTime() : undefined}
-            tw="text-color-text-0"
-          />
-        ),
+        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
+        renderCell: ({ createdAt }) =>
+          dateAgeMode === 'date' ? (
+            <Output
+              type={OutputType.DateTime}
+              value={createdAt != null ? new Date(createdAt).getTime() : undefined}
+              tw="text-color-text-0"
+            />
+          ) : (
+            <Output
+              type={OutputType.RelativeTime}
+              relativeTimeOptions={{ format: 'singleCharacter' }}
+              value={createdAt != null ? new Date(createdAt).getTime() : undefined}
+              tw="text-color-text-0"
+            />
+          ),
       },
       [FillsTableColumnKey.Market]: {
         columnKey: 'market',
@@ -310,6 +322,7 @@ export const FillsTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
+    const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
 
     const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
@@ -352,6 +365,8 @@ export const FillsTable = forwardRef(
             stringGetter,
             symbol,
             width: columnWidths?.[key],
+            dateAgeMode,
+            onDateAgeModeToggle: setDateAgeMode,
           })
         )}
         slotEmpty={

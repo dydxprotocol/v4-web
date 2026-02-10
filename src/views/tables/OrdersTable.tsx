@@ -1,4 +1,4 @@
-import { forwardRef, Key, ReactNode, useMemo } from 'react';
+import { forwardRef, Key, ReactNode, useMemo, useState } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus, PerpetualMarketSummary, SubaccountOrder } from '@/bonsai/types/summaryTypes';
@@ -25,6 +25,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
@@ -84,6 +85,8 @@ const getOrdersTableColumnDef = ({
   symbol = '',
   isAccountViewOnly,
   width,
+  dateAgeMode,
+  onDateAgeModeToggle,
 }: {
   key: OrdersTableColumnKey;
   currentMarket?: string;
@@ -93,6 +96,8 @@ const getOrdersTableColumnDef = ({
   symbol?: Nullable<string>;
   isAccountViewOnly: boolean;
   width?: ColumnSize;
+  dateAgeMode: DateAgeMode;
+  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<OrderTableRow> => ({
   width,
   ...(
@@ -231,17 +236,24 @@ const getOrdersTableColumnDef = ({
         },
       },
       [OrdersTableColumnKey.Updated]: {
-        columnKey: 'updatedAt',
+        columnKey: `updatedAt-${dateAgeMode}`,
         getCellValue: (row) => row.updatedAtMilliseconds ?? Infinity,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
         renderCell: ({ updatedAtMilliseconds }) => {
           if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
 
-          return (
+          return dateAgeMode === 'date' ? (
+            <Output
+              type={OutputType.DateTime}
+              value={updatedAtMilliseconds}
+              tw="text-color-text-0"
+            />
+          ) : (
             <Output
               type={OutputType.RelativeTime}
               value={updatedAtMilliseconds}
               relativeTimeOptions={{ format: 'singleCharacter' }}
+              tw="text-color-text-0"
             />
           );
         },
@@ -377,6 +389,7 @@ export const OrdersTable = forwardRef(
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
     const { isTablet } = useBreakpoints();
+    const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
 
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const marketOrders = useAppSelector(
@@ -438,6 +451,8 @@ export const OrdersTable = forwardRef(
             symbol,
             isAccountViewOnly,
             width: columnWidths?.[key],
+            dateAgeMode,
+            onDateAgeModeToggle: setDateAgeMode,
           })
         )}
         slotEmpty={
