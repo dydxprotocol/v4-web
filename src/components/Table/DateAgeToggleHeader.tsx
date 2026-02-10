@@ -2,6 +2,8 @@ import { useCallback } from 'react';
 
 import styled from 'styled-components';
 
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
+
 export type DateAgeMode = 'date' | 'age';
 
 type DateAgeToggleHeaderProps = {
@@ -31,22 +33,24 @@ export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps
   );
 
   return (
-    <$Container>
-      <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button" tabIndex={0}>
-        Date
-      </$Label>
-      <$Separator>/</$Separator>
-      <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button" tabIndex={0}>
-        Age
-      </$Label>
-    </$Container>
+    <TableColumnHeader>
+      <$Container>
+        <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button" tabIndex={0}>
+          Date
+        </$Label>
+        <$Separator>/</$Separator>
+        <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button" tabIndex={0}>
+          Age
+        </$Label>
+      </$Container>
+    </TableColumnHeader>
   );
 };
 
 const $Container = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 0.25ch;
+  gap: 0.25em;
   user-select: none;
 `;
 
