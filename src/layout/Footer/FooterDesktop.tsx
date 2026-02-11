@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import styled, { css } from 'styled-components';
 
@@ -11,11 +13,12 @@ import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { ChatIcon, LinkOutIcon } from '@/icons';
+import { CaretIcon, ChatIcon, LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { GlobalChat } from '@/components/GlobalChat';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -41,6 +44,7 @@ export const FooterDesktop = () => {
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
   const deployerName = useEnvConfig('deployerName');
   const { statusPage } = useURLConfigs();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const isStatusLoading = !status && !statusErrorMessage;
 
@@ -61,6 +65,22 @@ export const FooterDesktop = () => {
 
   return (
     <$Footer>
+      <$ChatArea>
+        {isChatOpen && <GlobalChat onClose={() => setIsChatOpen(false)} />}
+
+        {!isChatOpen && (
+          <$ChatToggle onClick={() => setIsChatOpen(true)}>
+            <$ChatToggleLeft>
+              <ChatIcon />
+              <span>Global Chat</span>
+              <$OnlineDot />
+              <$OnlineCount>2345 Online</$OnlineCount>
+            </$ChatToggleLeft>
+            <$ChatCaretIcon />
+          </$ChatToggle>
+        )}
+      </$ChatArea>
+
       <$Row>
         <WithTooltip
           slotTooltip={
@@ -137,11 +157,66 @@ export const FooterDesktop = () => {
     </$Footer>
   );
 };
+
 const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   ${layoutMixins.spacedRow}
   grid-area: Footer;
   background-color: var(--color-layer-2);
+`;
+
+const $ChatArea = styled.div`
+  ${layoutMixins.flexColumn}
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 22rem;
+  padding-left: 1rem;
+`;
+
+const $ChatToggle = styled.div`
+  ${layoutMixins.spacedRow}
+  padding: 0.625rem 1rem;
+  background-color: var(--color-layer-3);
+  border-radius: 0.5rem 0.5rem 0 0;
+  border: 1px solid var(--color-border);
+  font: var(--font-small-book);
+  color: var(--color-text-2);
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--color-layer-4);
+  }
+`;
+
+const $ChatToggleLeft = styled.div`
+  ${layoutMixins.row}
+  gap: 0.5rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+`;
+
+const $ChatCaretIcon = styled(CaretIcon)`
+  width: 0.625rem;
+  height: 0.625rem;
+  color: var(--color-text-0);
+`;
+
+const $OnlineDot = styled.div`
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  flex-shrink: 0;
+`;
+
+const $OnlineCount = styled.span`
+  font: var(--font-mini-book);
+  color: var(--color-text-0);
 `;
 
 const $Row = styled.div`
