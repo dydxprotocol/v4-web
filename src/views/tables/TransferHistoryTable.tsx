@@ -59,11 +59,11 @@ const getTransferHistoryTableColumnDef = ({
   ...(
     {
       [TransferHistoryTableColumnKey.Time]: {
-        columnKey: 'time',
+        columnKey: TransferHistoryTableColumnKey.Time,
         getCellValue: (row) => row.createdAt,
         label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
-          <DateAgeOutput value={createdAt} />
+          <DateAgeOutput value={createdAt} relativeTimeFormat="singleCharacter" />
         ),
       },
       [TransferHistoryTableColumnKey.Action]: {

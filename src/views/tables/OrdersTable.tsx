@@ -243,7 +243,7 @@ const getOrdersTableColumnDef = ({
           if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
 
           return (
-            <DateAgeOutput value={updatedAtMilliseconds} />
+            <DateAgeOutput value={updatedAtMilliseconds} relativeTimeFormat="singleCharacter" />
           );
         },
       },
@@ -377,6 +377,7 @@ export const OrdersTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
+
     const { isTablet } = useBreakpoints();
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const marketOrders = useAppSelector(

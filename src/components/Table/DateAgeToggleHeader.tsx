@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
+import { noop } from 'lodash';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,7 +19,7 @@ const DateAgeModeContext = createContext<{
   setDateAgeMode: (mode: DateAgeMode) => void;
 }>({
   dateAgeMode: 'age',
-  setDateAgeMode: () => {},
+  setDateAgeMode: noop,
 });
 
 export const DateAgeModeProvider = ({ children }: { children: React.ReactNode }) => {

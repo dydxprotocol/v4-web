@@ -155,7 +155,10 @@ const getFillsTableColumnDef = ({
         getCellValue: (row) => row.createdAt,
         label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
-          <DateAgeOutput value={createdAt != null ? new Date(createdAt).getTime() : null} />
+          <DateAgeOutput
+            value={createdAt != null ? new Date(createdAt).getTime() : null}
+            relativeTimeFormat="singleCharacter"
+          />
         ),
       },
       [FillsTableColumnKey.Market]: {
@@ -310,6 +313,7 @@ export const FillsTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
+
     const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
     const fills = currentMarket ? marketFills : allFills;
