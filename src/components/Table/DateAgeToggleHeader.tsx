@@ -39,7 +39,7 @@ export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps
   );
 
   return (
-    <$TableColumnHeader>
+    <TableColumnHeader>
       <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button">
         {stringGetter({ key: STRING_KEYS.DATE })}
       </$Label>
@@ -47,13 +47,9 @@ export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps
       <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button">
         {stringGetter({ key: STRING_KEYS.AGE })}
       </$Label>
-    </$TableColumnHeader>
+    </TableColumnHeader>
   );
 };
-
-const $TableColumnHeader = styled(TableColumnHeader)`
-  user-select: none;
-`;
 
 const $Label = styled.span<{ $isActive: boolean }>`
   cursor: pointer;
