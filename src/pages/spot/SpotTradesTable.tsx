@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -15,7 +15,6 @@ import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 import {
-  DateAgeMode,
   DateAgeModeProvider,
   DateAgeOutput,
   DateAgeToggleHeader,
@@ -50,20 +49,16 @@ export enum SpotTradesTableColumnKey {
 const getColumnDef = ({
   key,
   width,
-  dateAgeMode,
-  onDateAgeModeToggle,
 }: {
   key: SpotTradesTableColumnKey;
   width?: ColumnSize;
-  dateAgeMode: DateAgeMode;
-  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<SpotTradeItem> => ({
   width,
   ...(
     {
       [SpotTradesTableColumnKey.Time]: {
         columnKey: 'time',
-        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
+        label: <DateAgeToggleHeader />,
         getCellValue: (row) => row.createdAt,
         renderCell: ({ createdAt }) => (
           <TableCell>
@@ -175,23 +170,19 @@ export const SpotTradesTable = ({
   ],
   columnWidths,
 }: SpotTradesTableProps) => {
-  const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
-
   const columns = useMemo(
     () =>
       columnKeys.map((key) =>
         getColumnDef({
           key,
           width: columnWidths?.[key],
-          dateAgeMode,
-          onDateAgeModeToggle: setDateAgeMode,
         })
       ),
-    [columnKeys, columnWidths, dateAgeMode]
+    [columnKeys, columnWidths]
   );
 
   return (
-    <DateAgeModeProvider value={dateAgeMode}>
+    <DateAgeModeProvider>
       <$Table
         defaultSortDescriptor={{
           column: 'time',

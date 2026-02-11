@@ -1,4 +1,4 @@
-import { forwardRef, Key, ReactNode, useMemo, useState } from 'react';
+import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus, PerpetualMarketSummary, SubaccountOrder } from '@/bonsai/types/summaryTypes';
@@ -26,7 +26,6 @@ import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 import {
-  DateAgeMode,
   DateAgeModeProvider,
   DateAgeOutput,
   DateAgeToggleHeader,
@@ -90,8 +89,6 @@ const getOrdersTableColumnDef = ({
   symbol = '',
   isAccountViewOnly,
   width,
-  dateAgeMode,
-  onDateAgeModeToggle,
 }: {
   key: OrdersTableColumnKey;
   currentMarket?: string;
@@ -101,8 +98,6 @@ const getOrdersTableColumnDef = ({
   symbol?: Nullable<string>;
   isAccountViewOnly: boolean;
   width?: ColumnSize;
-  dateAgeMode: DateAgeMode;
-  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<OrderTableRow> => ({
   width,
   ...(
@@ -243,7 +238,7 @@ const getOrdersTableColumnDef = ({
       [OrdersTableColumnKey.Updated]: {
         columnKey: 'updatedAt',
         getCellValue: (row) => row.updatedAtMilliseconds ?? Infinity,
-        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
+        label: <DateAgeToggleHeader />,
         renderCell: ({ updatedAtMilliseconds }) => {
           if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
 
@@ -383,8 +378,6 @@ export const OrdersTable = forwardRef(
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
     const { isTablet } = useBreakpoints();
-    const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
-
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const marketOrders = useAppSelector(
       tableType === 'OPEN'
@@ -426,7 +419,7 @@ export const OrdersTable = forwardRef(
     );
 
     return (
-      <DateAgeModeProvider value={dateAgeMode}>
+      <DateAgeModeProvider>
         <$Table
           key={currentMarket ?? 'all-orders'}
           label="Orders"
@@ -446,8 +439,6 @@ export const OrdersTable = forwardRef(
               symbol,
               isAccountViewOnly,
               width: columnWidths?.[key],
-              dateAgeMode,
-              onDateAgeModeToggle: setDateAgeMode,
             })
           )}
           slotEmpty={

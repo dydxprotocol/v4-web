@@ -1,4 +1,4 @@
-import { forwardRef, Key, useMemo, useState } from 'react';
+import { forwardRef, Key, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { PerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
@@ -21,7 +21,6 @@ import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 import {
-  DateAgeMode,
   DateAgeModeProvider,
   DateAgeOutput,
   DateAgeToggleHeader,
@@ -76,15 +75,11 @@ const getFillsTableColumnDef = ({
   stringGetter,
   symbol = '',
   width,
-  dateAgeMode,
-  onDateAgeModeToggle,
 }: {
   key: FillsTableColumnKey;
   stringGetter: StringGetterFunction;
   symbol?: Nullable<string>;
   width?: ColumnSize;
-  dateAgeMode: DateAgeMode;
-  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<FillTableRow> => ({
   width,
   ...(
@@ -158,9 +153,9 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.Time]: {
         columnKey: 'time',
         getCellValue: (row) => row.createdAt,
-        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
+        label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
-          <DateAgeOutput value={createdAt != null ? new Date(createdAt).getTime() : undefined} />
+          <DateAgeOutput value={createdAt != null ? new Date(createdAt).getTime() : null} />
         ),
       },
       [FillsTableColumnKey.Market]: {
@@ -315,8 +310,6 @@ export const FillsTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
-    const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
-
     const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
     const fills = currentMarket ? marketFills : allFills;
@@ -343,7 +336,7 @@ export const FillsTable = forwardRef(
     );
 
     return (
-      <DateAgeModeProvider value={dateAgeMode}>
+      <DateAgeModeProvider>
         <$Table
           key={currentMarket ?? 'all-fills'}
           label="Fills"
@@ -359,8 +352,6 @@ export const FillsTable = forwardRef(
               stringGetter,
               symbol,
               width: columnWidths?.[key],
-              dateAgeMode,
-              onDateAgeModeToggle: setDateAgeMode,
             })
           )}
           slotEmpty={

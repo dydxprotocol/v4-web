@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -13,45 +13,53 @@ import { BigNumberish } from '@/lib/numbers';
 
 export type DateAgeMode = 'date' | 'age';
 
-const DateAgeModeContext = createContext<DateAgeMode>('age');
+const DateAgeModeContext = createContext<{
+  dateAgeMode: DateAgeMode;
+  setDateAgeMode: (mode: DateAgeMode) => void;
+}>({
+  dateAgeMode: 'age',
+  setDateAgeMode: () => {},
+});
 
-export const DateAgeModeProvider = DateAgeModeContext.Provider;
+export const DateAgeModeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
 
-type DateAgeToggleHeaderProps = {
-  mode: DateAgeMode;
-  onToggle: (mode: DateAgeMode) => void;
+  const context = useMemo(() => ({ dateAgeMode, setDateAgeMode }), [dateAgeMode]);
+
+  return <DateAgeModeContext.Provider value={context}>{children}</DateAgeModeContext.Provider>;
 };
 
-export const DateAgeToggleHeader = ({ mode, onToggle }: DateAgeToggleHeaderProps) => {
+export const DateAgeToggleHeader = () => {
   const stringGetter = useStringGetter();
+  const { dateAgeMode, setDateAgeMode } = useContext(DateAgeModeContext);
 
   const handleDateClick = useCallback(
     (e: React.MouseEvent) => {
-      if (mode === 'date') return;
+      if (dateAgeMode === 'date') return;
 
       e.stopPropagation();
-      onToggle('date');
+      setDateAgeMode('date');
     },
-    [mode, onToggle]
+    [dateAgeMode, setDateAgeMode]
   );
 
   const handleAgeClick = useCallback(
     (e: React.MouseEvent) => {
-      if (mode === 'age') return;
+      if (dateAgeMode === 'age') return;
 
       e.stopPropagation();
-      onToggle('age');
+      setDateAgeMode('age');
     },
-    [mode, onToggle]
+    [dateAgeMode, setDateAgeMode]
   );
 
   return (
     <TableColumnHeader>
-      <$Label $isActive={mode === 'date'} onClick={handleDateClick} role="button">
+      <$Label $isActive={dateAgeMode === 'date'} onClick={handleDateClick} role="button">
         {stringGetter({ key: STRING_KEYS.DATE })}
       </$Label>
       <$Separator />
-      <$Label $isActive={mode === 'age'} onClick={handleAgeClick} role="button">
+      <$Label $isActive={dateAgeMode === 'age'} onClick={handleAgeClick} role="button">
         {stringGetter({ key: STRING_KEYS.AGE })}
       </$Label>
     </TableColumnHeader>
@@ -79,7 +87,8 @@ export const DateAgeOutput = ({
   value: BigNumberish | null;
   relativeTimeFormat?: RelativeTimeFormat;
 }) => {
-  const dateAgeMode = useContext(DateAgeModeContext);
+  const { dateAgeMode } = useContext(DateAgeModeContext);
+
   if (dateAgeMode === 'date') {
     return <Output type={OutputType.DateTime} value={value} tw="text-color-text-0" />;
   }

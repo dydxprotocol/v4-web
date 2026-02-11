@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { BonsaiCore } from '@/bonsai/ontology';
 import { SubaccountTransfer } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
@@ -20,7 +18,6 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 import {
-  DateAgeMode,
   DateAgeModeProvider,
   DateAgeOutput,
   DateAgeToggleHeader,
@@ -52,15 +49,11 @@ const getTransferHistoryTableColumnDef = ({
   stringGetter,
   width,
   mintscanTxUrl,
-  dateAgeMode,
-  onDateAgeModeToggle,
 }: {
   key: TransferHistoryTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   mintscanTxUrl?: string;
-  dateAgeMode: DateAgeMode;
-  onDateAgeModeToggle: (mode: DateAgeMode) => void;
 }): ColumnDef<SubaccountTransfer> => ({
   width,
   ...(
@@ -68,7 +61,7 @@ const getTransferHistoryTableColumnDef = ({
       [TransferHistoryTableColumnKey.Time]: {
         columnKey: 'time',
         getCellValue: (row) => row.createdAt,
-        label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
+        label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
           <DateAgeOutput value={createdAt} />
         ),
@@ -148,14 +141,13 @@ export const TransferHistoryTable = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
-  const [dateAgeMode, setDateAgeMode] = useState<DateAgeMode>('age');
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
   return (
-    <DateAgeModeProvider value={dateAgeMode}>
+    <DateAgeModeProvider>
       <$Table
         label="Transfers"
         data={transfers}
@@ -167,8 +159,6 @@ export const TransferHistoryTable = ({
             stringGetter,
             width: columnWidths?.[key],
             mintscanTxUrl,
-            dateAgeMode,
-            onDateAgeModeToggle: setDateAgeMode,
           })
         )}
         slotEmpty={
