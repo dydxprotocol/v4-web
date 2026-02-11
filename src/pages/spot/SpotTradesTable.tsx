@@ -14,7 +14,12 @@ import { IconButton } from '@/components/IconButton';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
+import {
+  DateAgeMode,
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
@@ -57,16 +62,12 @@ const getColumnDef = ({
   ...(
     {
       [SpotTradesTableColumnKey.Time]: {
-        columnKey: `time-${dateAgeMode}`,
+        columnKey: 'time',
         label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
         getCellValue: (row) => row.createdAt,
         renderCell: ({ createdAt }) => (
           <TableCell>
-            {dateAgeMode === 'date' ? (
-              <Output type={OutputType.DateTime} value={createdAt} tw="text-color-text-0" />
-            ) : (
-              <Output type={OutputType.RelativeTime} value={createdAt} tw="text-color-text-0" />
-            )}
+            <DateAgeOutput value={createdAt} relativeTimeFormat="long" />
           </TableCell>
         ),
       },
@@ -190,27 +191,29 @@ export const SpotTradesTable = ({
   );
 
   return (
-    <$Table
-      defaultSortDescriptor={{
-        column: 'time',
-        direction: 'descending',
-      }}
-      tableId="spot-trades"
-      data={data}
-      getRowKey={(row) => row.id}
-      columns={columns}
-      initialPageSize={20}
-      paginationBehavior="paginate"
-      withInnerBorders
-      withScrollSnapColumns
-      withScrollSnapRows
-      slotEmpty={
-        <>
-          <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-          <h4>No trades yet...</h4>
-        </>
-      }
-    />
+    <DateAgeModeProvider value={dateAgeMode}>
+      <$Table
+        defaultSortDescriptor={{
+          column: 'time',
+          direction: 'descending',
+        }}
+        tableId="spot-trades"
+        data={data}
+        getRowKey={(row) => row.id}
+        columns={columns}
+        initialPageSize={20}
+        paginationBehavior="paginate"
+        withInnerBorders
+        withScrollSnapColumns
+        withScrollSnapRows
+        slotEmpty={
+          <>
+            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+            <h4>No trades yet...</h4>
+          </>
+        }
+      />
+    </DateAgeModeProvider>
   );
 };
 

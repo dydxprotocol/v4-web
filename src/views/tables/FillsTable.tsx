@@ -20,7 +20,12 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
+import {
+  DateAgeMode,
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
@@ -151,24 +156,12 @@ const getFillsTableColumnDef = ({
         ),
       },
       [FillsTableColumnKey.Time]: {
-        columnKey: `time-${dateAgeMode}`,
+        columnKey: 'time',
         getCellValue: (row) => row.createdAt,
         label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
-        renderCell: ({ createdAt }) =>
-          dateAgeMode === 'date' ? (
-            <Output
-              type={OutputType.DateTime}
-              value={createdAt != null ? new Date(createdAt).getTime() : undefined}
-              tw="text-color-text-0"
-            />
-          ) : (
-            <Output
-              type={OutputType.RelativeTime}
-              relativeTimeOptions={{ format: 'singleCharacter' }}
-              value={createdAt != null ? new Date(createdAt).getTime() : undefined}
-              tw="text-color-text-0"
-            />
-          ),
+        renderCell: ({ createdAt }) => (
+          <DateAgeOutput value={createdAt != null ? new Date(createdAt).getTime() : undefined} />
+        ),
       },
       [FillsTableColumnKey.Market]: {
         columnKey: 'market',
@@ -350,38 +343,40 @@ export const FillsTable = forwardRef(
     );
 
     return (
-      <$Table
-        key={currentMarket ?? 'all-fills'}
-        label="Fills"
-        tableId="fills"
-        data={fillsData}
-        getRowKey={(row: FillTableRow) => row.id ?? ''}
-        onRowAction={(key: Key) =>
-          dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
-        }
-        columns={columnKeys.map((key: FillsTableColumnKey) =>
-          getFillsTableColumnDef({
-            key,
-            stringGetter,
-            symbol,
-            width: columnWidths?.[key],
-            dateAgeMode,
-            onDateAgeModeToggle: setDateAgeMode,
-          })
-        )}
-        slotEmpty={
-          <>
-            <Icon iconName={IconName.History} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
-          </>
-        }
-        initialPageSize={initialPageSize}
-        withOuterBorder={withOuterBorder}
-        withInnerBorders={withInnerBorders}
-        withScrollSnapColumns
-        withScrollSnapRows
-        withFocusStickyRows
-      />
+      <DateAgeModeProvider value={dateAgeMode}>
+        <$Table
+          key={currentMarket ?? 'all-fills'}
+          label="Fills"
+          tableId="fills"
+          data={fillsData}
+          getRowKey={(row: FillTableRow) => row.id ?? ''}
+          onRowAction={(key: Key) =>
+            dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
+          }
+          columns={columnKeys.map((key: FillsTableColumnKey) =>
+            getFillsTableColumnDef({
+              key,
+              stringGetter,
+              symbol,
+              width: columnWidths?.[key],
+              dateAgeMode,
+              onDateAgeModeToggle: setDateAgeMode,
+            })
+          )}
+          slotEmpty={
+            <>
+              <Icon iconName={IconName.History} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
+            </>
+          }
+          initialPageSize={initialPageSize}
+          withOuterBorder={withOuterBorder}
+          withInnerBorders={withInnerBorders}
+          withScrollSnapColumns
+          withScrollSnapRows
+          withFocusStickyRows
+        />
+      </DateAgeModeProvider>
     );
   }
 );

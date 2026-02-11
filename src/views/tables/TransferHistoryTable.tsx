@@ -19,7 +19,12 @@ import { CopyButton } from '@/components/CopyButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { DateAgeMode, DateAgeToggleHeader } from '@/components/Table/DateAgeToggleHeader';
+import {
+  DateAgeMode,
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -61,20 +66,12 @@ const getTransferHistoryTableColumnDef = ({
   ...(
     {
       [TransferHistoryTableColumnKey.Time]: {
-        columnKey: `time-${dateAgeMode}`,
+        columnKey: 'time',
         getCellValue: (row) => row.createdAt,
         label: <DateAgeToggleHeader mode={dateAgeMode} onToggle={onDateAgeModeToggle} />,
-        renderCell: ({ createdAt }) =>
-          dateAgeMode === 'date' ? (
-            <Output type={OutputType.DateTime} value={createdAt} tw="text-color-text-0" />
-          ) : (
-            <Output
-              type={OutputType.RelativeTime}
-              relativeTimeOptions={{ format: 'singleCharacter' }}
-              value={createdAt}
-              tw="text-color-text-0"
-            />
-          ),
+        renderCell: ({ createdAt }) => (
+          <DateAgeOutput value={createdAt} />
+        ),
       },
       [TransferHistoryTableColumnKey.Action]: {
         columnKey: TransferHistoryTableColumnKey.Action,
@@ -158,43 +155,45 @@ export const TransferHistoryTable = ({
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
   return (
-    <$Table
-      label="Transfers"
-      data={transfers}
-      tableId="transfer-history"
-      getRowKey={(row: SubaccountTransfer) => row.id}
-      columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
-        getTransferHistoryTableColumnDef({
-          key,
-          stringGetter,
-          width: columnWidths?.[key],
-          mintscanTxUrl,
-          dateAgeMode,
-          onDateAgeModeToggle: setDateAgeMode,
-        })
-      )}
-      slotEmpty={
-        <>
-          {stringGetter({ key: STRING_KEYS.TRANSFERS_EMPTY_STATE })}
-          {canAccountTrade ? (
-            <Button
-              action={ButtonAction.Primary}
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
-            >
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
-            </Button>
-          ) : (
-            <OnboardingTriggerButton />
-          )}
-        </>
-      }
-      initialPageSize={initialPageSize}
-      selectionBehavior="replace"
-      withOuterBorder={withOuterBorder}
-      withInnerBorders={withInnerBorders}
-      withScrollSnapColumns
-      withScrollSnapRows
-    />
+    <DateAgeModeProvider value={dateAgeMode}>
+      <$Table
+        label="Transfers"
+        data={transfers}
+        tableId="transfer-history"
+        getRowKey={(row: SubaccountTransfer) => row.id}
+        columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
+          getTransferHistoryTableColumnDef({
+            key,
+            stringGetter,
+            width: columnWidths?.[key],
+            mintscanTxUrl,
+            dateAgeMode,
+            onDateAgeModeToggle: setDateAgeMode,
+          })
+        )}
+        slotEmpty={
+          <>
+            {stringGetter({ key: STRING_KEYS.TRANSFERS_EMPTY_STATE })}
+            {canAccountTrade ? (
+              <Button
+                action={ButtonAction.Primary}
+                onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+              >
+                {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+              </Button>
+            ) : (
+              <OnboardingTriggerButton />
+            )}
+          </>
+        }
+        initialPageSize={initialPageSize}
+        selectionBehavior="replace"
+        withOuterBorder={withOuterBorder}
+        withInnerBorders={withInnerBorders}
+        withScrollSnapColumns
+        withScrollSnapRows
+      />
+    </DateAgeModeProvider>
   );
 };
 const $Table = styled(Table)`

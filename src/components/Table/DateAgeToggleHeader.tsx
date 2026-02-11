@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { createContext, useCallback, useContext } from 'react';
 
 import styled from 'styled-components';
 
@@ -6,9 +6,16 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Output, OutputType, RelativeTimeFormat } from '@/components/Output';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 
+import { BigNumberish } from '@/lib/numbers';
+
 export type DateAgeMode = 'date' | 'age';
+
+const DateAgeModeContext = createContext<DateAgeMode>('age');
+
+export const DateAgeModeProvider = DateAgeModeContext.Provider;
 
 type DateAgeToggleHeaderProps = {
   mode: DateAgeMode;
@@ -64,3 +71,24 @@ const $Label = styled.span<{ $isActive: boolean }>`
 const $Separator = styled.span`
   color: var(--color-text-0);
 `;
+
+export const DateAgeOutput = ({
+  value,
+  relativeTimeFormat = 'singleCharacter',
+}: {
+  value: BigNumberish | null;
+  relativeTimeFormat?: RelativeTimeFormat;
+}) => {
+  const dateAgeMode = useContext(DateAgeModeContext);
+  if (dateAgeMode === 'date') {
+    return <Output type={OutputType.DateTime} value={value} tw="text-color-text-0" />;
+  }
+  return (
+    <Output
+      type={OutputType.RelativeTime}
+      value={value}
+      relativeTimeOptions={{ format: relativeTimeFormat }}
+      tw="text-color-text-0"
+    />
+  );
+};
