@@ -101,7 +101,6 @@ const Content = () => {
   useReferralCode();
   useUiRefreshMigrations();
   useOpenDepositIfRelevant();
-
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
