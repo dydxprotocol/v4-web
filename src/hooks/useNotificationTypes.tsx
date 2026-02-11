@@ -42,6 +42,7 @@ import { CancelAllNotification } from '@/views/notifications/CancelAllNotificati
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { SpotTradeNotification } from '@/views/notifications/SpotTradeNotification';
 import { SwapNotification } from '@/views/notifications/SwapNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 
@@ -62,6 +63,7 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
+import { getSpotTrades } from '@/state/spotTradesSelectors';
 import { getSwaps } from '@/state/swapSelectors';
 import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
@@ -1042,6 +1044,35 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
         });
       }, [swaps, trigger, stringGetter]);
+    },
+  },
+  {
+    type: NotificationType.SpotTrade,
+    useTrigger: ({ trigger }) => {
+      const spotTrades = useAppSelector(getSpotTrades, shallowEqual);
+
+      useEffect(() => {
+        spotTrades.forEach((trade) => {
+          trigger({
+            id: trade.id,
+            displayData: {
+              icon: null,
+              title: trade.status === 'success' ? 'Trade Successful' : 'Transaction Failed',
+              groupKey: NotificationType.SpotTrade,
+              toastSensitivity: 'foreground',
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <SpotTradeNotification
+                  trade={trade}
+                  notification={notification}
+                  isToast={isToast}
+                />
+              ),
+            },
+            updateKey: [trade.status],
+          });
+        });
+      }, [spotTrades, trigger]);
     },
   },
   {
