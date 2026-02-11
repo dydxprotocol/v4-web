@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { SpotApiSide } from '@/clients/spotApi';
+
 export type SpotTrade = {
   id: string;
-  side: 'buy' | 'sell';
+  side: SpotApiSide;
   tokenSymbol: string;
   tokenAmount: string;
   solAmount: string;

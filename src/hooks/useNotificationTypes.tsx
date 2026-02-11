@@ -42,7 +42,6 @@ import { CancelAllNotification } from '@/views/notifications/CancelAllNotificati
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
-import { SpotTradeNotification } from '@/views/notifications/SpotTradeNotification';
 import { SwapNotification } from '@/views/notifications/SwapNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 
@@ -69,6 +68,7 @@ import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
+import { SpotApiSide } from '@/clients/spotApi';
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 // eslint-disable-next-line import/no-cycle
@@ -1053,21 +1053,22 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         spotTrades.forEach((trade) => {
+          const isSuccess = trade.status === 'success';
           trigger({
             id: trade.id,
             displayData: {
-              icon: null,
-              title: trade.status === 'success' ? 'Trade Successful' : 'Transaction Failed',
+              slotTitleLeft: isSuccess ? (
+                <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
+              ) : (
+                <Icon iconName={IconName.Warning} tw="text-color-error" />
+              ),
+              title: isSuccess ? 'Trade Successful' : 'Transaction Failed',
+              body: isSuccess
+                ? `${trade.side === SpotApiSide.BUY ? 'Purchased' : 'Sold'} ${trade.tokenAmount} ${trade.tokenSymbol} for ${trade.solAmount} SOL`
+                : 'Transaction failed. Please try again.',
               groupKey: NotificationType.SpotTrade,
               toastSensitivity: 'foreground',
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              renderCustomBody: ({ isToast, notification }) => (
-                <SpotTradeNotification
-                  trade={trade}
-                  notification={notification}
-                  isToast={isToast}
-                />
-              ),
             },
             updateKey: [trade.status],
           });

@@ -120,7 +120,7 @@ export function useSpotForm() {
         addSpotTrade({
           trade: {
             id: `spot-${landResponse.txHash}`,
-            side: isBuy ? 'buy' : 'sell',
+            side: isBuy ? SpotApiSide.BUY : SpotApiSide.SELL,
             tokenSymbol,
             tokenAmount: formattedTokenAmount,
             solAmount: formattedSolAmount,
@@ -137,7 +137,7 @@ export function useSpotForm() {
         addSpotTrade({
           trade: {
             id: `spot-error-${Date.now()}`,
-            side: formSummary.state.side === SpotSide.BUY ? 'buy' : 'sell',
+            side: formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL,
             tokenSymbol: tokenMetadata?.symbol ?? '',
             tokenAmount: '',
             solAmount: '',
