@@ -171,13 +171,7 @@ export const SpotTradesTable = ({
   columnWidths,
 }: SpotTradesTableProps) => {
   const columns = useMemo(
-    () =>
-      columnKeys.map((key) =>
-        getColumnDef({
-          key,
-          width: columnWidths?.[key],
-        })
-      ),
+    () => columnKeys.map((key) => getColumnDef({ key, width: columnWidths?.[key] })),
     [columnKeys, columnWidths]
   );
 

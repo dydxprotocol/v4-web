@@ -377,8 +377,8 @@ export const OrdersTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
-
     const { isTablet } = useBreakpoints();
+
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const marketOrders = useAppSelector(
       tableType === 'OPEN'
