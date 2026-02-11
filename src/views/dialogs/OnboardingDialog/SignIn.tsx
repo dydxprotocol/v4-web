@@ -31,6 +31,7 @@ import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { isValidEmail } from '@/lib/emailUtils';
+import { testFlags } from '@/lib/testFlags';
 
 import { AppleAuth } from './AuthButtons/AppleAuth';
 import { GoogleAuth } from './AuthButtons/GoogleAuth';
@@ -51,7 +52,7 @@ export const SignIn = ({
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { authIframeClient } = useTurnkey();
-  const { signInWithOtp } = useTurnkeyAuth();
+  const { signInWithOtp, signInWithPasskey } = useTurnkeyAuth();
   const appTheme = useAppSelector(getAppTheme);
   const { tos, privacy } = useURLConfigs();
   const displayedWallets = useDisplayedWallets();
@@ -137,19 +138,21 @@ export const SignIn = ({
           <$HorizontalSeparatorFiller $isLightMode={appTheme === AppTheme.Light} />
         </div>
 
-        {/* <$OtherOptionButton
-          type={ButtonType.Button}
-          action={ButtonAction.Base}
-          size={ButtonSize.BasePlus}
-          onClick={onSignInWithPasskey}
-        >
-          <div tw="row gap-0.5">
-            <Icon iconName={IconName.Passkey} />
-            {stringGetter({ key: STRING_KEYS.SIGN_IN_PASSKEY })}
-          </div>
+        {testFlags.enablePasskeyAuth && (
+          <$OtherOptionButton
+            type={ButtonType.Button}
+            action={ButtonAction.Base}
+            size={ButtonSize.BasePlus}
+            onClick={signInWithPasskey}
+          >
+            <div tw="row gap-0.5">
+              <Icon iconName={IconName.Passkey} />
+              {stringGetter({ key: STRING_KEYS.SIGN_IN_PASSKEY })}
+            </div>
 
-          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
-        </$OtherOptionButton> */}
+            <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
+          </$OtherOptionButton>
+        )}
 
         {displayedWallets
           .filter(
