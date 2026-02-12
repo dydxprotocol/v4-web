@@ -1081,10 +1081,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     },
                   })
                 : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
-
-              // isSuccess
-              //   ? `${trade.side === SpotApiSide.BUY ? 'Purchased' : 'Sold'} ${trade.tokenAmount} ${trade.tokenSymbol} for ${trade.solAmount} SOL`
-              //   : 'Transaction failed. Please try again.',
               groupKey: NotificationType.SpotTrade,
               toastSensitivity: 'foreground',
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
