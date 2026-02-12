@@ -5,13 +5,8 @@ import styled, { css } from 'styled-components';
 import { CaretIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-<<<<<<< Updated upstream
-=======
-import { GlobalChatBody } from '@/components/GlobalChatBody';
-
 import { Icon, IconName } from './Icon';
 
->>>>>>> Stashed changes
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
 
