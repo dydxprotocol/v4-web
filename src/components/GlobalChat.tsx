@@ -5,6 +5,8 @@ import styled, { css } from 'styled-components';
 import { CaretIcon, ChatIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { GlobalChatBody } from '@/components/GlobalChatBody';
+
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -24,14 +26,12 @@ export const GlobalChat = () => {
           <$CaretIcon $isOpen={isOpen} />
         </$Header>
 
-        {/* Placeholder for chat body, will be its own component that only initializes its logic when opened */}
-        <$Body $isOpen={isOpen} />
+        <GlobalChatBody isOpen={isOpen} />
       </$Container>
     </$ChatArea>
   );
 };
 
-const BODY_HEIGHT = '30rem';
 const BODY_WIDTH = '22rem';
 
 const $ChatArea = styled.div`
@@ -86,9 +86,4 @@ const $CaretIcon = styled(CaretIcon)<{ $isOpen: boolean }>`
     css`
       rotate: -0.5turn;
     `}
-`;
-
-const $Body = styled.div<{ $isOpen: boolean }>`
-  height: ${({ $isOpen }) => ($isOpen ? BODY_HEIGHT : '0')};
-  transition: height 0.3s var(--ease-out-expo);
 `;
