@@ -7,11 +7,9 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { ComplianceStates } from '@/constants/compliance';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSpotTransactionSubmit } from '@/hooks/useSpotTransactionSubmit';
 
-import { Icon, IconName } from '@/components/Icon';
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
 import { appQueryClient } from '@/state/appQueryClient';
@@ -19,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { spotFormActions } from '@/state/spotForm';
 import { getSpotFormSummary } from '@/state/spotFormSelectors';
+import { addSpotTrade } from '@/state/spotTrades';
 
 import { SpotApiSide } from '@/clients/spotApi';
 
@@ -31,7 +30,6 @@ export function useSpotForm() {
   const formSummary = useAppSelector(getSpotFormSummary);
   const { canDeriveSolanaWallet } = useAccounts();
   const { mutateAsync: submitTransactionMutation, isPending } = useSpotTransactionSubmit();
-  const notify = useCustomNotification();
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -118,28 +116,36 @@ export function useSpotForm() {
         selectedLocale,
       });
 
-      notify(
-        {
-          title: 'Trade Successful',
-          slotTitleLeft: <Icon iconName={IconName.CheckCircle} tw="text-color-success" />,
-          body: `${isBuy ? 'Purchased' : 'Sold'} ${formattedTokenAmount} ${tokenSymbol} for ${formattedSolAmount} SOL`,
-        },
-        {
-          toastDuration: 5000,
-        }
+      dispatch(
+        addSpotTrade({
+          trade: {
+            id: `spot-${landResponse.txHash}`,
+            side: isBuy ? SpotApiSide.BUY : SpotApiSide.SELL,
+            tokenSymbol,
+            tokenAmount: formattedTokenAmount,
+            solAmount: formattedSolAmount,
+            txHash: landResponse.txHash,
+            status: 'success',
+            createdAt: Date.now(),
+          },
+        })
       );
 
       return result;
     } catch (error) {
-      notify(
-        {
-          title: 'Transaction Failed',
-          slotTitleLeft: <Icon iconName={IconName.Warning} tw="text-color-error" />,
-          body: 'Transaction failed. Please try again.',
-        },
-        {
-          toastDuration: 5000,
-        }
+      dispatch(
+        addSpotTrade({
+          trade: {
+            id: `spot-error-${Date.now()}`,
+            side: formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL,
+            tokenSymbol: tokenMetadata?.symbol ?? '',
+            tokenAmount: '',
+            solAmount: '',
+            txHash: '',
+            status: 'error',
+            createdAt: Date.now(),
+          },
+        })
       );
       throw error;
     }
@@ -150,7 +156,7 @@ export function useSpotForm() {
     decimalSeparator,
     groupSeparator,
     selectedLocale,
-    notify,
+    formSummary.state.side,
   ]);
 
   return {
