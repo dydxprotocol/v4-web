@@ -1049,6 +1049,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.SpotTrade,
     useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
       const spotTrades = useAppSelector(getSpotTrades, shallowEqual);
 
       useEffect(() => {
@@ -1062,10 +1064,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ) : (
                 <Icon iconName={IconName.Warning} tw="text-color-error" />
               ),
-              title: isSuccess ? 'Trade Successful' : 'Transaction Failed',
+              title: isSuccess
+                ? stringGetter({ key: STRING_KEYS.TRADE_SUCCESSFUL })
+                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED }),
               body: isSuccess
-                ? `${trade.side === SpotApiSide.BUY ? 'Purchased' : 'Sold'} ${trade.tokenAmount} ${trade.tokenSymbol} for ${trade.solAmount} SOL`
-                : 'Transaction failed. Please try again.',
+                ? stringGetter({
+                    key: STRING_KEYS.TRADE_SUCCESSFUL_DESCRIPTION,
+                    params: {
+                      PURCHASE_DIRECTION:
+                        trade.side === SpotApiSide.BUY
+                          ? stringGetter({ key: STRING_KEYS.PURCHASED })
+                          : stringGetter({ key: STRING_KEYS.SOLD }),
+                      AMOUNT: trade.tokenAmount,
+                      ASSET: trade.tokenSymbol,
+                      SOL_AMOUNT: trade.solAmount,
+                    },
+                  })
+                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
+
+              // isSuccess
+              //   ? `${trade.side === SpotApiSide.BUY ? 'Purchased' : 'Sold'} ${trade.tokenAmount} ${trade.tokenSymbol} for ${trade.solAmount} SOL`
+              //   : 'Transaction failed. Please try again.',
               groupKey: NotificationType.SpotTrade,
               toastSensitivity: 'foreground',
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -1073,7 +1092,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [trade.status],
           });
         });
-      }, [spotTrades, trigger]);
+      }, [spotTrades, stringGetter, trigger]);
     },
   },
   {
