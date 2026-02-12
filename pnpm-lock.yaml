@@ -1702,8 +1702,13 @@ packages:
       - utf-8-validate
     dev: false
 
+<<<<<<< HEAD
   /@dydxprotocol/v4-localization@1.1.385:
     resolution: {integrity: sha512-MD11fB5X6KroPMjIcWnQkZpOLzT7rRO4ggR1X6EQaCoqFv8sqUC6WAjLTWBRLSCNrIExBLiz0gTew36JhMXeDQ==}
+=======
+  /@dydxprotocol/v4-localization@1.1.383:
+    resolution: {integrity: sha512-Jr8wYIX2CuH+YRiPO71dlpTJ1po0vuk/vIkyvVqzN+1TKc+OACBTfUYLum6v891xVgjMB2Jrf+HpuTdixllRXA==}
+>>>>>>> main
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
