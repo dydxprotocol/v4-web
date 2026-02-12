@@ -1,25 +1,47 @@
+import { useCallback, useState } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { CaretIcon, ChatIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-export const GlobalChat = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
-  return (
-    <$Container>
-      <$Header onClick={onToggle}>
-        <$IconRow>
-          <ChatIcon />
-          Global Chat
-        </$IconRow>
-        <$CaretIcon $isOpen={isOpen} />
-      </$Header>
+export const GlobalChat = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-      <$Body $isOpen={isOpen} />
-    </$Container>
+  const handleToggle = useCallback(() => {
+    setIsOpen((prev) => !prev);
+  }, []);
+
+  return (
+    <$ChatArea>
+      <$Container>
+        <$Header onClick={handleToggle}>
+          <$IconRow>
+            <ChatIcon />
+            {/* TODO: Replace with localization all at once feature is complete */}
+            Global Chat
+          </$IconRow>
+          <$CaretIcon $isOpen={isOpen} />
+        </$Header>
+
+        {/* Placeholder for chat body, will be its own component that only initializes its logic when opened */}
+        <$Body $isOpen={isOpen} />
+      </$Container>
+    </$ChatArea>
   );
 };
 
 const BODY_HEIGHT = '30rem';
+const BODY_WIDTH = '22rem';
+
+const $ChatArea = styled.div`
+  ${layoutMixins.flexColumn}
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: ${BODY_WIDTH};
+  padding-left: 1rem;
+`;
 
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
@@ -37,7 +59,6 @@ const $Header = styled.header`
   font: var(--font-small-book);
   color: var(--color-text-2);
   cursor: pointer;
-  user-select: none;
 
   &:hover {
     filter: brightness(1.1);

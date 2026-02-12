@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import styled, { css } from 'styled-components';
 
@@ -47,7 +45,6 @@ export const FooterDesktop = () => {
   const deployerName = useEnvConfig('deployerName');
   const { statusPage } = useURLConfigs();
   const isChatEnabled = useStatsigGateValue(StatsigFlags.ffDydxChat);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const isStatusLoading = !status && !statusErrorMessage;
 
@@ -68,11 +65,7 @@ export const FooterDesktop = () => {
 
   return (
     <$Footer>
-      {isChatEnabled && (
-        <$ChatArea>
-          <GlobalChat isOpen={isChatOpen} onToggle={() => setIsChatOpen((prev) => !prev)} />
-        </$ChatArea>
-      )}
+      {isChatEnabled && <GlobalChat />}
 
       <$Row>
         <WithTooltip
@@ -156,15 +149,6 @@ const $Footer = styled.footer`
   ${layoutMixins.spacedRow}
   grid-area: Footer;
   background-color: var(--color-layer-2);
-`;
-
-const $ChatArea = styled.div`
-  ${layoutMixins.flexColumn}
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  width: 22rem;
-  padding-left: 1rem;
 `;
 
 const $Row = styled.div`
