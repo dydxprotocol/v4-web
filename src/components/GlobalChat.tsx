@@ -26,7 +26,7 @@ export const GlobalChat = () => {
           <$CaretIcon $isOpen={isOpen} />
         </$Header>
 
-        {/* Placeholder for chat body, will be its own component that only initializes its logic when opened */}
+        {/* Placeholder for chat body, will be its own component that only initializes its logic when opened. */}
         <$Body $isOpen={isOpen} />
       </$Container>
     </$ChatArea>
