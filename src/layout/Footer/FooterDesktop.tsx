@@ -13,7 +13,7 @@ import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { CaretIcon, ChatIcon, LinkOutIcon } from '@/icons';
+import { ChatIcon, LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -66,19 +66,7 @@ export const FooterDesktop = () => {
   return (
     <$Footer>
       <$ChatArea>
-        {isChatOpen && <GlobalChat onClose={() => setIsChatOpen(false)} />}
-
-        {!isChatOpen && (
-          <$ChatToggle onClick={() => setIsChatOpen(true)}>
-            <$ChatToggleLeft>
-              <ChatIcon />
-              <span>Global Chat</span>
-              <$OnlineDot />
-              <$OnlineCount>2345 Online</$OnlineCount>
-            </$ChatToggleLeft>
-            <$ChatCaretIcon />
-          </$ChatToggle>
-        )}
+        <GlobalChat isOpen={isChatOpen} onToggle={() => setIsChatOpen((prev) => !prev)} />
       </$ChatArea>
 
       <$Row>
@@ -172,51 +160,6 @@ const $ChatArea = styled.div`
   left: 0;
   width: 22rem;
   padding-left: 1rem;
-`;
-
-const $ChatToggle = styled.div`
-  ${layoutMixins.spacedRow}
-  padding: 0.625rem 1rem;
-  background-color: var(--color-layer-3);
-  border-radius: 0.5rem 0.5rem 0 0;
-  border: 1px solid var(--color-border);
-  font: var(--font-small-book);
-  color: var(--color-text-2);
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    background-color: var(--color-layer-4);
-  }
-`;
-
-const $ChatToggleLeft = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-
-  svg {
-    width: 1rem;
-    height: 1rem;
-  }
-`;
-
-const $ChatCaretIcon = styled(CaretIcon)`
-  width: 0.625rem;
-  height: 0.625rem;
-  color: var(--color-text-0);
-`;
-
-const $OnlineDot = styled.div`
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: var(--color-success);
-  flex-shrink: 0;
-`;
-
-const $OnlineCount = styled.span`
-  font: var(--font-mini-book);
-  color: var(--color-text-0);
 `;
 
 const $Row = styled.div`
