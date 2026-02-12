@@ -2,9 +2,16 @@ import { useCallback, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { CaretIcon, ChatIcon } from '@/icons';
+import { CaretIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+<<<<<<< Updated upstream
+=======
+import { GlobalChatBody } from '@/components/GlobalChatBody';
+
+import { Icon, IconName } from './Icon';
+
+>>>>>>> Stashed changes
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -17,7 +24,7 @@ export const GlobalChat = () => {
       <$Container>
         <$Header onClick={handleToggle}>
           <$IconRow>
-            <ChatIcon />
+            <Icon iconName={IconName.Chat} />
             {/* TODO: Replace with localization all at once feature is complete */}
             Global Chat
           </$IconRow>
