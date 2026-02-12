@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { CaretIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from './Icon';
@@ -23,7 +22,7 @@ export const GlobalChat = () => {
             {/* TODO: Replace with localization all at once feature is complete */}
             Global Chat
           </$IconRow>
-          <$CaretIcon $isOpen={isOpen} />
+          <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
         </$Header>
 
         {/* Placeholder for chat body, will be its own component that only initializes its logic when opened. */}
@@ -77,7 +76,7 @@ const $IconRow = styled.div`
   }
 `;
 
-const $CaretIcon = styled(CaretIcon)<{ $isOpen: boolean }>`
+const $Icon = styled(Icon)<{ $isOpen: boolean }>`
   width: 0.625rem;
   height: 0.625rem;
   color: var(--color-text-0);
