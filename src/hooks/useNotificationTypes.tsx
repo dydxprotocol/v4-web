@@ -62,11 +62,13 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
+import { getSpotTrades } from '@/state/spotTradesSelectors';
 import { getSwaps } from '@/state/swapSelectors';
 import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
+import { SpotApiSide } from '@/clients/spotApi';
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 // eslint-disable-next-line import/no-cycle
@@ -1042,6 +1044,51 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
         });
       }, [swaps, trigger, stringGetter]);
+    },
+  },
+  {
+    type: NotificationType.SpotTrade,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      const spotTrades = useAppSelector(getSpotTrades, shallowEqual);
+
+      useEffect(() => {
+        spotTrades.forEach((trade) => {
+          const isSuccess = trade.status === 'success';
+          trigger({
+            id: trade.id,
+            displayData: {
+              slotTitleLeft: isSuccess ? (
+                <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
+              ) : (
+                <Icon iconName={IconName.Warning} tw="text-color-error" />
+              ),
+              title: isSuccess
+                ? stringGetter({ key: STRING_KEYS.TRADE_SUCCESSFUL })
+                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED }),
+              body: isSuccess
+                ? stringGetter({
+                    key: STRING_KEYS.TRADE_SUCCESSFUL_DESCRIPTION,
+                    params: {
+                      PURCHASE_DIRECTION:
+                        trade.side === SpotApiSide.BUY
+                          ? stringGetter({ key: STRING_KEYS.PURCHASED })
+                          : stringGetter({ key: STRING_KEYS.SOLD }),
+                      AMOUNT: trade.tokenAmount,
+                      ASSET: trade.tokenSymbol,
+                      SOL_AMOUNT: trade.solAmount,
+                    },
+                  })
+                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
+              groupKey: NotificationType.SpotTrade,
+              toastSensitivity: 'foreground',
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+            },
+            updateKey: [trade.status],
+          });
+        });
+      }, [spotTrades, stringGetter, trigger]);
     },
   },
   {
