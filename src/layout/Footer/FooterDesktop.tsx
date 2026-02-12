@@ -7,9 +7,11 @@ import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useApiState } from '@/hooks/useApiState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -44,6 +46,7 @@ export const FooterDesktop = () => {
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
   const deployerName = useEnvConfig('deployerName');
   const { statusPage } = useURLConfigs();
+  const isChatEnabled = useStatsigGateValue(StatsigFlags.ffDydxChat);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const isStatusLoading = !status && !statusErrorMessage;
@@ -65,9 +68,11 @@ export const FooterDesktop = () => {
 
   return (
     <$Footer>
-      <$ChatArea>
-        <GlobalChat isOpen={isChatOpen} onToggle={() => setIsChatOpen((prev) => !prev)} />
-      </$ChatArea>
+      {isChatEnabled && (
+        <$ChatArea>
+          <GlobalChat isOpen={isChatOpen} onToggle={() => setIsChatOpen((prev) => !prev)} />
+        </$ChatArea>
+      )}
 
       <$Row>
         <WithTooltip

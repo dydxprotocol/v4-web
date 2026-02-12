@@ -3,15 +3,9 @@ import styled, { css } from 'styled-components';
 import { CaretIcon, ChatIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-export const GlobalChat = ({
-  isOpen,
-  onToggle,
-}: {
-  isOpen: boolean;
-  onToggle: () => void;
-}) => {
+export const GlobalChat = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
   return (
-    <$Container $isOpen={isOpen}>
+    <$Container>
       <$Header onClick={onToggle}>
         <$IconRow>
           <ChatIcon />
@@ -20,12 +14,14 @@ export const GlobalChat = ({
         <$CaretIcon $isOpen={isOpen} />
       </$Header>
 
-      {isOpen && <$Body />}
+      <$Body $isOpen={isOpen} />
     </$Container>
   );
 };
 
-const $Container = styled.div<{ $isOpen: boolean }>`
+const BODY_HEIGHT = '30rem';
+
+const $Container = styled.div`
   ${layoutMixins.flexColumn}
   width: 100%;
   background-color: var(--color-layer-3);
@@ -71,7 +67,7 @@ const $CaretIcon = styled(CaretIcon)<{ $isOpen: boolean }>`
     `}
 `;
 
-const $Body = styled.div`
-  flex: 1;
-  height: 30rem;
+const $Body = styled.div<{ $isOpen: boolean }>`
+  height: ${({ $isOpen }) => ($isOpen ? BODY_HEIGHT : '0')};
+  transition: height 0.3s var(--ease-out-expo);
 `;
