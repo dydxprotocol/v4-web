@@ -403,6 +403,7 @@ const getPositionsTableColumnDef = ({
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({
+          uniqueId,
           market,
           marketSummary,
           assetId,
@@ -412,6 +413,7 @@ const getPositionsTableColumnDef = ({
           updatedUnrealizedPnl: unrealizedPnl,
         }) => (
           <PositionsActionsCell
+            positionId={uniqueId}
             marketId={market}
             assetId={assetId}
             side={side}

@@ -26,6 +26,7 @@ import {
   setUpSpotTokenPriceQuery,
   setUpTokenMetadataQuery,
 } from './rest/spot';
+import { setUpTradesQuery } from './rest/trades';
 import { setUpTransfersQuery } from './rest/transfers';
 import {
   setUpAccountBalancesQuery,
@@ -56,6 +57,7 @@ export const storeLifecycles = [
   setUpFillsQuery,
   setUpUserLeverageParamsQuery,
   setUpOrdersQuery,
+  setUpTradesQuery,
   setUpTransfersQuery,
   setUpBlockTradingRewardsQuery,
   setUpOrderbook,

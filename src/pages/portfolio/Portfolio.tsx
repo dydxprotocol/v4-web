@@ -31,7 +31,7 @@ import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
 import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
 import { FundingHistoryList } from '@/views/Lists/Transfers/FundingHistoryList';
 import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
-import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
+import { TradeHistoryTable, TradeHistoryTableColumnKey } from '@/views/tables/TradeHistoryTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
@@ -113,26 +113,30 @@ const PortfolioPage = () => {
           <Route
             path={HistoryRoute.Trades}
             element={
-              <FillsTable
+              <TradeHistoryTable
                 initialPageSize={initialPageSize}
                 columnKeys={
                   isTablet
                     ? [
-                        FillsTableColumnKey.Time,
-                        FillsTableColumnKey.TypeAmount,
-                        FillsTableColumnKey.PriceFee,
+                        TradeHistoryTableColumnKey.Time,
+                        TradeHistoryTableColumnKey.Market,
+                        TradeHistoryTableColumnKey.Action,
+                        TradeHistoryTableColumnKey.Size,
+                        TradeHistoryTableColumnKey.Value,
+                        TradeHistoryTableColumnKey.ClosedPnl,
                       ]
                     : [
-                        FillsTableColumnKey.Market,
-                        FillsTableColumnKey.Time,
-                        FillsTableColumnKey.Type,
-                        FillsTableColumnKey.Side,
-                        FillsTableColumnKey.AmountTag,
-                        FillsTableColumnKey.Price,
-                        FillsTableColumnKey.Total,
-                        FillsTableColumnKey.Fee,
-                        FillsTableColumnKey.ClosedPnl,
-                        FillsTableColumnKey.Liquidity,
+                        TradeHistoryTableColumnKey.Market,
+                        TradeHistoryTableColumnKey.Leverage,
+                        TradeHistoryTableColumnKey.Type,
+                        TradeHistoryTableColumnKey.Action,
+                        TradeHistoryTableColumnKey.Price,
+                        TradeHistoryTableColumnKey.Size,
+                        TradeHistoryTableColumnKey.Value,
+                        TradeHistoryTableColumnKey.Fee,
+                        TradeHistoryTableColumnKey.ClosedPnl,
+                        TradeHistoryTableColumnKey.Time,
+                        TradeHistoryTableColumnKey.Actions,
                       ]
                 }
                 withOuterBorder={isNotTablet}

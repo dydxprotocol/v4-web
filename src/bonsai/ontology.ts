@@ -48,6 +48,8 @@ import {
   selectAccountOrders,
   selectAccountOrdersLoading,
   selectAccountStakingTier,
+  selectAccountTrades,
+  selectAccountTradesLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectChildSubaccountSummaries,
@@ -148,6 +150,7 @@ import {
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
+  SubaccountTrade,
   SubaccountTransfer,
   UserStakingTierSummary,
   UserStats,
@@ -186,6 +189,10 @@ interface BonsaiCoreShape {
     };
     fills: {
       data: BasicSelector<SubaccountFill[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    trades: {
+      data: BasicSelector<SubaccountTrade[]>;
       loading: BasicSelector<LoadableStatus>;
     };
     transfers: {
@@ -295,6 +302,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     fills: {
       data: selectAccountFills,
       loading: selectAccountFillsLoading,
+    },
+    trades: {
+      data: selectAccountTrades,
+      loading: selectAccountTradesLoading,
     },
     transfers: {
       data: selectAccountTransfers,

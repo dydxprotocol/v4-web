@@ -26,6 +26,7 @@ import {
   calculateParentSubaccountSummary,
   calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
+import { calculateTrades } from '../calculators/trades';
 import { calculateTransfers } from '../calculators/transfers';
 import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -50,6 +51,9 @@ import {
   selectRawParentSubaccountData,
   selectRawSelectedMarketLeverages,
   selectRawSelectedMarketLeveragesData,
+  selectRawTradesLiveData,
+  selectRawTradesRest,
+  selectRawTradesRestData,
   selectRawTransfersLiveData,
   selectRawTransfersRest,
   selectRawTransfersRestData,
@@ -305,4 +309,16 @@ export const selectAccountNobleWalletAddress = createAppSelector(
 export const selectAccountStakingTier = createAppSelector(
   [selectRawAccountStakingTierData],
   (stakingTier) => calculateAccountStakingTier(stakingTier)
+);
+
+export const selectAccountTrades = createAppSelector(
+  [selectRawTradesRestData, selectRawTradesLiveData],
+  (rest, live) => {
+    return calculateTrades(rest?.trades, live);
+  }
+);
+
+export const selectAccountTradesLoading = createAppSelector(
+  [selectRawTradesRest, selectRawParentSubaccount],
+  mergeLoadableStatus
 );

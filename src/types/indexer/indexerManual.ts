@@ -162,6 +162,43 @@ export interface IndexerCompositeFillObject {
   entryPriceBefore?: string | null;
 }
 
+export enum IndexerTradeAction {
+  OPEN = 'OPEN',
+  CLOSE = 'CLOSE',
+  PARTIAL_CLOSE = 'PARTIAL_CLOSE',
+  EXTEND = 'EXTEND',
+}
+
+// TODO: DWJ -- review this
+export interface IndexerCompositeTradeObject {
+  id?: string;
+  marketId?: string;
+  orderId?: string;
+  positionId?: string;
+  side?: IndexerOrderSide;
+  positionSide?: IndexerPositionSide;
+  type?: IndexerFillType; // or a new trade-specific type enum
+  executionPrice?: string;
+  value?: string;
+  prevSize?: string;
+  additionalSize?: string;
+  netFee?: string;
+  time?: string;
+  // Fields the new endpoint will likely add:
+  action?: IndexerTradeAction;
+  leverage?: string;
+  marginMode?: string; // "CROSS" | "ISOLATED"
+  orderType?: string;
+  netRealizedPnl?: string;
+}
+
+export interface IndexerCompositeTradeResponse {
+  pageSize?: number;
+  totalResults?: number;
+  offset?: number;
+  trades?: IndexerCompositeTradeObject[];
+}
+
 export interface IndexerWsParentSubaccountSubscribedResponse {
   subaccount: IndexerParentSubaccountResponse;
   blockHeight: string;

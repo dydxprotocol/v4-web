@@ -11,6 +11,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerPerpetualPositionResponseObject,
+  IndexerPositionSide,
   IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
@@ -198,6 +199,41 @@ export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
   marginMode: MarginMode;
   type: SubaccountFillType | undefined;
   closedPnl?: number;
+};
+
+export enum TradeAction {
+  OPEN_LONG = 'OPEN_LONG',
+  OPEN_SHORT = 'OPEN_SHORT',
+  CLOSE_LONG = 'CLOSE_LONG',
+  CLOSE_SHORT = 'CLOSE_SHORT',
+  PARTIAL_CLOSE_LONG = 'PARTIAL_CLOSE_LONG',
+  PARTIAL_CLOSE_SHORT = 'PARTIAL_CLOSE_SHORT',
+  ADD_TO_LONG = 'ADD_TO_LONG',
+  ADD_TO_SHORT = 'ADD_TO_SHORT',
+}
+
+export type SubaccountTrade = {
+  id: string;
+  marketId: string;
+  orderId: string;
+  positionId: string;
+  side: IndexerOrderSide | undefined;
+  positionSide?: IndexerPositionSide | undefined;
+  action: TradeAction;
+  price: string | undefined;
+  size: string | undefined;
+  prevSize?: string | undefined;
+  additionalSize?: string | undefined;
+  value: number | undefined;
+  fee: string | undefined;
+  closedPnl: number | undefined;
+  closedPnlPercent?: number | undefined;
+  createdAt: string | undefined;
+  marginMode: MarginMode;
+  orderType: SubaccountFillType | undefined;
+  leverage?: number;
+  entryPrice?: number;
+  liquidationPrice?: number;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;
