@@ -167,7 +167,7 @@ export const GlobalChatBodyContent = () => {
         ...prev,
         {
           id: String(Date.now()),
-          username: dydxAddress ?? 'anonymous',
+          username: dydxAddress ?? '',
           message,
         },
       ]);
