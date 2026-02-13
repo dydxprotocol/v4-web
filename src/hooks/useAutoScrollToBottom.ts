@@ -10,8 +10,6 @@ const DEFAULT_THRESHOLD = 50;
  * Auto-scrolls a virtualized list to the bottom when new items arrive,
  * but only if the user is already near the bottom. If the user has scrolled
  * up to read older content, new items won't yank them back down.
- *
- * Returns { onScroll } to attach to the scroll container element.
  */
 export const useAutoScrollToBottom = ({
   scrollRef,
