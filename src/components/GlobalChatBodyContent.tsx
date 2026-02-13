@@ -2,7 +2,6 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { randomUUID } from 'crypto';
 import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
@@ -39,7 +38,7 @@ export const GlobalChatBodyContent = () => {
       setMessages((prev) => [
         ...prev,
         {
-          id: randomUUID(),
+          id: String(Date.now()),
           username: dydxAddress ?? '',
           message,
         },
@@ -69,7 +68,7 @@ export const GlobalChatBodyContent = () => {
   return (
     <$Content>
       <$Messages ref={scrollRef} onScroll={onScroll}>
-        <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
+        <$VirtualList $height={rowVirtualizer.getTotalSize()}>
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const msg = messages[virtualRow.index]!;
             return (
@@ -77,9 +76,7 @@ export const GlobalChatBodyContent = () => {
                 key={msg.id}
                 data-index={virtualRow.index}
                 ref={rowVirtualizer.measureElement}
-                style={{
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
+                $translateY={virtualRow.start}
               >
                 <span>
                   <$Username $color={getColorForString(msg.username)}>
@@ -90,7 +87,7 @@ export const GlobalChatBodyContent = () => {
               </$VirtualMessage>
             );
           })}
-        </div>
+        </$VirtualList>
       </$Messages>
       <ChatFooter onSendMessage={handleSendMessage} />
     </$Content>
@@ -194,12 +191,18 @@ const $Messages = styled.div`
   padding: 0 1rem;
 `;
 
-const $VirtualMessage = styled.div`
+const $VirtualList = styled.div<{ $height: number }>`
+  height: ${({ $height }) => $height}px;
+  position: relative;
+`;
+
+const $VirtualMessage = styled.div<{ $translateY: number }>`
   ${layoutMixins.row}
   position: absolute;
   align-items: flex-start;
   font: var(--font-small-book);
   color: var(--color-text-0);
+  transform: translateY(${({ $translateY }) => $translateY}px);
 `;
 
 const $Username = styled.span<{ $color: string }>`
