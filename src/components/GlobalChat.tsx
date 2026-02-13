@@ -33,7 +33,7 @@ export const GlobalChat = () => {
   );
 };
 
-const BODY_HEIGHT = '35rem';
+const BODY_HEIGHT = '60vh';
 const BODY_WIDTH = '25rem';
 
 const $ChatArea = styled.div`
