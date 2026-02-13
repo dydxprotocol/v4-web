@@ -144,7 +144,7 @@ const DUMMY_MESSAGES = [
   },
 ];
 
-const VOLUME_THRESHOLD = 100;
+const VOLUME_THRESHOLD = 100_000;
 
 export const GlobalChatBodyContent = () => {
   const { dydxAddress } = useAccounts();
@@ -185,7 +185,7 @@ export const GlobalChatBodyContent = () => {
   return (
     <$Content>
       <$Messages ref={scrollRef} onScroll={onScroll}>
-        <div style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
+        <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const msg = messages[virtualRow.index]!;
             return (
@@ -200,7 +200,7 @@ export const GlobalChatBodyContent = () => {
                 <span>
                   <$Username $color={getColorForString(msg.username)}>
                     {truncateAddress(msg.username)}:
-                  </$Username>{' '}
+                  </$Username>
                   {msg.message}
                 </span>
               </$VirtualMessage>
@@ -208,7 +208,6 @@ export const GlobalChatBodyContent = () => {
           })}
         </div>
       </$Messages>
-
       <ChatFooter onSendMessage={handleSendMessage} />
     </$Content>
   );
@@ -237,7 +236,7 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
 
   const handleSend = useCallback(() => {
     const trimmed = inputValue.trim();
-    if (!trimmed) return;
+    if (isEmpty(trimmed)) return;
     onSendMessage(inputValue);
     setInputValue('');
   }, [inputValue, onSendMessage]);
@@ -267,7 +266,7 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
             <$Percent>{Math.round(progressPercent)}%</$Percent>
           </$VolumeHeader>
           <$ProgressBar>
-            <$ProgressFill style={{ width: `${progressPercent}%` }} />
+            <$ProgressFill $percent={progressPercent} />
           </$ProgressBar>
           <$VolumeDetails>
             <$VolumeDetail>
@@ -308,19 +307,20 @@ const $Content = styled.div`
 
 const $Messages = styled.div`
   ${layoutMixins.scrollArea}
+  padding: 0 1rem;
 `;
 
 const $VirtualMessage = styled.div`
   ${layoutMixins.row}
   position: absolute;
   align-items: flex-start;
-  padding: 0 1rem;
   font: var(--font-small-book);
   color: var(--color-text-0);
 `;
 
 const $Username = styled.span<{ $color: string }>`
   font: var(--font-small-bold);
+  margin-right: 0.25rem;
   color: ${({ $color }) => $color};
 `;
 
@@ -357,8 +357,9 @@ const $ProgressBar = styled.div`
   overflow: hidden;
 `;
 
-const $ProgressFill = styled.div`
+const $ProgressFill = styled.div<{ $percent: number }>`
   height: 100%;
+  width: ${({ $percent }) => $percent}%;
   border-radius: 0.125rem;
   background-color: var(--color-accent);
 `;
