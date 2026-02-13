@@ -132,7 +132,7 @@ export const BonkPnlPanel = () => {
 };
 
 const getTraderLink = (address: string) => {
-  return `https://community.chaoslabs.xyz/dydx-v4/risk/accounts/${address}/subAccount/0/overview`;
+  return `https://www.mintscan.io/dydx/address/${address}`;
 };
 
 const getBonkPnlTableColumnDef = ({
