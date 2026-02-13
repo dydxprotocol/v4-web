@@ -18,24 +18,13 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { getColorForString } from '@/lib/colorUtils';
 import { truncateAddress } from '@/lib/wallet';
 
 import { IconName } from './Icon';
 import { IconButton } from './IconButton';
 import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
-
-export const BODY_HEIGHT = '31rem';
-
-const NUM_USERNAME_COLORS = 18;
-
-const getUsernameColor = (username: string): string => {
-  const hash = username.split('').reduce((acc, char) => {
-    return char.charCodeAt(0) + acc * 31;
-  }, 0);
-  const hue = (Math.abs(hash) % NUM_USERNAME_COLORS) * (360 / NUM_USERNAME_COLORS);
-  return `hsl(${hue}, 70%, 65%)`;
-};
 
 const DUMMY_MESSAGES = [
   { id: '1', username: 'dydx1a4r7f6stq2dce9hkv5pz3gy8kdu0t7gvq4n2m', message: 'ape this shit now' },
@@ -209,7 +198,7 @@ export const GlobalChatBodyContent = () => {
                 }}
               >
                 <span>
-                  <$Username $color={getUsernameColor(msg.username)}>
+                  <$Username $color={getColorForString(msg.username)}>
                     {truncateAddress(msg.username)}:
                   </$Username>{' '}
                   {msg.message}

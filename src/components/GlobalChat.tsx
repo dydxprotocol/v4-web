@@ -93,5 +93,4 @@ const $Icon = styled(Icon)<{ $isOpen: boolean }>`
 const $Body = styled.div<{ $isOpen: boolean }>`
   height: ${({ $isOpen }) => ($isOpen ? BODY_HEIGHT : '0')};
   transition: height 0.3s var(--ease-out-expo);
-  overflow: hidden;
 `;
