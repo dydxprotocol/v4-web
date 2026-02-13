@@ -2,10 +2,10 @@ import { useCallback, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { CaretIcon, ChatIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { GlobalChatBody } from '@/components/GlobalChatBody';
+import { GlobalChatBody } from './GlobalChatBody';
+import { Icon, IconName } from './Icon';
 
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,11 +19,11 @@ export const GlobalChat = () => {
       <$Container>
         <$Header onClick={handleToggle}>
           <$IconRow>
-            <ChatIcon />
+            <Icon iconName={IconName.Chat} />
             {/* TODO: Replace with localization all at once feature is complete */}
             Global Chat
           </$IconRow>
-          <$CaretIcon $isOpen={isOpen} />
+          <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
         </$Header>
 
         <GlobalChatBody isOpen={isOpen} />
@@ -75,7 +75,7 @@ const $IconRow = styled.div`
   }
 `;
 
-const $CaretIcon = styled(CaretIcon)<{ $isOpen: boolean }>`
+const $Icon = styled(Icon)<{ $isOpen: boolean }>`
   width: 0.625rem;
   height: 0.625rem;
   color: var(--color-text-0);

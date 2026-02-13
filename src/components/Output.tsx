@@ -256,6 +256,8 @@ export function useFormattedNumberOutput(
   );
 }
 
+export type RelativeTimeFormat = 'long' | 'short' | 'narrow' | 'singleCharacter';
+
 export enum OutputType {
   Text = 'Text',
   CompactNumber = 'CompactNumber',
@@ -307,7 +309,7 @@ type ElementProps = {
   withSubscript?: boolean;
 
   relativeTimeOptions?: {
-    format: 'long' | 'short' | 'narrow' | 'singleCharacter';
+    format: RelativeTimeFormat;
     resolution?: number;
     stripRelativeWords?: boolean;
   };
