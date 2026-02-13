@@ -1,13 +1,16 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { GlobalChatBodyContent } from './GlobalChatBodyContent';
 import { Icon, IconName } from './Icon';
 
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const hasBeenOpened = useRef(false);
+  if (isOpen) hasBeenOpened.current = true;
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
@@ -24,16 +27,14 @@ export const GlobalChat = () => {
           </$IconRow>
           <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
         </$Header>
-
-        {/* Placeholder for chat body, will be its own component that only initializes its logic when opened. */}
-        <$Body $isOpen={isOpen} />
+        <$Body $isOpen={isOpen}>{hasBeenOpened.current && <GlobalChatBodyContent />}</$Body>
       </$Container>
     </$ChatArea>
   );
 };
 
-const BODY_HEIGHT = '30rem';
-const BODY_WIDTH = '22rem';
+const BODY_HEIGHT = '60vh';
+const BODY_WIDTH = '25rem';
 
 const $ChatArea = styled.div`
   ${layoutMixins.flexColumn}
