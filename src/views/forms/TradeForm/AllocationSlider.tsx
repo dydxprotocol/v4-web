@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import { useEffect, useState } from 'react';
 
-import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
+import styled from 'styled-components';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -8,7 +8,6 @@ import { formMixins } from '@/styles/formMixins';
 import { Input, InputType } from '@/components/Input';
 import { Slider } from '@/components/Slider';
 
-import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 
 export const AllocationSlider = ({
@@ -18,27 +17,21 @@ export const AllocationSlider = ({
   allocationPercentInput: string | undefined;
   setAllocationInput: (val: string | undefined) => void;
 }) => {
-  const {
-    value: allocation,
-    setValue: setAllocation,
-    commitValue: commitAllocation,
-  } = useQuickUpdatingState<string | undefined>({
-    setValueSlow: setAllocationInput,
-    slowValue: allocationPercentInput,
-    debounceMs: 100,
-  });
+  const [localValue, setLocalValue] = useState<string | undefined>(allocationPercentInput);
+
+  useEffect(() => {
+    setLocalValue(allocationPercentInput);
+  }, [allocationPercentInput]);
 
   const onSliderDrag = ([newValue]: number[]) => {
-    const newValueString = mapIfPresent(newValue, (lev) => MustBigNumber(lev).toFixed(0));
-    setAllocation(newValueString ?? '');
-  };
-
-  const commitValue = (newValue: string | undefined) => {
-    commitAllocation(newValue);
+    const newValueString = MustBigNumber(newValue).toFixed(0);
+    setLocalValue(newValueString);
   };
 
   const onValueCommit = ([newValue]: number[]) => {
-    commitValue(MustBigNumber(newValue).toFixed(0));
+    const finalValue = MustBigNumber(newValue).toFixed(0);
+    setLocalValue(finalValue);
+    setAllocationInput(finalValue);
   };
 
   return (
@@ -48,20 +41,21 @@ export const AllocationSlider = ({
           label="Allocation"
           min={0}
           max={100}
-          step={0.1}
-          value={MustBigNumber(allocation).toNumber()}
+          step={1}
+          value={MustBigNumber(localValue).toNumber()}
           onSliderDrag={onSliderDrag}
           onValueCommit={onValueCommit}
         />
       </div>
       <$InnerInputContainer>
         <Input
-          placeholder={`${MustBigNumber(allocation).toFixed(0)}%`}
+          placeholder={`${MustBigNumber(localValue).toFixed(0)}%`}
           type={InputType.Percent}
-          value={allocation}
+          value={localValue}
           max={100}
           onInput={({ formattedValue }: { formattedValue: string }) => {
-            commitValue(formattedValue);
+            setLocalValue(formattedValue);
+            setAllocationInput(formattedValue);
           }}
         />
       </$InnerInputContainer>
@@ -100,6 +94,7 @@ const $InnerInputContainer = styled.div`
 
 const $AllocationSlider = styled(Slider)`
   height: 1.375rem;
+
   --slider-track-background: linear-gradient(
     90deg,
     var(--color-layer-7) 0%,

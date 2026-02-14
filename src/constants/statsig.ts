@@ -20,6 +20,7 @@ export enum StatsigFlags {
   ffHideMarketsFilter = 'ff_hide_markets_filter',
   ffOpenInterestFilter = 'ff_open_interest_filter',
   abPopupDeposit = 'ab_popup_deposit',
+  ffMobileWeb = 'ff_mobile_web',
   ffOnlyShowLiquidationRebates = 'ff_only_show_liquidation_rebates',
   ffDydxChat = 'ff_dydx_chat',
 }

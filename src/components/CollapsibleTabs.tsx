@@ -90,17 +90,19 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
             ))}
           </$TabsList>
 
-          <Toolbar>
-            {currentTab?.slotToolbar ?? slotToolbar}
-            <CollapsibleTrigger asChild>
-              <$IconButton
-                iconName={IconName.Caret}
-                isToggle
-                buttonStyle={ButtonStyle.WithoutBackground}
-                shape={ButtonShape.Square}
-              />
-            </CollapsibleTrigger>
-          </Toolbar>
+          {slotToolbar && (
+            <Toolbar>
+              {currentTab?.slotToolbar ?? slotToolbar}
+              <CollapsibleTrigger asChild>
+                <$IconButton
+                  iconName={IconName.Caret}
+                  isToggle
+                  buttonStyle={ButtonStyle.WithoutBackground}
+                  shape={ButtonShape.Square}
+                />
+              </CollapsibleTrigger>
+            </Toolbar>
+          )}
         </$Header>
 
         <CollapsibleContent tw="stack shadow-none">

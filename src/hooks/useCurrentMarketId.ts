@@ -25,9 +25,9 @@ import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors'
 import { useMarketsData } from './useMarketsData';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
-export const useCurrentMarketId = () => {
+export const useCurrentMarketId = (route: AppRoute = AppRoute.Trade) => {
   const navigate = useNavigate();
-  const match = useMatch(`/${AppRoute.Trade}/:marketId`);
+  const match = useMatch(`/${route}/:marketId`);
   const { marketId } = match?.params ?? {};
   const dispatch = useAppDispatch();
   const selectedNetwork = useAppSelector(getSelectedNetwork);
@@ -98,7 +98,7 @@ export const useCurrentMarketId = () => {
       dispatch(setCurrentMarketId(validId));
 
       if (validId !== marketId) {
-        navigate(`${AppRoute.Trade}/${validId}`, {
+        navigate(`${route}/${validId}`, {
           replace: true,
         });
       }
@@ -136,7 +136,14 @@ export const useCurrentMarketId = () => {
         dispatch(closeDialogInTradeBox());
       }
     }
-  }, [hasMarketIds, hasLoadedLaunchableMarkets, isViewingUnlaunchedMarket, marketId, navigate]);
+  }, [
+    hasMarketIds,
+    hasLoadedLaunchableMarkets,
+    isViewingUnlaunchedMarket,
+    marketId,
+    navigate,
+    route,
+  ]);
 
   useEffect(() => {
     if (isViewingUnlaunchedMarket) {
@@ -158,6 +165,7 @@ export const useCurrentMarketId = () => {
   }, []);
 
   return {
+    marketId: validId,
     isViewingUnlaunchedMarket,
     hasLoadedMarkets: hasLoadedLaunchableMarkets && hasMarketIds,
   };
