@@ -59,6 +59,8 @@ import {
   selectOpenOrders,
   selectOrderHistory,
   selectParentSubaccountOpenPositions,
+  selectTWAPFills,
+  selectTWAPOrderHistory,
   selectTWAPOrders,
   selectParentSubaccountOpenPositionsLoading,
   selectParentSubaccountSummary,
@@ -191,6 +193,12 @@ interface BonsaiCoreShape {
     activeTwapOrders: {
       data: BasicSelector<TWAPSubaccountOrder[]>;
     };
+    twapOrderHistory: {
+      data: BasicSelector<TWAPSubaccountOrder[]>;
+    };
+    twapFills: {
+      data: BasicSelector<SubaccountFill[]>;
+    };
     fills: {
       data: BasicSelector<SubaccountFill[]>;
       loading: BasicSelector<LoadableStatus>;
@@ -303,6 +311,12 @@ export const BonsaiCore: BonsaiCoreShape = {
     },
     activeTwapOrders: {
       data: selectActiveTWAPOrders,
+    },
+    twapOrderHistory: {
+      data: selectTWAPOrderHistory,
+    },
+    twapFills: {
+      data: selectTWAPFills,
     },
     fills: {
       data: selectAccountFills,

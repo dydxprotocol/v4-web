@@ -44,10 +44,10 @@ import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
+import { TWAPTable } from '../twap/TWAPTable';
 import { TradeTableSettings } from './TradeTableSettings';
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
 import { MarketTypeFilter, PanelView } from './types';
-import { TWAPTable } from '../twap/TWAPTable';
 
 enum InfoSection {
   Position = 'Position',
@@ -389,17 +389,28 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       asChild: true,
       value: InfoSection.Twap,
       label: stringGetter({ key: STRING_KEYS.TWAP }),
-
-      content: (
-        <TWAPTable />
-      ),
+      content: <TWAPTable />,
     }),
     [stringGetter]
   );
 
   const tabItems = useMemo(
-    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem, twapTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem, twapTabItem]
+    () => [
+      positionTabItem,
+      ordersTabItem,
+      fillsTabItem,
+      orderHistoryTabItem,
+      paymentsTabItem,
+      twapTabItem,
+    ],
+    [
+      positionTabItem,
+      fillsTabItem,
+      ordersTabItem,
+      orderHistoryTabItem,
+      paymentsTabItem,
+      twapTabItem,
+    ]
   );
 
   const slotBottom = {

@@ -14,54 +14,64 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Icon, IconName } from '@/components/Icon';
-import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, Table } from '@/components/Table';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
-import { TagSize } from '@/components/Tag';
+import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { getOrderStatusStringKey } from '@/lib/enumToStringKeyHelpers';
 import { type Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
-type ActiveTWAPOrderRow = {
+type TWAPOrderHistoryRow = {
   marketSummary: Nullable<PerpetualMarketSummary>;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 } & TWAPSubaccountOrder;
 
-export enum ActiveTWAPTableColumnKey {
+export enum TWAPOrderHistoryTableColumnKey {
+  OrderTime = 'Order Time',
   Market = 'Market',
-  Side = 'Side',
   Execution = 'Executed / Total Size',
   AveragePrice = 'Average Price',
   Runtime = 'Runtime / Total',
   ReduceOnly = 'Reduce Only',
-  OrderTime = 'Order Time',
-  Terminate = '',
+  Status = 'Status',
 }
 
 type ElementProps = {
-  columnKeys: ActiveTWAPTableColumnKey[];
-  columnWidths?: Partial<Record<ActiveTWAPTableColumnKey, ColumnSize>>;
+  columnKeys: TWAPOrderHistoryTableColumnKey[];
+  columnWidths?: Partial<Record<TWAPOrderHistoryTableColumnKey, ColumnSize>>;
   initialPageSize?: PageSize;
 };
 
-const getActiveTWAPTableColumnDef = ({
+const getTWAPOrderHistoryTableColumnDef = ({
   key,
   stringGetter,
   width,
 }: {
-  key: ActiveTWAPTableColumnKey;
+  key: TWAPOrderHistoryTableColumnKey;
   stringGetter: ReturnType<typeof useStringGetter>;
   width?: ColumnSize;
-}): ColumnDef<ActiveTWAPOrderRow> => ({
+}): ColumnDef<TWAPOrderHistoryRow> => ({
   width,
   ...(
     {
-      [ActiveTWAPTableColumnKey.Market]: {
+      [TWAPOrderHistoryTableColumnKey.OrderTime]: {
+        columnKey: 'updatedAtMilliseconds',
+        getCellValue: (row) => row.updatedAtMilliseconds ?? 0,
+        label: stringGetter({ key: STRING_KEYS.TIME }),
+        allowsSorting: true,
+        renderCell: ({ updatedAtMilliseconds }) => {
+          if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
+
+          return <Output type={OutputType.RelativeTime} value={updatedAtMilliseconds} />;
+        },
+      },
+      [TWAPOrderHistoryTableColumnKey.Market]: {
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
@@ -70,14 +80,7 @@ const getActiveTWAPTableColumnDef = ({
           <MarketSummaryTableCell marketSummary={marketSummary ?? undefined} />
         ),
       },
-      [ActiveTWAPTableColumnKey.Side]: {
-        columnKey: 'side',
-        getCellValue: (row) => row.side,
-        label: stringGetter({ key: STRING_KEYS.SIDE }),
-        allowsSorting: true,
-        renderCell: ({ side }) => <OrderSideTag orderSide={side} size={TagSize.Medium} />,
-      },
-      [ActiveTWAPTableColumnKey.Execution]: {
+      [TWAPOrderHistoryTableColumnKey.Execution]: {
         columnKey: 'execution',
         getCellValue: (row) => row.totalFilled?.toNumber(),
         label: stringGetter({ key: STRING_KEYS.AMOUNT_FILLED }),
@@ -89,7 +92,7 @@ const getActiveTWAPTableColumnDef = ({
           </TableCell>
         ),
       },
-      [ActiveTWAPTableColumnKey.AveragePrice]: {
+      [TWAPOrderHistoryTableColumnKey.AveragePrice]: {
         columnKey: 'price',
         getCellValue: (row) => row.price.toNumber(),
         label: stringGetter({ key: STRING_KEYS.PRICE }),
@@ -103,7 +106,7 @@ const getActiveTWAPTableColumnDef = ({
           />
         ),
       },
-      [ActiveTWAPTableColumnKey.Runtime]: {
+      [TWAPOrderHistoryTableColumnKey.Runtime]: {
         columnKey: 'runtime',
         label: stringGetter({ key: STRING_KEYS.RUNTIME_TOTAL }),
         allowsSorting: false,
@@ -128,7 +131,7 @@ const getActiveTWAPTableColumnDef = ({
           );
         },
       },
-      [ActiveTWAPTableColumnKey.ReduceOnly]: {
+      [TWAPOrderHistoryTableColumnKey.ReduceOnly]: {
         columnKey: 'reduceOnly',
         label: stringGetter({ key: STRING_KEYS.REDUCE_ONLY }),
         allowsSorting: false,
@@ -143,54 +146,48 @@ const getActiveTWAPTableColumnDef = ({
           />
         ),
       },
-      [ActiveTWAPTableColumnKey.OrderTime]: {
-        columnKey: 'updatedAtMilliseconds',
-        getCellValue: (row) => row.updatedAtMilliseconds ?? 0,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+      [TWAPOrderHistoryTableColumnKey.Status]: {
+        columnKey: 'status',
+        getCellValue: (row) => row.status,
+        label: stringGetter({ key: STRING_KEYS.STATUS }),
         allowsSorting: true,
-        renderCell: ({ updatedAtMilliseconds }) => {
-          if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
-
-          return <Output type={OutputType.RelativeTime} value={updatedAtMilliseconds} />;
-        },
+        renderCell: ({ status }) => (
+          <TableCell>
+            {status != null && <OrderStatusIconNew status={status} />}
+            {status != null ? stringGetter({ key: getOrderStatusStringKey(status) }) : null}
+          </TableCell>
+        ),
       },
-      [ActiveTWAPTableColumnKey.Terminate]: {
-        columnKey: 'terminate',
-        label: '',
-        allowsSorting: false,
-        isActionable: true,
-        renderCell: () => <$TerminateButton>Terminate</$TerminateButton>,
-      },
-    } satisfies Record<ActiveTWAPTableColumnKey, ColumnDef<ActiveTWAPOrderRow>>
+    } satisfies Record<TWAPOrderHistoryTableColumnKey, ColumnDef<TWAPOrderHistoryRow>>
   )[key],
 });
 
-export const ActiveTWAPTable = forwardRef(
+export const TWAPOrderHistoryTable = forwardRef(
   ({ columnKeys, columnWidths, initialPageSize }: ElementProps, _ref) => {
     const stringGetter = useStringGetter();
-    const activeTWAPOrders = useAppSelector(BonsaiCore.account.activeTwapOrders.data);
+    const twapOrderHistory = useAppSelector(BonsaiCore.account.twapOrderHistory.data);
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
-    const twapOrdersData: ActiveTWAPOrderRow[] = useMemo(
+    const twapOrdersData: TWAPOrderHistoryRow[] = useMemo(
       () =>
-        activeTWAPOrders.map((order) => ({
+        twapOrderHistory.map((order) => ({
           ...order,
           marketSummary: marketSummaries[order.marketId],
           stepSizeDecimals: marketSummaries[order.marketId]?.stepSizeDecimals ?? TOKEN_DECIMALS,
           tickSizeDecimals: marketSummaries[order.marketId]?.tickSizeDecimals ?? USD_DECIMALS,
         })),
-      [activeTWAPOrders, marketSummaries]
+      [twapOrderHistory, marketSummaries]
     );
 
     return (
       <$Table
-        key="active-twap-orders"
-        label={stringGetter({ key: STRING_KEYS.TWAP_ACTIVE_ORDERS })}
-        tableId="active-twap-table"
+        key="twap-order-history"
+        label="TWAP Order History"
+        tableId="twap-order-history-table"
         data={twapOrdersData}
-        getRowKey={(row: ActiveTWAPOrderRow) => row.id}
+        getRowKey={(row: TWAPOrderHistoryRow) => row.id}
         columns={columnKeys.map((key) =>
-          getActiveTWAPTableColumnDef({
+          getTWAPOrderHistoryTableColumnDef({
             key,
             stringGetter,
             width: columnWidths?.[key],
@@ -215,7 +212,3 @@ export const ActiveTWAPTable = forwardRef(
 const $Table = styled(Table)`
   ${defaultTableMixins}
 ` as typeof Table;
-
-const $TerminateButton = styled.button`
-  color: var(--color-negative);
-`;

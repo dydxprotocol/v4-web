@@ -1,8 +1,14 @@
 import React, { useMemo, useState } from 'react';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { Tabs, type TabItem } from '@/components/Tabs';
 
 import { ActiveTWAPTable, ActiveTWAPTableColumnKey } from './ActiveTWAPTable';
+import { TWAPFillsTable, TWAPFillsTableColumnKey } from './TWAPFillsTable';
+import { TWAPOrderHistoryTable, TWAPOrderHistoryTableColumnKey } from './TWAPOrderHistoryTable';
 
 export enum TwapTableTab {
   Active = 'Active',
@@ -12,12 +18,13 @@ export enum TwapTableTab {
 
 export const TWAPTable: React.FC = () => {
   const [tab, setTab] = useState<TwapTableTab>(TwapTableTab.Active);
+  const stringGetter = useStringGetter();
 
   const tabItems: TabItem<TwapTableTab>[] = useMemo(
     () => [
       {
         value: TwapTableTab.Active,
-        label: 'Active',
+        label: stringGetter({ key: STRING_KEYS.ACTIVE }),
         content: (
           <ActiveTWAPTable
             columnKeys={[
@@ -33,8 +40,43 @@ export const TWAPTable: React.FC = () => {
           />
         ),
       },
+      {
+        value: TwapTableTab.History,
+        label: stringGetter({ key: STRING_KEYS.HISTORY }),
+        content: (
+          <TWAPOrderHistoryTable
+            columnKeys={[
+              TWAPOrderHistoryTableColumnKey.OrderTime,
+              TWAPOrderHistoryTableColumnKey.Market,
+              TWAPOrderHistoryTableColumnKey.Execution,
+              TWAPOrderHistoryTableColumnKey.AveragePrice,
+              TWAPOrderHistoryTableColumnKey.Runtime,
+              TWAPOrderHistoryTableColumnKey.ReduceOnly,
+              TWAPOrderHistoryTableColumnKey.Status,
+            ]}
+          />
+        ),
+      },
+      {
+        value: TwapTableTab.Fills,
+        label: stringGetter({ key: STRING_KEYS.FILLS }),
+        content: (
+          <TWAPFillsTable
+            columnKeys={[
+              TWAPFillsTableColumnKey.OrderTime,
+              TWAPFillsTableColumnKey.Market,
+              TWAPFillsTableColumnKey.Side,
+              TWAPFillsTableColumnKey.AveragePrice,
+              TWAPFillsTableColumnKey.Size,
+              TWAPFillsTableColumnKey.TradeValue,
+              TWAPFillsTableColumnKey.Fee,
+              TWAPFillsTableColumnKey.PnL,
+            ]}
+          />
+        ),
+      },
     ],
-    []
+    [stringGetter]
   );
 
   return (
