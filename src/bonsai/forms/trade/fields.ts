@@ -74,6 +74,9 @@ export function getTradeFormFieldStates(
     triggerPrice: '',
     execution: ExecutionType.GOOD_TIL_DATE,
     goodTil: DEFAULT_GOOD_TIL_TIME,
+    durationHours: undefined,
+    durationMinutes: undefined,
+    frequencySeconds: undefined,
     stopLossOrder: undefined,
     takeProfitOrder: undefined,
   };
@@ -215,6 +218,22 @@ export function getTradeFormFieldStates(
 
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);
+        return result;
+      case TradeFormType.TWAP:
+        makeVisible(result, [
+          'marketId',
+          'side',
+          'size',
+          'marginMode',
+          'durationHours',
+          'durationMinutes',
+          'frequencySeconds',
+          'reduceOnly',
+          'goodTil',
+          'execution',
+        ]);
+        setMarginMode(result);
+        disableReduceOnlyIfIncreasingMarketOrder(result);
         return result;
       default:
         assertNever(type);

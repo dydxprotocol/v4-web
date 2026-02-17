@@ -313,6 +313,9 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       triggerPrice: undefined,
       execution: undefined,
       goodTil: undefined,
+      durationHours: undefined,
+      durationMinutes: undefined,
+      frequencySeconds: undefined,
       stopLossOrder: undefined,
       takeProfitOrder: undefined,
     },
@@ -336,6 +339,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showPostOnlyTooltip: false,
       needsTimeInForce: false,
       needsExecution: false,
+      needsDuration: false,
+      needsFrequency: false,
 
       showSize: false,
       showReduceOnly: false,
@@ -346,6 +351,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showTriggerPrice: false,
       showExecution: false,
       showGoodTil: false,
+      showDuration: false,
+      showFrequency: false,
     },
     tradePayload: undefined,
     triggersSummary: undefined,
@@ -377,6 +384,7 @@ const orderTypeOptions: SelectionOption<TradeFormType>[] = [
   { value: TradeFormType.MARKET, stringKey: 'APP.TRADE.MARKET_ORDER_SHORT' },
   { value: TradeFormType.TRIGGER_LIMIT, stringKey: 'APP.TRADE.STOP_LIMIT' },
   { value: TradeFormType.TRIGGER_MARKET, stringKey: 'APP.TRADE.STOP_MARKET' },
+  { value: TradeFormType.TWAP, stringKey: 'APP.TRADE.TWAP' },
 ];
 
 const goodTilUnitOptions: SelectionOption<TimeUnit>[] = [
@@ -431,6 +439,7 @@ function calculateTradeFormOptions(
 
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.TRIGGER_MARKET]: () => iocOnlyExecutionOptions,
+        [TradeFormType.TWAP]: () => allExecutionOptions,
       })
     : emptyExecutionOptions;
 
@@ -449,8 +458,13 @@ function calculateTradeFormOptions(
     needsPostOnly: isFieldStateRelevant(fields.postOnly),
     needsTimeInForce: isFieldStateRelevant(fields.timeInForce),
     needsExecution: isFieldStateRelevant(fields.execution),
+    needsDuration:
+      isFieldStateRelevant(fields.durationHours) ||
+      isFieldStateRelevant(fields.durationMinutes),
+    needsFrequency: isFieldStateRelevant(fields.frequencySeconds),
 
-    showAllocationSlider: orderType !== TradeFormType.TRIGGER_MARKET,
+    showAllocationSlider:
+      orderType !== TradeFormType.TRIGGER_MARKET && orderType !== TradeFormType.TWAP,
     showTriggerOrders:
       isFieldStateEnabled(fields.takeProfitOrder) && isFieldStateEnabled(fields.stopLossOrder),
     triggerOrdersChecked:
@@ -461,6 +475,10 @@ function calculateTradeFormOptions(
     showLimitPrice: isFieldStateEnabled(fields.limitPrice),
     showTriggerPrice: isFieldStateEnabled(fields.triggerPrice),
     showGoodTil: isFieldStateEnabled(fields.goodTil),
+    showDuration:
+      isFieldStateEnabled(fields.durationHours) ||
+      isFieldStateEnabled(fields.durationMinutes),
+    showFrequency: isFieldStateEnabled(fields.frequencySeconds),
     showTimeInForce: isFieldStateEnabled(fields.timeInForce),
     showExecution: isFieldStateEnabled(fields.execution),
     showReduceOnly: isFieldStateEnabled(fields.reduceOnly),
@@ -613,6 +631,9 @@ export function tradeFormTypeToOrderType(
         return OrderType.TAKE_PROFIT_LIMIT;
       }
       return OrderType.STOP_LIMIT;
+    case TradeFormType.TWAP:
+      // TWAP orders are handled differently - they use market orders under the hood
+      return OrderType.MARKET;
     default:
       assertNever(tradeFormType);
       return OrderType.MARKET;
