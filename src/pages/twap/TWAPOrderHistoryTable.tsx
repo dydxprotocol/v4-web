@@ -16,6 +16,11 @@ import { defaultTableMixins } from '@/styles/tableMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, Table } from '@/components/Table';
+import {
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -63,12 +68,16 @@ const getTWAPOrderHistoryTableColumnDef = ({
       [TWAPOrderHistoryTableColumnKey.OrderTime]: {
         columnKey: 'updatedAtMilliseconds',
         getCellValue: (row) => row.updatedAtMilliseconds ?? 0,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader />,
         allowsSorting: true,
         renderCell: ({ updatedAtMilliseconds }) => {
-          if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
+          if (updatedAtMilliseconds == null) return <Output type={OutputType.Text} />;
 
-          return <Output type={OutputType.RelativeTime} value={updatedAtMilliseconds} />;
+          return (
+            <TableCell>
+              <DateAgeOutput value={updatedAtMilliseconds} relativeTimeFormat="short" />
+            </TableCell>
+          );
         },
       },
       [TWAPOrderHistoryTableColumnKey.Market]: {
@@ -180,31 +189,33 @@ export const TWAPOrderHistoryTable = forwardRef(
     );
 
     return (
-      <$Table
-        key="twap-order-history"
-        label="TWAP Order History"
-        tableId="twap-order-history-table"
-        data={twapOrdersData}
-        getRowKey={(row: TWAPOrderHistoryRow) => row.id}
-        columns={columnKeys.map((key) =>
-          getTWAPOrderHistoryTableColumnDef({
-            key,
-            stringGetter,
-            width: columnWidths?.[key],
-          })
-        )}
-        slotEmpty={
-          <>
-            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
-          </>
-        }
-        initialPageSize={initialPageSize}
-        withInnerBorders
-        withScrollSnapColumns
-        withScrollSnapRows
-        withFocusStickyRows
-      />
+      <DateAgeModeProvider>
+        <$Table
+          key="twap-order-history"
+          label={stringGetter({ key: STRING_KEYS.TWAP_ORDER_HISTORY })}
+          tableId="twap-order-history-table"
+          data={twapOrdersData}
+          getRowKey={(row: TWAPOrderHistoryRow) => row.id}
+          columns={columnKeys.map((key) =>
+            getTWAPOrderHistoryTableColumnDef({
+              key,
+              stringGetter,
+              width: columnWidths?.[key],
+            })
+          )}
+          slotEmpty={
+            <>
+              <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
+            </>
+          }
+          initialPageSize={initialPageSize}
+          withInnerBorders
+          withScrollSnapColumns
+          withScrollSnapRows
+          withFocusStickyRows
+        />
+      </DateAgeModeProvider>
     );
   }
 );

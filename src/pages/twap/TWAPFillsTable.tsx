@@ -6,7 +6,6 @@ import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -16,6 +15,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, Table } from '@/components/Table';
+import {
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -65,13 +69,15 @@ const getTWAPFillsTableColumnDef = ({
       [TWAPFillsTableColumnKey.OrderTime]: {
         columnKey: 'time',
         getCellValue: (row) => row.createdAt,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader />,
         allowsSorting: true,
         renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            value={createdAt != null ? new Date(createdAt).getTime() : null}
-          />
+          <TableCell>
+            <DateAgeOutput
+              value={createdAt != null ? new Date(createdAt).getTime() : null}
+              relativeTimeFormat="short"
+            />
+          </TableCell>
         ),
       },
       [TWAPFillsTableColumnKey.Market]: {
@@ -121,11 +127,15 @@ const getTWAPFillsTableColumnDef = ({
             .toNumber(),
         label: stringGetter({ key: STRING_KEYS.TOTAL }),
         allowsSorting: true,
-        renderCell: ({ size, price }) => (
-          <TableCell>
-            <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size ?? 0)} />
-          </TableCell>
-        ),
+        renderCell: ({ size, price }) => {
+          if (size == null || price == null) return <Output type={OutputType.Text} />;
+
+          return (
+            <TableCell>
+              <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />
+            </TableCell>
+          );
+        },
       },
       [TWAPFillsTableColumnKey.Fee]: {
         columnKey: 'fee',
@@ -171,31 +181,33 @@ export const TWAPFillsTable = forwardRef(
     );
 
     return (
-      <$Table
-        key="twap-fills"
-        label="TWAP Fills"
-        tableId="twap-fills-table"
-        data={fillsData}
-        getRowKey={(row: TWAPFillRow) => row.id ?? ''}
-        columns={columnKeys.map((key) =>
-          getTWAPFillsTableColumnDef({
-            key,
-            stringGetter,
-            width: columnWidths?.[key],
-          })
-        )}
-        slotEmpty={
-          <>
-            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
-          </>
-        }
-        initialPageSize={initialPageSize}
-        withInnerBorders
-        withScrollSnapColumns
-        withScrollSnapRows
-        withFocusStickyRows
-      />
+      <DateAgeModeProvider>
+        <$Table
+          key="twap-fills"
+          label={stringGetter({ key: STRING_KEYS.TWAP_FILLS })}
+          tableId="twap-fills-table"
+          data={fillsData}
+          getRowKey={(row: TWAPFillRow, rowIdx?: number) => row.id ?? rowIdx ?? ''}
+          columns={columnKeys.map((key) =>
+            getTWAPFillsTableColumnDef({
+              key,
+              stringGetter,
+              width: columnWidths?.[key],
+            })
+          )}
+          slotEmpty={
+            <>
+              <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
+            </>
+          }
+          initialPageSize={initialPageSize}
+          withInnerBorders
+          withScrollSnapColumns
+          withScrollSnapRows
+          withFocusStickyRows
+        />
+      </DateAgeModeProvider>
     );
   }
 );
