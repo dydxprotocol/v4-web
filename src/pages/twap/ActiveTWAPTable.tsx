@@ -115,13 +115,13 @@ const getActiveTWAPTableColumnDef = ({
           if (updatedAtMilliseconds == null || duration == null)
             return <Output type={OutputType.Text} />;
 
-          const elapsedMs = Date.now() - updatedAtMilliseconds;
-          const durationMs = parseInt(duration, 10) * 1000;
+          const elapsedRuntime = Date.now() - updatedAtMilliseconds;
+          const fullRuntime = parseInt(duration, 10) * 1000;
 
           return (
             <TableCell stacked>
-              <Output type={OutputType.Duration} value={elapsedMs} />
-              <Output type={OutputType.Duration} value={durationMs} />
+              <Output type={OutputType.Duration} value={elapsedRuntime} />
+              <Output type={OutputType.Duration} value={fullRuntime} />
             </TableCell>
           );
         },

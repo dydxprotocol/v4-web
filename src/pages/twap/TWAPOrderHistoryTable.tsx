@@ -118,19 +118,12 @@ const getTWAPOrderHistoryTableColumnDef = ({
         columnKey: 'runtime',
         label: stringGetter({ key: STRING_KEYS.RUNTIME_TOTAL }),
         allowsSorting: false,
-        renderCell: ({ updatedAtMilliseconds, duration }) => {
-          if (updatedAtMilliseconds == null || duration == null)
-            return <Output type={OutputType.Text} />;
+        renderCell: ({ duration }) => {
+          if (duration == null) return <Output type={OutputType.Text} />;
 
-          const elapsedMs = Date.now() - updatedAtMilliseconds;
-          const durationMs = parseInt(duration, 10) * 1000;
+          const fullRuntime = parseInt(duration, 10) * 1000;
 
-          return (
-            <TableCell stacked>
-              <Output type={OutputType.Duration} value={elapsedMs} />
-              <Output type={OutputType.Duration} value={durationMs} />
-            </TableCell>
-          );
+          return <Output type={OutputType.Duration} value={fullRuntime} />;
         },
       },
       [TWAPOrderHistoryTableColumnKey.ReduceOnly]: {
