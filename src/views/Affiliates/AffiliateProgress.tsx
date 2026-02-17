@@ -1,7 +1,6 @@
 import {
   AFFILIATES_FEE_DISCOUNT_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
-  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -22,14 +21,6 @@ export const AffiliateProgress = ({ volume }: { volume?: number }) => {
               key: STRING_KEYS.EARN_FOR_EACH_TRADER,
               params: {
                 AMOUNT_USD: DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
-              },
-            })}
-          </li>
-          <li>
-            {stringGetter({
-              key: STRING_KEYS.VIP_AFFILIATE_EARNINGS,
-              params: {
-                AMOUNT_USD: DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString(),
               },
             })}
           </li>

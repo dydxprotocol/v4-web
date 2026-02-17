@@ -4,6 +4,7 @@ import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { BalanceRequest, RouteRequest, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
+import { orderBy, partition } from 'lodash';
 import { Chain, parseUnits } from 'viem';
 import { arbitrum, optimism } from 'viem/chains';
 
@@ -11,7 +12,12 @@ import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
-import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer, USDC_ADDRESSES } from '@/constants/tokens';
+import {
+  DYDX_CHAIN_USDC_DENOM,
+  TokenBalance,
+  TokenForTransfer,
+  USDC_ADDRESSES,
+} from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
@@ -20,7 +26,7 @@ import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { AttemptBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
@@ -39,6 +45,44 @@ export function useBalances() {
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
   });
+}
+
+export function useDepositTokenBalances() {
+  const { isLoading, data } = useBalances();
+
+  const [withBalances, noBalances] = useMemo(() => {
+    if (!data || !data.chains) return [[], []];
+
+    const allBalances: TokenBalance[] = Object.keys(data.chains)
+      .map((chainId) => {
+        const denomToBalance = data.chains?.[chainId]?.denoms;
+        return denomToBalance
+          ? Object.entries(denomToBalance).map(([denom, balance]) => ({
+              chainId,
+              amount: balance.amount,
+              formattedAmount: balance.formattedAmount,
+              denom,
+              decimals: balance.decimals,
+              valueUSD: balance.valueUsd,
+            }))
+          : [];
+      })
+      .flat()
+      // TODO: log when there are no decimals? this shouldnt happen
+      .filter((balance) => balance.decimals);
+
+    const [unsortedWithBalances, unsortedWithoutBalances] = partition(
+      allBalances,
+      (balance) => parseUnits(balance.amount, balance.decimals!) > 0
+    );
+
+    return [
+      orderBy(unsortedWithBalances, ({ valueUSD }) => MustBigNumber(valueUSD).toNumber(), ['desc']),
+      unsortedWithoutBalances,
+    ];
+  }, [data]);
+
+  return { isLoading, withBalances, noBalances };
 }
 
 export function useBalance(

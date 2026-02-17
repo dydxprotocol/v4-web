@@ -35,21 +35,32 @@ import {
   SubaccountSummaryDerived,
 } from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
-import { getMarketEffectiveInitialMarginForMarket } from './markets';
+import {
+  calculateEffectiveSelectedLeverageBigNumber,
+  getMarketEffectiveInitialMarginForMarket,
+} from './markets';
 
 export function calculateParentSubaccountPositions(
   parent: ParentSubaccountDataBase,
-  markets: MarketsData
+  markets: MarketsData,
+  rawSelectedMarketLeverages: { [marketId: string]: number }
 ): SubaccountPosition[] {
   return Object.values(parent.childSubaccounts)
     .filter(isPresent)
     .flatMap((child) => {
-      const subaccount = calculateSubaccountSummary(child, markets);
+      const subaccount = calculateSubaccountSummary(child, markets, rawSelectedMarketLeverages);
       return orderBy(
         Object.values(child.openPerpetualPositions)
           .filter(isPresent)
           .filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN)
-          .map((perp) => calculateSubaccountPosition(subaccount, perp, markets[perp.market])),
+          .map((perp) =>
+            calculateSubaccountPosition(
+              subaccount,
+              perp,
+              markets[perp.market],
+              rawSelectedMarketLeverages
+            )
+          ),
         [(f) => f.createdAt],
         ['desc']
       );
@@ -58,10 +69,13 @@ export function calculateParentSubaccountPositions(
 
 export function calculateParentSubaccountSummary(
   parent: ParentSubaccountDataBase,
-  markets: MarketsData
+  markets: MarketsData,
+  rawSelectedMarketLeverages: { [marketId: string]: number }
 ): GroupedSubaccountSummary {
   const summaries = mapValues(parent.childSubaccounts, (subaccount) =>
-    subaccount != null ? calculateSubaccountSummary(subaccount, markets) : subaccount
+    subaccount != null
+      ? calculateSubaccountSummary(subaccount, markets, rawSelectedMarketLeverages)
+      : subaccount
   );
   const parentSummary = summaries[parent.parentSubaccount];
   if (parentSummary == null) {
@@ -71,6 +85,7 @@ export function calculateParentSubaccountSummary(
     marginUsage: parentSummary.marginUsage,
     leverage: parentSummary.leverage,
     freeCollateral: parentSummary.freeCollateral,
+    rawFreeCollateral: parentSummary.rawFreeCollateral,
     parentSubaccountEquity: parentSummary.equity,
     equity: Object.values(summaries)
       .filter(isPresent)
@@ -86,8 +101,16 @@ export function calculateMarketsNeededForSubaccount(parent: ParentSubaccountData
 }
 
 export const calculateSubaccountSummary = weakMapMemoize(
-  (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
-    const core = calculateSubaccountSummaryCore(subaccountData, markets);
+  (
+    subaccountData: ChildSubaccountData,
+    markets: MarketsData,
+    rawSelectedMarketLeverages: { [marketId: string]: number }
+  ): SubaccountSummary => {
+    const core = calculateSubaccountSummaryCore(
+      subaccountData,
+      markets,
+      rawSelectedMarketLeverages
+    );
     return {
       ...core,
       ...calculateSubaccountSummaryDerived(core),
@@ -98,7 +121,8 @@ export const calculateSubaccountSummary = weakMapMemoize(
 
 function calculateSubaccountSummaryCore(
   subaccountData: ChildSubaccountData,
-  markets: MarketsData
+  markets: MarketsData,
+  rawSelectedMarketLeverages: { [marketId: string]: number }
 ): SubaccountSummaryCore {
   const quoteBalance = calc(() => {
     const usdcPosition = subaccountData.assetPositions.USDC;
@@ -120,9 +144,9 @@ function calculateSubaccountSummaryCore(
       const {
         value: positionValue,
         notional: positionNotional,
-        initialRisk: positionInitialRisk,
+        initialRiskFromSelectedLeverage: positionInitialRisk,
         maintenanceRisk: positionMaintenanceRisk,
-      } = calculateDerivedPositionCore(getBnPosition(position), market);
+      } = calculateDerivedPositionCore(getBnPosition(position), market, rawSelectedMarketLeverages);
       return {
         valueTotal: acc.valueTotal.plus(positionValue),
         notionalTotal: acc.notionalTotal.plus(positionNotional),
@@ -151,7 +175,8 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
   const { initialRiskTotal, notionalTotal, quoteBalance, valueTotal } = core;
   const equity = BigNumber.max(valueTotal.plus(quoteBalance), BIG_NUMBERS.ZERO);
 
-  const freeCollateral = BigNumber.max(equity.minus(initialRiskTotal), BIG_NUMBERS.ZERO);
+  const rawFreeCollateral = equity.minus(initialRiskTotal);
+  const freeCollateral = BigNumber.max(rawFreeCollateral, BIG_NUMBERS.ZERO);
 
   let leverage = null;
   let marginUsage = null;
@@ -163,6 +188,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
 
   return {
     freeCollateral,
+    rawFreeCollateral,
     equity,
     leverage,
     marginUsage,
@@ -172,10 +198,11 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
 function calculateSubaccountPosition(
   subaccountSummary: SubaccountSummary,
   position: IndexerPerpetualPositionResponseObject,
-  market: IndexerWsBaseMarketObject | undefined
+  market: IndexerWsBaseMarketObject | undefined,
+  rawSelectedMarketLeverages?: { [marketId: string]: number }
 ): SubaccountPosition {
   const bnPosition = getBnPosition(position);
-  const core = calculateDerivedPositionCore(bnPosition, market);
+  const core = calculateDerivedPositionCore(bnPosition, market, rawSelectedMarketLeverages);
   return {
     ...bnPosition,
     ...core,
@@ -199,14 +226,36 @@ function getBnPosition(position: IndexerPerpetualPositionResponseObject): Subacc
   };
 }
 
+export function calculateEffectiveMarketImfFromSelectedLeverage({
+  rawSelectedLeverage,
+  initialMarginFraction,
+  effectiveInitialMarginFraction,
+}: {
+  rawSelectedLeverage: number | undefined;
+  initialMarginFraction: BigNumber | undefined;
+  effectiveInitialMarginFraction: BigNumber | undefined;
+}) {
+  const effectiveSelectedLeverage = calculateEffectiveSelectedLeverageBigNumber({
+    userSelectedLeverage: rawSelectedLeverage,
+    initialMarginFraction,
+  });
+  const imfFromSelectedLeverage = BIG_NUMBERS.ONE.div(effectiveSelectedLeverage);
+  const adjustedImfFromSelectedLeverage = BigNumber.max(
+    imfFromSelectedLeverage,
+    effectiveInitialMarginFraction ?? 0
+  );
+  return { adjustedImfFromSelectedLeverage, effectiveSelectedLeverage };
+}
+
 function calculateDerivedPositionCore(
   position: SubaccountPositionBase,
-  market: IndexerWsBaseMarketObject | undefined
+  market: IndexerWsBaseMarketObject | undefined,
+  rawSelectedMarketLeverages?: { [marketId: string]: number }
 ): SubaccountPositionDerivedCore {
   const marginMode = isParentSubaccount(position.subaccountNumber) ? 'CROSS' : 'ISOLATED';
   const effectiveImf =
     market != null
-      ? getMarketEffectiveInitialMarginForMarket(market) ?? BIG_NUMBERS.ZERO
+      ? (getMarketEffectiveInitialMarginForMarket(market) ?? BIG_NUMBERS.ZERO)
       : BIG_NUMBERS.ZERO;
   const effectiveMmf = MaybeBigNumber(market?.maintenanceMarginFraction) ?? BIG_NUMBERS.ZERO;
 
@@ -218,6 +267,14 @@ function calculateDerivedPositionCore(
 
   const notional = unsignedSize.times(oracle);
   const value = signedSize.times(oracle);
+
+  const { adjustedImfFromSelectedLeverage, effectiveSelectedLeverage } =
+    calculateEffectiveMarketImfFromSelectedLeverage({
+      rawSelectedLeverage: rawSelectedMarketLeverages?.[position.market],
+      initialMarginFraction: MaybeBigNumber(market?.initialMarginFraction),
+      effectiveInitialMarginFraction: effectiveImf,
+    });
+  const initialRiskFromSelectedLeverage = notional.times(adjustedImfFromSelectedLeverage);
 
   return {
     uniqueId: getPositionUniqueId(position.market, position.subaccountNumber),
@@ -237,6 +294,9 @@ function calculateDerivedPositionCore(
       }
       return BIG_NUMBERS.ONE.div(effectiveImf);
     }),
+    effectiveSelectedLeverage,
+    adjustedImfFromSelectedLeverage,
+    initialRiskFromSelectedLeverage,
     baseEntryPrice: position.entryPrice,
     baseNetFunding: position.netFunding,
   };
@@ -247,13 +307,23 @@ function calculatePositionDerivedExtra(
   subaccountSummary: SubaccountSummary
 ): SubaccountPositionDerivedExtra {
   const { equity, maintenanceRiskTotal } = subaccountSummary;
-  const { signedSize, notional, value, marginMode, adjustedMmf, maintenanceRisk, initialRisk } =
-    position;
+  const {
+    signedSize,
+    notional,
+    value,
+    marginMode,
+    adjustedMmf,
+    maintenanceRisk,
+    initialRisk,
+    initialRiskFromSelectedLeverage,
+  } = position;
 
   const leverage = equity.gt(0) ? notional.div(equity) : null;
 
   const marginValueMaintenance = marginMode === 'ISOLATED' ? equity : maintenanceRisk;
   const marginValueInitial = marginMode === 'ISOLATED' ? equity : initialRisk;
+  const marginValueInitialFromSelectedLeverage =
+    marginMode === 'ISOLATED' ? equity : initialRiskFromSelectedLeverage;
 
   const liquidationPrice = calc(() => {
     const otherPositionsRisk = maintenanceRiskTotal.minus(maintenanceRisk);
@@ -280,7 +350,7 @@ function calculatePositionDerivedExtra(
     const entryValue = signedSize.multipliedBy(MustBigNumber(position.baseEntryPrice));
     const unrealizedPnlInner = value.minus(entryValue);
 
-    const baseEquity = getPositionBaseEquity({ ...position, leverage });
+    const baseEquity = getPositionBaseEquity(position);
 
     const unrealizedPnlPercentInner = baseEquity.isZero()
       ? null
@@ -293,6 +363,7 @@ function calculatePositionDerivedExtra(
     leverage,
     marginValueMaintenance,
     marginValueInitial,
+    marginValueInitialFromSelectedLeverage,
     liquidationPrice,
     updatedUnrealizedPnl,
     updatedUnrealizedPnlPercent,
@@ -301,12 +372,14 @@ function calculatePositionDerivedExtra(
 
 export function calculateChildSubaccountSummaries(
   parent: ParentSubaccountDataBase,
-  markets: MarketsData
+  markets: MarketsData,
+  selectedMarketLeverages: { [marketId: string]: number }
 ): ChildSubaccountSummaries {
   return pickBy(
     mapValues(
       parent.childSubaccounts,
-      (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
+      (subaccount) =>
+        subaccount && calculateSubaccountSummary(subaccount, markets, selectedMarketLeverages)
     ),
     isTruthy
   );
@@ -353,13 +426,11 @@ export function calculateUnopenedIsolatedPositions(
 }
 
 export function getPositionBaseEquity(
-  position: Pick<SubaccountPosition, 'signedSize' | 'baseEntryPrice' | 'leverage'>
+  position: Pick<SubaccountPosition, 'signedSize' | 'baseEntryPrice' | 'effectiveSelectedLeverage'>
 ) {
   const entryValue = position.signedSize.times(position.baseEntryPrice);
 
-  const scaledLeverage = position.leverage
-    ? BigNumber.max(position.leverage.abs(), BIG_NUMBERS.ONE)
-    : BIG_NUMBERS.ONE;
+  const scaledLeverage = BigNumber.max(position.effectiveSelectedLeverage.abs(), BIG_NUMBERS.ONE);
 
   return entryValue.abs().div(scaledLeverage);
 }

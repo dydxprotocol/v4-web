@@ -9,7 +9,7 @@ import {
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
@@ -20,11 +20,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
-import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
+import { EditAffiliateInput } from '@/views/Affiliates/EditAffiliateInput';
 
 import { track } from '@/lib/analytics/analytics';
 import { triggerTwitterIntent } from '@/lib/twitter';
@@ -43,24 +43,16 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { affiliateProgramFaq, affiliateProgram } = useURLConfigs();
+  const { affiliateProgramFaq } = useURLConfigs();
   const { dydxAddress } = useAccounts();
   const {
     affiliateMetadataQuery: { data },
     affiliateMaxEarningQuery: { data: maxEarningData },
   } = useAffiliatesInfo(dydxAddress);
 
-  useEffect(() => {
-    if (data?.isEligible === undefined) return;
-
-    track(
-      AnalyticsEvents.AffiliateInviteFriendsModalOpened({ isAffiliateEligible: data.isEligible })
-    );
-  }, [data?.isEligible]);
-
   const maxEarning = maxEarningData?.maxEarning;
 
-  const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
+  const [, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
     onSuccess: copyBlobToClipboard,
   });
@@ -84,6 +76,14 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
   const affiliatesUrl =
     data?.metadata?.referralCode && `${window.location.host}?ref=${data.metadata.referralCode}`;
+
+  useEffect(() => {
+    if (data?.isEligible === undefined) return;
+
+    track(
+      AnalyticsEvents.AffiliateInviteFriendsModalOpened({ isAffiliateEligible: data.isEligible })
+    );
+  }, [data?.isEligible]);
 
   const dialogDescription = (
     <span>
@@ -114,6 +114,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.UNLOCK_AFFILIATE_PROGRAM })}
       description={dialogDescription}
+      withAnimation
     >
       {!dydxAddress && (
         <OnboardingTriggerButton
@@ -127,26 +128,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       {dydxAddress && !data?.isEligible && <AffiliateProgress volume={data?.totalVolume} />}
       {dydxAddress && data?.isEligible && (
         <div tw="column gap-1">
-          <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
-            <div>
-              <div tw="text-small text-color-text-0">
-                {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
-              </div>
-              <div>{affiliatesUrl}</div>
-            </div>
-            {affiliatesUrl && (
-              <CopyButton
-                action={ButtonAction.Primary}
-                size={ButtonSize.Small}
-                value={affiliatesUrl}
-                onCopy={() => {
-                  track(AnalyticsEvents.AffiliateURLCopied({ url: affiliatesUrl }));
-                }}
-              >
-                {stringGetter({ key: STRING_KEYS.COPY_LINK })}
-              </CopyButton>
-            )}
-          </div>
+          <$EditAffiliateInput />
           {affiliatesUrl && (
             <div
               ref={(domNode) => {
@@ -173,20 +155,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               />
             </div>
           )}
-
           <div tw="flex gap-1">
-            <Button
-              action={ButtonAction.Base}
-              slotLeft={<Icon iconName={IconName.Rocket} />}
-              state={{
-                isLoading: isCopying,
-              }}
-              tw="flex-1"
-              type={ButtonType.Link}
-              href={affiliateProgram}
-            >
-              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-            </Button>
             <Button
               action={ButtonAction.Base}
               slotLeft={<Icon iconName={IconName.SocialX} />}
@@ -206,6 +175,10 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     </Dialog>
   );
 };
+
+const $EditAffiliateInput = styled(EditAffiliateInput)`
+  --edit-affiliate-input-bgColor: var(--color-layer-2);
+`;
 
 const $QrCode = styled(QrCode)`
   width: 7rem;

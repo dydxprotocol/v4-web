@@ -11,6 +11,8 @@ const ClassicThemeBase: () => ThemeColorBase = () => ({
   green: ColorToken.Green3,
   red: ColorToken.Red2,
 
+  redFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
+  greenFaded: generateFadedColorVariant(ColorToken.Green3, OpacityToken.Opacity16),
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.GrayBlue7,
@@ -37,6 +39,7 @@ const ClassicThemeBase: () => ThemeColorBase = () => ({
 
   accent: ColorToken.Purple1,
   accentFaded: generateFadedColorVariant(ColorToken.Purple1, OpacityToken.Opacity16),
+  accentMoreFaded: generateFadedColorVariant(ColorToken.Purple1, OpacityToken.Opacity8),
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green3,
@@ -83,6 +86,8 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
   green: ColorToken.Green1,
   red: ColorToken.Red0,
 
+  redFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
+  greenFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.Black,
@@ -109,6 +114,7 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
 
   accent: ColorToken.Purple0,
   accentFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity16),
+  accentMoreFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity8),
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green1,
@@ -155,6 +161,8 @@ const LightThemeBase: () => ThemeColorBase = () => ({
   green: ColorToken.Green5,
   red: ColorToken.Red1,
 
+  redFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
+  greenFaded: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity16),
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.LightGray7,
@@ -181,6 +189,7 @@ const LightThemeBase: () => ThemeColorBase = () => ({
 
   accent: ColorToken.Purple0,
   accentFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity16),
+  accentMoreFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity8),
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green5,

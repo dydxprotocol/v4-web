@@ -21,8 +21,6 @@ import { TelegramInviteBanner } from '@/views/TelegramInviteBanner';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
-import { getDismissedAffiliateBanner } from '@/state/dismissableSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -42,7 +40,6 @@ export const Overview = () => {
   const shouldShowTelegramInvite =
     dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress);
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const dismissedAffiliateBanner = useAppSelector(getDismissedAffiliateBanner);
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
@@ -55,12 +52,6 @@ export const Overview = () => {
 
   return (
     <div>
-      {affiliatesEnabled && !dismissedAffiliateBanner && !isTablet && (
-        <DetachedSection>
-          <AffiliatesBanner withClose showLink />
-        </DetachedSection>
-      )}
-
       {shouldShowTelegramInvite && (
         <DetachedSection>
           <TelegramInviteBanner />

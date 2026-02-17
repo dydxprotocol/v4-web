@@ -83,7 +83,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const {
     entryPrice,
     exitPrice,
-    leverage,
+    effectiveSelectedLeverage: leverage,
     liquidationPrice,
     netFunding,
     realizedPnl,
@@ -128,7 +128,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const currentSize = size;
   const postOrderSize = currentMarketPositionPostTrade.signedSize;
   const leverageBN = MustBigNumber(leverage);
-  const newLeverageBN = MustBigNumber(currentMarketPositionPostTrade.leverage);
+  const newLeverageBN = MustBigNumber(currentMarketPositionPostTrade.effectiveSelectedLeverage);
   const maxLeverage = BIG_NUMBERS.ONE.div(
     MustBigNumber(currentMarketPositionPostTrade.adjustedImf)
   );
@@ -136,11 +136,12 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const hasNoPositionInMarket = MustBigNumber(currentSize).isZero();
 
   const newLeverageIsInvalid =
-    !!currentMarketPositionPostTrade.leverage &&
+    !!currentMarketPositionPostTrade.effectiveSelectedLeverage &&
     (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
 
   const newLeverageIsLarger =
-    !leverage || (currentMarketPositionPostTrade.leverage && newLeverageBN.gt(leverageBN));
+    !leverage ||
+    (currentMarketPositionPostTrade.effectiveSelectedLeverage && newLeverageBN.gt(leverageBN));
 
   let liquidationArrowSign = NumberSign.Neutral;
   const newLiquidationPriceIsLarger = MustBigNumber(
@@ -152,7 +153,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     postOrderSize: postOrderSize?.toNumber(),
   }).positionSideHasChanged;
 
-  if (currentMarketPositionPostTrade.leverage) {
+  if (currentMarketPositionPostTrade.effectiveSelectedLeverage) {
     if (newLeverageIsInvalid) {
       liquidationArrowSign = NumberSign.Negative;
     } else if (newPositionIsClosed) {
@@ -191,7 +192,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       useDiffOutput: true,
       showSign: ShowSign.None,
       value: leverage?.toNumber(),
-      newValue: currentMarketPositionPostTrade.leverage?.toNumber(),
+      newValue: currentMarketPositionPostTrade.effectiveSelectedLeverage?.toNumber(),
       withBaseFont: true,
     },
     {

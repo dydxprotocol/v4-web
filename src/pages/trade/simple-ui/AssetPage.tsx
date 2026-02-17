@@ -81,7 +81,7 @@ const AssetPage = () => {
                 <WithTooltip tooltip="vault-apr-90d">
                   <MegaVaultYieldOutput
                     withLoading
-                    yieldType="ninetyDay"
+                    yieldType="thirtyDay"
                     tw="inline-block"
                     slotRight={<span>{stringGetter({ key: STRING_KEYS.APR })}</span>}
                   />

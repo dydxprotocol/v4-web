@@ -43,6 +43,7 @@ export type MarketData = {
   marketCap: Nullable<number>;
   sectorTags: Nullable<string[]>;
   isFavorite: boolean;
+  marketFeeDiscountMultiplier?: number;
 };
 
 export enum MarketSorting {
@@ -66,7 +67,7 @@ export enum MarketFilters {
   DEPIN = 'depin',
   GAMING = 'gaming',
   MEMES = 'memes',
-  RWA = 'real-world-assets',
+  RWA = 'tokenized-assets',
   LAUNCHABLE = 'launchable',
 }
 export enum HiddenMarketFilterTags {

@@ -6,7 +6,15 @@ import { DydxAddress } from '@/constants/wallets';
 
 import type { RootState } from './_store';
 import { createAppSelector } from './appTypes';
-import { Deposit, isDeposit, isWithdraw, Transfer, Withdraw } from './transfers';
+import {
+  Deposit,
+  isDeposit,
+  isSpotWithdraw,
+  isWithdraw,
+  SpotWithdraw,
+  Transfer,
+  Withdraw,
+} from './transfers';
 
 export const getTransfersByAddress = (state: RootState) => state.transfers.transfersByDydxAddress;
 
@@ -82,12 +90,21 @@ export const selectWithdraw = createAppSelector(
   }
 );
 
+export const selectSpotWithdraw = createAppSelector(
+  [selectAllTransfers, (s, id: string) => id],
+  (allTransfers, id) => {
+    return allTransfers.find(
+      (transfer): transfer is SpotWithdraw => isSpotWithdraw(transfer) && transfer.id === id
+    );
+  }
+);
+
 export const selectHasNonExpiredPendingWithdraws = createAppSelector(
   [selectParentSubaccountInfo, getTransfersByAddress],
   (parentSubaccountInfo, transfersByAddress) => {
     const pendingWithdraws = parentSubaccountInfo.wallet
-      ? transfersByAddress[parentSubaccountInfo.wallet as DydxAddress]?.filter(isWithdraw) ??
-        EMPTY_ARR
+      ? (transfersByAddress[parentSubaccountInfo.wallet as DydxAddress]?.filter(isWithdraw) ??
+        EMPTY_ARR)
       : EMPTY_ARR;
 
     const idleTimes = pendingWithdraws.reduce<number[]>((acc, w) => {

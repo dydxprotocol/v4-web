@@ -85,7 +85,7 @@ export const useApiState = () => {
   const connectionError = getConnectionError({
     apiState,
     initializationError:
-      initializationError ?? bonsaiInitializationError ? 'Unknown error' : undefined,
+      (initializationError ?? bonsaiInitializationError) ? 'Unknown error' : undefined,
   });
   const statusErrorMessage = getStatusErrorMessage({ connectionError, stringGetter });
 

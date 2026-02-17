@@ -40,7 +40,7 @@ const TIME_RANGES = [
   { value: '90d', labelNumDays: '90', time: 90 * timeUnits.day },
 ] as const;
 
-const finalBackupZoomDomain = 90 * timeUnits.day;
+const finalBackupZoomDomain = 30 * timeUnits.day;
 
 export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const stringGetter = useStringGetter();
@@ -111,7 +111,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       pointsInView
         // remove stuff after hover
         .filter((v) => hoveredTime == null || (v.date ?? 0) <= hoveredTime)
-        .map((v) => (selectedChart === 'equity' ? v.equity ?? 0 : v.totalPnl ?? 0)),
+        .map((v) => (selectedChart === 'equity' ? (v.equity ?? 0) : (v.totalPnl ?? 0))),
     [hoveredTime, pointsInView, selectedChart]
   );
   const atLeastOnePoint = relevantDataPoints.length > 0;
@@ -132,7 +132,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const xAccessorFunc = useCallback((datum: VaultPnlDatum | undefined) => datum?.date ?? 0, []);
   const yAccessorFunc = useCallback(
     (datum: VaultPnlDatum | undefined) =>
-      selectedChart === 'pnl' ? datum?.totalPnl ?? 0 : datum?.equity ?? 0,
+      selectedChart === 'pnl' ? (datum?.totalPnl ?? 0) : (datum?.equity ?? 0),
     [selectedChart]
   );
 

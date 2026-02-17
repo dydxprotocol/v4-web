@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { MarginMode, TradeFormSummary } from '@/bonsai/forms/trade/types';
+import { TradeFormSummary } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
@@ -8,10 +8,12 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -23,9 +25,10 @@ import { Button } from '@/components/Button';
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { WithSeparators } from '@/components/Separator';
 import { ToggleButton } from '@/components/ToggleButton';
+import { TradeFeeDiscountTag } from '@/components/TradeFeeDiscountTag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -34,12 +37,10 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { nullIfZero } from '@/lib/numbers';
-import { calculateCrossPositionMargin, getDoubleValuesHasDiff } from '@/lib/tradeData';
+import { getDoubleValuesHasDiff } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ConfirmButtonConfig = {
@@ -82,21 +83,18 @@ export const PlaceOrderButtonAndReceipt = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
 
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
-  const { tickSizeDecimals } = orEmptyObj(
+  const { tickSizeDecimals, displayableTicker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const {
-    liquidationPrice,
-    leverage,
-    notional: notionalTotal,
-    adjustedImf,
-    marginValueMaintenance,
-  } = orEmptyObj(summary.accountDetailsBefore?.position);
+  const marketFeeDiscountMultiplier = useAppSelector(
+    BonsaiHelpers.currentMarket.marketInfo
+  )?.marketFeeDiscountMultiplier;
+
+  const { liquidationPrice, marginValueInitialFromSelectedLeverage } = orEmptyObj(
+    summary.accountDetailsBefore?.position
+  );
 
   const postOrderPositionData = orEmptyObj(summary.accountDetailsAfter?.position);
-
-  const tradeValues = useAppSelector(getTradeFormValues);
-  const { marginMode } = tradeValues;
 
   const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
@@ -110,49 +108,25 @@ export const PlaceOrderButtonAndReceipt = ({
   const areInputsFilled = tradePayload != null;
 
   const renderMarginValue = () => {
-    if (marginMode === MarginMode.CROSS) {
-      const currentCrossMargin = nullIfZero(
-        calculateCrossPositionMargin({
-          notionalTotal: notionalTotal?.toNumber(),
-          adjustedImf: adjustedImf?.toNumber(),
-        })
-      );
-
-      const postOrderCrossMargin = nullIfZero(
-        calculateCrossPositionMargin({
-          notionalTotal: postOrderPositionData.notional?.toNumber(),
-          adjustedImf: postOrderPositionData.adjustedImf?.toNumber(),
-        })
-      );
-
-      return (
-        <DiffOutput
-          useGrouping
-          type={OutputType.Fiat}
-          value={currentCrossMargin}
-          newValue={postOrderCrossMargin}
-          withDiff={areInputsFilled && currentCrossMargin !== postOrderCrossMargin}
-        />
-      );
-    }
-
     return (
       <DiffOutput
         useGrouping
         type={OutputType.Fiat}
-        value={marginValueMaintenance}
-        newValue={postOrderPositionData.marginValueMaintenance}
+        value={marginValueInitialFromSelectedLeverage}
+        newValue={postOrderPositionData.marginValueInitialFromSelectedLeverage}
         withDiff={
           areInputsFilled &&
           getDoubleValuesHasDiff(
-            marginValueMaintenance?.toNumber(),
-            postOrderPositionData.marginValueMaintenance?.toNumber() ??
+            marginValueInitialFromSelectedLeverage?.toNumber(),
+            postOrderPositionData.marginValueInitialFromSelectedLeverage?.toNumber() ??
               (summary.tradeInfo.isPositionClosed ? 0 : undefined)
           )
         }
       />
     );
   };
+
+  const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
 
   const items = (
     [
@@ -215,57 +189,62 @@ export const PlaceOrderButtonAndReceipt = ({
         value: renderMarginValue(),
       },
       {
-        key: 'position-leverage',
-        label: (
-          <WithTooltip tooltip="position-leverage" side="right">
-            {stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE })}
-          </WithTooltip>
-        ),
-        value: (
-          <DiffOutput
-            useGrouping
-            type={OutputType.Multiple}
-            value={leverage?.toNumber()}
-            newValue={postOrderPositionData.leverage}
-            withDiff={
-              areInputsFilled &&
-              getDoubleValuesHasDiff(
-                leverage?.toNumber(),
-                postOrderPositionData.leverage?.toNumber() ??
-                  (summary.tradeInfo.isPositionClosed ? 0 : undefined)
-              )
-            }
-            showSign={ShowSign.None}
-          />
-        ),
-      },
-      {
         key: 'fee',
         label: (
-          <WithTooltip tooltip="fee" side="right">
-            {stringGetter({ key: STRING_KEYS.FEE })}
-          </WithTooltip>
+          <span tw="row gap-0.25">
+            <WithTooltip tooltip="fee" side="right">
+              {stringGetter({ key: STRING_KEYS.FEE })}
+            </WithTooltip>
+            <TradeFeeDiscountTag
+              marketFeeDiscountMultiplier={marketFeeDiscountMultiplier}
+              symbol={displayableTicker}
+            />
+          </span>
         ),
         value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
       },
-      {
-        key: 'max-reward',
-        label: (
-          <>
-            {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
-            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
-          </>
-        ),
-        value: (
-          <Output
-            type={OutputType.Asset}
-            value={reward}
-            useGrouping
-            tag={reward ? chainTokenLabel : ''}
-          />
-        ),
-        tooltip: 'max-reward',
-      },
+      isSept2025Rewards
+        ? {
+            key: 'max-reward',
+            label: (
+              <>
+                {stringGetter({ key: STRING_KEYS.REWARDS })}
+                <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
+              </>
+            ),
+            slotRight: (
+              <div tw="rounded-0.25 bg-color-accent-faded px-0.25 py-0.125 text-tiny text-color-accent">
+                {stringGetter({ key: STRING_KEYS.NEW })}
+              </div>
+            ),
+            value: (
+              <Output
+                type={OutputType.Asset}
+                value={reward}
+                useGrouping
+                tag={reward ? chainTokenLabel : ''}
+              />
+            ),
+            tooltip: 'max-reward-dec-2025',
+          }
+        : {
+            key: 'max-reward',
+            label: (
+              <>
+                {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
+                <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
+              </>
+            ),
+            value: (
+              <Output
+                type={OutputType.Asset}
+                value={reward}
+                useGrouping
+                tag={reward ? chainTokenLabel : ''}
+              />
+            ),
+            tooltip: 'max-reward',
+          },
     ] satisfies Array<DetailsItem | false | undefined>
   ).filter(isTruthy);
 
@@ -280,7 +259,7 @@ export const PlaceOrderButtonAndReceipt = ({
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
         ? STRING_KEYS.PREVIEW_ORDER
-        : actionStringKey ?? STRING_KEYS.UNAVAILABLE,
+        : (actionStringKey ?? STRING_KEYS.UNAVAILABLE),
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
       showValidatorError: true,

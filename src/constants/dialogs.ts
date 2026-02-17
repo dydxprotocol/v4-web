@@ -20,7 +20,8 @@ export type AdjustIsolatedMarginDialogProps = {
   positionId: SubaccountPosition['uniqueId'];
 };
 export type CheckEmailDialogProps = {
-  onClose: () => void;
+  userEmail: string;
+  onClose?: () => void;
 };
 export type ClosePositionDialogProps = {};
 export type CloseAllPositionsConfirmationDialogProps = {};
@@ -31,8 +32,10 @@ export type ComplianceConfigDialogProps = {};
 export type ConfirmPendingDepositDialogProps = {
   usdcBalance: number;
 };
+export type DepositAddressDialogProps = {};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
+export type EmailSignInStatusDialogProps = {};
 export type ExchangeOfflineDialogProps = { preventClose?: boolean };
 export type ExternalLinkDialogProps = {
   buttonText?: ReactNode;
@@ -43,13 +46,13 @@ export type ExternalLinkDialogProps = {
 };
 export type ExternalNavStrideDialogProps = {};
 export type FillDetailsDialogProps = { fillId: string };
-export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
+export type ManageAccountDialogProps = {};
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
-export type MobileSignInDialogProps = {};
+export type MobileSignInDialogProps = { skipWaiting?: boolean };
 export type OnboardingDialogProps = {};
 export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
@@ -60,6 +63,7 @@ export type ReferralDialogProps = { refCode: string };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type SetMarketLeverageDialogProps = { marketId: string };
 export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
 export type SharePNLAnalyticsDialogProps = {
@@ -94,6 +98,7 @@ export type TriggersDialogProps = {
   navigateToMarketOrders: (market: string) => void;
 };
 export type TransferDialogProps = { selectedAsset?: DydxChainAsset };
+export type TradingKeysDialogProps = {};
 export type UnstakeDialogProps = {};
 export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialog2Props = {};
@@ -107,7 +112,7 @@ export type WithdrawFromSubaccountDialogProps = {};
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
   stakedAmount?: bigint;
-  userTier?: number | 'vip';
+  userTier?: number;
 };
 export type CoinbaseDepositDialogProps = {
   onBack?: () => void;
@@ -127,18 +132,20 @@ export const DialogTypes = unionize(
     CoinbaseDepositDialog: ofType<CoinbaseDepositDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
+    DepositAddresses: ofType<DepositAddressDialogProps>(),
     /* TODO: rename Deposit2 to Deposit once old deposit flow is deprecated */
     Deposit2: ofType<DepositDialog2Props>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
+    EmailSignInStatus: ofType<EmailSignInStatusDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
     ExternalLink: ofType<ExternalLinkDialogProps>(),
     ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
     ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
     FillDetails: ofType<FillDetailsDialogProps>(),
-    GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
+    ManageAccount: ofType<ManageAccountDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
     MobileSignIn: ofType<MobileSignInDialogProps>(),
@@ -151,6 +158,7 @@ export const DialogTypes = unionize(
     Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
+    SetMarketLeverage: ofType<SetMarketLeverageDialogProps>(),
     SetupPasskey: ofType<SetupPasskeyDialogProps>(),
     ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
@@ -159,6 +167,7 @@ export const DialogTypes = unionize(
     StakingReward: ofType<StakingRewardDialogProps>(),
     Trade: ofType<TradeDialogProps>(),
     Transfer: ofType<TransferDialogProps>(),
+    TradingKeys: ofType<TradingKeysDialogProps>(),
     TransferStatus: ofType<TransferStatusDialogProps>(),
     Triggers: ofType<TriggersDialogProps>(),
     Unstake: ofType<UnstakeDialogProps>(),

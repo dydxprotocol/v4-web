@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
+import styled from 'styled-components';
+
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { CoinbaseDepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { CopyIcon } from '@/icons';
@@ -13,6 +19,11 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
+import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
+
+import { track } from '@/lib/analytics/analytics';
+
+import { SpotDepositForm } from './TransferDialogs/DepositDialog2/SpotDepositForm';
 
 const THREE_SECOND_DELAY = 3000;
 export const CoinbaseDepositDialog = ({
@@ -21,7 +32,24 @@ export const CoinbaseDepositDialog = ({
 }: DialogProps<CoinbaseDepositDialogProps>) => {
   const stringGetter = useStringGetter();
   const [showCopyLogo, setShowCopyLogo] = useState(true);
-  const { nobleAddress } = useAccounts();
+  const [selectedTab, setSelectedTab] = useState<'perps' | 'spot'>('perps');
+  const { nobleAddress, solanaAddress } = useAccounts();
+  const isSpotEnabled = useEnableSpot();
+  const { complianceState } = useComplianceState();
+
+  useEffect(() => {
+    if (selectedTab === 'spot') {
+      track(AnalyticsEvents.SpotDepositInitiated({}));
+    }
+  }, [selectedTab]);
+
+  useLayoutEffect(() => {
+    if (complianceState === ComplianceStates.READ_ONLY) {
+      setIsOpen(false);
+    } else if (complianceState !== ComplianceStates.FULL_ACCESS) {
+      setSelectedTab('spot');
+    }
+  }, [complianceState, setIsOpen]);
 
   const onCopy = () => {
     if (!nobleAddress) return;
@@ -31,46 +59,78 @@ export const CoinbaseDepositDialog = ({
     setTimeout(() => setShowCopyLogo(true), THREE_SECOND_DELAY);
   };
 
+  const perpetualsContent = (
+    <div tw="flex flex-col gap-0.5">
+      <div tw="text-center text-color-text-0">
+        {stringGetter({
+          key: STRING_KEYS.TO_DEPOSIT_FROM_COINBASE,
+          params: {
+            ASSET: <span tw="text-color-text-1">USDC</span>,
+            NETWORK: <span tw="text-color-text-1">Noble Network</span>,
+          },
+        })}
+      </div>
+      <div tw="self-center" style={{ height: 200, width: 200 }}>
+        <QrCode tw="text-center" hasLogo size={200} value={nobleAddress ?? ''} />
+      </div>
+      <div tw="flex items-center justify-between gap-0.5 self-stretch rounded-0.5 bg-color-layer-2 px-1 py-0.5">
+        <div tw="text-color-text-0">{nobleAddress}</div>
+        <button onClick={onCopy} tw="flex items-center" type="button">
+          <div tw="sr-only">{stringGetter({ key: STRING_KEYS.COPY })}</div>
+          {showCopyLogo ? <CopyIcon /> : <GreenCheckCircle />}
+        </button>
+      </div>
+      <div tw="rounded-0.5 border border-solid border-color-border p-0.5 text-small">
+        {stringGetter({ key: STRING_KEYS.NOBLE_CHAIN_ONLY })}
+      </div>
+      <Button
+        tw="bg-color-layer-4"
+        action={ButtonAction.Secondary}
+        onClick={() => setIsOpen(false)}
+        type={ButtonType.Submit}
+      >
+        {stringGetter({ key: STRING_KEYS.CLOSE })}
+      </Button>
+    </div>
+  );
+
+  const tabs: SpotTabItem[] = [
+    {
+      value: 'perps',
+      label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
+      content: perpetualsContent,
+      disabled: complianceState !== ComplianceStates.FULL_ACCESS,
+    },
+    {
+      value: 'spot',
+      label: stringGetter({ key: STRING_KEYS.SPOT }),
+      content: <SpotDepositForm />,
+    },
+  ];
+
   return (
-    <Dialog
+    <$Dialog
       isOpen
       hasHeaderBorder
       onBack={onBack}
       setIsOpen={setIsOpen}
       title={<div tw="text-center">{stringGetter({ key: STRING_KEYS.DEPOSIT_VIA_COINBASE })}</div>}
     >
-      <div tw="flex flex-col gap-0.5 px-0.5 pt-1.25">
-        <div tw="text-center text-color-text-0">
-          {stringGetter({
-            key: STRING_KEYS.TO_DEPOSIT_FROM_COINBASE,
-            params: {
-              ASSET: <span tw="text-color-text-1">USDC</span>,
-              NETWORK: <span tw="text-color-text-1">Noble Network</span>,
-            },
-          })}
-        </div>
-        <div tw="self-center" style={{ height: 200, width: 200 }}>
-          <QrCode tw="text-center" hasLogo size={200} value={nobleAddress ?? ''} />
-        </div>
-        <div tw="flex items-center justify-between gap-0.5 self-stretch rounded-0.5 bg-color-layer-2 px-1 py-0.5">
-          <div tw="text-color-text-0">{nobleAddress}</div>
-          <button onClick={onCopy} tw="flex items-center" type="button">
-            <div tw="sr-only">{stringGetter({ key: STRING_KEYS.COPY })}</div>
-            {showCopyLogo ? <CopyIcon /> : <GreenCheckCircle />}
-          </button>
-        </div>
-        <div tw="rounded-0.5 border border-solid border-color-border p-0.5 text-small">
-          {stringGetter({ key: STRING_KEYS.NOBLE_CHAIN_ONLY })}
-        </div>
-        <Button
-          tw="bg-color-layer-4"
-          action={ButtonAction.Secondary}
-          onClick={() => setIsOpen(false)}
-          type={ButtonType.Submit}
-        >
-          {stringGetter({ key: STRING_KEYS.CLOSE })}
-        </Button>
+      <div tw="h-full w-full p-1.25">
+        <SpotTabs
+          value={selectedTab}
+          onValueChange={(v) => setSelectedTab(v as 'perps' | 'spot')}
+          hideTabs={!isSpotEnabled || !solanaAddress}
+          items={tabs}
+        />
       </div>
-    </Dialog>
+    </$Dialog>
   );
 };
+
+const $Dialog = styled(Dialog)`
+  --dialog-content-paddingTop: 0;
+  --dialog-content-paddingRight: 0;
+  --dialog-content-paddingBottom: 0;
+  --dialog-content-paddingLeft: 0;
+`;

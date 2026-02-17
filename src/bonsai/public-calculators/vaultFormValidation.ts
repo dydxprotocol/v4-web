@@ -230,10 +230,10 @@ export function validateVaultForm(
 
   const amount =
     formData.action === VaultFormAction.DEPOSIT
-      ? formData.amount ?? 0
+      ? (formData.amount ?? 0)
       : sharesToAttemptWithdraw != null
         ? sharesToAttemptWithdraw * (vaultAccount?.shareValue ?? 0)
-        : formData.amount ?? 0;
+        : (formData.amount ?? 0);
 
   const withdrawnAmountIncludingSlippage =
     slippageResponse?.expectedQuoteQuantums != null

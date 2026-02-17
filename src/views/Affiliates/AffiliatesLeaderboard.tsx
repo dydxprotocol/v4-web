@@ -14,9 +14,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { cardBasedTableMixins } from '@/styles/tableMixins';
 
-import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Output, OutputType } from '@/components/Output';
 import { AllTableProps, Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
@@ -74,7 +73,7 @@ const AffiliatesFilter = ({
   );
 };
 
-export const AffiliatesLeaderboard = () => {
+export const AffiliatesLeaderboard = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
@@ -201,38 +200,30 @@ export const AffiliatesLeaderboard = () => {
   };
 
   return (
-    <div tw="flex flex-col gap-1 px-1">
-      <div tw="flex flex-col gap-0.5">
-        <ContentSectionHeader
-          tw="p-0"
-          title={stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD })}
-        />
-        <AffiliatesFilter
-          compactLayout
-          selectedFilter={epochFilter}
-          filters={affiliatesFilters}
-          onChangeFilter={setFilter}
-        />
-        <$Table
-          withInnerBorders
-          data={affiliates ?? EMPTY_ARR}
-          tableId="affiliate-leaderboard"
-          getRowKey={(row: IAffiliateLeaderboardStats) => row.rank}
-          label={stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD })}
-          columns={columns}
-          paginationBehavior="showAll"
-        />
-      </div>
+    <div className={className} tw="flex flex-col gap-0.5">
+      <AffiliatesFilter
+        compactLayout
+        selectedFilter={epochFilter}
+        filters={affiliatesFilters}
+        onChangeFilter={setFilter}
+      />
+      <$Table
+        withOuterBorder
+        withInnerBorders
+        data={affiliates ?? EMPTY_ARR}
+        tableId="affiliate-leaderboard"
+        getRowKey={(row: IAffiliateLeaderboardStats) => row.rank}
+        label={stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD })}
+        columns={columns}
+        paginationBehavior="showAll"
+      />
     </div>
   );
 };
 
 const $Table = styled(Table)<AllTableProps<any>>`
-  ${tradeViewMixins.horizontalTable}
-
-  th {
-    background: var(--color-layer-2);
-  }
+  ${cardBasedTableMixins}
+  border-radius: 1rem;
 `;
 
 const $AccountOutput = tw(Output)`font-base-medium text-color-text-1`;

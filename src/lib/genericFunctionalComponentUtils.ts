@@ -4,7 +4,7 @@ import { ForwardedRef, PropsWithoutRef, ReactNode, RefAttributes, forwardRef } f
 // Typescript can fully apply higher order function type inference
 // this is only necessary when render function props has generic type arguments
 export const forwardRefFn: <T, P = {}>(
-  render: (props: P, ref: ForwardedRef<T>) => ReactNode
+  render: (props: PropsWithoutRef<P>, ref: ForwardedRef<T>) => ReactNode
 ) => (props: PropsWithoutRef<P> & RefAttributes<T>) => ReactNode = forwardRef;
 
 // if your input and output components are fully functional, use this to type the styled result

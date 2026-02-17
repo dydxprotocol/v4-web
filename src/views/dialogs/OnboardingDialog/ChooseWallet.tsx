@@ -7,6 +7,7 @@ import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useEnableTurnkey } from '@/hooks/useEnableTurnkey';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -19,13 +20,13 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
+import { AccentTag } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
-
-import { testFlags } from '@/lib/testFlags';
 
 export const ChooseWallet = ({
   onChooseWallet,
   onSignInWithSocials,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
@@ -35,6 +36,7 @@ export const ChooseWallet = ({
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
   const isSimpleUi = useSimpleUiEnabled();
+  const isTurnkeyEnabled = useEnableTurnkey();
 
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
@@ -47,7 +49,7 @@ export const ChooseWallet = ({
         <HorizontalSeparatorFiller />
       </div>
 
-      <$OtherOptionButton
+      {/* <$OtherOptionButton
         type={ButtonType.Button}
         action={ButtonAction.Base}
         size={ButtonSize.BasePlus}
@@ -59,7 +61,7 @@ export const ChooseWallet = ({
         </div>
 
         <Icon iconName={IconName.ChevronRight} />
-      </$OtherOptionButton>
+      </$OtherOptionButton> */}
 
       <$OtherOptionButton
         type={ButtonType.Button}
@@ -72,7 +74,12 @@ export const ChooseWallet = ({
           Sign in with Socials
         </div>
 
-        <Icon iconName={IconName.ChevronRight} />
+        <div tw="row gap-0.5">
+          <AccentTag tw="rounded-[0.5rem]" isHighlighted>
+            {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
+          </AccentTag>
+          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
+        </div>
       </$OtherOptionButton>
     </div>
   );
@@ -116,9 +123,9 @@ export const ChooseWallet = ({
         ))}
       </$Wallets>
 
-      {testFlags.enableTurnkey && alternateOptions}
+      {isTurnkeyEnabled && alternateOptions}
 
-      {!isSimpleUi && !testFlags.enableTurnkey && (
+      {!isSimpleUi && !isTurnkeyEnabled && (
         <$Link href={walletLearnMore} withIcon>
           {stringGetter({ key: STRING_KEYS.LEARN_ABOUT_WALLETS })}
         </$Link>
@@ -189,7 +196,11 @@ const $Link = styled(Link)`
 
 const $OtherOptionButton = styled(Button)`
   width: 100%;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   justify-content: space-between;
   --icon-size: 1rem;
+
+  @media ${breakpoints.tablet} {
+    border-radius: 1rem;
+  }
 `;

@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -14,7 +10,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -24,15 +20,9 @@
     "useUnknownInCatchVariables": false,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "types": [
-      "node",
-      "@wdio/globals",
-      "mocha"
-    ],
+    "types": ["node", "@wdio/globals", "mocha"],
     "plugins": [
       {
         "transform": "typia/lib/transform"
@@ -40,14 +30,7 @@
     ],
     "strictNullChecks": true
   },
-  "include": [
-    "src",
-    "scripts",
-    "styled.d.ts",
-    "__tests__",
-    "wdio.conf.ts",
-    "types"
-  ],
+  "include": ["src", "scripts", "styled.d.ts", "__tests__", "wdio.conf.ts", "types"],
   "references": [
     {
       "path": "./tsconfig.node.json"

@@ -20,7 +20,7 @@ export const formMixins = {
   inputContainer: css`
     --input-height: var(--form-input-height);
     --input-width: 100%;
-    --input-backgroundColor: ${({ theme }) => theme.inputBackground};
+    --input-default-backgroundColor: ${({ theme }) => theme.inputBackground};
 
     ${layoutMixins.row}
     justify-content: space-between;
@@ -32,7 +32,7 @@ export const formMixins = {
     min-height: var(--input-height);
     max-height: var(--input-height);
 
-    background-color: var(--input-backgroundColor);
+    background-color: var(--input-backgroundColor, var(--input-default-backgroundColor));
     border: var(--border-width) solid var(--input-borderColor);
     border-radius: var(--input-radius, 0.5em);
 

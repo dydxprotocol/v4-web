@@ -4,7 +4,6 @@ import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { Validator } from '@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import BigNumber from 'bignumber.js';
 import { debounce } from 'lodash';
-import { NumberFormatValues } from 'react-number-format';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -94,16 +93,16 @@ export const StakeFormInputContents = ({
     []
   );
 
-  const onChangeAmount = (value?: BigNumber) => {
-    setStakedAmount(value);
-    debouncedChangeTrack(value?.toNumber(), selectedValidator?.operatorAddress);
+  const onInputAmount = ({ formattedValue }: { formattedValue: string }) => {
+    const newValue = formattedValue !== '' ? MustBigNumber(formattedValue) : undefined;
+    setStakedAmount(newValue);
+    debouncedChangeTrack(newValue?.toNumber(), selectedValidator?.operatorAddress);
   };
 
-  const onChange = ({ floatValue }: NumberFormatValues) =>
-    onChangeAmount(floatValue !== undefined ? MustBigNumber(floatValue) : undefined);
-
   const onToggleMaxInput = (isPressed: boolean) =>
-    isPressed ? onChangeAmount(MustBigNumber(maxStakeAmount)) : onChangeAmount(undefined);
+    isPressed
+      ? onInputAmount({ formattedValue: maxStakeAmount.toString() })
+      : onInputAmount({ formattedValue: '' });
 
   return (
     <>
@@ -116,7 +115,7 @@ export const StakeFormInputContents = ({
           id="stakeAmount"
           label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
           type={InputType.Number}
-          onChange={onChange}
+          onInput={onInputAmount}
           value={stakedAmount?.toNumber()}
           slotRight={
             isBalanceEnoughForGas && (

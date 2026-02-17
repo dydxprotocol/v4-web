@@ -103,3 +103,14 @@ export const SuccessTag = styled(Tag)`
   color: var(--color-success);
   border: solid 1px var(--color-success);
 `;
+
+export const PrivateTag = styled(Tag)`
+  background-color: var(--color-gradient-error);
+  color: var(--color-error);
+`;
+
+export const OutlinedAccentTag = styled(Tag)`
+  background-color: transparent;
+  color: var(--color-accent);
+  border: solid var(--default-border-width) var(--color-accent);
+`;

@@ -69,8 +69,13 @@ const MobileQrCode = ({
   );
 };
 
-export const MobileSignInDialog = ({ setIsOpen }: DialogProps<MobileSignInDialogProps>) => {
-  const [currentState, setCurrentState] = useState(MobileSignInState.Waiting);
+export const MobileSignInDialog = ({
+  setIsOpen,
+  skipWaiting = false,
+}: DialogProps<MobileSignInDialogProps>) => {
+  const [currentState, setCurrentState] = useState(
+    skipWaiting ? MobileSignInState.Scanning : MobileSignInState.Waiting
+  );
   const [isScanning, setIsScanning] = useState(false);
   const stringGetter = useStringGetter();
 

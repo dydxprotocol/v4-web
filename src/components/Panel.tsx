@@ -46,12 +46,12 @@ export const Panel = ({
           )}
         </Link>
       ) : (
-        slotHeader ??
+        (slotHeader ??
         (slotHeaderContent && (
           <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
             {slotHeaderContent}
           </$Header>
-        ))
+        )))
       )}
       <$Content>{children}</$Content>
     </div>

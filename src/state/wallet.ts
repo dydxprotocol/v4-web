@@ -2,6 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
 import { WalletInfo, WalletNetworkType } from '@/constants/wallets';
+import { TurnkeyEmailOnboardingData, TurnkeyWallet } from '@/types/turnkey';
 
 export type SourceAccount = {
   address?: string;
@@ -15,9 +16,11 @@ export interface WalletState {
   sourceAccount: SourceAccount;
   localWallet?: {
     address?: string;
+    solanaAddress?: string;
     subaccountNumber?: number;
   };
-  localWalletNonce?: number;
+  turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
+  turnkeyPrimaryWallet?: TurnkeyWallet;
 }
 
 const initialState: WalletState = {
@@ -31,16 +34,14 @@ const initialState: WalletState = {
     address: undefined,
     subaccountNumber: 0,
   },
-  localWalletNonce: undefined,
+  turnkeyEmailOnboardingData: undefined,
+  turnkeyPrimaryWallet: undefined,
 };
 
 export const walletSlice = createSlice({
   name: 'wallet',
   initialState,
   reducers: {
-    setLocalWalletNonce: (state, action: PayloadAction<number | undefined>) => {
-      state.localWalletNonce = action.payload;
-    },
     setSourceAddress: (
       state,
       action: PayloadAction<{ address: string; chain: WalletNetworkType }>
@@ -73,9 +74,23 @@ export const walletSlice = createSlice({
     },
     setLocalWallet: (
       state,
-      { payload }: PayloadAction<{ address?: string; subaccountNumber?: number }>
+      {
+        payload,
+      }: PayloadAction<{ address?: string; solanaAddress?: string; subaccountNumber?: number }>
     ) => {
       state.localWallet = payload;
+    },
+    setTurnkeyEmailOnboardingData: (state, action: PayloadAction<TurnkeyEmailOnboardingData>) => {
+      state.turnkeyEmailOnboardingData = action.payload;
+    },
+    clearTurnkeyEmailOnboardingData: (state) => {
+      state.turnkeyEmailOnboardingData = undefined;
+    },
+    setTurnkeyPrimaryWallet: (state, action: PayloadAction<TurnkeyWallet>) => {
+      state.turnkeyPrimaryWallet = action.payload;
+    },
+    clearTurnkeyPrimaryWallet: (state) => {
+      state.turnkeyPrimaryWallet = undefined;
     },
     clearSourceAccount: (state) => {
       state.sourceAccount = {
@@ -84,16 +99,45 @@ export const walletSlice = createSlice({
         encryptedSignature: undefined,
         walletInfo: undefined,
       };
+      state.turnkeyPrimaryWallet = undefined;
+    },
+  },
+});
+
+export interface WalletEphemeralState {
+  localWalletNonce?: number;
+  hdKeyNonce?: number;
+}
+
+const initialEphemeralState: WalletEphemeralState = {
+  localWalletNonce: undefined,
+  hdKeyNonce: undefined,
+};
+
+export const walletEphemeralSlice = createSlice({
+  name: 'walletEphemeral',
+  initialState: initialEphemeralState,
+  reducers: {
+    setLocalWalletNonce: (state, action: PayloadAction<number | undefined>) => {
+      state.localWalletNonce = action.payload;
+    },
+    setHdKeyNonce: (state, action: PayloadAction<number | undefined>) => {
+      state.hdKeyNonce = action.payload;
     },
   },
 });
 
 export const {
-  setLocalWalletNonce,
   setSourceAddress,
   setWalletInfo,
   setSavedEncryptedSignature,
   clearSavedEncryptedSignature,
   clearSourceAccount,
   setLocalWallet,
+  setTurnkeyEmailOnboardingData,
+  clearTurnkeyEmailOnboardingData,
+  setTurnkeyPrimaryWallet,
+  clearTurnkeyPrimaryWallet,
 } = walletSlice.actions;
+
+export const { setLocalWalletNonce, setHdKeyNonce } = walletEphemeralSlice.actions;

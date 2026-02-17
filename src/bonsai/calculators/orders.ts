@@ -77,9 +77,9 @@ function calculateSubaccountOrder(
     remainingSize: MustBigNumber(base.size).minus(MustBigNumber(base.totalFilled)),
     removalReason: base.removalReason,
     // TWAP order parameters
-    duration: base.duration || undefined,
-    interval: base.interval || undefined,
-    priceTolerance: base.priceTolerance || undefined,
+    duration: base.duration ?? undefined,
+    interval: base.interval ?? undefined,
+    priceTolerance: base.priceTolerance ?? undefined,
   };
   order = maybeUpdateOrderIfExpired(order, protocolHeight);
   return order;

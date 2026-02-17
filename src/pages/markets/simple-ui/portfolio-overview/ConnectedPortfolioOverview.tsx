@@ -104,6 +104,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
               createdAtMilliseconds: now,
               equity,
               totalPnl: equity - latestTick.equity + latestTick.totalPnl,
+              netTransfers: latestTick.netTransfers,
             },
           ]
             .filter(isTruthy)
@@ -113,6 +114,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
                 subaccountId: subaccountId ?? 0,
                 equity: Number(datum.equity),
                 totalPnl: Number(datum.totalPnl),
+                netTransfers: Number(datum.netTransfers),
                 createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
                 side: {
                   [-1]: PnlSide.Loss,

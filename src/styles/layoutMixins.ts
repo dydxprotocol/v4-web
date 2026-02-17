@@ -606,15 +606,17 @@ export const layoutMixins = {
 
     --stickyArea1-width: calc(
       var(--stickyArea0-width) -
-        (var(--stickyArea0-paddingLeft) + var(--stickyArea0-leftWidth) + var(--stickyArea0-leftGap)) -
+        (
+          var(--stickyArea0-paddingLeft) + var(--stickyArea0-leftWidth) + var(--stickyArea0-leftGap)
+        ) -
         (
           var(--stickyArea0-paddingRight) + var(--stickyArea0-rightWidth) +
             var(--stickyArea0-rightGap)
         )
     );
     --stickyArea1-totalInsetLeft: calc(
-      var(--stickyArea0-totalInsetLeft) + var(--stickyArea0-leftWidth) + var(--stickyArea0-leftGap) +
-        var(--stickyArea1-paddingLeft)
+      var(--stickyArea0-totalInsetLeft) + var(--stickyArea0-leftWidth) +
+        var(--stickyArea0-leftGap) + var(--stickyArea1-paddingLeft)
     );
     --stickyArea1-totalInsetRight: calc(
       var(--stickyArea0-totalInsetRight) + var(--stickyArea0-rightWidth) +
@@ -691,15 +693,17 @@ export const layoutMixins = {
 
     --stickyArea2-width: calc(
       var(--stickyArea1-width) -
-        (var(--stickyArea1-paddingLeft) + var(--stickyArea1-leftWidth) + var(--stickyArea1-leftGap)) -
+        (
+          var(--stickyArea1-paddingLeft) + var(--stickyArea1-leftWidth) + var(--stickyArea1-leftGap)
+        ) -
         (
           var(--stickyArea1-paddingRight) + var(--stickyArea1-rightWidth) +
             var(--stickyArea1-rightGap)
         )
     );
     --stickyArea2-totalInsetLeft: calc(
-      var(--stickyArea1-totalInsetLeft) + var(--stickyArea1-leftWidth) + var(--stickyArea1-leftGap) +
-        var(--stickyArea2-paddingLeft)
+      var(--stickyArea1-totalInsetLeft) + var(--stickyArea1-leftWidth) +
+        var(--stickyArea1-leftGap) + var(--stickyArea2-paddingLeft)
     );
     --stickyArea2-totalInsetRight: calc(
       var(--stickyArea1-totalInsetRight) + var(--stickyArea1-rightWidth) +
@@ -776,15 +780,17 @@ export const layoutMixins = {
 
     --stickyArea3-width: calc(
       var(--stickyArea2-width) -
-        (var(--stickyArea2-paddingLeft) + var(--stickyArea2-leftWidth) + var(--stickyArea2-leftGap)) -
+        (
+          var(--stickyArea2-paddingLeft) + var(--stickyArea2-leftWidth) + var(--stickyArea2-leftGap)
+        ) -
         (
           var(--stickyArea2-paddingRight) + var(--stickyArea2-rightWidth) +
             var(--stickyArea2-rightGap)
         )
     );
     --stickyArea3-totalInsetLeft: calc(
-      var(--stickyArea2-totalInsetLeft) + var(--stickyArea2-leftWidth) + var(--stickyArea2-leftGap) +
-        var(--stickyArea3-paddingLeft)
+      var(--stickyArea2-totalInsetLeft) + var(--stickyArea2-leftWidth) +
+        var(--stickyArea2-leftGap) + var(--stickyArea3-paddingLeft)
     );
     --stickyArea3-totalInsetRight: calc(
       var(--stickyArea2-totalInsetRight) + var(--stickyArea2-rightWidth) +

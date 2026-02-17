@@ -70,6 +70,6 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
 
   return {
     selectedTradeType,
-    tradeTypeItems: showAll ? allTradeTypeItems ?? EMPTY_ARR : asSubItems,
+    tradeTypeItems: showAll ? (allTradeTypeItems ?? EMPTY_ARR) : asSubItems,
   };
 };

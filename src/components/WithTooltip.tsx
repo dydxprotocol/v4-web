@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS, TooltipStrings } from '@/constants/localization';
 import { TooltipStringKeys, tooltipStrings } from '@/constants/tooltips';
@@ -22,6 +22,7 @@ type ElementProps = {
   tooltipStringTitle?: string;
   stringParams?: Record<string, string | undefined>;
   withIcon?: boolean;
+  slotRight?: ReactNode;
   children?: ReactNode;
   slotTooltip?: ReactNode;
   slotTrigger?: ReactNode;
@@ -32,6 +33,7 @@ type StyleProps = {
   side?: 'top' | 'right' | 'bottom' | 'left';
   sideOffset?: number;
   className?: string;
+  withUnderline?: boolean;
 };
 
 export const WithTooltip = ({
@@ -41,12 +43,14 @@ export const WithTooltip = ({
   slotTrigger,
   stringParams,
   withIcon,
+  slotRight,
   children,
   align,
   side,
   sideOffset,
   className,
   slotTooltip,
+  withUnderline = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
@@ -80,8 +84,9 @@ export const WithTooltip = ({
         <Trigger asChild>
           {slotTrigger ?? (
             <$Abbr>
-              {children}
+              <$Underlined withUnderline={withUnderline}>{children}</$Underlined>
               {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-color-text-0" />}
+              {slotRight}
             </$Abbr>
           )}
         </Trigger>
@@ -115,13 +120,20 @@ export const WithTooltip = ({
   );
 };
 
+const $Underlined = styled.span<{ withUnderline: boolean }>`
+  ${layoutMixins.inlineRow}
+  ${({ withUnderline }) =>
+    withUnderline &&
+    css`
+      text-decoration: underline dashed 0px;
+      text-underline-position: under;
+      text-decoration-color: var(--color-text-0);
+      text-decoration-skip-ink: all;
+    `}
+`;
+
 const $Abbr = styled.abbr`
   ${layoutMixins.inlineRow}
-
-  text-decoration: underline dashed 0px;
-  text-underline-position: under;
-  text-decoration-color: var(--color-text-0);
-  text-decoration-skip-ink: all;
 
   cursor: help;
 `;

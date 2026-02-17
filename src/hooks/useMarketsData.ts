@@ -4,12 +4,16 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { AssetData } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
+import { HIDDEN_MARKETS } from '@/constants/hiddenMarkets';
 import {
   HiddenMarketFilterTags,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
   type MarketData,
 } from '@/constants/markets';
+import { StatsigFlags } from '@/constants/statsig';
+
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
@@ -74,7 +78,7 @@ const sortByMarketCap = (a: AssetData, b: AssetData) => {
   return (b.marketCap ?? 0) - (a.marketCap ?? 0);
 };
 
-const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT']);
+const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT', 'USD1', 'USDE']);
 export const useMarketsData = ({
   filter = MarketFilters.ALL,
   searchFilter,
@@ -100,6 +104,9 @@ export const useMarketsData = ({
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(perpetualMarkets).length > 0;
 
+  const shouldFilterHiddenMarkets = useStatsigGateValue(StatsigFlags.ffHideMarketsFilter);
+  const shouldFilterOpenInterest = useStatsigGateValue(StatsigFlags.ffOpenInterestFilter);
+
   // AssetIds from existing PerpetualMarkets
   const marketsAssetIdSet = useMemo(
     () =>
@@ -116,8 +123,12 @@ export const useMarketsData = ({
       .filter(isTruthy)
       // filter out markets that cannot be traded
       .filter((m) => m.status !== 'FINAL_SETTLEMENT')
-      // temporarily filter out markets with empty/0 oracle price
+      // temporarily filter out markets with empty/0 oracle price and $0 open interest
       .filter((m) => MustBigNumber(m.oraclePrice).gt(0))
+      // filter out markets with $0 open interest (when gate is enabled)
+      .filter((m) => !shouldFilterOpenInterest || MustBigNumber(m.openInterestUSDC).gt(0))
+      // filter out hidden markets (when gate is enabled)
+      .filter((m) => !shouldFilterHiddenMarkets || !HIDDEN_MARKETS.has(m.assetId))
       .map(getMarketDataFromPerpetualMarketSummary);
 
     const unlaunchedMarketsData =
@@ -125,6 +136,8 @@ export const useMarketsData = ({
         ? Object.values(assets)
             .filter(isTruthy)
             .filter((a) => !ASSETS_TO_REMOVE.has(a.assetId))
+            // filter out hidden markets (when gate is enabled)
+            .filter((a) => !shouldFilterHiddenMarkets || !HIDDEN_MARKETS.has(a.assetId))
             .sort(sortByMarketCap)
             .map((asset) => {
               // Remove assets that are already in the list of markets from Indexer a long with assets that have no price or a negative price
@@ -140,11 +153,13 @@ export const useMarketsData = ({
     return [...listOfMarkets, ...unlaunchedMarketsData];
   }, [
     perpetualMarkets,
-    marketsAssetIdSet,
-    assets,
-    favoritedMarkets,
-    shouldHideLaunchableMarkets,
     forceShowUnlaunchedMarkets,
+    shouldHideLaunchableMarkets,
+    assets,
+    shouldFilterOpenInterest,
+    shouldFilterHiddenMarkets,
+    marketsAssetIdSet,
+    favoritedMarkets,
   ]);
 
   const filteredMarkets = useMemo(() => {

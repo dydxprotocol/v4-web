@@ -214,7 +214,8 @@ const $Container = styled.div<{ backgroundImagePath: string }>`
     right: 0;
 
     ${({ backgroundImagePath }) => css`
-      background-image: url(${backgroundImagePath}),
+      background-image:
+        url(${backgroundImagePath}),
         linear-gradient(to top, var(--color-layer-3) 60%, var(--color-positive-dark));
     `}
     mask-image: linear-gradient(to bottom, var(--color-layer-3) 20%, transparent);

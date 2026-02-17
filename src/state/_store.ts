@@ -6,7 +6,7 @@ import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
-import { localWalletManager } from '@/lib/hdKeyManager';
+import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { transformOntologyObject } from '@/lib/transformOntology';
 
 import { accountSlice } from './account';
@@ -27,13 +27,17 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
+import { spotSlice } from './spot';
+import { spotFormSlice } from './spotForm';
+import { spotTradesSlice } from './spotTrades';
+import { swapsSlice } from './swaps';
 import { tradeFormSlice } from './tradeForm';
 import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
 import { tradingViewSlice } from './tradingView';
 import { transfersSlice } from './transfers';
 import { triggersFormSlice } from './triggersForm';
 import { vaultsSlice } from './vaults';
-import { walletSlice } from './wallet';
+import { walletEphemeralSlice, walletSlice } from './wallet';
 
 const reducers = {
   account: accountSlice.reducer,
@@ -46,6 +50,9 @@ const reducers = {
   triggersForm: triggersFormSlice.reducer,
   tradeForm: tradeFormSlice.reducer,
   closePositionForm: closePositionFormSlice.reducer,
+  spot: spotSlice.reducer,
+  spotForm: spotFormSlice.reducer,
+  spotTrades: spotTradesSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,
@@ -53,8 +60,10 @@ const reducers = {
   perpetuals: perpetualsSlice.reducer,
   tradingView: tradingViewSlice.reducer,
   transfers: transfersSlice.reducer,
+  swaps: swapsSlice.reducer,
   vaults: vaultsSlice.reducer,
   wallet: walletSlice.reducer,
+  walletEphemeral: walletEphemeralSlice.reducer,
   raw: rawSlice.reducer,
 } as const;
 
@@ -69,6 +78,8 @@ const persistConfig = {
     'dismissable',
     'tradingView',
     'transfers',
+    'swaps',
+    'spotTrades',
     'wallet',
     'appUiConfigs',
     'accountUiMemory',
@@ -124,6 +135,7 @@ export const persistor = persistStore(store);
 
 // Set store so localWalletManager classes can getState and dispatch
 localWalletManager.setStore(store);
+hdKeyManager.setStore(store);
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;

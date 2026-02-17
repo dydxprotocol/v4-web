@@ -944,6 +944,19 @@ export interface IndexerHistoricalTradingRewardAggregationsResponse {
 /**
  *
  * @export
+ * @interface InlineResponse200
+ */
+export interface IndexerInlineResponse200 {
+  /**
+   *
+   * @type {boolean}
+   * @memberof InlineResponse200
+   */
+  success: boolean;
+}
+/**
+ *
+ * @export
  */
 export type IndexerIsoString = string;
 /**
@@ -1618,6 +1631,74 @@ export enum IndexerPerpetualPositionStatus {
 /**
  *
  * @export
+ * @interface PnlResponse
+ */
+export interface IndexerPnlResponse {
+  /**
+   *
+   * @type {number}
+   * @memberof PnlResponse
+   */
+  pageSize?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof PnlResponse
+   */
+  totalResults?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof PnlResponse
+   */
+  offset?: number | null;
+  /**
+   *
+   * @type {Array<IndexerPnlResponseObject>}
+   * @memberof PnlResponse
+   */
+  pnl: Array<IndexerPnlResponseObject>;
+}
+/**
+ *
+ * @export
+ * @interface PnlResponseObject
+ */
+export interface IndexerPnlResponseObject {
+  /**
+   *
+   * @type {string}
+   * @memberof PnlResponseObject
+   */
+  equity: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PnlResponseObject
+   */
+  netTransfers: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PnlResponseObject
+   */
+  totalPnl: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PnlResponseObject
+   */
+  createdAt: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PnlResponseObject
+   */
+  createdAtHeight: string;
+}
+/**
+ *
+ * @export
  * @enum {string}
  */
 export enum IndexerPnlTickInterval {
@@ -1675,6 +1756,120 @@ export interface IndexerPnlTicksResponseObject {
 export enum IndexerPositionSide {
   LONG = 'LONG',
   SHORT = 'SHORT',
+}
+/**
+ * Request interface for user sign-in operations
+ * @export
+ * @interface SignInRequest
+ */
+export interface IndexerSignInRequest {
+  /**
+   *
+   * @type {IndexerSigninMethod}
+   * @memberof SignInRequest
+   */
+  signinMethod: IndexerSigninMethod;
+  /**
+   * User's email address (required for EMAIL signin method)
+   * @type {string}
+   * @memberof SignInRequest
+   */
+  userEmail?: string | null;
+  /**
+   * Target public key for authentication (required for EMAIL and SOCIAL signin methods)
+   * @type {string}
+   * @memberof SignInRequest
+   */
+  targetPublicKey?: string | null;
+  /**
+   * OAuth provider name (required for SOCIAL signin method)
+   * @type {string}
+   * @memberof SignInRequest
+   */
+  provider?: string | null;
+  /**
+   * OIDC token from OAuth provider (required for SOCIAL signin method)
+   * @type {string}
+   * @memberof SignInRequest
+   */
+  oidcToken?: string | null;
+  /**
+   * Challenge string for passkey authentication (required for PASSKEY signin method)
+   * @type {string}
+   * @memberof SignInRequest
+   */
+  challenge?: string | null;
+  /**
+   *
+   * @type {IndexerSignInRequestAttestation}
+   * @memberof SignInRequest
+   */
+  attestation?: IndexerSignInRequestAttestation | null;
+  /**
+   * Optional magic link template URL for email authentication
+   * @type {string}
+   * @memberof SignInRequest
+   */
+  magicLink?: string | null;
+}
+/**
+ * Attestation object for passkey authentication (required for PASSKEY signin method)
+ * @export
+ * @interface SignInRequestAttestation
+ */
+export interface IndexerSignInRequestAttestation {
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof SignInRequestAttestation
+   */
+  transports: Array<SignInRequestAttestation.IndexerTransportsEnum>;
+  /**
+   *
+   * @type {string}
+   * @memberof SignInRequestAttestation
+   */
+  attestationObject: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SignInRequestAttestation
+   */
+  clientDataJson: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SignInRequestAttestation
+   */
+  credentialId: string;
+}
+
+/**
+ * @export
+ * @namespace SignInRequestAttestation
+ */
+export namespace SignInRequestAttestation {
+  /**
+   * @export
+   * @enum {string}
+   */
+  export enum IndexerTransportsEnum {
+    BLE = 'AUTHENTICATOR_TRANSPORT_BLE',
+    INTERNAL = 'AUTHENTICATOR_TRANSPORT_INTERNAL',
+    NFC = 'AUTHENTICATOR_TRANSPORT_NFC',
+    USB = 'AUTHENTICATOR_TRANSPORT_USB',
+    HYBRID = 'AUTHENTICATOR_TRANSPORT_HYBRID',
+  }
+}
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+export enum IndexerSigninMethod {
+  Email = 'email',
+  Social = 'social',
+  Passkey = 'passkey',
 }
 /**
  *
@@ -2068,6 +2263,74 @@ export enum IndexerTransferType {
   TRANSFEROUT = 'TRANSFER_OUT',
   DEPOSIT = 'DEPOSIT',
   WITHDRAWAL = 'WITHDRAWAL',
+}
+/**
+ *
+ * @export
+ * @interface TurnkeyAuthResponse
+ */
+export interface IndexerTurnkeyAuthResponse {
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyAuthResponse
+   */
+  dydxAddress?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyAuthResponse
+   */
+  organizationId?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyAuthResponse
+   */
+  apiKeyId?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyAuthResponse
+   */
+  userId?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyAuthResponse
+   */
+  session?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyAuthResponse
+   */
+  salt: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof TurnkeyAuthResponse
+   */
+  alreadyExists?: boolean | null;
+}
+/**
+ *
+ * @export
+ * @interface TurnkeyUploadAddressBody
+ */
+export interface IndexerTurnkeyUploadAddressBody {
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyUploadAddressBody
+   */
+  signature: string;
+  /**
+   *
+   * @type {string}
+   * @memberof TurnkeyUploadAddressBody
+   */
+  dydxAddress: string;
 }
 /**
  *

@@ -1,31 +1,33 @@
-import { ElementType } from 'react';
+import { ElementType, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, OnboardingState } from '@/constants/account';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
-import { DydxChainAsset, WalletNetworkType, wallets, WalletType } from '@/constants/wallets';
+import { ConnectorType, DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
+import { AppleIcon, AppleLightIcon, DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -37,7 +39,6 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
-import { WithTooltip } from '@/components/WithTooltip';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -46,25 +47,30 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
-import { selectIsKeplrConnected } from '@/state/walletSelectors';
+import { selectIsKeplrConnected, selectIsTurnkeyConnected } from '@/state/walletSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
+import { SpotActions } from './SpotActions';
 import { SubaccountActions } from './SubaccountActions';
 import { WalletActions } from './WalletActions';
 
+// TODO: spot localization
+
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
-  const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const spotEnabled = useEnableSpot();
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
   const isKeplr = useAppSelector(selectIsKeplrConnected);
+  const isTurnkey = useAppSelector(selectIsTurnkeyConnected);
+  const spotWalletData = useAppSelector(BonsaiCore.spot.walletPositions.data);
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
@@ -73,18 +79,13 @@ export const AccountMenu = () => {
 
   const { debugCompliance } = useEnvFeatures();
   const {
-    sourceAccount: { walletInfo, address },
+    sourceAccount: { walletInfo },
     dydxAddress,
     hdKey,
+    solanaAddress,
+    canDeriveSolanaWallet,
   } = useAccounts();
   const { registerAffiliate } = useSubaccount();
-
-  let displayAddress: string | undefined;
-  if (walletInfo?.name === WalletType.Phantom) {
-    displayAddress = truncateAddress(address, '');
-  } else {
-    displayAddress = truncateAddress(address, '0x');
-  }
 
   const privy = usePrivy();
   const { google, discord, twitter } = privy.user ?? {};
@@ -104,25 +105,64 @@ export const AccountMenu = () => {
     usedBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC) &&
     usedBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
 
-  let walletIcon;
-  if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
-  } else if (
-    onboardingState === OnboardingState.AccountConnected &&
-    walletInfo?.name === WalletType.Privy
-  ) {
-    if (google) {
-      walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
-    } else if (discord) {
-      walletIcon = <Icon iconComponent={DiscordIcon as ElementType} />;
-    } else if (twitter) {
-      walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
-    } else {
-      walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+  const walletIcon = useMemo(() => {
+    if (onboardingState === OnboardingState.WalletConnected) {
+      return <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
     }
-  } else if (walletInfo) {
-    walletIcon = <WalletIcon wallet={walletInfo} />;
-  }
+
+    if (walletInfo == null) {
+      return null;
+    }
+
+    if (
+      onboardingState === OnboardingState.AccountConnected &&
+      walletInfo.name === WalletType.Privy
+    ) {
+      if (google) {
+        return <Icon iconComponent={GoogleIcon as ElementType} />;
+      }
+
+      if (discord) {
+        return <Icon iconComponent={DiscordIcon as ElementType} />;
+      }
+
+      if (twitter) {
+        return <Icon iconComponent={TwitterIcon as ElementType} />;
+      }
+
+      return (
+        <Icon
+          tw="rounded-[0.25rem]"
+          iconComponent={wallets[WalletType.Privy].icon as ElementType}
+        />
+      );
+    }
+
+    if (
+      onboardingState === OnboardingState.AccountConnected &&
+      walletInfo.connectorType === ConnectorType.Turnkey
+    ) {
+      if (walletInfo.providerName === 'google') {
+        return <Icon iconComponent={GoogleIcon as ElementType} />;
+      }
+
+      if (walletInfo.providerName === 'apple') {
+        return (
+          <Icon
+            iconComponent={
+              theme === AppTheme.Light
+                ? (AppleIcon as ElementType)
+                : (AppleLightIcon as ElementType)
+            }
+          />
+        );
+      }
+
+      return <Icon iconComponent={wallets[WalletType.Turnkey].icon as ElementType} />;
+    }
+
+    return <WalletIcon wallet={walletInfo} />;
+  }, [onboardingState, walletInfo, google, discord, twitter, theme]);
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
@@ -132,48 +172,35 @@ export const AccountMenu = () => {
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
           <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
-            <$AddressRow>
-              <AssetIcon
-                logoUrl={chainTokenImage}
-                symbol={chainTokenLabel}
-                tw="z-[2] [--asset-icon-size:1.75rem]"
-              />
-              <$Column>
-                {walletInfo && walletInfo.name !== WalletType.Keplr ? (
-                  <DydxDerivedAddress address={address} />
-                ) : (
-                  <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                )}
-                <$Address>{truncateAddress(dydxAddress)}</$Address>
-              </$Column>
-              <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
-              <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
-                <$IconButton
+            <div tw="row flex-wrap gap-[0.25rem]">
+              {!!walletInfo && canDeriveSolanaWallet && spotEnabled && solanaAddress && (
+                <$AddressCopyButton
+                  value={solanaAddress}
+                  size={ButtonSize.XSmall}
+                  shape={ButtonShape.Pill}
+                  copyIconPosition="end"
                   action={ButtonAction.Base}
-                  href={`${mintscanBase}/account/${dydxAddress}`}
-                  iconName={IconName.LinkOut}
-                  shape={ButtonShape.Square}
-                  type={ButtonType.Link}
-                />
-              </WithTooltip>
-            </$AddressRow>
-            {walletInfo &&
-              walletInfo.name !== WalletType.Privy &&
-              walletInfo.name !== WalletType.Keplr && (
-                <$AddressRow>
-                  <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
-                    <Icon
-                      iconName={IconName.AddressConnector}
-                      tw="absolute top-[-1.625rem] h-1.75"
-                    />
-                    <WalletIcon wallet={walletInfo} />
-                  </div>
-                  <$Column>
-                    <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
-                    <$Address>{displayAddress}</$Address>
-                  </$Column>
-                </$AddressRow>
+                >
+                  <Icon iconName={IconName.Sol} size="1.25rem" />
+                  {stringGetter({ key: STRING_KEYS.SPOT })}
+                </$AddressCopyButton>
               )}
+              <$AddressCopyButton
+                value={dydxAddress}
+                size={ButtonSize.XSmall}
+                shape={ButtonShape.Pill}
+                copyIconPosition="end"
+                action={ButtonAction.Base}
+              >
+                <AssetIcon
+                  logoUrl={chainTokenImage}
+                  symbol={chainTokenLabel}
+                  tw="[--asset-icon-size:1.25rem]"
+                />
+                {stringGetter({ key: STRING_KEYS.PERPETUALS })}
+              </$AddressCopyButton>
+            </div>
+
             <$Balances>
               <div>
                 <div>
@@ -241,6 +268,25 @@ export const AccountMenu = () => {
                   withOnboarding
                 />
               </div>
+              {canDeriveSolanaWallet && spotEnabled && (
+                <div>
+                  <div>
+                    <$label>
+                      Spot Sol Balance
+                      <Icon iconName={IconName.Sol} size="1rem" />
+                    </$label>
+                    <$BalanceOutput
+                      type={OutputType.Asset}
+                      value={
+                        spotWalletData?.solBalance
+                          ? spotWalletData.solBalance / LAMPORTS_PER_SOL
+                          : 0
+                      }
+                    />
+                  </div>
+                  <SpotActions />
+                </div>
+              )}
             </$Balances>
             {showConfirmPendingDeposit && (
               <$ConfirmPendingDeposit>
@@ -278,6 +324,13 @@ export const AccountMenu = () => {
           onSelect: onRecoverKeys,
           separator: true,
         },
+        onboardingState === OnboardingState.AccountConnected &&
+          isTurnkey && {
+            value: 'ManageAccount',
+            icon: <Icon iconName={IconName.User} />,
+            label: stringGetter({ key: STRING_KEYS.ACCOUNT_MANAGEMENT }),
+            onSelect: () => dispatch(openDialog(DialogTypes.ManageAccount())),
+          },
         affiliatesEnabled &&
           onboardingState === OnboardingState.AccountConnected && {
             value: 'Affiliates',
@@ -337,7 +390,7 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...(appleAppStoreUrl ?? googlePlayStoreUrl
+        ...((appleAppStoreUrl ?? googlePlayStoreUrl)
           ? [
               {
                 value: 'MobileDownload',
@@ -355,23 +408,22 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...(onboardingState === OnboardingState.AccountConnected && hdKey
-          ? [
-              {
-                value: 'MobileQrSignIn',
-                icon: <Icon iconName={IconName.Qr} />,
-                label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
-                onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn())),
-              },
-              {
-                value: 'MnemonicExport',
-                icon: <Icon iconName={IconName.ExportKeys} />,
-                label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'destroy' as const,
-                onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
-              },
-            ]
-          : []),
+        onboardingState === OnboardingState.AccountConnected &&
+          hdKey && {
+            value: 'MobileQrSignIn',
+            icon: <Icon iconName={IconName.Qr} />,
+            label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
+            onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn({}))),
+          },
+        onboardingState === OnboardingState.AccountConnected &&
+          hdKey &&
+          !isTurnkey && {
+            value: 'MnemonicExport',
+            icon: <Icon iconName={IconName.ExportKeys} />,
+            label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
+            highlightColor: 'destroy' as const,
+            onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
+          },
         ...(privy.ready && privy.authenticated
           ? [
               {
@@ -400,58 +452,8 @@ export const AccountMenu = () => {
   );
 };
 
-const DydxDerivedAddress = ({
-  address,
-  chain,
-  dydxAddress,
-}: {
-  address?: string;
-  chain?: WalletNetworkType.Solana | WalletNetworkType.Evm;
-  dydxAddress?: string;
-}) => {
-  const stringGetter = useStringGetter();
-
-  const tooltipText =
-    chain === WalletNetworkType.Solana
-      ? stringGetter({
-          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_SOLANA_BODY,
-          params: {
-            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-            SOLANA_ADDRESS: truncateAddress(address, ''),
-          },
-        })
-      : stringGetter({
-          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_ETHEREUM_BODY,
-          params: {
-            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-            EVM_ADDRESS: truncateAddress(address, '0x'),
-          },
-        });
-
-  return (
-    <WithTooltip
-      slotTooltip={
-        <dl>
-          <dt>{tooltipText}</dt>
-        </dl>
-      }
-    >
-      <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-    </WithTooltip>
-  );
-};
-
 const $Column = styled.div`
   ${layoutMixins.column}
-`;
-const $AddressRow = styled.div`
-  ${layoutMixins.row}
-
-  gap: 0.5rem;
-
-  ${$Column} {
-    margin-right: 0.5rem;
-  }
 `;
 const $label = styled.div`
   ${layoutMixins.row}
@@ -529,7 +531,6 @@ const $IconButton = styled(IconButton)`
     `}
 `;
 
-const $CopyButton = styled(CopyButton)`
-  --button-padding: 0 0.25rem;
-  --button-border: solid var(--border-width) var(--color-layer-6);
+const $AddressCopyButton = styled(CopyButton)`
+  --button-padding: 0 0.375rem;
 `;

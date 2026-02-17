@@ -15,7 +15,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -61,10 +61,12 @@ export const MarketsTable = forwardRef(
                   id,
                   assetId,
                   effectiveInitialMarginFraction,
-                  logo,
+                  displayId,
                   initialMarginFraction,
-                  name,
                   isUnlaunched,
+                  logo,
+                  marketFeeDiscountMultiplier,
+                  name,
                   volume24h,
                 }) => (
                   <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
@@ -72,11 +74,13 @@ export const MarketsTable = forwardRef(
                     <AssetTableCell
                       tw="overflow-auto"
                       configs={{
+                        id,
                         effectiveInitialMarginFraction,
-                        logo,
+                        displayId,
                         initialMarginFraction,
                         isUnlaunched,
-                        id,
+                        logo,
+                        marketFeeDiscountMultiplier,
                       }}
                       name={name}
                       symbol={assetId}
@@ -139,20 +143,24 @@ export const MarketsTable = forwardRef(
                   id,
                   assetId,
                   effectiveInitialMarginFraction,
-                  logo,
+                  displayId,
                   initialMarginFraction,
-                  name,
                   isUnlaunched,
+                  logo,
+                  marketFeeDiscountMultiplier,
+                  name,
                 }) => (
                   <div tw="flex items-center gap-0.25">
                     <FavoriteButton marketId={id} />
                     <AssetTableCell
                       configs={{
                         id,
+                        displayId,
                         effectiveInitialMarginFraction,
-                        logo,
                         initialMarginFraction,
                         isUnlaunched,
+                        logo,
+                        marketFeeDiscountMultiplier,
                       }}
                       name={name}
                       symbol={assetId}
@@ -364,7 +372,7 @@ const $Toolbar = styled(Toolbar)`
 `;
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
   tbody {
     --tableCell-padding: 1rem 0;
   }

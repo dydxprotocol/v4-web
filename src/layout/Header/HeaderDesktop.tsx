@@ -11,6 +11,7 @@ import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -33,24 +34,23 @@ import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
-import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
+import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
-  const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
+  const { documentation, community, mintscanBase, exchangeStats, fundingComparison } =
+    useURLConfigs();
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
-
-  const availableBalance = useAppSelector(getSubaccountFreeCollateral);
+  const isSpotEnabled = useEnableSpot();
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
@@ -64,10 +64,10 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
-        testFlags.spot && {
+        isSpotEnabled && {
           value: 'SPOT',
-          label: 'Spot',
-          href: `${AppRoute.Spot}/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn`,
+          label: stringGetter({ key: STRING_KEYS.SPOT }),
+          href: AppRoute.Spot,
         },
         {
           value: 'MARKETS',
@@ -116,10 +116,22 @@ export const HeaderDesktop = () => {
               },
             },
             {
+              value: 'ApiTradingKeys',
+              slotBefore: <Icon iconName={IconName.Passkey} />,
+              label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
+              onClick: () => dispatch(openDialog(DialogTypes.TradingKeys())),
+            },
+            {
               value: 'MINTSCAN',
               slotBefore: <Icon iconName={IconName.Mintscan} />,
               label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
               href: mintscanBase,
+            },
+            {
+              value: 'FUNDING_COMPARISON',
+              slotBefore: <Icon iconName={IconName.FundingChart} />,
+              label: stringGetter({ key: STRING_KEYS.FUNDING_COMPARISON }),
+              href: fundingComparison,
             },
             {
               value: 'COMMUNITY',
@@ -185,37 +197,37 @@ export const HeaderDesktop = () => {
 
       <$NavAfter>
         {onboardingState === OnboardingState.AccountConnected &&
-          complianceState === ComplianceStates.FULL_ACCESS && (
-            <>
-              <Button
-                tw="mr-[0.5em]"
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                action={
-                  !availableBalance || availableBalance > 0
-                    ? ButtonAction.Secondary
-                    : ButtonAction.Primary
-                }
-                onClick={() => {
-                  dispatch(openDialog(DialogTypes.Deposit2({})));
-                }}
-                state={{ isDisabled: !dydxAccounts }}
-              >
-                {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-              </Button>
-              <VerticalSeparator />
-            </>
+          complianceState !== ComplianceStates.READ_ONLY && (
+            <Button
+              tw="mr-[0.5em]"
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              action={ButtonAction.Primary}
+              onClick={() => {
+                dispatch(openDialog(DialogTypes.Deposit2({})));
+              }}
+              state={{ isDisabled: !dydxAccounts }}
+            >
+              <Icon iconName={IconName.Deposit2} size="1rem" />
+              <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
+            </Button>
           )}
 
-        <MobileDownloadLinks />
+        {onboardingState === OnboardingState.AccountConnected ? (
+          <$IconButton
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.Mobile}
+            onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
+          />
+        ) : (
+          <MobileDownloadLinks />
+        )}
 
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
           onClick={() => dispatch(openDialog(DialogTypes.Help()))}
         />
-
-        <VerticalSeparator />
 
         <NotificationsMenu
           slotTrigger={
@@ -225,8 +237,6 @@ export const HeaderDesktop = () => {
             />
           }
         />
-
-        <VerticalSeparator />
 
         <AccountMenu />
       </$NavAfter>
@@ -309,7 +319,7 @@ const $NavAfter = styled.div`
   justify-self: end;
   padding: 0 0.75rem;
 
-  gap: 0.5rem;
+  gap: 1rem;
 
   a {
     color: var(--color-text-1);

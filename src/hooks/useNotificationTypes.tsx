@@ -1,13 +1,17 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
-import { useQuery } from '@tanstack/react-query';
-import { groupBy, isNumber, max, pick } from 'lodash';
+import { groupBy, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
+import { CHAIN_INFO } from '@/constants/chains';
+import {
+  LOSS_REBATE_DETAILS_DECEMBER,
+  TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2,
+} from '@/constants/clc';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
@@ -25,12 +29,6 @@ import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
-import {
-  CURRENT_REWARDS_SEASON,
-  CURRENT_REWARDS_SEASON_AMOUNT,
-  CURRENT_REWARDS_SEASON_EXPIRATION,
-} from '@/hooks/surgeRewards';
-
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
@@ -44,10 +42,12 @@ import { CancelAllNotification } from '@/views/notifications/CancelAllNotificati
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { SwapNotification } from '@/views/notifications/SwapNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import {
+  getSubaccountFreeCollateral,
   selectOrphanedTriggerOrders,
   selectReclaimableChildSubaccountFunds,
   selectShouldAccountRebalanceUsdc,
@@ -62,9 +62,13 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
+import { getSpotTrades } from '@/state/spotTradesSelectors';
+import { getSwaps } from '@/state/swapSelectors';
+import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
+import { SpotApiSide } from '@/clients/spotApi';
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 // eslint-disable-next-line import/no-cycle
@@ -72,14 +76,15 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
-import { sleep } from '@/lib/timeUtils';
-import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
+import { isPresent, orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
+import { DEC_2025_COMPETITION_DETAILS } from './rewards/util';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
+import { useAutomatedDepositNotifications } from './useAutomatedDepositNotifications';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
@@ -325,17 +330,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const { type, status } = transfer;
           const id = transfer.id;
 
-          const finalAmount = formatNumberOutput(
-            transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
-            OutputType.Fiat,
-            { decimalSeparator, groupSeparator, selectedLocale }
-          );
+          const finalAmount = isSpotWithdraw(transfer)
+            ? `${formatNumberOutput(transfer.amount, OutputType.Number, { decimalSeparator, groupSeparator, selectedLocale, fractionDigits: 4 })} SOL`
+            : formatNumberOutput(
+                transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
+                OutputType.Fiat,
+                { decimalSeparator, groupSeparator, selectedLocale }
+              );
 
           const isSuccess = status === 'success';
           let body: string = '';
           let title: string = '';
 
-          if (type === 'withdraw') {
+          if (type === 'withdraw' || type === 'spot-withdraw') {
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
             });
@@ -567,160 +574,200 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
-      const currentSeason = CURRENT_REWARDS_SEASON;
+      const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+      const selectedLocale = useAppSelector(getSelectedLocale);
 
-      const { data: rewards } = useQuery({
-        queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
-        enabled:
+      useEffect(() => {
+        if (
+          new Date().getTime() < new Date(DEC_2025_COMPETITION_DETAILS.claimEndtime).getTime() &&
+          new Date().getTime() > new Date(DEC_2025_COMPETITION_DETAILS.claimStartTime).getTime() &&
           dydxAddress != null &&
-          new Date().getTime() < new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime(),
-        retry: false,
-        queryFn: async () => {
-          try {
-            // don't take up bandwidth during sensitive loading time
-            await sleep(1500);
-            const data = await fetch(
-              `https://cloud.chaoslabs.co/query/api/dydx/reward-distribution?season=${currentSeason - 1}`
-            );
-            const result = await data.json();
-            const maybeNumber = result.find((f: any) => f.address === dydxAddress).rewards;
-            if (isNumber(maybeNumber)) {
-              return maybeNumber;
+          DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress] != null
+        ) {
+          const amount = MustNumber(
+            DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress]
+          );
+          trigger({
+            id: `dec-2025-rebate-1-claim`,
+            displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: stringGetter({
+                key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_TITLE,
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_BODY,
+                params: {
+                  AMOUNT: formatNumberOutput(amount, OutputType.Fiat, {
+                    decimalSeparator,
+                    groupSeparator,
+                    selectedLocale,
+                  }),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent>
+                  {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })} →
+                </Link>
+              ),
+            },
+            updateKey: [`dec-2025-rebate-1-claim`, dydxAddress],
+          });
+        }
+      }, [decimalSeparator, dydxAddress, groupSeparator, selectedLocale, stringGetter, trigger]);
+
+      const qualifiedForRound2 = useMemo(() => {
+        return (
+          Date.now() < new Date(TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.claimDeadline).getTime() &&
+          Date.now() > new Date(TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.claimStartTime).getTime() &&
+          TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.estimatedWalletRewards[
+            dydxAddress?.toLowerCase() ?? ''
+          ] != null
+        );
+      }, [dydxAddress]);
+
+      const tokenRewardPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
+
+      useEffect(() => {
+        if (qualifiedForRound2 && dydxAddress != null && tokenRewardPrice != null) {
+          const estimatedUsdRewardAmount =
+            TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.estimatedWalletRewards[
+              dydxAddress.toLowerCase()
+            ] ?? 0;
+
+          const adjustedUsdRewardAmount =
+            (estimatedUsdRewardAmount / TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.assumedPrice) *
+            tokenRewardPrice;
+
+          const formattedRewardAmount = formatNumberOutput(
+            adjustedUsdRewardAmount,
+            OutputType.Number,
+            {
+              decimalSeparator,
+              groupSeparator,
+              selectedLocale,
+              fractionDigits: USD_DECIMALS,
+              minimumFractionDigits: USD_DECIMALS,
             }
-            return null;
-          } catch (e) {
-            return null;
-          }
-        },
-      });
+          );
 
-      useEffect(() => {
-        const now = new Date().getTime();
-        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
-        if (now < seasonEnd && rewards != null && rewards > 5) {
           trigger({
-            id: `rewards-program-surge-s${currentSeason - 1}-payout`,
+            id: `jan-2026-trading-league-rewards-round-2`,
             displayData: {
               icon: <Icon iconName={IconName.Sparkles} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
-                params: { SEASON_NUMBER: currentSeason - 1, DYDX_REWARDS: rewards },
+                key: STRING_KEYS.TRADING_LEAGUE_REWARD_CLAIM_TITLE,
               }),
               body: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_BODY,
+                key: STRING_KEYS.TRADING_LEAGUE_REWARD_CLAIM_BODY,
                 params: {
-                  SEASON_NUMBER: currentSeason - 1,
+                  REWARD_AMOUNT: formattedRewardAmount,
+                  CLAIM_DEADLINE: new Date(
+                    TRADING_LEAGUE_REWARDS_DETAILS_ROUND_2.claimDeadline
+                  ).toLocaleDateString(selectedLocale, { month: 'short', day: 'numeric' }),
+                  LEARN_MORE_LINK: (
+                    <Link
+                      href="https://dydx.forum/t/dydx-trading-leagues-pilot-program-request-1m-in-dydx-from-the-community-treasury/4613/24"
+                      isAccent
+                      isInline
+                    >
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
                 },
               }),
               toastSensitivity: 'foreground',
               groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              actionAltText: stringGetter({ key: STRING_KEYS.CLAIM }),
               renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/surge" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                <Link href="https://www.dydx.xyz/trading-league-rewards" isAccent>
+                  {stringGetter({ key: STRING_KEYS.CLAIM })} →
                 </Link>
               ),
             },
-            updateKey: [`rewards-program-surge-s${currentSeason - 1}-payout`],
+            updateKey: [`jan-2026-trading-league-rewards-round-2`, dydxAddress],
           });
         }
-      }, [currentSeason, rewards, stringGetter, trigger]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [
+        Boolean(tokenRewardPrice),
+        qualifiedForRound2,
+        dydxAddress,
+        stringGetter,
+        trigger,
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      ]);
+
+      const qualifyForDecLossRebate = useMemo(() => {
+        return (
+          LOSS_REBATE_DETAILS_DECEMBER.estimatedWalletRebates[dydxAddress?.toLowerCase() ?? ''] !=
+            null &&
+          Date.now() < new Date(LOSS_REBATE_DETAILS_DECEMBER.claimDeadline).getTime() &&
+          Date.now() > new Date(LOSS_REBATE_DETAILS_DECEMBER.claimStartTime).getTime()
+        );
+      }, [dydxAddress]);
 
       useEffect(() => {
-        const now = new Date().getTime();
-        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
-        const endingSoon = seasonEnd - timeUnits.day * 3;
-
-        if (now <= endingSoon) {
-          trigger({
-            id: `rewards-program-surge-s${currentSeason}-start`,
-            displayData: {
-              icon: <Icon iconName={IconName.Trophy} />,
-              title: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
-                params: {
-                  SEASON_NUMBER: currentSeason,
-                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
-                },
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
-                params: {
-                  SEASON_NUMBER: currentSeason,
-                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
-              renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/surge" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                </Link>
-              ),
-            },
-            updateKey: [`rewards-program-surge-s${currentSeason}-start`],
-          });
-        } else if (now < seasonEnd) {
-          let daysLeft = Math.floor((seasonEnd - now) / timeUnits.day);
-          // oops, we don't want to show 1 days left or 0 days left
-          if (daysLeft < 2) {
-            daysLeft = 2;
-          }
-          trigger({
-            id: `rewards-program-surge-s${currentSeason}-ending`,
-            displayData: {
-              icon: <Icon iconName={IconName.Clock} />,
-              title: stringGetter({
-                key: STRING_KEYS.SURGE_SEASON_ENDING_TITLE,
-                params: { SEASON_NUMBER: currentSeason, DAYS_LEFT: daysLeft },
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.SURGE_SEASON_ENDING_BODY,
-                params: {
-                  SEASON_NUMBER: currentSeason,
-                  DAYS_LEFT: daysLeft,
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
-              renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/surge" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                </Link>
-              ),
-            },
-            updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
-          });
+        if (!qualifyForDecLossRebate) {
+          return;
         }
-      }, [currentSeason, stringGetter, trigger]);
 
-      const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
-      useEffect(() => {
-        if (new Date().getTime() < new Date(PUMP_COMPETITION_EXPIRATION).getTime())
-          trigger({
-            id: `pump-trading-competition-base`,
-            displayData: {
-              icon: <Icon iconName={IconName.Sparkles} />,
-              title: stringGetter({
-                key: STRING_KEYS.PUMP_COMPETITION_TITLE,
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.PUMP_COMPETITION_BODY,
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
-              renderActionSlot: () => (
-                <Link href="https://www.dydx.xyz/blog/pump-trading-competition" isAccent>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                </Link>
-              ),
-            },
-            updateKey: [`pump-trading-competition-base`],
-          });
-      }, [stringGetter, trigger]);
+        const usdRebateAmount =
+          LOSS_REBATE_DETAILS_DECEMBER.estimatedWalletRebates[dydxAddress?.toLowerCase() ?? ''] ??
+          0;
+        const formattedRebateAmount = formatNumberOutput(usdRebateAmount, OutputType.Fiat, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+          fractionDigits: USD_DECIMALS,
+          minimumFractionDigits: USD_DECIMALS,
+        });
+
+        trigger({
+          id: `dec-2025-loss-rebate-claim`,
+          displayData: {
+            icon: <Icon iconName={IconName.Sparkles} />,
+            title: stringGetter({
+              key: STRING_KEYS.TRADING_LOSS_REBATE_CLAIM_TITLE,
+            }),
+            body: stringGetter({
+              key: STRING_KEYS.TRADING_LOSS_REBATE_CLAIM_BODY,
+              params: {
+                REBATE_AMOUNT: formattedRebateAmount,
+                CLAIM_DEADLINE: new Date(
+                  LOSS_REBATE_DETAILS_DECEMBER.claimDeadline
+                ).toLocaleDateString(selectedLocale, { month: 'short', day: 'numeric' }),
+                HERE_LINK: (
+                  <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent isInline>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.RewardsProgramUpdates,
+            actionAltText: stringGetter({ key: STRING_KEYS.CLAIM }),
+            renderActionSlot: () => (
+              <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent>
+                {stringGetter({ key: STRING_KEYS.CLAIM })} →
+              </Link>
+            ),
+          },
+          updateKey: [`jan-2026-trading-league-rewards-round-2`, dydxAddress],
+        });
+      }, [
+        qualifyForDecLossRebate,
+        trigger,
+        stringGetter,
+        dydxAddress,
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      ]);
     },
   },
   {
@@ -972,6 +1019,79 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.Swap,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      const swaps = useAppSelector(getSwaps, shallowEqual);
+
+      useEffect(() => {
+        swaps.forEach((swap) => {
+          const isPending = swap.status === 'pending' || swap.status === 'pending-transfer';
+          trigger({
+            id: swap.id,
+            displayData: {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.SWAP }),
+              groupKey: NotificationType.Swap,
+              toastSensitivity: 'background',
+              toastDuration: isPending ? Infinity : DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <SwapNotification swap={swap} notification={notification} isToast={isToast} />
+              ),
+            },
+            updateKey: [swap.status],
+          });
+        });
+      }, [swaps, trigger, stringGetter]);
+    },
+  },
+  {
+    type: NotificationType.SpotTrade,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      const spotTrades = useAppSelector(getSpotTrades, shallowEqual);
+
+      useEffect(() => {
+        spotTrades.forEach((trade) => {
+          const isSuccess = trade.status === 'success';
+          trigger({
+            id: trade.id,
+            displayData: {
+              slotTitleLeft: isSuccess ? (
+                <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
+              ) : (
+                <Icon iconName={IconName.Warning} tw="text-color-error" />
+              ),
+              title: isSuccess
+                ? stringGetter({ key: STRING_KEYS.TRADE_SUCCESSFUL })
+                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED }),
+              body: isSuccess
+                ? stringGetter({
+                    key: STRING_KEYS.TRADE_SUCCESSFUL_DESCRIPTION,
+                    params: {
+                      PURCHASE_DIRECTION:
+                        trade.side === SpotApiSide.BUY
+                          ? stringGetter({ key: STRING_KEYS.PURCHASED })
+                          : stringGetter({ key: STRING_KEYS.SOLD }),
+                      AMOUNT: trade.tokenAmount,
+                      ASSET: trade.tokenSymbol,
+                      SOL_AMOUNT: trade.solAmount,
+                    },
+                  })
+                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
+              groupKey: NotificationType.SpotTrade,
+              toastSensitivity: 'foreground',
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+            },
+            updateKey: [trade.status],
+          });
+        });
+      }, [spotTrades, stringGetter, trigger]);
+    },
+  },
+  {
     type: NotificationType.FeedbackRequest,
     useTrigger: ({ trigger }) => {
       const { dydxAddress } = useAccounts();
@@ -1027,13 +1147,139 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.DepositAddressEvents,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
+      const subaccountFreeCollateral = useAppSelector(getSubaccountFreeCollateral);
+
+      const { newDeposits, setNewDeposits, prevDepositIdsRef, setEnabled } =
+        useAutomatedDepositNotifications();
+
+      const prevWalletBalanceRef = useRef<string | undefined>(undefined);
+      const prevSubaccountFreeCollateralRef = useRef<number | undefined>(undefined);
+      const lastNotificationTimeRef = useRef<number>(0);
+      const NOTIFICATION_DEBOUNCE = 1 * timeUnits.second; // 1 second
+
+      useEffect(() => {
+        if (newDeposits.length === 0) return;
+
+        const now = Date.now();
+        newDeposits.forEach((deposit) => {
+          if (
+            now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE &&
+            !prevDepositIdsRef.current.has(deposit.id)
+          ) {
+            trigger({
+              id: `automated-deposit-${deposit.id}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2,
+                groupKey: NotificationType.DepositAddressEvents,
+                slotTitleLeft: (
+                  <Icon iconName={IconName.Signal} size="1.25rem" tw="text-color-success" />
+                ),
+                title: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_TITLE }),
+                body: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_BODY }),
+                toastSensitivity: 'foreground',
+                actionDescription: stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION }),
+                renderActionSlot: () => {
+                  const chainInfo = CHAIN_INFO[deposit.chain_id];
+                  return (
+                    chainInfo?.explorerBaseUrl && (
+                      <Link
+                        href={`${chainInfo.explorerBaseUrl}/tx/${deposit.transaction_hash}`}
+                        isAccent
+                      >
+                        {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
+                      </Link>
+                    )
+                  );
+                },
+              },
+              updateKey: [deposit.id],
+            });
+            prevDepositIdsRef.current.add(deposit.id);
+          }
+          lastNotificationTimeRef.current = now;
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [newDeposits, trigger, stringGetter]);
+
+      // Stage 2: Watch for wallet balance increases (after sweep/rebalance to subaccount)
+      useEffect(() => {
+        if (!usdcAmount) return;
+
+        const now = Date.now();
+        const prevWallet = prevWalletBalanceRef.current;
+        const prevSubaccountFreeCollateral = prevSubaccountFreeCollateralRef.current;
+
+        if (!prevSubaccountFreeCollateral) {
+          prevSubaccountFreeCollateralRef.current = subaccountFreeCollateral;
+        }
+
+        if (!prevWallet) {
+          prevWalletBalanceRef.current = usdcAmount;
+          return;
+        }
+
+        const prevWalletBalanceBN = MaybeBigNumber(prevWallet);
+        const usdcBalanceBN = MaybeBigNumber(usdcAmount);
+
+        if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
+          const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
+
+          const matchingDeposit = newDeposits.find((deposit) =>
+            prevDepositIdsRef.current.has(deposit.id)
+          );
+
+          if (!matchingDeposit) return;
+
+          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+            trigger({
+              id: `deposit-confirmed-${matchingDeposit.id}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2, // 20 seconds
+                groupKey: NotificationType.DepositAddressEvents,
+                icon: <Icon iconName={IconName.CheckCircle} size="1.25rem" />,
+                title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
+                body: stringGetter({
+                  key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
+                  params: {
+                    AMOUNT: diff.toFixed(USD_DECIMALS),
+                    ASSET: 'USDC',
+                  },
+                }),
+                toastSensitivity: 'foreground',
+              },
+            });
+            lastNotificationTimeRef.current = now;
+          }
+
+          const updatedDeposits = newDeposits.filter(
+            (deposit) => deposit.id !== matchingDeposit.id
+          );
+          setNewDeposits(updatedDeposits);
+          if (updatedDeposits.length === 0) {
+            setEnabled(false);
+          }
+        }
+
+        prevWalletBalanceRef.current = usdcAmount;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [usdcAmount, subaccountFreeCollateral, trigger, stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.CosmosWalletLifecycle,
     useTrigger: ({ trigger, hideNotification }) => {
       const dispatch = useAppDispatch();
       const stringGetter = useStringGetter();
       const isKeplr = useAppSelector(selectIsKeplrConnected);
       const reclaimableChildSubaccountFunds = useAppSelector(selectReclaimableChildSubaccountFunds);
-      const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
+      const { ordersToCancel } = orEmptyObj(useAppSelector(selectOrphanedTriggerOrders));
       const maybeRebalanceAction = useAppSelector(selectShouldAccountRebalanceUsdc);
 
       useEffect(() => {

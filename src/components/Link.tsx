@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, HTMLAttributes } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -11,11 +11,12 @@ type ElementProps = {
     event: string;
     meta?: any;
   };
-  children: React.ReactNode;
+  children?: React.ReactNode;
   href?: string;
   onClick?: (e: React.MouseEvent) => void;
   withIcon?: boolean;
   isNewPage?: boolean;
+  iconSize?: string;
 };
 
 type StyleProps = {
@@ -24,7 +25,10 @@ type StyleProps = {
   className?: string;
 };
 
-export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
+export const Link = forwardRef<
+  HTMLAnchorElement,
+  ElementProps & StyleProps & HTMLAttributes<HTMLAnchorElement>
+>(
   (
     {
       analyticsConfig,
@@ -36,6 +40,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       isAccent = false,
       isNewPage = true,
       className,
+      iconSize,
       ...props
     }: ElementProps & StyleProps,
     ref
@@ -60,7 +65,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       {...props}
     >
       {children}
-      {withIcon && <Icon iconName={IconName.LinkOut} />}
+      {withIcon && <Icon size={iconSize} iconName={IconName.LinkOut} />}
     </$A>
   )
 );

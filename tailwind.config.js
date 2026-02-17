@@ -19,6 +19,8 @@ export default {
       black: 'var(--color-black)',
       green: 'var(--color-green)',
       red: 'var(--color-red)',
+      'red-faded': 'var(--color-red-faded)',
+      'green-faded': 'var(--color-green-faded)',
       'white-faded': 'var(--color-white-faded)',
 
       'color-layer-0': 'var(--color-layer-0)',
@@ -45,6 +47,7 @@ export default {
 
       'color-accent': 'var(--color-accent)',
       'color-accent-faded': 'var(--color-accent-faded)',
+      'color-accent-more-faded': 'var(--color-accent-more-faded)',
       'color-favorite': 'var(--color-favorite)',
 
       'color-success': 'var(--color-success)',
@@ -71,7 +74,7 @@ export default {
     },
     fontFamily: {
       base: 'var(--fontFamily-base)',
-      monospace: 'var(--fontFamily-monospace',
+      monospace: 'var(--fontFamily-monospace)',
     },
     fontSize: {
       tiny: 'var(--fontSize-tiny)',
@@ -129,6 +132,7 @@ export default {
     },
     borderRadius: ({ theme }) => ({
       ...theme('spacing'),
+      full: '9999px',
     }),
     extend: {
       animation: {
@@ -158,10 +162,12 @@ export default {
         '.font-tiny-regular': { font: 'var(--font-tiny-regular)' },
         '.font-tiny-book': { font: 'var(--font-tiny-book)' },
         '.font-tiny-medium': { font: 'var(--font-tiny-medium)' },
+        '.font-tiny-bold': { font: 'var(--font-tiny-bold)' },
 
         '.font-mini-regular': { font: 'var(--font-mini-regular)' },
         '.font-mini-book': { font: 'var(--font-mini-book)' },
         '.font-mini-medium': { font: 'var(--font-mini-medium)' },
+        '.font-mini-bold': { font: 'var(--font-mini-bold)' },
 
         '.font-small-regular': { font: 'var(--font-small-regular)' },
         '.font-small-book': { font: 'var(--font-small-book)' },
@@ -192,6 +198,8 @@ export default {
         '.font-extra-large-book': { font: 'var(--font-extra-large-book)' },
         '.font-extra-large-medium': { font: 'var(--font-extra-large-medium)' },
         '.font-extra-large-bold': { font: 'var(--font-extra-large-bold)' },
+
+        '.font-mono': { fontFamily: 'var(--fontFamily-monospace)' },
       });
       addComponents({
         '.row': {

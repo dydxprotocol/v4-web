@@ -32,6 +32,8 @@ type BaseColors = {
   green: string;
   red: string;
 
+  redFaded: string;
+  greenFaded: string;
   whiteFaded: string;
 };
 
@@ -50,6 +52,7 @@ type BorderColors = {
   borderDefault: string;
   borderDestructive: string;
   borderButton: string;
+  borderFaded: string;
 };
 
 type TextColors = {
@@ -68,6 +71,7 @@ type GradientColors = {
 type AccentColors = {
   accent: string;
   accentFaded: string;
+  accentMoreFaded: string;
   favorite: string;
 };
 
@@ -90,6 +94,10 @@ type DirectionalColors = {
   negativeDark: string;
   positiveFaded: string;
   negativeFaded: string;
+  positive20: string;
+  negative20: string;
+  positive50: string;
+  negative50: string;
 };
 
 type RiskColors = {

@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
 import { ASSET_ICON_MAP } from '@/constants/assets';
 import { CHAIN_INFO } from '@/constants/chains';
 
+import { LoadingContext } from '@/contexts/LoadingContext';
+
 import { Nullable } from '@/lib/typeUtils';
+
+import { LoadingAssetIcon } from './Loading/LoadingAssetIcon';
 
 export type AssetSymbol = keyof typeof ASSET_ICON_MAP;
 
@@ -23,20 +27,37 @@ export const AssetIcon = ({
   symbol,
   className,
   chainId,
+  isLoading = false,
 }: {
   logoUrl?: Nullable<string>;
   symbol?: Nullable<string>;
   className?: string;
   chainId?: string;
+  isLoading?: boolean;
 }) => {
   const [isError, setIsError] = useState(false);
+  const isAssetIconLoading = useContext(LoadingContext);
+
+  const placeHolderElement = useMemo(
+    () => (
+      <$Container className={className} $hasChainIcon={!!chainId}>
+        <Placeholder className={className} symbol={symbol ?? ''} />
+        {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
+      </$Container>
+    ),
+    [chainId, className, symbol]
+  );
+
+  if (isLoading || isAssetIconLoading) {
+    return <$LoadingAssetIcon className={className} />;
+  }
 
   if (isError || (!logoUrl && !isAssetSymbol(symbol))) {
-    return <Placeholder className={className} symbol={symbol ?? ''} />;
+    return placeHolderElement;
   }
 
   return logoUrl ? (
-    <$Container className={className}>
+    <$Container className={className} $hasChainIcon={!!chainId}>
       <$ContainerBackground />
       <$AssetIcon
         src={logoUrl}
@@ -51,6 +72,7 @@ export const AssetIcon = ({
           }
         }}
       />
+      {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
     </$Container>
   ) : isAssetSymbol(symbol) ? (
     <$Container className={className} $hasChainIcon={!!chainId}>
@@ -59,7 +81,7 @@ export const AssetIcon = ({
       {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
     </$Container>
   ) : (
-    <Placeholder className={className} symbol={symbol ?? ''} />
+    placeHolderElement
   );
 };
 
@@ -97,7 +119,7 @@ const $ContainerBackground = styled.div`
   min-height: 100%;
   width: 100%;
   min-width: 100%;
-  transform: scale(0.99); // Scale in order to hide outline from '--asset-icon-backgroundColor'
+  transform: scale(0.97); // Scale in order to hide outline from '--asset-icon-backgroundColor'
   background-color: var(--asset-icon-backgroundColor, var(--color-white));
   border-radius: 50%;
 `;
@@ -132,4 +154,8 @@ const $ChainIcon = styled.img`
   width: 50%;
   border-radius: 9px;
   border: 2px solid var(--asset-icon-chain-icon-borderColor, var(--color-layer-4));
+`;
+
+const $LoadingAssetIcon = styled(LoadingAssetIcon)`
+  --loading-asset-icon-size: var(--asset-icon-size, 1em);
 `;

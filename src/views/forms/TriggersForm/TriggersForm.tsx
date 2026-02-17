@@ -191,7 +191,7 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
           <AdvancedTriggersOptions
             symbol={symbol}
             existsLimitOrder={existsLimitOrder}
-            size={differingOrderSizes ? null : summary.stopLossOrder.size ?? null}
+            size={differingOrderSizes ? null : (summary.stopLossOrder.size ?? null)}
             positionSize={signedSize ? signedSize.abs().toNumber() : null}
             differingOrderSizes={differingOrderSizes}
             multipleTakeProfitOrders={multipleTakeProfitOrders}

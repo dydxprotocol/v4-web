@@ -1,8 +1,8 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { VaultFormAccountData } from '@/bonsai/public-calculators/vaultFormValidation';
 
-import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { ConnectorType } from '@/constants/wallets';
+import { OnboardingState, OnboardingSteps, SpotWalletStatus } from '@/constants/account';
+import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import {
   getDisplayChooseWallet,
@@ -13,18 +13,17 @@ import {
 import { createAppSelector } from '@/state/appTypes';
 
 import { isNewOrderStatusOpen } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 
 import { getSubaccountId } from './accountInfoSelectors';
 import { getCurrentMarketId } from './currentMarketSelectors';
 import { getSourceAccount } from './walletSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
-  [getOnboardingState, getDisplayChooseWallet],
-  (onboardingState: OnboardingState, displayChooseWallet: boolean) => {
+  [getOnboardingState, getDisplayChooseWallet, (s, isTurnkeyEnabled: boolean) => isTurnkeyEnabled],
+  (onboardingState: OnboardingState, displayChooseWallet: boolean, isTurnkeyEnabled: boolean) => {
     return {
       [OnboardingState.Disconnected]:
-        displayChooseWallet || !testFlags.enableTurnkey
+        displayChooseWallet || !isTurnkeyEnabled
           ? OnboardingSteps.ChooseWallet
           : OnboardingSteps.SignIn,
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
@@ -142,4 +141,20 @@ export const selectSubaccountStateForVaults = createAppSelector(
     freeCollateral: freeCollateral ?? undefined,
     canViewAccount,
   })
+);
+
+export const calculateSpotWalletStatus = createAppSelector(
+  [getOnboardingState, getSourceAccount],
+  (onboardingState, sourceAccount): SpotWalletStatus => {
+    const isWalletConnected = onboardingState === OnboardingState.AccountConnected;
+    const canDeriveSolanaWallet = sourceAccount.chain !== WalletNetworkType.Cosmos;
+
+    if (!isWalletConnected) {
+      return SpotWalletStatus.Disconnected;
+    }
+    if (!canDeriveSolanaWallet) {
+      return SpotWalletStatus.Unsupported;
+    }
+    return SpotWalletStatus.Connected;
+  }
 );

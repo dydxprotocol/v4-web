@@ -10,17 +10,21 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import {
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
@@ -41,8 +45,6 @@ import {
   getIndexerOrderSideStringKey,
 } from '../../lib/enumToStringKeyHelpers';
 
-const MOBILE_FILLS_PER_PAGE = 50;
-
 export enum FillsTableColumnKey {
   Time = 'Time',
   Market = 'Market',
@@ -55,6 +57,7 @@ export enum FillsTableColumnKey {
   AmountTag = 'Amount-Tag',
   Total = 'Total',
   Fee = 'Fee',
+  ClosedPnl = 'ClosedPnl',
 
   // Tablet Only
   TypeAmount = 'Type-Amount',
@@ -150,13 +153,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.Time]: {
         columnKey: 'time',
         getCellValue: (row) => row.createdAt,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt != null ? new Date(createdAt).getTime() : undefined}
-            tw="text-color-text-0"
+          <DateAgeOutput
+            value={createdAt != null ? new Date(createdAt).getTime() : null}
+            relativeTimeFormat="singleCharacter"
           />
         ),
       },
@@ -212,6 +213,16 @@ const getFillsTableColumnDef = ({
         renderCell: ({ fee }) => (
           <TableCell>
             <Output type={OutputType.Fiat} value={fee} />
+          </TableCell>
+        ),
+      },
+      [FillsTableColumnKey.ClosedPnl]: {
+        columnKey: 'closedPnl',
+        getCellValue: (row) => row.closedPnl,
+        label: stringGetter({ key: STRING_KEYS.CLOSED_PNL }),
+        renderCell: ({ closedPnl }) => (
+          <TableCell>
+            <Output type={OutputType.Fiat} value={closedPnl} />
           </TableCell>
         ),
       },
@@ -284,7 +295,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
 };
@@ -296,7 +306,6 @@ export const FillsTable = forwardRef(
       columnWidths,
       currentMarket,
       initialPageSize,
-      withGradientCardRows,
       withOuterBorder,
       withInnerBorders = true,
     }: ElementProps & StyleProps,
@@ -304,7 +313,6 @@ export const FillsTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
-    const { isMobile } = useBreakpoints();
 
     const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
@@ -332,43 +340,43 @@ export const FillsTable = forwardRef(
     );
 
     return (
-      <$Table
-        key={currentMarket ?? 'all-fills'}
-        label="Fills"
-        tableId="fills"
-        data={
-          isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
-        }
-        getRowKey={(row: FillTableRow) => row.id ?? ''}
-        onRowAction={(key: Key) =>
-          dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
-        }
-        columns={columnKeys.map((key: FillsTableColumnKey) =>
-          getFillsTableColumnDef({
-            key,
-            stringGetter,
-            symbol,
-            width: columnWidths?.[key],
-          })
-        )}
-        slotEmpty={
-          <>
-            <Icon iconName={IconName.History} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
-          </>
-        }
-        initialPageSize={initialPageSize}
-        withOuterBorder={withOuterBorder}
-        withInnerBorders={withInnerBorders}
-        withScrollSnapColumns
-        withScrollSnapRows
-        withFocusStickyRows
-      />
+      <DateAgeModeProvider>
+        <$Table
+          key={currentMarket ?? 'all-fills'}
+          label="Fills"
+          tableId="fills"
+          data={fillsData}
+          getRowKey={(row: FillTableRow) => row.id ?? ''}
+          onRowAction={(key: Key) =>
+            dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
+          }
+          columns={columnKeys.map((key: FillsTableColumnKey) =>
+            getFillsTableColumnDef({
+              key,
+              stringGetter,
+              symbol,
+              width: columnWidths?.[key],
+            })
+          )}
+          slotEmpty={
+            <>
+              <Icon iconName={IconName.History} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
+            </>
+          }
+          initialPageSize={initialPageSize}
+          withOuterBorder={withOuterBorder}
+          withInnerBorders={withInnerBorders}
+          withScrollSnapColumns
+          withScrollSnapRows
+          withFocusStickyRows
+        />
+      </DateAgeModeProvider>
     );
   }
 );
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 ` as typeof Table;
 const $InlineRow = tw.div`inlineRow`;
 const $Side = styled.span<{ side: Nullable<IndexerOrderSide> }>`

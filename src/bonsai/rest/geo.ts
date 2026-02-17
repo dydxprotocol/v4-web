@@ -13,10 +13,11 @@ import { createStoreEffect } from '../lib/createStoreEffect';
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
+import { GeoState } from '../types/summaryTypes';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { safeSubscribeObserver } from './lib/safeSubscribe';
 
-async function fetchGeo(url: string): Promise<{ data: string | undefined }> {
+async function fetchGeo(url: string): Promise<{ data: GeoState | undefined }> {
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -25,15 +26,15 @@ async function fetchGeo(url: string): Promise<{ data: string | undefined }> {
 
   const payload = await response.json();
 
-  const country = payload?.geo?.country;
+  const geo = payload?.geo as GeoState;
 
-  return { data: typeof country === 'string' ? country : undefined };
+  return { data: geo };
 }
 
 export function setUpGeoQuery(store: RootStore) {
   const geoEndpoint = createAppSelector(
     [getSelectedNetwork],
-    (network) => ENVIRONMENT_CONFIG_MAP[network].endpoints.geo
+    (network) => ENVIRONMENT_CONFIG_MAP[network].endpoints.geoV2
   );
 
   return createStoreEffect(store, geoEndpoint, (endpoint) => {

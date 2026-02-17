@@ -1,4 +1,3 @@
-import { BonsaiHooks } from '@/bonsai/ontology';
 import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -15,17 +14,14 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
 import { Link } from '@/components/Link';
-import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
@@ -39,8 +35,7 @@ import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
-import { MigratePanel } from './token/MigratePanel';
-import { StakingPanel } from './token/StakingPanel';
+import { SwapAndStakingPanel } from './token/SwapAndStakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -64,9 +59,7 @@ const Profile = () => {
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
   const { sourceAccount, dydxAddress } = useAccounts();
-  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
-  const currentWeekTradingReward = BonsaiHooks.useHistoricalTradingRewardsWeekly().data;
 
   const { data: ensName } = useEnsName({
     address:
@@ -127,7 +120,7 @@ const Profile = () => {
         <$ProfileIcon />
         <div>
           <h1 tw="font-extra-medium">
-            {isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}
+            {isConnected ? (ensName ?? truncateAddress(dydxAddress)) : '-'}
           </h1>
           {isConnected && sourceAccount.walletInfo ? (
             <$SubHeader>
@@ -186,34 +179,8 @@ const Profile = () => {
         tw="[grid-area:help]"
       />
 
-      <MigratePanel tw="[grid-area:migrate]" />
+      <SwapAndStakingPanel tw="[grid-area:staking]" />
 
-      <StakingPanel tw="[grid-area:staking]" />
-
-      <$RewardsPanel
-        slotHeaderContent={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
-        href={`/${chainTokenLabel}`}
-        hasSeparator
-      >
-        <$Details
-          items={[
-            {
-              key: 'week-rewards',
-              label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
-              value: (
-                <Output
-                  slotRight={
-                    <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} tw="ml-[0.5ch]" />
-                  }
-                  type={OutputType.Asset}
-                  value={currentWeekTradingReward}
-                />
-              ),
-            },
-          ]}
-          layout="grid"
-        />
-      </$RewardsPanel>
       <Panel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
         href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
@@ -280,9 +247,8 @@ const $MobileProfileLayout = styled.div`
     'header header'
     'actions actions'
     'settings help'
-    'migrate migrate'
     'staking staking'
-    'rewards fees'
+    'fees fees'
     'history history'
     'governance governance'
     'incentives incentives'
@@ -293,9 +259,8 @@ const $MobileProfileLayout = styled.div`
       'header header'
       'actions actions'
       'settings help'
-      'migrate migrate'
       'staking staking'
-      'rewards fees'
+      'fees fees'
       'history history'
       'governance governance'
       'incentives incentives'
@@ -378,18 +343,6 @@ const $ActionButton = styled(IconButton)<{ iconName?: IconName }>`
 
 const $Details = tw(Details)`font-small-book [--details-value-font:--font-medium-book]`;
 
-const $RewardsPanel = styled(Panel)`
-  grid-area: rewards;
-  align-self: flex-start;
-  height: 100%;
-  > div {
-    height: 100%;
-  }
-
-  dl {
-    --details-grid-numColumns: 1;
-  }
-`;
 const $HistoryPanel = styled(Panel)`
   grid-area: history;
   --panel-content-paddingY: 0;

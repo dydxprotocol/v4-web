@@ -55,6 +55,7 @@ export interface TriggerOrderInputData {
   // these are only for checking equity tier issues
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
+  selectedMarketLeverages: { [marketId: string]: number };
   equityTiers: EquityTiersSummary | undefined;
   allOpenOrders?: SubaccountOrder[];
 }

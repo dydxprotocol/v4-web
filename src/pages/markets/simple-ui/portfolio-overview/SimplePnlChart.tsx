@@ -25,6 +25,7 @@ export type PnlDatum = {
   equity: number;
   totalPnl: number;
   createdAt: number;
+  netTransfers: number;
 };
 
 export enum HistoricalPnlPeriod {

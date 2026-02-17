@@ -43,6 +43,7 @@ import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketId } from './currentMarketSelectors';
 import { getLocalPlaceOrders } from './localOrdersSelectors';
+import { selectHasPendingSwaps } from './swapSelectors';
 import { selectHasNonExpiredPendingWithdraws } from './transfersSelectors';
 
 /**
@@ -119,7 +120,7 @@ export const getMarketOrders = createAppSelector(
 export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
-    !currentMarketId ? EMPTY_ARR : marketOrders[currentMarketId] ?? EMPTY_ARR
+    !currentMarketId ? EMPTY_ARR : (marketOrders[currentMarketId] ?? EMPTY_ARR)
 );
 
 /**
@@ -284,14 +285,6 @@ export const getOnboardingGuards = (state: RootState) => state.account.onboardin
 export const getComplianceStatus = createAppSelector(
   [BonsaiCore.compliance.data],
   (compliance) => compliance.status
-);
-
-/**
- * @returns compliance status of the current session
- */
-export const getComplianceUpdatedAt = createAppSelector(
-  [BonsaiCore.compliance.data],
-  (compliance) => compliance.updatedAt
 );
 
 /**
@@ -491,11 +484,12 @@ export const selectOrphanedTriggerOrders = createAppSelector(
       return undefined;
     }
 
+    const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
+
     const ordersToCancel = calc(() => {
       if (ordersLoading !== 'success' || positionsLoading !== 'success') {
         return [];
       }
-      const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
 
       const filteredOrders = openOrders.filter((o) => {
         const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
@@ -518,7 +512,7 @@ export const selectOrphanedTriggerOrders = createAppSelector(
       return cancelOrders;
     });
 
-    return ordersToCancel;
+    return { ordersToCancel, groupedPositions };
   }
 );
 
@@ -527,8 +521,9 @@ export const selectShouldAccountRebalanceUsdc = createAppSelector(
     BonsaiCore.account.balances.data,
     BonsaiCore.account.childSubaccountSummaries.data,
     selectHasNonExpiredPendingWithdraws,
+    selectHasPendingSwaps,
   ],
-  (balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {
+  (balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws, hasPendingSwaps) => {
     if (childSubaccountSummaries == null) {
       return undefined;
     }
@@ -540,7 +535,7 @@ export const selectShouldAccountRebalanceUsdc = createAppSelector(
       const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
       const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
 
-      if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
+      if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws && !hasPendingSwaps) {
         const amountToDeposit = usdcBalanceBN
           .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
           .toFixed(USDC_DECIMALS);

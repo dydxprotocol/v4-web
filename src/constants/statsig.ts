@@ -13,8 +13,15 @@ export enum StatsigFlags {
   ffEnableFunkitNew = 'ff_enable_funkit_new',
   ffDepositRewrite = 'ff_deposit_rewrite',
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
-
+  ffSeptember2025Rewards = 'ff_rewards_sep_2025',
+  ffTurnkeyWeb = 'ff_turnkey_web',
+  ffSwapEnabled = 'ff_swap_ui_web',
+  ffSpot = 'ff_spot',
+  ffHideMarketsFilter = 'ff_hide_markets_filter',
+  ffOpenInterestFilter = 'ff_open_interest_filter',
   abPopupDeposit = 'ab_popup_deposit',
+  ffOnlyShowLiquidationRebates = 'ff_only_show_liquidation_rebates',
+  ffDydxChat = 'ff_dydx_chat',
 }
 
 export enum CustomFlags {

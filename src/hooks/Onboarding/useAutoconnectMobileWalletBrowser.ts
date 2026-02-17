@@ -13,18 +13,20 @@ import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
 
 import { sleep } from '@/lib/timeUtils';
 
 import { useAccounts } from '../useAccounts';
+import { useEnableTurnkey } from '../useEnableTurnkey';
+import { useAppSelectorWithArgs } from '../useParameterizedSelector';
 import { useWalletConnection } from '../useWalletConnection';
 import { useGenerateKeys } from './useGenerateKeys';
 
 export function useAutoconnectMobileWalletBrowser() {
   const { detectedBrowser } = useDetectedWalletBrowser();
   const displayedWallets = useDisplayedWallets();
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const isTurnkeyEnabled = useEnableTurnkey();
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const isSimpleUi = useSimpleUiEnabled();
   const { hasAttemptedMobileWalletConnect, selectWallet, setHasAttemptedMobileWalletConnect } =
     useWalletConnection();

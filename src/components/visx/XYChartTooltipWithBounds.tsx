@@ -208,7 +208,6 @@ const TooltipInner = <Datum extends object>({
       if (isValidNumber(left) && isValidNumber(top)) {
         const color =
           (nearestDatumKey && colorScale?.(nearestDatumKey)) ??
-          null ??
           theme?.gridStyles.stroke ??
           theme?.htmlLabel?.color ??
           '#222';
@@ -237,7 +236,7 @@ const TooltipInner = <Datum extends object>({
         : 'right';
 
   return showTooltip ? (
-    <g data-state={showTooltip ? 'open' : 'closed'}>
+    <g data-state="open">
       {showVerticalCrosshair && (
         <line
           x1={crosshairLeft}

@@ -4,8 +4,6 @@ import { Separator } from '@radix-ui/react-separator';
 import styled, { css } from 'styled-components';
 
 const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
-  --separatorHeight-padding: 1.5rem;
-
   flex: 0 !important;
   z-index: -1;
 
@@ -28,7 +26,7 @@ const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
             height: 100%;
           `
         : css`
-            height: calc(100% - var(--separatorHeight-padding));
+            height: calc(100% - var(--separatorHeight-padding, 1.5rem));
           `}
   }
 `;

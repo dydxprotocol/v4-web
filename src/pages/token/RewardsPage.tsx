@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { BonsaiHooks } from '@/bonsai/ontology';
 import { sumBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
@@ -9,10 +11,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
-import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useEnableLiquidationRebates } from '@/hooks/useEnableLiquidationRebates';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -21,30 +22,42 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Tabs } from '@/components/Tabs';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
-import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
-import { MigratePanel } from './MigratePanel';
-import { RewardHistoryPanel } from './RewardHistoryPanel';
+import { LiquidationRebatesHeader } from './LiquidationRebatesHeader';
+import { LiquidationRebatesPanel } from './LiquidationRebatesPanel';
+import { RebatesIncetivesPanel } from './RebatesIncetivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
-import { StakingPanel } from './StakingPanel';
+import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
-import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
+import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
+
+enum Tab {
+  Rewards = 'Rewards',
+  LiquidationRebates = 'LiquidationRebates',
+  Competition = 'Competition',
+}
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
   const { complianceState } = useComplianceState();
-  const { isTablet, isNotTablet } = useBreakpoints();
+  const { isTablet } = useBreakpoints();
+  const enableLiquidationRebates = useEnableLiquidationRebates();
 
   const { usdcDenom } = useTokenConfigs();
+
+  const [value, setValue] = useState(
+    enableLiquidationRebates ? Tab.LiquidationRebates : Tab.Rewards
+  );
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -53,17 +66,6 @@ const RewardsPage = () => {
     (a) => a.amount
   );
 
-  const ethereumChainId = useEnvConfig('ethereumChainId');
-  const chainId = Number(ethereumChainId);
-  // v3 token is only on mainnet
-  const { balance: tokenBalance } = useAccountBalance({
-    addressOrDenom: chainId === 1 ? import.meta.env.VITE_V3_TOKEN_ADDRESS : undefined,
-    chainId: 1,
-    isCosmosChain: false,
-  });
-
-  const showMigratePanel =
-    import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && MustBigNumber(tokenBalance).gt(0);
   const showGeoblockedPanel = complianceState !== ComplianceStates.FULL_ACCESS;
   const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel;
 
@@ -90,31 +92,68 @@ const RewardsPage = () => {
           <$DetachedSection>
             {showGeoblockedPanel && <GeoblockedPanel />}
             {showStakingRewardPanel && stakingRewardPanel}
-            <StakingPanel />
+            <SwapAndStakingPanel />
             <UnbondingPanels />
             <LaunchIncentivesPanel />
-            <TradingRewardsChartPanel />
-            <GovernancePanel />
-            <RewardHistoryPanel />
             <RewardsHelpPanel />
             {legalDisclaimer}
           </$DetachedSection>
         </div>
       ) : (
         <$DetachedSection>
-          {showMigratePanel && <MigratePanel />}
           <div tw="flex gap-1.5">
-            <div tw="flexColumn flex-[2] gap-1.5">
-              <LaunchIncentivesPanel />
-              <TradingRewardsChartPanel />
-              <RewardHistoryPanel />
-            </div>
+            <$Tabs
+              fullWidthTabs
+              dividerStyle="underline"
+              value={value}
+              onValueChange={(v: Tab) => {
+                setValue(v);
+              }}
+              tw="flex-[2]"
+              items={
+                enableLiquidationRebates
+                  ? [
+                      {
+                        content: (
+                          <div tw="flexColumn gap-1.5">
+                            <LiquidationRebatesHeader />
+                            <LiquidationRebatesPanel />
+                          </div>
+                        ),
+                        label: stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES }),
+                        value: Tab.LiquidationRebates,
+                      },
+                    ]
+                  : [
+                      {
+                        content: (
+                          <div tw="flexColumn gap-1.5">
+                            <LaunchIncentivesPanel />
+                            <RewardsLeaderboardPanel />
+                          </div>
+                        ),
+                        label: stringGetter({ key: STRING_KEYS.REWARDS }),
+                        value: Tab.Rewards,
+                      },
+                      {
+                        content: (
+                          <div tw="flexColumn gap-1.5">
+                            <RebatesIncetivesPanel />
+                            <CompetitionLeaderboardPanel />
+                          </div>
+                        ),
+                        label: stringGetter({ key: STRING_KEYS.REBATES }),
+                        value: Tab.Competition,
+                      },
+                    ]
+              }
+              withTransitions={false}
+            />
             <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
-              <StakingPanel />
+              <SwapAndStakingPanel />
               <UnbondingPanels />
-              <GovernancePanel />
               <RewardsHelpPanel />
               {legalDisclaimer}
             </div>
@@ -132,3 +171,7 @@ const $Page = styled.div`
 `;
 
 const $DetachedSection = tw(DetachedSection)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen`;
+
+const $Tabs = styled(Tabs)`
+  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+` as typeof Tabs;

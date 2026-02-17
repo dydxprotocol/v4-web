@@ -6,6 +6,8 @@ import { type RootState } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
+import { selectIsPerpsGeoRestricted } from './selectors/compliance';
+
 const suffix = '/v4/ws';
 export function getWebsocketUrlForNetwork(network: DydxNetwork) {
   const endpointsConfig: EndpointsConfig = ENVIRONMENT_CONFIG_MAP[network].endpoints;
@@ -23,8 +25,8 @@ export const selectIndexerUrl = createAppSelector([getSelectedNetwork], (network
 
 // TODO allow configurable parent subaccount number
 export const selectParentSubaccountInfo = createAppSelector(
-  [(state) => state.wallet.localWallet?.address],
-  (wallet) => ({ wallet, subaccount: 0 })
+  [(state) => state.wallet.localWallet?.address, selectIsPerpsGeoRestricted],
+  (wallet, isPerpsGeoRestricted) => ({ wallet, subaccount: 0, isPerpsGeoRestricted })
 );
 
 export const selectIndexerReady = createAppSelector(

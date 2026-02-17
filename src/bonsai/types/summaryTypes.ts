@@ -5,7 +5,6 @@ import {
   PricesModule,
   RewardsModule,
 } from '@dydxprotocol/v4-client-js';
-import { type BigNumber } from 'bignumber.js';
 
 import {
   IndexerAPITimeInForce,
@@ -58,7 +57,11 @@ export type SubaccountSummaryCore = {
 };
 
 export type SubaccountSummaryDerived = {
+  // clamped at 0
   freeCollateral: BigNumber;
+  // allowed to be negative
+  rawFreeCollateral: BigNumber;
+  // clamped at 0
   equity: BigNumber;
   leverage: BigNumber | null;
   marginUsage: BigNumber | null;
@@ -109,6 +112,10 @@ export type SubaccountPositionDerivedCore = {
   initialRisk: BigNumber;
   maintenanceRisk: BigNumber;
   maxLeverage: BigNumber | null;
+  effectiveSelectedLeverage: BigNumber;
+
+  adjustedImfFromSelectedLeverage: BigNumber;
+  initialRiskFromSelectedLeverage: BigNumber;
 
   // these are just copied from the perpetual position for aesthetic reasons honestly
   baseEntryPrice: BigNumber;
@@ -120,6 +127,7 @@ export type SubaccountPositionDerivedExtra = {
   leverage: BigNumber | null;
   marginValueMaintenance: BigNumber;
   marginValueInitial: BigNumber;
+  marginValueInitialFromSelectedLeverage: BigNumber;
   liquidationPrice: BigNumber | null;
 
   updatedUnrealizedPnl: BigNumber;
@@ -183,6 +191,24 @@ export type SubaccountOrder = {
   priceTolerance: string | undefined;
 };
 
+export type TWAPSubaccountOrder = SubaccountOrder & {
+  type: IndexerOrderType.TWAP;
+  orderFlags: typeof OrderFlags.TWAP;
+  duration: string;
+  interval: string;
+  priceTolerance: string;
+};
+
+export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
+  return (
+    order.orderFlags === OrderFlags.TWAP &&
+    order.type === IndexerOrderType.TWAP &&
+    order.duration != null &&
+    order.interval != null &&
+    order.priceTolerance != null
+  );
+}
+
 export enum SubaccountFillType {
   LIMIT = 'LIMIT',
   LIQUIDATED = 'LIQUIDATED',
@@ -194,6 +220,7 @@ export enum SubaccountFillType {
 export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
   marginMode: MarginMode;
   type: SubaccountFillType | undefined;
+  closedPnl?: number;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;
@@ -268,22 +295,38 @@ export type PerpetualMarketSummary = MarketInfo &
     spotVolume24h: number | null;
     isFavorite: boolean;
     isUnlaunched: boolean;
+    marketFeeDiscountMultiplier: number | undefined;
   };
 
 export type PerpetualMarketSummaries = {
   [marketId: string]: PerpetualMarketSummary;
 };
 
+export type PerpetualMarketFeeDiscount = NonNullable<
+  ToPrimitives<FeeTierModule.QueryAllMarketFeeDiscountParamsResponse['params']>
+>;
+
 export type UserFeeTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserFeeTierResponse['tier']>>;
+export type UserStakingTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserStakingTierResponse>>;
+export interface UserStakingTierSummary {
+  feeTierName: string;
+  discountPercent: number | undefined;
+  stakedBaseTokens: string | undefined;
+}
+
 export type EquityTiers = NonNullable<
   ToPrimitives<ClobModule.QueryEquityTierLimitConfigurationResponse['equityTierLimitConfig']>
 >;
 export type FeeTiers = NonNullable<
   ToPrimitives<FeeTierModule.QueryPerpetualFeeParamsResponse['params']>
 >;
+export type StakingTiers = NonNullable<
+  ToPrimitives<FeeTierModule.QueryStakingTiersResponse['stakingTiers']>
+>;
 export type ConfigTiers = {
   feeTiers: FeeTiers | undefined;
   equityTiers: EquityTiers | undefined;
+  stakingTiers: StakingTiers | undefined;
 };
 
 export type RewardsParams = NonNullable<ToPrimitives<RewardsModule.QueryParamsResponse['params']>>;
@@ -315,10 +358,25 @@ export interface EquityTiersSummary {
 
 export interface UserStats {
   feeTierId?: string;
+  stakingTierId?: string;
   makerFeeRate?: number;
   takerFeeRate?: number;
   makerVolume30D?: number;
   takerVolume30D?: number;
+  stakingTierDiscount?: number;
+}
+
+export interface PerpetualMarketFee {
+  clobPairId: number;
+  chargePpm: number;
+  startTime?: string;
+  endTime?: string;
+  isApplicable: boolean;
+  feeDiscountMultiplier: number;
+}
+
+export interface AllPerpetualMarketsFeeDiscounts {
+  [clobPairId: string]: PerpetualMarketFee;
 }
 
 export type AccountBalances = {
@@ -348,7 +406,21 @@ export interface ComplianceResponse {
   updatedAt?: string;
 }
 
-export type Compliance = ComplianceResponse & { geo?: string };
+export type GeoState = {
+  country: string;
+  region: string;
+  regionCode: string;
+  city: string;
+  timezone: string;
+  ll: [number, number]; // latitude, longitude
+
+  blocked: boolean;
+  whitelisted: boolean; // has precedence over blocked, so blocked: true and whiteslited: true means allowed
+};
+
+export type Compliance = ComplianceResponse & {
+  geo: { isPerpetualsGeoBlocked: boolean; currentCountry?: string };
+};
 
 export type SubaccountPnlEntry = SubaccountPnlTick;
 

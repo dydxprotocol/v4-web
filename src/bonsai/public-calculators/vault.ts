@@ -203,7 +203,8 @@ function calculateVaultPosition(
         },
       },
     },
-    market != null ? { [market.ticker]: market } : {}
+    market != null ? { [market.ticker]: market } : {},
+    {}
   );
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

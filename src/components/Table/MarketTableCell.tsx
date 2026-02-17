@@ -6,8 +6,10 @@ import { TableCell } from './TableCell';
 
 export const MarketSummaryTableCell = ({
   marketSummary,
+  onClick,
 }: {
   marketSummary?: PerpetualMarketSummary;
+  onClick?: () => void;
 }) => {
   return (
     <TableCell
@@ -19,6 +21,7 @@ export const MarketSummaryTableCell = ({
           symbol={marketSummary?.assetId}
         />
       }
+      onClick={onClick}
     >
       {marketSummary?.displayableAsset ?? ''}
     </TableCell>

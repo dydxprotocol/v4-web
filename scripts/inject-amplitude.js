@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 const AMPLITUDE_API_KEY = process.env.AMPLITUDE_API_KEY;
 const AMPLITUDE_SERVER_URL = process.env.AMPLITUDE_SERVER_URL;
-const AMPLITUDE_SERVER_ZONE = process.env.AMPLITUDE_SERVER_ZONE || "US";
+const AMPLITUDE_SERVER_ZONE = process.env.AMPLITUDE_SERVER_ZONE || 'US';
 
 const currentPath = fileURLToPath(import.meta.url);
 const projectRoot = path.dirname(currentPath);
@@ -14,7 +14,7 @@ if (AMPLITUDE_API_KEY) {
     const files = await fs.readdir('entry-points');
     for (const file of files) {
       inject(file);
-    };
+    }
   } catch (err) {
     console.error('Error injecting Amplitude scripts:', err);
   }
@@ -33,13 +33,14 @@ async function inject(fileName) {
     !(function () {
       var e = "${AMPLITUDE_API_KEY}";
       e &&
-        (globalThis.amplitude.init(e${AMPLITUDE_SERVER_URL
-      ? `, undefined, {
+        (globalThis.amplitude.init(e${
+          AMPLITUDE_SERVER_URL
+            ? `, undefined, {
               serverUrl: "${AMPLITUDE_SERVER_URL}",
               serverZone: "${AMPLITUDE_SERVER_ZONE}"
             }`
-      : ''
-    }),
+            : ''
+        }),
         globalThis.amplitude.setOptOut(!1),
         globalThis.addEventListener("dydx:track", function (e) {
           var t = e.detail.eventType,
@@ -49,7 +50,7 @@ async function inject(fileName) {
         globalThis.addEventListener("dydx:identify", function (e) {
           var t = e.detail.property,
             d = e.detail.propertyValue;
-          if ("walletAddress" === t) globalThis.amplitude.setUserId(d);
+          if ("userId" === t) globalThis.amplitude.setUserId(d);
           else {
             var i = new globalThis.amplitude.Identify();
             i.set(t, d), globalThis.amplitude.identify(i);

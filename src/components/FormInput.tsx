@@ -18,6 +18,7 @@ type StyleProps = {
 
 type ElementProps = {
   label?: React.ReactNode;
+  slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
   validationConfig?: {
     attached?: boolean;
@@ -30,11 +31,21 @@ export type FormInputProps = ElementProps & StyleProps & InputProps;
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   (
-    { id, label, slotRight, className, validationConfig, backgroundColorOverride, ...otherProps },
+    {
+      id,
+      label,
+      slotLeft,
+      slotRight,
+      className,
+      validationConfig,
+      backgroundColorOverride,
+      ...otherProps
+    },
     ref
   ) => (
     <$FormInputContainer className={className} isValidationAttached={validationConfig?.attached}>
-      <$InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
+      <$InputContainer hasLabel={!!label} hasSlotLeft={!!slotLeft} hasSlotRight={!!slotRight}>
+        {slotLeft}
         {label ? (
           <$WithLabel
             label={label}
@@ -86,6 +97,7 @@ const $FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
 
 const $InputContainer = styled.div<{
   hasLabel?: boolean;
+  hasSlotLeft?: boolean;
   hasSlotRight?: boolean;
 }>`
   ${formMixins.inputContainer}
@@ -96,14 +108,22 @@ const $InputContainer = styled.div<{
         --form-input-paddingY: 0;
       `}
 
-    padding: var(--form-input-paddingY) var(--form-input-paddingX);
-    padding-top: 0;
+    padding: var(--form-input-paddingTop, 0) var(--form-input-paddingRight, var(--form-input-paddingX)) var(--form-input-paddingBottom, var(--form-input-paddingY)) var(--form-input-paddingLeft, var(--form-input-paddingX));
   }
+
+  ${({ hasSlotLeft }) =>
+    hasSlotLeft &&
+    css`
+      padding-left: var(--form-input-paddingLeft, var(--form-input-paddingX));
+      input {
+        padding-left: 0;
+      }
+    `}
 
   ${({ hasSlotRight }) =>
     hasSlotRight &&
     css`
-      padding-right: var(--form-input-paddingX);
+      padding-right: var(--form-input-paddingRight, var(--form-input-paddingX));
       input {
         padding-right: 0;
       }

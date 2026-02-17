@@ -1,7 +1,5 @@
 import { Hdkey } from '@/constants/account';
-import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
-import { isMainnet } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
@@ -89,6 +87,7 @@ const signComplianceSignatureKeplr = async (
 
 export const signCompliancePayload = async (
   address: string,
+  nonce: number,
   params: {
     message: string;
     action: string;
@@ -97,7 +96,7 @@ export const signCompliancePayload = async (
   }
 ): Promise<string> => {
   try {
-    const hdkey = hdKeyManager.getHdkey(address);
+    const hdkey = hdKeyManager.getHdkey(address, nonce);
     if (hdkey?.privateKey && hdkey.publicKey) {
       const { signedMessage, timestamp } = await signComplianceSignature(
         params.message,
@@ -128,10 +127,4 @@ export const signCompliancePayload = async (
     log('DydxChainTransactions/signComplianceMessage', error);
     return stringifyTransactionError(error);
   }
-};
-
-export const isBlockedGeo = (geo: string): boolean => {
-  return isMainnet
-    ? [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
-    : false;
 };

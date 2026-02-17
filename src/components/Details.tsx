@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, ReactNode } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -23,6 +23,7 @@ export type DetailsItem = {
   // eslint-disable-next-line react/no-unused-prop-types
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
+  slotRight?: ReactNode;
 };
 
 const DETAIL_LAYOUTS = {
@@ -67,6 +68,7 @@ const DetailItem = ({
   justifyItems,
   layout = 'column',
   withOverflow,
+  slotRight,
 }: DetailsItem & StyleProps) => (
   <$Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
     <dt>
@@ -75,6 +77,7 @@ const DetailItem = ({
         stringParams={tooltipParams}
         side={DETAIL_ITEM_TOOLTIP_LAYOUTS[layout]}
         withIcon={withTooltipIcon}
+        slotRight={slotRight}
       >
         {label}
       </WithTooltip>
@@ -96,30 +99,31 @@ export const Details = ({
   <LoadingContext.Provider value={isLoading}>
     <$Details layout={layout} withSeparators={withSeparators} className={className}>
       <WithSeparators withSeparators={withSeparators} layout={DETAIL_LAYOUTS[layout]}>
-        {items.map(({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon }) => (
-          <Fragment key={key}>
-            <DetailItem
-              {...{
-                key,
-                tooltip,
-                tooltipParams,
-                label,
-                value,
-                withTooltipIcon,
-                justifyItems,
-                layout,
-                withOverflow,
-              }}
-            />
-            {subitems && showSubitems && layout === 'column' && (
-              <$SubDetails
-                items={subitems}
-                layout={DETAIL_LAYOUTS[layout]}
-                withSeparators={withSeparators}
+        {items.map(
+          ({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon, slotRight }) => (
+            <Fragment key={key}>
+              <DetailItem
+                key={key}
+                tooltip={tooltip}
+                tooltipParams={tooltipParams}
+                label={label}
+                value={value}
+                withTooltipIcon={withTooltipIcon}
+                justifyItems={justifyItems}
+                layout={layout}
+                withOverflow={withOverflow}
+                slotRight={slotRight}
               />
-            )}
-          </Fragment>
-        ))}
+              {subitems && showSubitems && layout === 'column' && (
+                <$SubDetails
+                  items={subitems}
+                  layout={DETAIL_LAYOUTS[layout]}
+                  withSeparators={withSeparators}
+                />
+              )}
+            </Fragment>
+          )
+        )}
       </WithSeparators>
     </$Details>
   </LoadingContext.Provider>

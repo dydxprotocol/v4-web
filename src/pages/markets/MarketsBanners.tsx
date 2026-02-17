@@ -1,10 +1,12 @@
 import { RefObject, useMemo } from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -17,12 +19,21 @@ import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedSurgeBanner } from '@/state/dismissable';
-import { getHasDismissedPmlBanner, getHasDismissedSurgeBanner } from '@/state/dismissableSelectors';
+import {
+  setHasDismissedNoFeeBanner,
+  setHasDismissedPmlBanner,
+  setHasDismissedRebateBanner,
+} from '@/state/dismissable';
+import {
+  getHasDismissedNoFeeBanner,
+  getHasDismissedPmlBanner,
+  getHasDismissedRebateBanner,
+} from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
@@ -39,10 +50,21 @@ export const MarketsBanners = ({
   const launched = useMemo(() => allMarkets.filter((f) => !f.isUnlaunched), [allMarkets]);
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
+  const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
+  const hasDismissedNoFeeBanner = useAppSelector(getHasDismissedNoFeeBanner);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onDismissPmlBanner = () => {
     dispatch(setHasDismissedPmlBanner(true));
+  };
+
+  const onDismissRebateBanner = () => {
+    dispatch(setHasDismissedRebateBanner(true));
+  };
+
+  const onDismissNoFeeBanner = () => {
+    dispatch(setHasDismissedNoFeeBanner(true));
   };
 
   const onClickPmlBanner = () => {
@@ -51,7 +73,13 @@ export const MarketsBanners = ({
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const onClickNoFeeBanner = () => {
+    navigate(`${AppRoute.Trade}/BTC-USD`);
+  };
+
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
+  const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
+  const shouldDisplayNoFeeBanner = !hasDismissedNoFeeBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -100,54 +128,73 @@ export const MarketsBanners = ({
     </$PmlBanner>
   ) : null;
 
-  // Surge Banner - New Implementation
-  const hasDismissedSurgeBanner = useAppSelector(getHasDismissedSurgeBanner);
-
-  const onDismissSurgeBanner = (e: React.MouseEvent<any>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(setHasDismissedSurgeBanner(true));
-  };
-
-  const shouldDisplaySurgeBanner = !hasDismissedSurgeBanner;
-
-  const surgeBanner = shouldDisplaySurgeBanner ? (
-    <$SurgeBanner>
+  const rebateBanner = shouldDisplayRebateBanner ? (
+    <$RebateBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
-        <span tw="mb-0.75 text-large font-extra-bold">
-          <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.TITLE })}</span>
+        <span tw="mb-0.75 text-large font-extra-large-bold">
+          <span tw="mr-0.25 rounded-0 px-0.25 text-color-accent">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_SURGE })}
+          </span>
+          <span tw="text-color-text-2">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_FEES })}
+          </span>
         </span>
         <div tw="flex items-center gap-1.5">
           <Button
             action={ButtonAction.Primary}
             type={ButtonType.Link}
-            href="https://dydx.trade/DYDX?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner"
+            href="https://dydx.trade/DYDX?utm_source=markets&utm_medium=markets-banner&utm_campaign=02092025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner"
             tw="relative z-10 w-12"
           >
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            {stringGetter({ key: STRING_KEYS.GET_STARTED })}
           </Button>
-          <span tw="text-color-text-1 font-medium-book">
-            {stringGetter({ key: STRING_KEYS.END_DATE })}
-          </span>
         </div>
       </div>
 
       <img
-        src="/surge-banner-hedgies.png"
-        alt="surge rewards hedgies"
-        tw="h-full object-contain mobile:hidden"
+        src="/hedgiepercentage.png"
+        alt="rebate rewards hedgies"
+        tw="absolute right-0 top-0 h-full object-contain mobile:hidden"
       />
 
       <IconButton
         tw="absolute right-0.5 top-0.5 border-none"
         iconName={IconName.Close}
         size={ButtonSize.XSmall}
-        onClick={onDismissSurgeBanner}
+        onClick={onDismissRebateBanner}
       />
-    </$SurgeBanner>
+    </$RebateBanner>
   ) : null;
 
-  return surgeBanner ?? pmlBanner ?? null;
+  const noFeeBanner = shouldDisplayNoFeeBanner ? (
+    <$NoFeeBanner>
+      <img src="/no-fee-banner-hedgie.png" alt="Hedgie" tw="block h-[150%]" />
+      <img
+        src="/no-fee-banner-coins.png"
+        alt="Coins"
+        tw="pointer-events-none absolute right-7 h-[200%] object-contain"
+      />
+      <div tw="z-[1] ml-1 mr-auto flex flex-col items-start">
+        <span tw="text-large text-white font-extra-bold">
+          <span tw="mr-0.25 rounded-[0.25rem] bg-color-accent px-0.25">
+            {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE_ACCENT })}
+          </span>{' '}
+          {stringGetter({ key: STRING_KEYS.NO_FEE_FEBRUARY_BANNER_TITLE })}
+        </span>
+        <Link isAccent onClick={onClickNoFeeBanner} tw="font-base-medium">
+          {stringGetter({ key: STRING_KEYS.NO_FEE_FEBRUARY_BANNER_CTA })} →
+        </Link>
+      </div>
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={onDismissNoFeeBanner}
+      />
+    </$NoFeeBanner>
+  ) : null;
+
+  return noFeeBanner ?? rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -193,32 +240,6 @@ const $PmlBanner = styled($MarketsPageBanner)`
   }
 `;
 
-const $SurgeBanner = styled($MarketsPageBanner)`
-  height: 8rem;
-  background: var(--color-layer-0);
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 70%;
-    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
-    opacity: 0.2;
-    z-index: 0;
-  }
-
-  img,
-  span,
-  button,
-  a {
-    z-index: 1;
-  }
-`;
-
 const $StarsOverlay = styled.div`
   position: absolute;
   left: 0;
@@ -239,4 +260,48 @@ const $Details = styled(Details)`
   > :first-child {
     padding-left: 0;
   }
+`;
+
+const $RebateBanner = styled($MarketsPageBanner)`
+  height: 8rem;
+  background: var(--color-layer-1);
+  position: relative;
+
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 80%;
+    height: 130%;
+    background: radial-gradient(ellipse at bottom right, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.6;
+    z-index: 0;
+  }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
+  }
+`;
+
+const $NoFeeBanner = styled($MarketsPageBanner)`
+  position: relative;
+  height: 8rem;
+  overflow: hidden;
+  background-image:
+    url('/no-fee-banner-dots.png'), linear-gradient(90.59deg, #141528 17.91%, #18181f 82.09%);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 `;

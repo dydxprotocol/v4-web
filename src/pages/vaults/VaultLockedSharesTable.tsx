@@ -13,7 +13,7 @@ import { useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultAccount } from '@/hooks/vaultsHooks';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
@@ -120,7 +120,7 @@ const VaultLockedSharesTable = ({
 };
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
 ` as typeof Table;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { SHA256 } from 'crypto-js';
 import { useLocation } from 'react-router-dom';
 
 import {
@@ -8,7 +9,7 @@ import {
   lastSuccessfulWebsocketRequestByOrigin,
 } from '@/constants/analytics';
 import { DialogTypesTypes } from '@/constants/dialogs';
-import { WalletInfo } from '@/constants/wallets';
+import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
@@ -24,6 +25,8 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
+import { useEnableTurnkey } from './useEnableTurnkey';
+import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useSimpleUiEnabled } from './useSimpleUiEnabled';
@@ -31,7 +34,7 @@ import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
   const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
-  const { sourceAccount, selectedWallet, dydxAddress } = useAccounts();
+  const { sourceAccount, selectedWallet, dydxAddress, solanaAddress } = useAccounts();
   const { indexerClient } = useDydxClient();
   const statsigConfig = useAllStatsigGateValues();
   /** User properties */
@@ -62,9 +65,9 @@ export const useAnalytics = () => {
   }, [isSimpleUi]);
 
   // AnalyticsUserProperty.Geo
-  const geo = useAppSelector(getGeo) ?? undefined;
+  const geo = useAppSelector(getGeo);
   useEffect(() => {
-    identify(AnalyticsUserProperties.Geo(geo ?? null));
+    identify(AnalyticsUserProperties.Geo(geo.currentCountry ?? null));
   }, [geo]);
 
   useEffect(() => {
@@ -101,6 +104,30 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperties.Network(selectedNetwork));
   }, [selectedNetwork]);
 
+  // AnalyticsUserProperty.UserId
+  const [analyticsUserId, setAnalyticsUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
+      setAnalyticsUserId(null);
+    }
+
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+      if (sourceAccount.walletInfo.userEmail) {
+        const normalizedEmail = sourceAccount.walletInfo.userEmail.trim().toLowerCase();
+        const hashedEmail = SHA256(normalizedEmail).toString();
+        setAnalyticsUserId(hashedEmail);
+        return;
+      }
+    }
+
+    setAnalyticsUserId(sourceAccount.address ?? null);
+  }, [sourceAccount.address, sourceAccount.walletInfo]);
+
+  useEffect(() => {
+    identify(AnalyticsUserProperties.UserId(analyticsUserId));
+  }, [analyticsUserId]);
+
   // AnalyticsUserProperty.WalletType
   useEffect(() => {
     identify(AnalyticsUserProperties.WalletType(sourceAccount.walletInfo?.name ?? null));
@@ -122,6 +149,11 @@ export const useAnalytics = () => {
   useEffect(() => {
     identify(AnalyticsUserProperties.DydxAddress(dydxAddress ?? null));
   }, [dydxAddress]);
+
+  // AnalyticsUserProperty.SolanaAddress
+  useEffect(() => {
+    identify(AnalyticsUserProperties.SolanaAddress(solanaAddress ?? null));
+  }, [solanaAddress]);
 
   useEffect(() => {
     identify(
@@ -227,7 +259,8 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.OnboardingStepChanged
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const isTurnkeyEnabled = useEnableTurnkey();
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const onboardingState = useAppSelector(getOnboardingState);
   const [hasOnboardingStateChanged, setHasOnboardingStateChanged] = useState(false);
 

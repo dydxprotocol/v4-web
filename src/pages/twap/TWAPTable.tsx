@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+
 import { Tabs, type TabItem } from '@/components/Tabs';
+
 import { ActiveTWAPTable, ActiveTWAPTableColumnKey } from './ActiveTWAPTable';
 
 const tabItems: TabItem<string>[] = [
@@ -7,16 +9,18 @@ const tabItems: TabItem<string>[] = [
     value: 'Active',
     label: 'Active',
     content: (
-      <ActiveTWAPTable columnKeys={[
-        ActiveTWAPTableColumnKey.Market,
-        ActiveTWAPTableColumnKey.Side,
-        ActiveTWAPTableColumnKey.Execution,
-        ActiveTWAPTableColumnKey.AveragePrice,
-        ActiveTWAPTableColumnKey.Runtime,
-        ActiveTWAPTableColumnKey.ReduceOnly,
-        ActiveTWAPTableColumnKey.OrderTime,
-        ActiveTWAPTableColumnKey.Terminate,
-      ]} showClosePositionAction={false} navigateToOrders={() => {}} />
+      <ActiveTWAPTable
+        columnKeys={[
+          ActiveTWAPTableColumnKey.Market,
+          ActiveTWAPTableColumnKey.Side,
+          ActiveTWAPTableColumnKey.Execution,
+          ActiveTWAPTableColumnKey.AveragePrice,
+          ActiveTWAPTableColumnKey.Runtime,
+          ActiveTWAPTableColumnKey.ReduceOnly,
+          ActiveTWAPTableColumnKey.OrderTime,
+          ActiveTWAPTableColumnKey.Terminate,
+        ]}
+      />
     ),
   },
   {
@@ -52,4 +56,3 @@ export const TWAPTable: React.FC = () => {
     />
   );
 };
-

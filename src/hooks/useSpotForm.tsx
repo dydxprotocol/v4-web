@@ -1,0 +1,175 @@
+import { useCallback, useMemo } from 'react';
+
+import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
+import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
+import { BonsaiCore } from '@/bonsai/ontology';
+
+import { ComplianceStates } from '@/constants/compliance';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
+import { useSpotTransactionSubmit } from '@/hooks/useSpotTransactionSubmit';
+
+import { formatNumberOutput, OutputType } from '@/components/Output';
+
+import { appQueryClient } from '@/state/appQueryClient';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
+import { spotFormActions } from '@/state/spotForm';
+import { getSpotFormSummary } from '@/state/spotFormSelectors';
+import { addSpotTrade } from '@/state/spotTrades';
+
+import { SpotApiSide } from '@/clients/spotApi';
+
+import { useComplianceState } from './useComplianceState';
+
+// TODO: spot localization
+
+export function useSpotForm() {
+  const dispatch = useAppDispatch();
+  const formSummary = useAppSelector(getSpotFormSummary);
+  const { canDeriveSolanaWallet } = useAccounts();
+  const { mutateAsync: submitTransactionMutation, isPending } = useSpotTransactionSubmit();
+  const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const { complianceState } = useComplianceState();
+
+  const hasErrors = useMemo(
+    () => formSummary.errors.some((error) => error.type === ErrorType.error),
+    [formSummary.errors]
+  );
+
+  const primaryAlert = useMemo(
+    () => getHighestPriorityAlert(formSummary.errors),
+    [formSummary.errors]
+  );
+
+  const canSubmit = useMemo(
+    () =>
+      canDeriveSolanaWallet &&
+      !hasErrors &&
+      formSummary.summary.payload != null &&
+      !isPending &&
+      complianceState !== ComplianceStates.READ_ONLY,
+    [canDeriveSolanaWallet, complianceState, formSummary.summary.payload, hasErrors, isPending]
+  );
+
+  const actions = useMemo(
+    () => ({
+      setSide: (side: SpotSide) => dispatch(spotFormActions.setSide(side)),
+      setBuyInputType: (type: Parameters<typeof spotFormActions.setBuyInputType>[0]) =>
+        dispatch(spotFormActions.setBuyInputType(type)),
+      setSellInputType: (type: Parameters<typeof spotFormActions.setSellInputType>[0]) =>
+        dispatch(spotFormActions.setSellInputType(type)),
+      setSize: (size: string) => dispatch(spotFormActions.setSize(size)),
+      reset: () => dispatch(spotFormActions.reset()),
+    }),
+    [dispatch]
+  );
+
+  const handleInputTypeChange = useCallback(
+    (side: SpotSide, type: SpotBuyInputType | SpotSellInputType) => {
+      const amounts = formSummary.summary.amounts;
+
+      if (side === SpotSide.BUY) {
+        const nextType = type as SpotBuyInputType;
+        const nextSizeNum = nextType === SpotBuyInputType.USD ? amounts?.usd : amounts?.sol;
+
+        dispatch(spotFormActions.setBuyInputType(nextType));
+        dispatch(spotFormActions.setSize(nextSizeNum?.toString() ?? ''));
+        return;
+      }
+
+      const nextType = type as SpotSellInputType;
+      const nextSizeNum = nextType === SpotSellInputType.USD ? amounts?.usd : amounts?.percent;
+
+      dispatch(spotFormActions.setSellInputType(nextType));
+      dispatch(spotFormActions.setSize(nextSizeNum?.toString() ?? ''));
+    },
+    [dispatch, formSummary.summary.amounts]
+  );
+
+  const submitTransaction = useCallback(async () => {
+    try {
+      const result = await submitTransactionMutation();
+      dispatch(spotFormActions.reset());
+
+      appQueryClient.invalidateQueries({
+        queryKey: ['spot', 'portfolioTrades'],
+        exact: false,
+      });
+
+      const { landResponse } = result;
+      const isBuy = landResponse.side === SpotApiSide.BUY;
+      const tokenSymbol = tokenMetadata?.symbol ?? '';
+
+      const formattedTokenAmount = formatNumberOutput(landResponse.tokenChange, OutputType.Asset, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      });
+
+      const formattedSolAmount = formatNumberOutput(landResponse.solChange, OutputType.Asset, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      });
+
+      dispatch(
+        addSpotTrade({
+          trade: {
+            id: `spot-${landResponse.txHash}`,
+            side: isBuy ? SpotApiSide.BUY : SpotApiSide.SELL,
+            tokenSymbol,
+            tokenAmount: formattedTokenAmount,
+            solAmount: formattedSolAmount,
+            txHash: landResponse.txHash,
+            status: 'success',
+            createdAt: Date.now(),
+          },
+        })
+      );
+
+      return result;
+    } catch (error) {
+      dispatch(
+        addSpotTrade({
+          trade: {
+            id: `spot-error-${Date.now()}`,
+            side: formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL,
+            tokenSymbol: tokenMetadata?.symbol ?? '',
+            tokenAmount: '',
+            solAmount: '',
+            txHash: '',
+            status: 'error',
+            createdAt: Date.now(),
+          },
+        })
+      );
+      throw error;
+    }
+  }, [
+    dispatch,
+    submitTransactionMutation,
+    tokenMetadata?.symbol,
+    decimalSeparator,
+    groupSeparator,
+    selectedLocale,
+    formSummary.state.side,
+  ]);
+
+  return {
+    state: formSummary.state,
+    actions,
+    summary: formSummary.summary,
+    errors: formSummary.errors,
+    inputData: formSummary.inputData,
+    hasErrors,
+    primaryAlert,
+    canSubmit,
+    isPending,
+    handleInputTypeChange,
+    submitTransaction,
+  };
+}

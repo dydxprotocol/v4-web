@@ -17,7 +17,9 @@ export interface EndpointsConfig {
   stakingAPR?: string;
   solanaRpcUrl: string;
   affiliates?: string;
-  spotCandleService?: string;
+  spotApi: string;
+  geoV2: string;
+  pnlImageApi: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -35,6 +37,8 @@ export const useEndpointsConfig = () => {
     stakingAPR: endpointsConfig.stakingAPR,
     solanaRpcUrl: endpointsConfig.solanaRpcUrl,
     affiliatesBaseUrl: endpointsConfig.affiliates,
-    spotCandleService: endpointsConfig.spotCandleService,
+    spotApi: endpointsConfig.spotApi,
+    geoV2: endpointsConfig.geoV2,
+    pnlImageApi: endpointsConfig.pnlImageApi,
   };
 };

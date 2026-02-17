@@ -7,13 +7,12 @@ import { DydxChainId, ENVIRONMENT_CONFIG_MAP, TOKEN_CONFIG_MAP } from '@/constan
 
 import type { RootState, RootStore } from '@/state/_store';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { getGeoCheckEnabled, getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import { SourceAccount } from '@/state/wallet';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
-import { isBlockedGeo } from '@/lib/compliance';
 import { localWalletManager } from '@/lib/hdKeyManager';
 
 import { createStoreEffect } from '../../lib/createStoreEffect';
@@ -42,8 +41,16 @@ const selectNobleTxAuthorizedAccount = createAppSelector(
     calculateIsAccountViewOnly,
     BonsaiCore.compliance.data,
     getLocalWalletNonce,
+    getGeoCheckEnabled,
   ],
-  (parentSubaccountInfo, sourceAccount, isAccountViewOnly, complianceData, localWalletNonce) => {
+  (
+    parentSubaccountInfo,
+    sourceAccount,
+    isAccountViewOnly,
+    complianceData,
+    localWalletNonce,
+    enableGeoCheck
+  ) => {
     const isAccountRestrictionFree =
       !isAccountViewOnly &&
       ![
@@ -51,8 +58,7 @@ const selectNobleTxAuthorizedAccount = createAppSelector(
         ComplianceStatus.CLOSE_ONLY,
         ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
       ].includes(complianceData.status) &&
-      complianceData.geo &&
-      !isBlockedGeo(complianceData.geo);
+      !(complianceData.geo.isPerpetualsGeoBlocked && enableGeoCheck);
 
     if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
       return undefined;

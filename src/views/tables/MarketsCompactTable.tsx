@@ -14,7 +14,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -60,9 +60,16 @@ export const MarketsCompactTable = ({
               logo,
               initialMarginFraction,
               name,
+              displayId,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction, id }}
+                configs={{
+                  logo,
+                  effectiveInitialMarginFraction,
+                  initialMarginFraction,
+                  id,
+                  displayId,
+                }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName
@@ -136,9 +143,16 @@ export const MarketsCompactTable = ({
               logo,
               initialMarginFraction,
               name,
+              displayId,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction, id }}
+                configs={{
+                  logo,
+                  effectiveInitialMarginFraction,
+                  initialMarginFraction,
+                  id,
+                  displayId,
+                }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName
@@ -253,7 +267,7 @@ export const MarketsCompactTable = ({
 };
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
   --tableCell-padding: 0.625rem 1.25rem;
   --tableRow-backgroundColor: var(--color-layer-3);
 

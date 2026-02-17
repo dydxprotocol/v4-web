@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import { mapValues } from 'lodash';
 
 import {
@@ -9,7 +8,6 @@ import {
 
 import { assertNever } from '@/lib/assertNever';
 import { calc } from '@/lib/do';
-import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 
 import {
   ExecutionType,
@@ -33,8 +31,6 @@ const DEFAULT_GOOD_TIL_TIME: GoodUntilTime = {
   duration: '28',
   unit: TimeUnit.DAY,
 };
-
-const DEFAULT_ISOLATED_TARGET_LEVERAGE = 2.0;
 
 export function getTradeFormFieldStates(
   form: TradeForm,
@@ -63,19 +59,7 @@ export function getTradeFormFieldStates(
 
   const existingPosition = baseAccount?.position;
 
-  const existingPositionLeverage = existingPosition?.leverage?.toNumber();
-  const maxMarketLeverage = existingPosition?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE;
   const existingPositionSide = existingPosition?.side;
-
-  const defaultTargetLeverage = calc(() => {
-    if (
-      existingPositionOrOpenOrderMarginMode === MarginMode.ISOLATED &&
-      existingPositionLeverage != null
-    ) {
-      return BigNumber.min(existingPositionLeverage, maxMarketLeverage);
-    }
-    return BigNumber.min(DEFAULT_ISOLATED_TARGET_LEVERAGE, maxMarketLeverage);
-  });
 
   const defaults: Required<TradeForm> = {
     type: DEFAULT_TRADE_TYPE,
@@ -84,7 +68,6 @@ export function getTradeFormFieldStates(
     size: OrderSizeInputs.SIZE({ value: '' }),
     reduceOnly: false,
     marginMode: MarginMode.CROSS,
-    targetLeverage: defaultTargetLeverage.toString(10),
     limitPrice: '',
     postOnly: false,
     timeInForce: TimeInForce.GTT,
@@ -104,12 +87,6 @@ export function getTradeFormFieldStates(
       state: 'irrelevant',
     })
   ) as TradeFormFieldStates;
-
-  function targetLeverageVisibleIfIsolated(result: TradeFormFieldStates): void {
-    if (result.marginMode.effectiveValue === MarginMode.ISOLATED) {
-      makeVisible(result, ['targetLeverage']);
-    }
-  }
 
   function setMarginMode(result: TradeFormFieldStates): void {
     if (marketIsIsolatedOnly) {
@@ -133,9 +110,8 @@ export function getTradeFormFieldStates(
 
   function defaultSizeIfSizeInputIsInvalid(states: TradeFormFieldStates) {
     if (
-      (states.size.effectiveValue?.type === 'AVAILABLE_PERCENT' &&
-        states.reduceOnly.effectiveValue !== true) ||
-      states.size.effectiveValue?.type === 'SIGNED_POSITION_LEVERAGE'
+      states.size.effectiveValue?.type === 'AVAILABLE_PERCENT' &&
+      states.type.effectiveValue === TradeFormType.TRIGGER_MARKET
     ) {
       states.size.effectiveValue = defaults.size;
     }
@@ -177,7 +153,6 @@ export function getTradeFormFieldStates(
       case TradeFormType.MARKET:
         makeVisible(result, ['marketId', 'side', 'size', 'marginMode', 'reduceOnly']);
         setMarginMode(result);
-        targetLeverageVisibleIfIsolated(result);
         disableReduceOnlyIfIncreasingMarketOrder(result);
 
         return result;
@@ -194,7 +169,6 @@ export function getTradeFormFieldStates(
         ]);
         defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
-        targetLeverageVisibleIfIsolated(result);
 
         // goodTil is only visible and required for GTT
         if (result.timeInForce.effectiveValue === TimeInForce.GTT) {
@@ -219,7 +193,6 @@ export function getTradeFormFieldStates(
         ]);
         defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
-        targetLeverageVisibleIfIsolated(result);
 
         // reduceOnly is only visible when execution is IOC
         if (result.execution.effectiveValue !== ExecutionType.IOC) {
@@ -239,7 +212,6 @@ export function getTradeFormFieldStates(
         ]);
         defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
-        targetLeverageVisibleIfIsolated(result);
 
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);

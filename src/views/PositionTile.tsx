@@ -204,7 +204,8 @@ const $PositionTile = styled.div<{
   padding: 1rem;
   gap: 0.5rem;
 
-  background: linear-gradient(130.25deg, var(--position-from-color) 0.9%, transparent 64.47%),
+  background:
+    linear-gradient(130.25deg, var(--position-from-color) 0.9%, transparent 64.47%),
     linear-gradient(227.14deg, var(--position-to-color) 1.6%, transparent 63.87%),
     var(--position-default-gradient);
 
@@ -218,7 +219,8 @@ const $PositionTile = styled.div<{
       flex-direction: column;
       align-items: start;
 
-      background: linear-gradient(130.25deg, transparent 0.9%, transparent 64.47%),
+      background:
+        linear-gradient(130.25deg, transparent 0.9%, transparent 64.47%),
         linear-gradient(227.14deg, var(--position-from-color) 1.6%, transparent 63.87%),
         var(--position-default-gradient);
 

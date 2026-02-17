@@ -46,6 +46,7 @@ type StyleProps = {
   fullWidthTabs?: boolean;
   side?: 'top' | 'bottom';
   dividerStyle?: 'border' | 'underline' | 'none';
+  withInnerBorder?: boolean;
   withTransitions?: boolean;
   className?: string;
 };
@@ -64,12 +65,14 @@ export const Tabs = <TabItemsValue extends string>({
   side = 'top',
   dividerStyle = 'none',
   withTransitions = true,
+  withInnerBorder,
   disabled = false,
   className,
 }: ElementProps<TabItemsValue> & StyleProps) => {
   const currentItem = items.find((item) => item.value === value);
   const withBorders = dividerStyle === 'border';
   const withUnderline = dividerStyle === 'underline';
+  const withInnerBorders = withInnerBorder ?? (withBorders || withUnderline);
 
   const headerRef = useRef<HTMLDivElement>(null);
   const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
@@ -81,7 +84,7 @@ export const Tabs = <TabItemsValue extends string>({
       <$List $fullWidthTabs={fullWidthTabs} $withBorders={withBorders}>
         {items.map((item) =>
           !item.subitems ? (
-            item.customTrigger ?? (
+            (item.customTrigger ?? (
               <$Trigger
                 key={item.value}
                 value={item.value}
@@ -93,7 +96,7 @@ export const Tabs = <TabItemsValue extends string>({
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
               </$Trigger>
-            )
+            ))
           ) : (
             <$DropdownSelectMenu
               key={item.value ?? item.label}
@@ -136,7 +139,7 @@ export const Tabs = <TabItemsValue extends string>({
       }
       onWheel={onWheel}
       $side={side}
-      $withInnerBorder={withBorders || withUnderline}
+      $withInnerBorder={withInnerBorders}
     >
       <$HorizontalScrollContainer
         $side={side}

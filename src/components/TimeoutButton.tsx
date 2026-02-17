@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { ButtonAction, ButtonState } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,6 +12,8 @@ type ElementProps = {
   timeoutInSeconds: number;
   onTimeOut?: () => void;
   slotFinal?: ReactNode;
+  renderCustomCountdown?: (props: { secondsLeft: number }) => ReactNode;
+  resetCounter?: number; // Increment this to reset the counter
 } & ButtonProps;
 
 export type TimeoutButtonProps = ElementProps;
@@ -21,9 +23,12 @@ export const TimeoutButton = ({
   timeoutInSeconds,
   onTimeOut,
   slotFinal,
+  renderCustomCountdown,
+  resetCounter = 0,
   ...otherProps
 }: TimeoutButtonProps) => {
-  const [timeoutDeadline] = useState(Date.now() + timeoutInSeconds * 1000);
+  const [timeoutDeadline, setTimeoutDeadline] = useState(Date.now() + timeoutInSeconds * 1000);
+  const resetCountRef = useRef(resetCounter);
   const now = useNow();
   const stringGetter = useStringGetter();
 
@@ -32,14 +37,27 @@ export const TimeoutButton = ({
   useEffect(() => {
     if (secondsLeft > 0) return;
     onTimeOut?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondsLeft]);
+
+  useEffect(() => {
+    if (resetCounter !== resetCountRef.current) {
+      setTimeoutDeadline(Date.now() + timeoutInSeconds * 1000);
+      resetCountRef.current = resetCounter;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetCounter, setTimeoutDeadline]);
 
   if (slotFinal && secondsLeft <= 0) return slotFinal;
 
+  if (renderCustomCountdown && secondsLeft > 0) {
+    return renderCustomCountdown({ secondsLeft });
+  }
+
   return (
     <Button
-      {...otherProps}
       action={ButtonAction.Primary}
+      {...otherProps}
       state={{
         isDisabled:
           secondsLeft > 0 ||

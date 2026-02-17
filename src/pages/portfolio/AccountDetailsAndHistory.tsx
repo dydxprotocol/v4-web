@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { TooltipContextType } from '@visx/xychart';
 import BigNumber from 'bignumber.js';
@@ -9,13 +9,14 @@ import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
+import { usePortfolioValues } from '@/hooks/PortfolioValues/usePortfolioValues';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Output, OutputType, ShowSign, formatDateOutput } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
@@ -26,70 +27,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { Nullable, orEmptyObj } from '@/lib/typeUtils';
-
-const usePortfolioValues = ({
-  equity,
-  visibleData,
-  activeDatum,
-}: {
-  equity?: Nullable<number>;
-  visibleData?: PnlDatum[];
-  activeDatum?: PnlDatum;
-}) => {
-  const stringGetter = useStringGetter();
-  const selectedLocale = useAppSelector(getSelectedLocale);
-
-  const accountValueLabel = useMemo(
-    () =>
-      activeDatum
-        ? formatDateOutput(activeDatum.createdAt, OutputType.DateTime, {
-            selectedLocale,
-            dateFormat: 'medium',
-          })
-        : stringGetter({ key: STRING_KEYS.TRADING_ACCOUNT }),
-    [activeDatum, selectedLocale, stringGetter]
-  );
-
-  const accountEquity = useMemo(
-    () => (activeDatum ? activeDatum.equity : equity),
-    [activeDatum, equity]
-  );
-
-  const earliestVisibleDatum = visibleData?.[0];
-  const latestVisibleDatum = visibleData?.[visibleData.length - 1];
-
-  const pnl = useMemo(() => {
-    let pnlDiff;
-    let pnlDiffPercent;
-    if (earliestVisibleDatum && latestVisibleDatum) {
-      const fullTimeframeDiff = MustBigNumber(latestVisibleDatum.totalPnl).minus(
-        earliestVisibleDatum.totalPnl
-      );
-
-      pnlDiff = activeDatum
-        ? MustBigNumber(activeDatum.totalPnl).minus(earliestVisibleDatum.totalPnl)
-        : fullTimeframeDiff;
-
-      pnlDiffPercent = pnlDiff.div(earliestVisibleDatum.equity);
-
-      return {
-        pnlDiff: pnlDiff.toString(),
-        pnlDiffPercent: pnlDiffPercent.toString(),
-        sign: fullTimeframeDiff.gte(0) ? NumberSign.Positive : NumberSign.Negative,
-      };
-    }
-    return undefined;
-  }, [activeDatum, earliestVisibleDatum, latestVisibleDatum]);
-
-  return {
-    accountValueLabel,
-    accountEquity,
-    pnlDiff: pnl?.pnlDiff,
-    pnlDiffPercent: pnl?.pnlDiffPercent,
-    pnlDiffSign: pnl?.sign ?? NumberSign.Neutral,
-  };
-};
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();

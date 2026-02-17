@@ -1,8 +1,9 @@
+import { type SpotBuyInputType, type SpotSellInputType } from '@/bonsai/forms/spot';
 import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
-import { ApiStatus } from '@/bonsai/types/summaryTypes';
+import { ApiStatus, SubaccountFill } from '@/bonsai/types/summaryTypes';
 import { type SupportedLocale } from '@dydxprotocol/v4-localization';
-import { RouteResponse, UserAddress } from '@skip-go/client';
+import { Route, RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { type CustomFlags, type StatsigFlags } from '@/constants/statsig';
@@ -10,6 +11,8 @@ import { type DisplayUnit, type QuickLimitOption } from '@/constants/trade';
 import { type ConnectorType, type DydxAddress, type WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
+
+import { type SpotApiSide, type SpotApiTradeRoute } from '@/clients/spotApi';
 
 import type { OnboardingState, OnboardingSteps } from './account';
 import { type DialogTypesTypes } from './dialogs';
@@ -77,6 +80,7 @@ export const AnalyticsUserProperties = unionize(
 
     // Account
     DydxAddress: ofType<DydxAddress | null>(),
+    SolanaAddress: ofType<string | null>(),
     SubaccountNumber: ofType<number | null>(),
 
     // Affiliate
@@ -84,6 +88,10 @@ export const AnalyticsUserProperties = unionize(
 
     // validators
     BonsaiValidatorUrl: ofType<string | null>(),
+
+    // User
+    UserId: ofType<string | null>(),
+    IsNewUser: ofType<boolean | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -102,10 +110,13 @@ export const AnalyticsUserPropertyLoggableTypes = {
   WalletAddress: 'walletAddress',
   IsRememberMe: 'isRememberMe',
   DydxAddress: 'dydxAddress',
+  SolanaAddress: 'solanaAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
   BonsaiValidatorUrl: 'bonsaiValidator',
   CustomFlags: 'customFlags',
+  UserId: 'userId',
+  IsNewUser: 'isNewUser',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
@@ -150,6 +161,7 @@ export const AnalyticsEvents = unionize(
     ExportFundingPaymentsCheckboxClick: ofType<{
       value: boolean;
     }>(),
+    ExportRewardsLeaderboardClick: ofType<{}>(),
 
     // Navigation
     NavigatePage: ofType<{
@@ -195,10 +207,34 @@ export const AnalyticsEvents = unionize(
       state: OnboardingState;
       step?: OnboardingSteps;
     }>(),
+    OnboardingSignInWithWalletClick: ofType<{}>(),
+    OnboardingSignInWithSocialsClick: ofType<{}>(),
     OnboardingAccountDerived: ofType<{
       hasPreviousTransactions: boolean;
     }>(),
     OnboardingWalletIsNonDeterministic: ofType<{}>(),
+
+    // Turnkey Onboarding
+    TurnkeyLoginInitiated: ofType<{
+      signinMethod: 'email' | 'google' | 'apple';
+    }>(),
+    TurnkeyLoginEmailToken: ofType<{}>(),
+    TurnkeyLoginError: ofType<{
+      signinMethod: 'email' | 'google' | 'apple';
+      error: string;
+    }>(),
+    TurnkeyLoginCompleted: ofType<{
+      signinMethod: 'email' | 'google' | 'apple';
+    }>(),
+    UploadAddressError: ofType<{
+      dydxAddress: string;
+      error: string;
+    }>(),
+    TurnkeyFetchDepositAddressError: ofType<{
+      dydxAddress: string;
+      error: string;
+    }>(),
+    TurnkeyResendEmailClick: ofType<{}>(),
 
     // Transfers
     TransferFaucet: ofType<{}>(),
@@ -278,6 +314,16 @@ export const AnalyticsEvents = unionize(
           sinceSubmissionMs: number | undefined;
         }
     >(),
+    TradeMarketOrderFilled: ofType<{
+      roundtripMs: number;
+      sinceSubmissionMs: number | undefined;
+      volume: number;
+      size: number;
+      price: number;
+      fill: SubaccountFill;
+      order: PlaceOrderPayload;
+      source: TradeMetadataSource;
+    }>(),
 
     TradeCancelOrderClick: ofType<{ orderId: string }>(),
     TradeCancelOrder: ofType<{ orderId: string }>(),
@@ -347,6 +393,18 @@ export const AnalyticsEvents = unionize(
       validatorAddress?: string;
     }>(),
 
+    // Swapping
+    SwapInitiated: ofType<{ id: string } & Route>(),
+    SwapError: ofType<
+      {
+        id: string;
+        step: 'withdraw-subaccount' | 'execute-swap';
+        error: string;
+      } & Route
+    >(),
+    SwapSubmitted: ofType<{ id: string; txHash: string; chainId: string } & Route>(),
+    SwapFinalized: ofType<{ id: string; txHash: string; chainId: string } & Route>(),
+
     // Sharing
     SharePnlShared: ofType<{
       asset: string;
@@ -412,6 +470,7 @@ export const AnalyticsEvents = unionize(
     }>(),
     AffiliateSaveReferralAddress: ofType<{ affiliateAddress: string }>(),
     AffiliateURLCopied: ofType<{ url: string }>(),
+    AffiliateReferralCodeUpdated: ofType<{ newCode: string }>(),
 
     // Favoriting Markets
     FavoriteMarket: ofType<{ marketId: string }>(),
@@ -428,6 +487,8 @@ export const AnalyticsEvents = unionize(
     LaunchMarketPageChangePriceChartTimeframe: ofType<{ timeframe: string; asset: string }>(),
     LaunchMarketTransaction: ofType<{ marketId: string }>(),
     LaunchMarketViewFromTradePage: ofType<{ marketId: string }>(),
+
+    TradingApiKeyGenerated: ofType<{}>(),
 
     // Deposit
     DepositInitiated: ofType<
@@ -457,6 +518,7 @@ export const AnalyticsEvents = unionize(
     >(),
     DepositError: ofType<{ error: string }>(),
     SelectQrDeposit: ofType<{}>(),
+    TurnkeyDepositInitiated: ofType<{}>(),
 
     // Withdraw
     WithdrawInitiated:
@@ -476,6 +538,112 @@ export const AnalyticsEvents = unionize(
     WithdrawSubmitted: ofType<Withdraw>(),
     WithdrawFinalized: ofType<Withdraw>(),
     WithdrawError: ofType<{ error: string }>(),
+
+    // USDC Rebalancing
+    RebalanceWalletFundsInitiated: ofType<
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToDeposit: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToWithdraw: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+    >(),
+    RebalanceWalletFundsFinalized: ofType<
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToDeposit: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToWithdraw: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+    >(),
+    RebalanceWalletFundsError: ofType<
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToDeposit: string;
+          targetAmount: number;
+          error: string;
+          isAutoRebalance: boolean;
+        }
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToWithdraw: string;
+          targetAmount: number;
+          error: string;
+          isAutoRebalance: boolean;
+        }
+    >(),
+
+    // Marketing Banner
+    MarketingBannerClick: ofType<{
+      source: string;
+      campaign: string;
+      timestamp: number;
+    }>(),
+
+    // Spot Trading
+    SpotTransactionSubmitStarted: ofType<{
+      side: SpotApiSide;
+      tokenMint: string;
+      tokenSymbol?: string;
+      tradeRoute: SpotApiTradeRoute;
+      estimatedUsdAmount?: number;
+      inputType: SpotBuyInputType | SpotSellInputType;
+    }>(),
+    SpotTransactionSubmitSuccess: ofType<{
+      side: SpotApiSide;
+      tokenMint: string;
+      tokenSymbol?: string;
+      tradeRoute: SpotApiTradeRoute;
+      usdAmount: number;
+      solAmount: number;
+      timingMs: Record<string, number>;
+    }>(),
+    SpotTransactionSubmitError: ofType<{
+      side: SpotApiSide;
+      tokenMint: string;
+      tokenSymbol?: string;
+      tradeRoute: SpotApiTradeRoute;
+      estimatedUsdAmount?: number;
+      step: string;
+      errorName: string;
+      errorMessage: string;
+    }>(),
+
+    // Spot Withdrawal
+    SpotSolWithdrawalStarted: ofType<{
+      solAmount: number;
+    }>(),
+    SpotSolWithdrawalSuccess: ofType<{
+      solAmount: number;
+      timingMs: Record<string, number>;
+    }>(),
+    SpotSolWithdrawalError: ofType<{
+      solAmount: number;
+      step: string;
+      errorName: string;
+      errorMessage: string;
+    }>(),
+
+    // Spot Deposit
+    SpotDepositInitiated: ofType<{}>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -508,7 +676,8 @@ export type TradeMetadataSource =
   | 'TradeForm'
   | 'TriggersForm'
   | 'SimpleTriggersForm'
-  | 'TradingViewChart';
+  | 'TradingViewChart'
+  | 'CloseAllPositionsButton';
 
 export type TradeAdditionalMetadata = {
   source: TradeMetadataSource;

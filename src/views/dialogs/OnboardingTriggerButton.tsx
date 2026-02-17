@@ -44,9 +44,9 @@ export const OnboardingTriggerButton = ({
       {onboardingState === OnboardingState.AccountConnected
         ? isAccountViewOnly
           ? stringGetter({ key: STRING_KEYS.UNAVAILABLE })
-          : stringGetter({ key: STRING_KEYS.CONNECT_WALLET })
+          : stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })
         : {
-            [OnboardingState.Disconnected]: stringGetter({ key: STRING_KEYS.CONNECT_WALLET }),
+            [OnboardingState.Disconnected]: stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE }),
             [OnboardingState.WalletConnected]: stringGetter({ key: STRING_KEYS.RECOVER_KEYS }),
           }[onboardingState as string]}
     </Button>

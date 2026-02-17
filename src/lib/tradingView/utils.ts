@@ -17,6 +17,7 @@ import { Themes } from '@/styles/themes';
 import { AppTheme, type AppColorMode } from '@/state/appUiConfigs';
 
 import { getDisplayableTickerFromMarket } from '../assetUtils';
+import { isPresent } from '../typeUtils';
 
 // Show order book candles instead of trade candles if there are no trades in that time period
 const MAX_NUM_TRADES_FOR_ORDERBOOK_PRICES = 1;
@@ -42,10 +43,23 @@ const getOhlcValues = ({
     trades <= MAX_NUM_TRADES_FOR_ORDERBOOK_PRICES &&
     orderbookOpen !== undefined &&
     orderbookClose !== undefined;
+  const alsoUseTradeForHighLow = trades >= 1;
 
   return {
-    low: showOrderbookCandles ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
-    high: showOrderbookCandles ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
+    low: showOrderbookCandles
+      ? Math.min(
+          ...[orderbookOpen, orderbookClose, alsoUseTradeForHighLow ? tradeLow : undefined].filter(
+            isPresent
+          )
+        )
+      : tradeLow,
+    high: showOrderbookCandles
+      ? Math.max(
+          ...[orderbookOpen, orderbookClose, alsoUseTradeForHighLow ? tradeHigh : undefined].filter(
+            isPresent
+          )
+        )
+      : tradeHigh,
     open: showOrderbookCandles ? orderbookOpen : tradeOpen,
     close: showOrderbookCandles ? orderbookClose : tradeClose,
   };
@@ -205,10 +219,10 @@ export const getWidgetOptions = (
   ];
 
   const disabledFeaturesForSimpleUi: TradingTerminalFeatureset[] = [
-    'header_widget',
     'left_toolbar',
     'display_market_status',
     'legend_widget',
+    'header_resolutions',
   ];
 
   const disabledFeatures: TradingTerminalFeatureset[] = [

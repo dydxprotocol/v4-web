@@ -39,7 +39,7 @@ export function isInstantTransfer(route: RouteResponse) {
 
 export function getUserAddressesForRoute(
   route: RouteResponse,
-  sourceAccount: SourceAccount,
+  sourceAccount?: SourceAccount,
   nobleAddress?: string,
   dydxAddress?: string,
   osmosisAddress?: string,
@@ -70,13 +70,13 @@ export function getUserAddressesForRoute(
         return { chainId, address: dydxAddress };
       default:
         if (
-          (isEvmDepositChainId(chainId) && sourceAccount.chain === WalletNetworkType.Evm) ||
-          (chainId === SOLANA_MAINNET_ID && sourceAccount.chain === SOLANA_MAINNET_ID)
+          (isEvmDepositChainId(chainId) && sourceAccount?.chain === WalletNetworkType.Evm) ||
+          (chainId === SOLANA_MAINNET_ID && sourceAccount?.chain === SOLANA_MAINNET_ID)
         ) {
           return { chainId, address: sourceAccount.address as string };
         }
 
-        throw new Error(`unhandled chainId ${chainId} for user address ${sourceAccount.address}`);
+        throw new Error(`unhandled chainId ${chainId} for user address ${sourceAccount?.address}`);
     }
   });
 }

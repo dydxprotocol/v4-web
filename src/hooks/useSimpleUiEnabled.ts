@@ -5,7 +5,7 @@ import { testFlags } from '@/lib/testFlags';
 export const useSimpleUiEnabled = () => {
   const { isTablet } = useBreakpoints();
   const forcedSimpleUiValue = testFlags.simpleUi;
-  const isSimpleUi = isTablet ? forcedSimpleUiValue ?? true : false;
+  const isSimpleUi = isTablet ? (forcedSimpleUiValue ?? true) : false;
 
   return isSimpleUi;
 };

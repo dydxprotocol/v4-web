@@ -3,6 +3,7 @@ import { type WalletType as CosmosWalletType } from 'graz';
 import { type EIP6963ProviderInfo } from 'mipd';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { LoginMethod } from '@/types/turnkey';
 
 import {
   CoinbaseIcon,
@@ -12,6 +13,7 @@ import {
   MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
+  PrivyIcon,
   WalletConnectIcon,
 } from '@/icons';
 
@@ -62,6 +64,7 @@ export enum WalletType {
   Privy = 'PRIVY',
   Phantom = 'PHANTOM',
   MetaMask = 'METAMASK',
+  Turnkey = 'TURNKEY',
 }
 
 export enum ConnectorType {
@@ -74,6 +77,7 @@ export enum ConnectorType {
   Test = 'test',
   Privy = 'privy',
   PhantomSolana = 'phantomSolana',
+  Turnkey = 'turnkey',
 }
 
 export enum WalletNetworkType {
@@ -94,6 +98,14 @@ export type WalletInfo =
         | ConnectorType.PhantomSolana
         | ConnectorType.Privy;
       name: WalletType;
+    }
+  | {
+      connectorType: ConnectorType.Turnkey;
+      name: WalletType.Turnkey;
+      userEmail?: string;
+      providerName?: string;
+      loginMethod: LoginMethod;
+      requiresAddressUpload?: boolean;
     }
   | {
       connectorType: ConnectorType.Cosmos;
@@ -136,8 +148,8 @@ export const wallets = {
   },
   [WalletType.Privy]: {
     type: WalletType.Privy,
-    stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
-    icon: EmailIcon,
+    stringKey: STRING_KEYS.PRIVY,
+    icon: PrivyIcon,
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,
@@ -153,6 +165,11 @@ export const wallets = {
     type: WalletType.MetaMask,
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
+  },
+  [WalletType.Turnkey]: {
+    type: WalletType.Turnkey,
+    stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
+    icon: EmailIcon,
   },
 } satisfies Record<WalletInfo['name'], WalletConfig>;
 
@@ -170,6 +187,31 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
     },
     message: {
       action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
+    },
+  }) as const;
+
+/**
+ * @description Overwrites the types and message to include salt for Turnkey onboarding
+ * @returns Typed data to sign for dYdX Chain onboarding with turnkey
+ */
+export const getSignTypedDataForTurnkey = ({
+  selectedDydxChainId,
+  salt,
+}: {
+  selectedDydxChainId: DydxChainId;
+  salt: string;
+}) =>
+  ({
+    ...getSignTypedData(selectedDydxChainId),
+    types: {
+      dYdX: [
+        { name: 'action', type: 'string' },
+        { name: 'salt', type: 'string' },
+      ],
+    },
+    message: {
+      action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
+      salt,
     },
   }) as const;
 

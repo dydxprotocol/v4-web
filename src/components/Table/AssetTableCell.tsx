@@ -15,6 +15,7 @@ import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { Output, OutputType } from '../Output';
+import { TradeFeeDiscountTag } from '../TradeFeeDiscountTag';
 import { TableCell } from './TableCell';
 
 interface AssetTableCellProps {
@@ -23,7 +24,13 @@ interface AssetTableCellProps {
   configs:
     | Pick<
         MarketData,
-        'effectiveInitialMarginFraction' | 'logo' | 'initialMarginFraction' | 'isUnlaunched' | 'id'
+        | 'effectiveInitialMarginFraction'
+        | 'logo'
+        | 'initialMarginFraction'
+        | 'isUnlaunched'
+        | 'id'
+        | 'marketFeeDiscountMultiplier'
+        | 'displayId'
       >
     | null
     | undefined;
@@ -36,8 +43,14 @@ interface AssetTableCellProps {
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
   const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
-  const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
-    orEmptyObj(configs);
+  const {
+    logo,
+    initialMarginFraction,
+    effectiveInitialMarginFraction,
+    isUnlaunched,
+    marketFeeDiscountMultiplier,
+    displayId,
+  } = orEmptyObj(configs);
 
   const maxLeverage =
     configs != null ? (
@@ -62,6 +75,10 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
             {name}
           </$Asset>
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
+          <TradeFeeDiscountTag
+            marketFeeDiscountMultiplier={marketFeeDiscountMultiplier}
+            symbol={displayId}
+          />
         </div>
         {children}
       </$TableCellContent>

@@ -74,7 +74,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
           type={OutputType.Asset}
           value={usdcRewards}
           showSign={ShowSign.Both}
-          minimumFractionDigits={SMALL_USD_DECIMALS}
+          fractionDigits={SMALL_USD_DECIMALS}
         />
         <AssetIcon logoUrl={usdcImage} symbol="USDC" />
       </$InlineRow>
@@ -93,7 +93,8 @@ const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
   --gradient-start-color: var(--color-layer-5);
 
   ${({ backgroundImagePath }) => css`
-    background: url(${backgroundImagePath}),
+    background:
+      url(${backgroundImagePath}),
       linear-gradient(270deg, var(--color-positive-dark), var(--gradient-start-color) 60%);
   `}
   position: relative;

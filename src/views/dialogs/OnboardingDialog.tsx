@@ -1,16 +1,22 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
+import { timeUnits } from '@/constants/time';
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useEnableTurnkey } from '@/hooks/useEnableTurnkey';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -30,9 +36,10 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
 
 import { LanguageSelector } from '../menus/LanguageSelector';
@@ -52,10 +59,11 @@ export const OnboardingDialog = ({
   const { selectWallet, sourceAccount } = useAccounts();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const isTurnkeyEnabled = useEnableTurnkey();
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const isSimpleUi = useSimpleUiEnabled();
-  const isTurnkeyEnabled = testFlags.enableTurnkey;
+  const { dydxAddress } = useAccounts();
+  const privyWallet = useDisplayedWallets().find((wallet) => wallet.name === WalletType.Privy);
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -74,20 +82,25 @@ export const OnboardingDialog = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (!currentOnboardingStep) {
+    if (!currentOnboardingStep || dydxAddress) {
       setIsOpen(false);
     }
-  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow]);
+  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow, dydxAddress]);
 
-  const setIsOpenFromDialog = (open: boolean) => {
-    setIsOpen(open);
-  };
+  const setIsOpenFromDialog = useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+    },
+    [setIsOpen]
+  );
 
   const onDisplayChooseWallet = () => {
+    track(AnalyticsEvents.OnboardingSignInWithWalletClick());
     dispatch(setDisplayChooseWallet(true));
   };
 
   const onSignInWithSocials = () => {
+    track(AnalyticsEvents.OnboardingSignInWithSocialsClick());
     dispatch(setDisplayChooseWallet(false));
   };
 
@@ -100,50 +113,76 @@ export const OnboardingDialog = ({
     );
   };
 
-  const onSubmitEmail = () => {
+  const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
     setIsOpen(false);
+
     dispatch(
       openDialog(
-        DialogTypes.CheckEmail({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
+        DialogTypes.CheckEmail({
+          userEmail,
+        })
       )
     );
   };
 
-  const onChooseWallet = (wallet: WalletInfo) => {
-    if (wallet.connectorType === ConnectorType.DownloadWallet) {
-      window.open(wallet.downloadLink, '_blank');
-      return;
-    }
-    if (wallet.name === WalletType.Privy || wallet.name === WalletType.Keplr) {
-      setIsOpenFromDialog(false);
-    }
-    selectWallet(wallet);
-  };
+  const onChooseWallet = useMemo(
+    () =>
+      debounce((wallet: WalletInfo) => {
+        if (wallet.connectorType === ConnectorType.DownloadWallet) {
+          window.open(wallet.downloadLink, '_blank');
+          return;
+        }
+        if (wallet.name === WalletType.Privy || wallet.name === WalletType.Keplr) {
+          setIsOpenFromDialog(false);
+        }
+        selectWallet(wallet);
+      }, timeUnits.second),
+    [selectWallet, setIsOpenFromDialog]
+  );
+
+  const privyUserOption = Boolean(import.meta.env.VITE_PRIVY_APP_ID) && privyWallet && (
+    <Link isAccent tw="font-small-medium" onClick={() => onChooseWallet(privyWallet)}>
+      Privy User?
+    </Link>
+  );
 
   return (
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
+      onBack={
+        isTurnkeyEnabled && currentOnboardingStep === OnboardingSteps.ChooseWallet
+          ? onSignInWithSocials
+          : undefined
+      }
       setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.SignIn]: {
-            title: stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE }),
+            title: (
+              <div tw="row justify-between">
+                {stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })}
+                {privyUserOption}
+              </div>
+            ),
             description: stringGetter({
               key: STRING_KEYS.SIGN_IN_DESCRIPTION,
             }),
             children: (
               <$Content>
                 <SignIn
+                  onChooseWallet={onChooseWallet}
                   onDisplayChooseWallet={onDisplayChooseWallet}
                   onSignInWithPasskey={onSignInWithPasskey}
-                  onSubmitEmail={onSubmitEmail}
+                  onSubmitEmail={({ userEmail }: { userEmail: string }) =>
+                    onSubmitEmail({ userEmail })
+                  }
                 />
               </$Content>
             ),
           },
           [OnboardingSteps.ChooseWallet]: {
             title: isTurnkeyEnabled ? (
-              stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })
+              stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })
             ) : (
               <div tw="flex items-center gap-0.5">
                 {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
@@ -242,8 +281,11 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
       `}
   }
 
+  @media ${breakpoints.notTablet} {
+    --dialog-header-backgroundColor: var(--color-layer-3);
+  }
+
   --dialog-icon-size: 1.25rem;
-  --dialog-content-paddingBottom: 1rem;
 `;
 
 const $Ring = tw(Ring)`w-1.25 h-1.25 [--ring-color:--color-accent]`;

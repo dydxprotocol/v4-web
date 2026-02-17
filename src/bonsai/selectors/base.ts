@@ -6,6 +6,8 @@ export const selectRawAccountState = (state: RootState) => state.raw.account;
 
 export const selectRawMarkets = (state: RootState) => state.raw.markets.allMarkets;
 export const selectRawMarketsData = (state: RootState) => state.raw.markets.allMarkets.data;
+export const selectRawMarketsFeeDiscounts = (state: RootState) =>
+  state.raw.markets.feeDiscounts.data;
 export const selectRawAssetsData = (state: RootState) => state.raw.markets.assets.data;
 export const selectRawAssets = (state: RootState) => state.raw.markets.assets;
 export const selectRawSparklines = (state: RootState) => state.raw.markets.sparklines;
@@ -53,8 +55,12 @@ export const selectRawValidatorHeight = (state: RootState) => state.raw.heights.
 
 export const selectRawConfigFeeTiers = (state: RootState) => state.raw.configs.data?.feeTiers;
 export const selectRawConfigEquityTiers = (state: RootState) => state.raw.configs.data?.equityTiers;
+export const selectRawConfigStakingTiers = (state: RootState) =>
+  state.raw.configs.data?.stakingTiers;
 
 export const selectRawAccountFeeTierData = (state: RootState) => state.raw.account.feeTier.data;
+export const selectRawAccountStakingTierData = (state: RootState) =>
+  state.raw.account.stakingTier.data;
 export const selectRawAccountStatsData = (state: RootState) => state.raw.account.stats.data;
 
 export const selectRawAccountBalancesData = (state: RootState) => state.raw.account.balances.data;
@@ -65,7 +71,33 @@ export const selectRawLocalAddressScreenV2 = (state: RootState) =>
   state.raw.compliance.localAddressScreenV2;
 export const selectRawSourceAddressScreenV2 = (state: RootState) =>
   state.raw.compliance.sourceAddressScreenV2;
+export const selectRawSolanaAddressScreen = (state: RootState) =>
+  state.raw.compliance.solanaAddressScreen;
 export const selectRawGeo = (state: RootState) => state.raw.compliance.geo;
-
+export const selectRawGeoHeaders = (state: RootState) => state.raw.compliance.geoHeaders;
 export const selectRawRewardParams = (state: RootState) => state.raw.rewards.data.data;
 export const selectRawRewardPrice = (state: RootState) => state.raw.rewards.price.data;
+
+export const selectRawSelectedMarketLeverages = (state: RootState) =>
+  state.raw.markets.selectedMarketLeverages;
+export const selectRawSelectedMarketLeveragesData = (state: RootState) =>
+  state.raw.markets.selectedMarketLeverages.data;
+export const selectRawSpotSolPrice = (state: RootState) => state.raw.spot.solPrice.data;
+export const selectRawSpotSolPriceLoading = (state: RootState) => state.raw.spot.solPrice.status;
+export const selectRawSpotTokenPrice = (state: RootState) => state.raw.spot.tokenPrice.data;
+export const selectRawSpotTokenPriceLoading = (state: RootState) =>
+  state.raw.spot.tokenPrice.status;
+
+export const selectRawSpotTokenMetadata = (state: RootState) => state.raw.spot.tokenMetadata.data;
+export const selectRawSpotTokenMetadataLoading = (state: RootState) =>
+  state.raw.spot.tokenMetadata.status;
+
+export const selectRawSpotWalletPositions = (state: RootState) =>
+  state.raw.spot.walletPositions.data;
+export const selectRawSpotWalletPositionsLoading = (state: RootState) =>
+  state.raw.spot.walletPositions.status;
+
+export const selectRawSpotPortfolioTrades = (state: RootState) =>
+  state.raw.spot.portfolioTrades.data;
+export const selectRawSpotPortfolioTradesLoading = (state: RootState) =>
+  state.raw.spot.portfolioTrades.status;

@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import { SupportedLocales } from '@/constants/localization';
 import {
   LEVERAGE_DECIMALS,
+  NumberSign,
   PERCENT_DECIMALS,
   SMALL_PERCENT_DECIMALS,
   SMALL_USD_DECIMALS,
@@ -176,7 +177,7 @@ export function formatNumberOutput(
     const precisionVal = minimumFractionDigits
       ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
       : val;
-    const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
+    const dp = minimumFractionDigits ? (precisionVal.decimalPlaces() ?? numDigits) : numDigits;
     return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
   };
 
@@ -255,6 +256,8 @@ export function useFormattedNumberOutput(
   );
 }
 
+export type RelativeTimeFormat = 'long' | 'short' | 'narrow' | 'singleCharacter';
+
 export enum OutputType {
   Text = 'Text',
   CompactNumber = 'CompactNumber',
@@ -306,7 +309,7 @@ type ElementProps = {
   withSubscript?: boolean;
 
   relativeTimeOptions?: {
-    format: 'long' | 'short' | 'narrow' | 'singleCharacter';
+    format: RelativeTimeFormat;
     resolution?: number;
     stripRelativeWords?: boolean;
   };
@@ -326,6 +329,7 @@ type StyleProps = {
   className?: string;
   withBaseFont?: boolean;
   withSignColor?: boolean;
+  withSignedValueColor?: boolean;
 };
 
 export type OutputProps = ElementProps & StyleProps;
@@ -349,6 +353,7 @@ export const Output = ({
   withParentheses,
   showSign = ShowSign.Negative,
   withSignColor = false,
+  withSignedValueColor,
 
   dateOptions,
   relativeTimeOptions = {
@@ -499,6 +504,15 @@ export const Output = ({
           className={className}
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
+          valueColor={
+            withSignedValueColor
+              ? isNegative
+                ? NumberSign.Negative
+                : isPositive
+                  ? NumberSign.Positive
+                  : undefined
+              : undefined
+          }
         >
           {slotLeft}
           {sign && (
@@ -553,10 +567,21 @@ const $Text = styled.output<{ withParentheses?: boolean }>`
       --output-afterString: ')';
     `}
 `;
-const $Number = styled($Text)<{ withBaseFont?: boolean }>`
+const $Number = styled($Text)<{ withBaseFont?: boolean; valueColor?: NumberSign }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&
     css`
       font-feature-settings: var(--fontFeature-monoNumbers);
     `}
+
+  ${({ valueColor }) =>
+    valueColor === NumberSign.Positive
+      ? css`
+          color: var(--color-positive) !important;
+        `
+      : valueColor === NumberSign.Negative
+        ? css`
+            color: var(--color-negative) !important;
+          `
+        : ''}
 `;
