@@ -3,7 +3,6 @@ import { forwardRef, useMemo } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { type PerpetualMarketSummary, type TWAPSubaccountOrder } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
-import { Duration } from 'luxon';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -67,7 +66,7 @@ const getTWAPOrderHistoryTableColumnDef = ({
     {
       [TWAPOrderHistoryTableColumnKey.OrderTime]: {
         columnKey: 'updatedAtMilliseconds',
-        getCellValue: (row) => row.updatedAtMilliseconds ?? 0,
+        getCellValue: (row) => row.updatedAtMilliseconds,
         label: <DateAgeToggleHeader />,
         allowsSorting: true,
         renderCell: ({ updatedAtMilliseconds }) => {
@@ -123,19 +122,13 @@ const getTWAPOrderHistoryTableColumnDef = ({
           if (updatedAtMilliseconds == null || duration == null)
             return <Output type={OutputType.Text} />;
 
-          const elapsedSeconds = Math.floor((Date.now() - updatedAtMilliseconds) / 1000);
-          const durationSeconds = parseInt(duration, 10) || 0;
-          const elapsed = Duration.fromObject({ seconds: elapsedSeconds })
-            .rescale()
-            .toHuman({ unitDisplay: 'narrow' });
-          const total = Duration.fromObject({ seconds: durationSeconds })
-            .rescale()
-            .toHuman({ unitDisplay: 'narrow' });
+          const elapsedMs = Date.now() - updatedAtMilliseconds;
+          const durationMs = parseInt(duration, 10) * 1000;
 
           return (
             <TableCell stacked>
-              <Output type={OutputType.Text} value={elapsed} />
-              <Output type={OutputType.Text} value={total} />
+              <Output type={OutputType.Duration} value={elapsedMs} />
+              <Output type={OutputType.Duration} value={durationMs} />
             </TableCell>
           );
         },
