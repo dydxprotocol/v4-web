@@ -186,27 +186,18 @@ export type SubaccountOrder = {
   reduceOnly: boolean;
   removalReason: string | undefined;
   marginMode: MarginMode | undefined;
-  duration: string | undefined;
-  interval: string | undefined;
-  priceTolerance: string | undefined;
 };
 
 export type TWAPSubaccountOrder = SubaccountOrder & {
   type: IndexerOrderType.TWAP;
   orderFlags: typeof OrderFlags.TWAP;
-  duration: string;
-  interval: string;
-  priceTolerance: string;
+  duration: string | undefined;
+  interval: string | undefined;
+  priceTolerance: string | undefined;
 };
 
 export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
-  return (
-    order.orderFlags === OrderFlags.TWAP &&
-    order.type === IndexerOrderType.TWAP &&
-    order.duration != null &&
-    order.interval != null &&
-    order.priceTolerance != null
-  );
+  return order.orderFlags === OrderFlags.TWAP && order.type === IndexerOrderType.TWAP;
 }
 
 export enum SubaccountFillType {

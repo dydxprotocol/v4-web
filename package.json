@@ -229,9 +229,7 @@
   },
   "pnpm": {
     "overrides": {
-      "follow-redirects": "1.15.3",
-      "@injectivelabs/sdk-ts": "1.16.10",
-      "@injectivelabs/ts-types": "1.16.10"
+      "follow-redirects": "1.15.3"
     }
   },
   "babelMacros": {

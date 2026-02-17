@@ -30,7 +30,7 @@ import { calculateTransfers } from '../calculators/transfers';
 import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import { isTWAPOrder, type TWAPSubaccountOrder, SubaccountTransfer } from '../types/summaryTypes';
+import { isTWAPOrder, SubaccountTransfer, type TWAPSubaccountOrder } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawAccountStakingTierData,

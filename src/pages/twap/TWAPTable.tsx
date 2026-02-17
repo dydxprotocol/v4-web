@@ -1,50 +1,41 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { Tabs, type TabItem } from '@/components/Tabs';
 
 import { ActiveTWAPTable, ActiveTWAPTableColumnKey } from './ActiveTWAPTable';
 
-const tabItems: TabItem<string>[] = [
-  {
-    value: 'Active',
-    label: 'Active',
-    content: (
-      <ActiveTWAPTable
-        columnKeys={[
-          ActiveTWAPTableColumnKey.Market,
-          ActiveTWAPTableColumnKey.Side,
-          ActiveTWAPTableColumnKey.Execution,
-          ActiveTWAPTableColumnKey.AveragePrice,
-          ActiveTWAPTableColumnKey.Runtime,
-          ActiveTWAPTableColumnKey.ReduceOnly,
-          ActiveTWAPTableColumnKey.OrderTime,
-          ActiveTWAPTableColumnKey.Terminate,
-        ]}
-      />
-    ),
-  },
-  {
-    value: 'OrderHistory',
-    label: 'Order History',
-    content: (
-      <div>
-        <h1>Order History</h1>
-      </div>
-    ),
-  },
-  {
-    value: 'Fills',
-    label: 'Fills',
-    content: (
-      <div>
-        <h1>Fills</h1>
-      </div>
-    ),
-  },
-];
+export enum TwapTableTab {
+  Active = 'Active',
+  History = 'History',
+  Fills = 'Fills',
+}
 
 export const TWAPTable: React.FC = () => {
-  const [tab, setTab] = useState('Active');
+  const [tab, setTab] = useState<TwapTableTab>(TwapTableTab.Active);
+
+  const tabItems: TabItem<TwapTableTab>[] = useMemo(
+    () => [
+      {
+        value: TwapTableTab.Active,
+        label: 'Active',
+        content: (
+          <ActiveTWAPTable
+            columnKeys={[
+              ActiveTWAPTableColumnKey.Market,
+              ActiveTWAPTableColumnKey.Side,
+              ActiveTWAPTableColumnKey.Execution,
+              ActiveTWAPTableColumnKey.AveragePrice,
+              ActiveTWAPTableColumnKey.Runtime,
+              ActiveTWAPTableColumnKey.ReduceOnly,
+              ActiveTWAPTableColumnKey.OrderTime,
+              ActiveTWAPTableColumnKey.Terminate,
+            ]}
+          />
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <Tabs

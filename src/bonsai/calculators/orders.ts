@@ -236,8 +236,6 @@ function calculateBaseOrderStatus(
       return OrderStatus.Canceling;
     case IndexerOrderStatus.UNTRIGGERED:
       return OrderStatus.Untriggered;
-    case IndexerOrderStatus.ERROR:
-      return OrderStatus.Canceled; // Treat ERROR status as canceled
     default:
       assertNever(status);
       return undefined;

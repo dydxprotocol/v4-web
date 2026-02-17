@@ -15,7 +15,7 @@ import { defaultTableMixins } from '@/styles/tableMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { type BaseTableRowData, type ColumnDef, Table } from '@/components/Table';
+import { type ColumnDef, Table } from '@/components/Table';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -25,12 +25,11 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { type Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
-type ActiveTWAPOrderRow = BaseTableRowData &
-  TWAPSubaccountOrder & {
-    marketSummary: Nullable<PerpetualMarketSummary>;
-    stepSizeDecimals: number;
-    tickSizeDecimals: number;
-  };
+type ActiveTWAPOrderRow = {
+  marketSummary: Nullable<PerpetualMarketSummary>;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
+} & TWAPSubaccountOrder;
 
 export enum ActiveTWAPTableColumnKey {
   Market = 'Market',
@@ -108,7 +107,8 @@ const getActiveTWAPTableColumnDef = ({
         label: 'Runtime / Total',
         allowsSorting: false,
         renderCell: ({ updatedAtMilliseconds, duration }) => {
-          if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
+          if (updatedAtMilliseconds == null || duration == null)
+            return <Output type={OutputType.Text} />;
 
           const elapsedSeconds = Math.floor((Date.now() - updatedAtMilliseconds) / 1000);
           const durationSeconds = parseInt(duration, 10) || 0;
