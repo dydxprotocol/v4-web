@@ -8,6 +8,7 @@ import styled, { css, keyframes } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
+import { BREAKPOINT_REM } from '@/constants/page';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -35,7 +36,6 @@ const LARGE_TRADE_USD_VALUE = 10000;
 type StyleProps = {
   className?: string;
   histogramSide: 'left' | 'right';
-  isTablet?: boolean;
 };
 
 // Current fix for styled-component not preserving generic row
@@ -179,7 +179,6 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       withScrollSnapColumns
       withFocusStickyRows
       withInnerBorders={isTablet}
-      isTablet={isTablet}
     />
   );
 };
@@ -187,13 +186,11 @@ const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} a
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   background: var(--color-layer-2);
 
-  ${({ isTablet }) =>
-    isTablet &&
-    css`
-      thead {
-        --stickyArea-totalInsetTop: 0;
-      }
-    `}
+  @media (max-width: ${BREAKPOINT_REM.tablet}) {
+    thead {
+      --stickyArea-totalInsetTop: 0;
+    }
+  }
 
   tr {
     --histogram-bucket-size: 1;
