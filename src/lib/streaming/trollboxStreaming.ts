@@ -1,15 +1,12 @@
-import { logBonsaiError } from '@/bonsai/logs';
-
 import {
   type ITrollboxServerData,
   type TrollboxUpdate,
   type TrollboxUserMessage,
-  nextMessageId,
 } from '@/lib/trollbox';
 
 import { BaseSocketIOManager } from './BaseSocketIOManager';
 
-const TROLLBOX_URL = 'https://dydx-trollbox.pocketprotector.xyz';
+const TROLLBOX_URL = import.meta.env.VITE_TROLLBOX_URL;
 const TROLLBOX_CHANNEL = 'trollbox';
 
 class TrollboxSocketManager extends BaseSocketIOManager {
@@ -19,13 +16,12 @@ class TrollboxSocketManager extends BaseSocketIOManager {
 
   protected setupEventListeners(): void {
     this.socket!.on('message', (data: ITrollboxServerData) => {
-      console.log('Received trollbox data:', data);
       switch (data.type) {
         case 'message_history':
           this.notifyHandlers(TROLLBOX_CHANNEL, {
             type: 'history',
             messages: data.messages.map((m) => ({
-              id: nextMessageId(),
+              id: m.id,
               from: m.from,
               message: m.message,
               timestamp: m.timestamp,
@@ -36,7 +32,7 @@ class TrollboxSocketManager extends BaseSocketIOManager {
           this.notifyHandlers(TROLLBOX_CHANNEL, {
             type: 'message',
             message: {
-              id: nextMessageId(),
+              id: data.id,
               from: data.from,
               message: data.message,
               timestamp: data.timestamp,
@@ -64,10 +60,10 @@ class TrollboxSocketManager extends BaseSocketIOManager {
   protected sendUnsubscription(_channel: string): void {}
 
   send(payload: TrollboxUserMessage): void {
-    if (!this.socket?.connected) {
-      logBonsaiError('TrollboxSocketManager', 'attempted to send while disconnected');
+    if (this.socket == null || !this.socket.connected) {
       return;
     }
+
     this.socket.emit('message', payload);
   }
 }
@@ -75,9 +71,8 @@ class TrollboxSocketManager extends BaseSocketIOManager {
 let trollboxManager: TrollboxSocketManager | null = null;
 
 export const subscribeToTrollbox = (onUpdate: (data: TrollboxUpdate) => void): (() => void) => {
-  if (!trollboxManager) {
-    trollboxManager = new TrollboxSocketManager();
-  }
+  if (trollboxManager == null) trollboxManager = new TrollboxSocketManager();
+
   return trollboxManager.subscribe(TROLLBOX_CHANNEL, onUpdate);
 };
 
@@ -86,8 +81,8 @@ export const sendTrollboxMessage = (payload: TrollboxUserMessage): void => {
 };
 
 export const disconnectTrollbox = (): void => {
-  if (trollboxManager) {
-    trollboxManager.disconnect();
-    trollboxManager = null;
-  }
+  if (trollboxManager == null) return;
+
+  trollboxManager.disconnect();
+  trollboxManager = null;
 };

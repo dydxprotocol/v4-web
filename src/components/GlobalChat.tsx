@@ -2,6 +2,8 @@ import { useCallback, useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
+import { useTrollboxOnlineCount } from '@/hooks/useTrollboxOnlineCount';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { GlobalChatBodyContent } from './GlobalChatBodyContent';
@@ -10,6 +12,8 @@ import { Icon, IconName } from './Icon';
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const hasBeenOpened = useRef(false);
+  const onlineCount = useTrollboxOnlineCount();
+
   if (isOpen) hasBeenOpened.current = true;
 
   const handleToggle = useCallback(() => {
@@ -24,6 +28,12 @@ export const GlobalChat = () => {
             <Icon iconName={IconName.Chat} />
             {/* TODO: Replace with localization all at once feature is complete */}
             Global Chat
+            {onlineCount != null && (
+              <$OnlineIndicator>
+                <$OnlineDot />
+                {onlineCount.toLocaleString()} Online
+              </$OnlineIndicator>
+            )}
           </$IconRow>
           <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
         </$Header>
@@ -75,6 +85,19 @@ const $IconRow = styled.div`
     width: 1rem;
     height: 1rem;
   }
+`;
+
+const $OnlineIndicator = styled.span`
+  ${layoutMixins.row}
+  gap: 0.375rem;
+  color: var(--color-text-0);
+`;
+
+const $OnlineDot = styled.span`
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-green);
 `;
 
 const $Icon = styled(Icon)<{ $isOpen: boolean }>`

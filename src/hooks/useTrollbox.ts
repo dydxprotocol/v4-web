@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { assertNever } from '@/lib/assertNever';
 import { sendTrollboxMessage, subscribeToTrollbox } from '@/lib/streaming/trollboxStreaming';
 import { type TrollboxChatMessage, type TrollboxUpdate, signTrollboxMessage } from '@/lib/trollbox';
 
 import { useAccounts } from './useAccounts';
 
-const MAX_MESSAGES = 500;
+const MAX_MESSAGES_IN_MEMORY = 1000;
 
 export const useTrollbox = () => {
   const { dydxAddress, hdKey } = useAccounts();
@@ -22,24 +23,26 @@ export const useTrollbox = () => {
         case 'message':
           setMessages((prev) => {
             const next = [...prev, update.message];
-            return next.length > MAX_MESSAGES ? next.slice(-MAX_MESSAGES) : next;
+            return next.length > MAX_MESSAGES_IN_MEMORY
+              ? next.slice(-MAX_MESSAGES_IN_MEMORY)
+              : next;
           });
           break;
         case 'error':
           // eslint-disable-next-line no-console
-          console.error('Trollbox error:', update.error);
+          console.error('Dydx chat error:', update.error);
           break;
         default:
-          break;
+          assertNever(update);
       }
     });
 
     return unsubscribe;
   }, []);
 
-  const sendMessage = useCallback(
+  const handleSendMessage = useCallback(
     async (text: string) => {
-      if (!dydxAddress || !hdKey?.privateKey) return;
+      if (dydxAddress == null || hdKey?.privateKey == null) return;
 
       try {
         const payload = await signTrollboxMessage(text, dydxAddress, hdKey.privateKey);
@@ -52,5 +55,5 @@ export const useTrollbox = () => {
     [dydxAddress, hdKey?.privateKey]
   );
 
-  return { messages, sendMessage, isLoaded };
+  return { messages, handleSendMessage, isLoaded };
 };

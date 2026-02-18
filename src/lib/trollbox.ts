@@ -3,19 +3,22 @@ import { toHex } from '@cosmjs/encoding';
 
 // Serverside data formats
 export interface ITrollboxServerDataConnected {
+  id: string;
   type: 'connected';
   connectionId: string;
   timestamp: number;
 }
 
 export interface ITrollboxServerDataMessageHistory {
+  id: string;
   type: 'message_history';
   connectionId: string;
   timestamp: number;
-  messages: Array<{ from: string; message: string; timestamp: number; connectionId: string }>;
+  messages: ITrollboxServerDataMessage[];
 }
 
 export interface ITrollboxServerDataMessage {
+  id: string;
   type: 'message';
   connectionId: string;
   timestamp: number;
@@ -24,6 +27,7 @@ export interface ITrollboxServerDataMessage {
 }
 
 export interface ITrollboxServerDataError {
+  id: string;
   type: 'error';
   connectionId: string;
   timestamp: number;
@@ -66,14 +70,6 @@ export interface TrollboxUpdateError {
 }
 
 export type TrollboxUpdate = TrollboxUpdateHistory | TrollboxUpdateMessage | TrollboxUpdateError;
-
-// -- IDs --
-
-let messageIdCounter = 0;
-export function nextMessageId(): string {
-  messageIdCounter += 1;
-  return `trollbox-${messageIdCounter}`;
-}
 
 // -- Signing --
 

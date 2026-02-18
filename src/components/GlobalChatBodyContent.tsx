@@ -30,7 +30,7 @@ const VOLUME_THRESHOLD = 100;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { messages, sendMessage, isLoaded } = useTrollbox();
+  const { messages, handleSendMessage, isLoaded } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +82,7 @@ export const GlobalChatBodyContent = () => {
           })}
         </$VirtualList>
       </$Messages>
-      <ChatFooter onSendMessage={sendMessage} />
+      <ChatFooter onSendMessage={handleSendMessage} />
     </$Content>
   );
 };
@@ -201,7 +201,7 @@ const $VirtualMessage = styled.div<{ $translateY: number }>`
   position: absolute;
   align-items: flex-start;
   font: var(--font-small-book);
-  color: var(--color-text-0);
+  color: var(--color-text-1);
   transform: translateY(${({ $translateY }) => $translateY}px);
 `;
 
@@ -277,7 +277,7 @@ const $ChatInput = styled.input`
   border: 1px solid var(--color-border);
   background-color: var(--color-layer-4);
   font: var(--font-small-book);
-  color: var(--color-text-0);
+  color: var(--color-text-1);
 
   &::placeholder {
     color: var(--color-text-0);
