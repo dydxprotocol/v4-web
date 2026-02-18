@@ -176,7 +176,7 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
             onChange={handleOnChange}
             onKeyDown={handleKeyDown}
           />
-          <IconButton
+          <$SendButton
             iconName={IconName.Send}
             onClick={handleSend}
             shape={ButtonShape.Square}
@@ -283,6 +283,11 @@ const $VolumeDetail = styled.span`
 const $InputRow = styled.div`
   ${layoutMixins.row}
   gap: 0.5rem;
+`;
+
+const $SendButton = styled(IconButton)`
+  --button-width: 2.25rem;
+  --button-height: 2.25rem;
 `;
 
 const $ChatInput = styled.input`
