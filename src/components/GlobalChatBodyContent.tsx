@@ -27,11 +27,12 @@ import { IconButton } from './IconButton';
 import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
 
+const MESSAGE_CHARACTER_LIMIT = 255;
 const VOLUME_THRESHOLD = 1000;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { messages, handleSendMessage, toasts, dismissToast } = useTrollbox();
+  const { messages, handleSendMessage, toasts, pushToast, dismissToast } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -99,12 +100,18 @@ export const GlobalChatBodyContent = () => {
           })}
         </$VirtualList>
       </$Messages>
-      <ChatFooter onSendMessage={handleSendMessage} />
+      <ChatFooter onSendMessage={handleSendMessage} pushToast={pushToast} />
     </$Content>
   );
 };
 
-const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => void }) => {
+const ChatFooter = ({
+  onSendMessage,
+  pushToast,
+}: {
+  onSendMessage: (message: string) => void;
+  pushToast: (message: string) => void;
+}) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const userStats = useAppSelector(BonsaiCore.account.stats.data);
   const statsStatus = useAppSelector((s) => s.raw.account.stats.status);
@@ -122,13 +129,20 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
   const isChatLocked = !isStatsLoading && volume30D < VOLUME_THRESHOLD;
   const volumeRemaining = Math.max(VOLUME_THRESHOLD - volume30D, 0);
 
+  const isOverLimit = inputValue.length > MESSAGE_CHARACTER_LIMIT;
+
   const handleSend = useCallback(() => {
     const trimmed = inputValue.trim();
     if (isEmpty(trimmed)) return;
 
+    if (inputValue.length > MESSAGE_CHARACTER_LIMIT) {
+      pushToast(`Message is too long. Please keep it under ${MESSAGE_CHARACTER_LIMIT} characters.`);
+      return;
+    }
+
     onSendMessage(inputValue);
     setInputValue('');
-  }, [inputValue, onSendMessage]);
+  }, [inputValue, onSendMessage, pushToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -181,7 +195,7 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
             onClick={handleSend}
             shape={ButtonShape.Square}
             action={ButtonAction.Base}
-            state={{ isDisabled: isEmpty(inputValue.trim()) }}
+            state={{ isDisabled: isEmpty(inputValue.trim()) || isOverLimit }}
           />
         </$InputRow>
       )}
