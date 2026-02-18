@@ -26,12 +26,24 @@ export interface ITrollboxServerDataMessage {
   message: string;
 }
 
+export type ITrollboxErrorType =
+  | 'message_too_large'
+  | 'message_empty'
+  | 'missing_field'
+  | 'invalid_address'
+  | 'invalid_signature'
+  | 'invalid_timestamp'
+  | 'rate_limit'
+  | 'insufficient_volume'
+  | 'validation_error';
+
 export interface ITrollboxServerDataError {
   id: string;
   type: 'error';
   connectionId: string;
   timestamp: number;
   error: string;
+  errorType: ITrollboxErrorType;
 }
 
 export type ITrollboxServerData =
@@ -60,6 +72,7 @@ export interface TrollboxUpdateMessage {
 export interface TrollboxUpdateError {
   type: 'error';
   error: string;
+  errorType?: ITrollboxErrorType;
 }
 
 export type TrollboxUpdate = TrollboxUpdateHistory | TrollboxUpdateMessage | TrollboxUpdateError;

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { assertNever } from '@/lib/assertNever';
 import { sendTrollboxMessage, subscribeToTrollbox } from '@/lib/streaming/trollboxStreaming';
 import {
+  ITrollboxErrorType,
   type TrollboxChatMessage,
   type TrollboxUpdate,
   signTrollboxMessage,
@@ -12,6 +13,18 @@ import { useAccounts } from './useAccounts';
 
 const MAX_MESSAGES_IN_MEMORY = 1000;
 const TOAST_AUTO_CLOSE_MS = 5_000;
+
+const TROLLBOX_ERROR_MESSAGES: Record<ITrollboxErrorType, string> = {
+  message_too_large: 'Your message is too long. Please keep it under 255 characters.',
+  message_empty: 'Message cannot be empty.',
+  missing_field: 'Message is missing required fields.',
+  invalid_address: 'Invalid dYdX address.',
+  invalid_signature: 'Signature verification failed. Please try again.',
+  invalid_timestamp: 'Message expired. Please try again.',
+  rate_limit: "You're sending messages too fast. Please wait before trying again.",
+  insufficient_volume: 'You need at least $1,000 in trading volume to chat.',
+  validation_error: 'Failed to send message. Please try again.',
+};
 
 export type ChatToast = {
   id: string;
@@ -53,7 +66,7 @@ export const useTrollbox = () => {
           });
           break;
         case 'error':
-          pushToast(update.error);
+          pushToast(update.errorType ? TROLLBOX_ERROR_MESSAGES[update.errorType] : update.error);
           break;
         default:
           assertNever(update);

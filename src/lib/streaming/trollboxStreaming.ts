@@ -35,7 +35,6 @@ class TrollboxSocketManager extends BaseSocketIOManager {
               id: data.id,
               from: data.from,
               message: data.message,
-              timestamp: data.timestamp,
             },
           } satisfies TrollboxUpdate);
           break;
@@ -43,6 +42,7 @@ class TrollboxSocketManager extends BaseSocketIOManager {
           this.notifyHandlers(TROLLBOX_CHANNEL, {
             type: 'error',
             error: data.error,
+            errorType: data.errorType,
           } satisfies TrollboxUpdate);
           break;
         case 'connected':
