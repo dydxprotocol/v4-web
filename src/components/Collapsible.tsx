@@ -85,6 +85,9 @@ const $Root = styled(Root)`
   &[data-state='open'] {
     gap: 0.5rem;
   }
+
+  padding-bottom: 1rem;
+  border-bottom: solid 1px var(--color-border);
 `;
 
 const $Trigger = styled(Trigger)`

@@ -71,6 +71,10 @@ class TestFlags {
   get spot() {
     return this.booleanFlag(this.queryParams.spot);
   }
+
+  get enableMobileWeb() {
+    return this.booleanFlag(this.queryParams.enable_mobile_web);
+  }
 }
 
 export const testFlags = new TestFlags();

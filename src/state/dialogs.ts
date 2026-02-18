@@ -6,6 +6,7 @@ export interface DialogsState {
   activeDialog?: DialogType;
   activeTradeBoxDialog?: TradeBoxDialogType;
   isUserMenuOpen: boolean;
+  isMarketsMenuOpen: boolean;
   dialogQueue: DialogType[];
 }
 
@@ -13,6 +14,7 @@ const initialState: DialogsState = {
   activeDialog: undefined,
   activeTradeBoxDialog: undefined,
   isUserMenuOpen: false,
+  isMarketsMenuOpen: false,
   dialogQueue: [],
 };
 
@@ -47,6 +49,9 @@ export const dialogsSlice = createSlice({
     setIsUserMenuOpen: (state, action: PayloadAction<boolean>) => {
       state.isUserMenuOpen = action.payload;
     },
+    setIsMarketsMenuOpen: (state, action: PayloadAction<boolean>) => {
+      state.isMarketsMenuOpen = action.payload;
+    },
   },
 });
 
@@ -57,4 +62,5 @@ export const {
   openDialog,
   openDialogInTradeBox,
   setIsUserMenuOpen,
+  setIsMarketsMenuOpen,
 } = dialogsSlice.actions;

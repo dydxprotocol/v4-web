@@ -38,12 +38,12 @@ export const NotificationStack = ({ notifications, className }: ElementProps & S
   const [shouldStackNotifications, setshouldStackNotifications] = useState(true);
 
   const { markUnseen, markSeen, onNotificationAction } = useNotifications();
-  const { isMobile } = useBreakpoints();
+  const { isTablet } = useBreakpoints();
   const hasMultipleToasts = notifications.length > 1;
 
   return (
     <StyledToastArea
-      swipeDirection={isMobile ? 'up' : 'right'}
+      swipeDirection={isTablet ? 'up' : 'right'}
       className={className}
       size={notifications.length}
     >

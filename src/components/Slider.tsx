@@ -48,35 +48,28 @@ const $Root = styled(Root)`
   --radix-slider-thumb-transform: translateX(-65%) !important;
   --slider-track-background: ;
   --slider-track-backgroundColor: var(--color-layer-4);
-
   position: relative;
-
   display: flex;
   align-items: center;
-
   user-select: none;
-
   height: 100%;
+  touch-action: none;
 `;
 
 const $Track = styled(Track)`
   position: relative;
-
   display: flex;
   flex-grow: 1;
   align-items: center;
-
   height: 0.5rem;
   margin-right: 0.25rem; // make thumb covers the end of the track
-
   cursor: pointer;
   background: var(--slider-track-background);
-
+  touch-action: none;
   &:before {
     content: '';
     width: 100%;
     height: 100%;
-
     background: linear-gradient(
         90deg,
         transparent,
@@ -128,16 +121,14 @@ const $Tick = styled.span<{ $midpoint?: number; $light: boolean; $text?: string 
 const $Thumb = styled(Thumb)`
   height: 1.375rem;
   width: 1.375rem;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   background-color: var(--color-layer-6);
   opacity: 0.8;
-
   border: 1.5px solid var(--color-layer-7);
   border-radius: 50%;
-
   cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
 `;

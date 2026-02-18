@@ -1,5 +1,4 @@
 import { PositionUniqueId, SubaccountOrder } from '@/bonsai/types/summaryTypes';
-import { Separator } from '@radix-ui/react-separator';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
@@ -7,6 +6,7 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { BREAKPOINT_REM } from '@/constants/page';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -131,6 +131,7 @@ export const PositionsTriggersCell = ({
     if (orders.length === 0) {
       return (
         <$Container $align={align} onClick={openTriggersDialog}>
+          <$TabletPlaceholder>--</$TabletPlaceholder>
           <$Output type={OutputType.Fiat} value={null} $withLiquidationWarning={false} />
         </$Container>
       );
@@ -219,26 +220,39 @@ export const PositionsTriggersCell = ({
   return (
     <$TableCell>
       {renderOutput({ align: 'right', orders: takeProfitOrders })}
-      <$VerticalSeparator />
+      <$Divider />
       {renderOutput({ align: 'left', orders: stopLossOrders })}
       {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && editButton}
     </$TableCell>
   );
 };
 
+const tabletQuery = `@media (max-width: ${BREAKPOINT_REM.tablet})`;
+const notTabletQuery = `@media (min-width: ${BREAKPOINT_REM.tablet})`;
+
 const $TableCell = styled(TableCell)`
   align-items: stretch;
-  gap: 0.75em;
-  justify-content: center;
 
-  --output-width: 70px;
+  ${tabletQuery} {
+    --output-width: 30px;
+    gap: 0.25em;
+  }
+
+  ${notTabletQuery} {
+    --output-width: 70px;
+    gap: 0.75em;
+    justify-content: center;
+  }
 `;
 
 const $Container = styled.div<{ $align: 'right' | 'left' }>`
-  display: inline-flex;
   align-items: center;
   gap: 0.25em;
-  width: var(--output-width);
+
+  ${notTabletQuery} {
+    width: var(--output-width);
+    display: inline-flex;
+  }
 
   ${({ $align }) =>
     $align &&
@@ -252,12 +266,25 @@ const $Container = styled.div<{ $align: 'right' | 'left' }>`
     }[$align]}
 `;
 
+// Shown only on tablet (replaces the Output component's null state)
+const $TabletPlaceholder = styled.span`
+  display: none;
+
+  ${tabletQuery} {
+    display: inline;
+  }
+`;
+
 const $Output = styled(Output)<{
   value: number | null;
   $withLiquidationWarning: boolean;
 }>`
   ${layoutMixins.textTruncate}
   font: var(--font-mini-medium);
+
+  ${tabletQuery} {
+    display: none;
+  }
 
   ${({ value, $withLiquidationWarning }) =>
     $withLiquidationWarning
@@ -293,6 +320,14 @@ const $Label = styled.div`
   ${layoutMixins.textTruncate}
 `;
 
-const $VerticalSeparator = styled(Separator)`
-  border-right: solid var(--border-width) var(--color-border);
+const $Divider = styled.div`
+  ${tabletQuery} {
+    &::before {
+      content: '/';
+    }
+  }
+
+  ${notTabletQuery} {
+    border-right: solid var(--border-width) var(--color-border);
+  }
 `;

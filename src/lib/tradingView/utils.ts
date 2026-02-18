@@ -225,6 +225,8 @@ export const getWidgetOptions = (
     'header_resolutions',
   ];
 
+  const disabledFeaturesForTablet: TradingTerminalFeatureset[] = ['header_widget'];
+
   const disabledFeatures: TradingTerminalFeatureset[] = [
     'header_symbol_search',
     'header_compare',
@@ -236,6 +238,7 @@ export const getWidgetOptions = (
     'trading_account_manager',
     ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
     ...(isSimpleUi ? disabledFeaturesForSimpleUi : []),
+    ...(isTablet ? disabledFeaturesForTablet : []),
   ];
 
   // Needed for iframe loading on some mobile browsers

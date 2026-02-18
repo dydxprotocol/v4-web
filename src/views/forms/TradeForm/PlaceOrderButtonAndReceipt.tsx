@@ -12,6 +12,7 @@ import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -74,6 +75,7 @@ export const PlaceOrderButtonAndReceipt = ({
   summary,
   tradingUnavailable,
 }: ElementProps) => {
+  const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
@@ -335,35 +337,41 @@ export const PlaceOrderButtonAndReceipt = ({
 
   return (
     <$Footer>
-      <div tw="row gap-0.5 justify-self-end px-0 py-0.5">
-        <$WithSeparators layout="row">
-          {[
-            hasInput && (
-              <Button
-                type={ButtonType.Reset}
-                action={ButtonAction.Reset}
+      {!isTablet && (
+        <div tw="row gap-0.5 justify-self-end px-0 py-0.5">
+          <$WithSeparators layout="row">
+            {[
+              hasInput && (
+                <Button
+                  type={ButtonType.Reset}
+                  action={ButtonAction.Reset}
+                  shape={ButtonShape.Pill}
+                  size={ButtonSize.XSmall}
+                  onClick={onClearInputs}
+                  key="clear"
+                >
+                  {stringGetter({ key: STRING_KEYS.CLEAR })}
+                </Button>
+              ),
+              <$HideButton
+                slotRight={<Icon iconName={IconName.Caret} size="0.66em" />}
                 shape={ButtonShape.Pill}
                 size={ButtonSize.XSmall}
-                onClick={onClearInputs}
-                key="clear"
+                onPressedChange={setIsReceiptOpen}
+                isPressed={isReceiptOpen}
+                key="hide"
               >
-                {stringGetter({ key: STRING_KEYS.CLEAR })}
-              </Button>
-            ),
-            <$HideButton
-              slotRight={<Icon iconName={IconName.Caret} size="0.66em" />}
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-              onPressedChange={setIsReceiptOpen}
-              isPressed={isReceiptOpen}
-              key="hide"
-            >
-              {stringGetter({ key: STRING_KEYS.RECEIPT })}
-            </$HideButton>,
-          ].filter(isTruthy)}
-        </$WithSeparators>
-      </div>
-      <WithDetailsReceipt detailItems={items} hideReceipt={!isReceiptOpen}>
+                {stringGetter({ key: STRING_KEYS.RECEIPT })}
+              </$HideButton>,
+            ].filter(isTruthy)}
+          </$WithSeparators>
+        </div>
+      )}
+      <WithDetailsReceipt
+        detailItems={items}
+        hideReceipt={!isReceiptOpen}
+        side={isTablet ? 'bottom' : 'top'}
+      >
         {!canAccountTrade ? (
           <OnboardingTriggerButton size={ButtonSize.Base} />
         ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
@@ -379,8 +387,8 @@ export const PlaceOrderButtonAndReceipt = ({
 const $Footer = styled.footer`
   ${formMixins.footer}
   padding-bottom: var(--dialog-content-paddingBottom);
-
   ${layoutMixins.column}
+  width: 100%;
 `;
 
 const $WithSeparators = styled(WithSeparators)`

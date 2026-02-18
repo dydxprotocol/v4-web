@@ -13,7 +13,6 @@ import {
 
 import { useNotifications } from '@/hooks/useNotifications';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { NotificationStack } from './NotifcationStack';
@@ -80,8 +79,4 @@ const StyledToastArea = styled.div`
   mask-image: linear-gradient(to left, transparent, white 0.5rem);
 
   pointer-events: none;
-
-  @media ${breakpoints.mobile} {
-    display: none; // hide notifications on mobile web view
-  }
 `;
