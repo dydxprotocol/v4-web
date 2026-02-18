@@ -14,7 +14,8 @@ import { useAccounts } from './useAccounts';
 const MAX_MESSAGES_IN_MEMORY = 1000;
 const TOAST_AUTO_CLOSE_MS = 5_000;
 
-const TROLLBOX_ERROR_MESSAGES: Record<ITrollboxErrorType, string> = {
+// TODO: Replace with localization
+const TROLLBOX_BACKEND_ERROR_TYPES: Record<ITrollboxErrorType, string> = {
   message_too_large: 'Your message is too long. Please keep it under 255 characters.',
   message_empty: 'Message cannot be empty.',
   missing_field: 'Message is missing required fields.',
@@ -34,7 +35,6 @@ export type ChatToast = {
 export const useTrollbox = () => {
   const { dydxAddress, hdKey } = useAccounts();
   const [messages, setMessages] = useState<TrollboxChatMessage[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [toasts, setToasts] = useState<ChatToast[]>([]);
 
   const pushToast = useCallback((message: string) => {
@@ -55,7 +55,6 @@ export const useTrollbox = () => {
       switch (update.type) {
         case 'history':
           setMessages(update.messages);
-          setIsLoaded(true);
           break;
         case 'message':
           setMessages((prev) => {
@@ -66,7 +65,9 @@ export const useTrollbox = () => {
           });
           break;
         case 'error':
-          pushToast(update.errorType ? TROLLBOX_ERROR_MESSAGES[update.errorType] : update.error);
+          pushToast(
+            update.errorType != null ? TROLLBOX_BACKEND_ERROR_TYPES[update.errorType] : update.error
+          );
           break;
         default:
           assertNever(update);
@@ -90,5 +91,5 @@ export const useTrollbox = () => {
     [dydxAddress, hdKey?.privateKey, pushToast]
   );
 
-  return { messages, handleSendMessage, isLoaded, toasts, pushToast, dismissToast };
+  return { messages, handleSendMessage, toasts, pushToast, dismissToast };
 };

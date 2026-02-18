@@ -4,6 +4,7 @@ import {
   type TrollboxUserMessage,
 } from '@/lib/trollboxUtils';
 
+import { assertNever } from '../assertNever';
 import { BaseSocketIOManager } from './BaseSocketIOManager';
 
 const TROLLBOX_URL = import.meta.env.VITE_TROLLBOX_URL;
@@ -48,7 +49,7 @@ class TrollboxSocketManager extends BaseSocketIOManager {
         case 'connected':
           break;
         default:
-          break;
+          assertNever(data);
       }
     });
   }
@@ -61,11 +62,7 @@ class TrollboxSocketManager extends BaseSocketIOManager {
 
   send(payload: TrollboxUserMessage): void {
     if (this.socket == null || !this.socket.connected) {
-      this.notifyHandlers(TROLLBOX_CHANNEL, {
-        type: 'error',
-        error: 'Not connected to trollbox server',
-      } satisfies TrollboxUpdate);
-      return;
+      throw new Error('WebSocket is not connected');
     }
 
     this.socket.emit('message', payload);

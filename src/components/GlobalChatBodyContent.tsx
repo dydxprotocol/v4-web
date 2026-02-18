@@ -31,7 +31,7 @@ const VOLUME_THRESHOLD = 1000;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { messages, handleSendMessage, isLoaded, toasts, dismissToast } = useTrollbox();
+  const { messages, handleSendMessage, toasts, dismissToast } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +51,7 @@ export const GlobalChatBodyContent = () => {
     itemCount: messages.length,
   });
 
-  if (!isLoaded) {
+  if (isEmpty(messages)) {
     return (
       <$LoadingContent>
         <LoadingSpinner size="32" />
@@ -65,14 +65,13 @@ export const GlobalChatBodyContent = () => {
         <$ToastContainer>
           {toasts.map((toast) => (
             <$Toast key={toast.id}>
-              <Icon iconName={IconName.Warning} tw="text-[1rem] text-color-warning" />
+              <$ToastIcon iconName={IconName.Warning} />
               <$ToastMessage>{toast.message}</$ToastMessage>
-              <IconButton
+              <$ToastDismissButton
                 iconName={IconName.Close}
                 shape={ButtonShape.Square}
                 size={ButtonSize.XSmall}
                 onClick={() => dismissToast(toast.id)}
-                tw="[--button-border:none] [--button-textColor:var(--color-text-0)]"
               />
             </$Toast>
           ))}
@@ -114,13 +113,10 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
   const isLoggedIn = onboardingState === OnboardingState.AccountConnected;
   const isStatsLoading = statsStatus === 'pending' && userStats.makerVolume30D == null;
 
-  const volume30D = useMemo(() => {
-    if (userStats.makerVolume30D == null || userStats.takerVolume30D == null) {
-      return 0;
-    }
-
-    return userStats.makerVolume30D + userStats.takerVolume30D;
-  }, [userStats.makerVolume30D, userStats.takerVolume30D]);
+  const volume30D = useMemo(
+    () => (userStats.makerVolume30D ?? 0) + (userStats.takerVolume30D ?? 0),
+    [userStats.makerVolume30D, userStats.takerVolume30D]
+  );
 
   const progressPercent = Math.min((volume30D / VOLUME_THRESHOLD) * 100, 100);
   const isChatLocked = !isStatsLoading && volume30D < VOLUME_THRESHOLD;
@@ -129,6 +125,7 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
   const handleSend = useCallback(() => {
     const trimmed = inputValue.trim();
     if (isEmpty(trimmed)) return;
+
     onSendMessage(inputValue);
     setInputValue('');
   }, [inputValue, onSendMessage]);
@@ -207,8 +204,6 @@ const $Content = styled.div`
 
 const $Messages = styled.div`
   ${layoutMixins.scrollArea}
-  flex: 1;
-  min-height: 0;
   padding: 0 1rem;
 `;
 
@@ -332,6 +327,16 @@ const $Toast = styled.div`
   align-items: center;
   box-shadow: 0 0 0.5rem 0.1rem var(--color-layer-2);
   animation: ${toastSlideIn} 0.3s var(--ease-out-expo);
+`;
+
+const $ToastIcon = styled(Icon)`
+  font-size: 1rem;
+  color: var(--color-warning);
+`;
+
+const $ToastDismissButton = styled(IconButton)`
+  --button-border: none;
+  --button-textColor: var(--color-text-0);
 `;
 
 const $ToastMessage = styled.span`
