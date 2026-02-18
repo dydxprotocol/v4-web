@@ -197,7 +197,7 @@ export const TWAPFillsTable = forwardRef(
           )}
           slotEmpty={
             <>
-              <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+              <Icon iconName={IconName.History} tw="text-[3em]" />
               <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
             </>
           }
