@@ -57,10 +57,6 @@ const TradePage = () => {
         <DetachedSection>
           <HorizontalPanel />
         </DetachedSection>
-
-        {/* <DetachedSection>
-          <MobileBottomPanel />
-        </DetachedSection> */}
       </$MobileContent>
 
       <div

@@ -486,7 +486,7 @@ const $Output = styled(Output)<{ sign?: NumberSign; smallText?: boolean; margin?
   ${({ margin }) => margin && `margin: ${margin};`}
 `;
 
-const $PositionInfo = styled.div`
+const $PositionInfo = styled.footer`
   margin: 0 auto;
   width: 100%;
 

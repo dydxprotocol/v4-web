@@ -49,7 +49,11 @@ const MarketFilterRow = ({
             align="end"
             tw="z-1"
             items={sortItems}
-            slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
+            slotTop={
+              <span tw="text-color-text-0 font-small-book">
+                {stringGetter({ key: STRING_KEYS.SORT_BY })}
+              </span>
+            }
           >
             <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
               <SortIcon />

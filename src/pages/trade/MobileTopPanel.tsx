@@ -62,7 +62,7 @@ export const MobileTopPanel = ({
     {
       content: <TvChart />,
       forceMount: true,
-      label: 'Chart', // stringGetter({ key: STRING_KEYS.CHART }),
+      label: 'Chart', // TODO: stringGetter({ key: STRING_KEYS.CHART }),
       value: Tab.Price,
     },
     !isViewingUnlaunchedMarket && {

@@ -35,6 +35,7 @@ const LARGE_TRADE_USD_VALUE = 10000;
 type StyleProps = {
   className?: string;
   histogramSide: 'left' | 'right';
+  isTablet?: boolean;
 };
 
 // Current fix for styled-component not preserving generic row
@@ -178,6 +179,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       withScrollSnapColumns
       withFocusStickyRows
       withInnerBorders={isTablet}
+      isTablet={isTablet}
     />
   );
 };
@@ -185,9 +187,13 @@ const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} a
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   background: var(--color-layer-2);
 
-  thead {
-    --stickyArea-totalInsetTop: 0;
-  }
+  ${({ isTablet }) =>
+    isTablet &&
+    css`
+      thead {
+        --stickyArea-totalInsetTop: 0;
+      }
+    `}
 
   tr {
     --histogram-bucket-size: 1;

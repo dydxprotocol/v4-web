@@ -263,6 +263,7 @@ const Content = () => {
 
         {showMobileWeb ? <FooterMobile /> : <FooterDesktop />}
 
+        {/* Extremely large z-index to ensure the notifications always show on user's screen */}
         <NotificationsToastArea tw="z-[2000] [grid-area:Main]" />
 
         <$DialogArea ref={dialogAreaRef}>

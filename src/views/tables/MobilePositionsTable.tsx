@@ -279,11 +279,11 @@ export const MobilePositionsTable = forwardRef(
                       </div>
                       <div tw="flex flex-[0.6] flex-col gap-0.125">
                         <Button
-                          tw="h-[34px] rounded-[8px] border-none bg-color-border-red px-1 text-mini text-red"
+                          tw="h-2 rounded-[8px] border-none bg-color-border-red px-1 text-mini text-red"
                           onClick={() => onCloseButtonToggle(position.market)}
                         >
-                          <Icon iconName={IconName.Close} size="12px" />
-                          Close
+                          <Icon iconName={IconName.Close} size="0.75rem" />
+                          {stringGetter({ key: STRING_KEYS.CLOSE })}
                         </Button>
                       </div>
                     </div>

@@ -56,6 +56,7 @@ const CloseTradeForm = ({ market }: Props) => {
   const tradeValues = useAppSelector(getClosePositionFormValues);
   const fullSummary = useAppSelector(getClosePositionFormSummary);
   const { summary } = fullSummary;
+  const { showLimitPrice } = summary.options;
   const effectiveSizes = summary.tradeInfo.inputSummary.size;
 
   const {
@@ -96,20 +97,10 @@ const CloseTradeForm = ({ market }: Props) => {
     isClosingPosition: true,
   });
 
-  const {
-    type: selectedTradeType,
-    side = OrderSide.BUY,
-    // isClosingPosition,
-  } = tradeValues;
-
-  const useLimit = selectedTradeType === TradeFormType.LIMIT;
+  const { type: selectedTradeType, side = OrderSide.BUY } = tradeValues;
 
   const onTradeTypeChange = useCallback(
     (tradeType: TradeFormType) => {
-      // if (isClosingPosition === true) {
-      //   return;
-      // }
-
       dispatch(closePositionFormActions.setOrderType(tradeType));
     },
     [dispatch, side]
@@ -186,7 +177,7 @@ const CloseTradeForm = ({ market }: Props) => {
           tw="w-full"
         />
 
-        {useLimit && (
+        {showLimitPrice && (
           <FormInput
             key="close-position-limit-price"
             id="close-position-limit-price"

@@ -111,7 +111,6 @@ const RegularTradeForm = () => {
     reduceOnly,
     marginMode = MarginMode.CROSS,
     side = OrderSide.BUY,
-    // isClosingPosition,
   } = tradeValues;
 
   const setMarginMode = (mode: MarginMode) => {
@@ -130,10 +129,6 @@ const RegularTradeForm = () => {
 
   const onTradeTypeChange = useCallback(
     (tradeType: TradeFormType) => {
-      // if (isClosingPosition === true) {
-      //   return;
-      // }
-
       dispatch(tradeFormActions.reset());
       dispatch(tradeFormActions.setSide(side));
       dispatch(tradeFormActions.setOrderType(tradeType));
@@ -207,7 +202,7 @@ const RegularTradeForm = () => {
             />
           </Button>
         </div>
-        <div tw="flex w-full gap-0.25 rounded-[0.5em] bg-[#181819] p-[4px]">
+        <div tw="flex w-full gap-0.25 rounded-[0.5em] bg-color-layer-2 p-0.25">
           <LongButton
             $isLong={side === OrderSide.BUY}
             onClick={() => setTradeSide(OrderSide.BUY)}
@@ -267,7 +262,7 @@ const RegularTradeForm = () => {
               </div>
             )}
           <AvailableRow>
-            <p tw="text-small text-color-text-0">Available</p>
+            <p tw="text-small text-color-text-0">{stringGetter({ key: STRING_KEYS.AVAILABLE })}</p>
             <p tw="text-small text-color-text-0">
               {availableBalance.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
@@ -282,7 +277,7 @@ const RegularTradeForm = () => {
           <TradeSizeInputs />
         </$InputsColumn>
         <ToggleRow>
-          <ToggleLabel>Triggers</ToggleLabel>
+          <ToggleLabel>{stringGetter({ key: STRING_KEYS.TRIGGERS })}</ToggleLabel>
           <Switch
             name="triggers"
             checked={triggerOrdersChecked}
@@ -380,7 +375,6 @@ const LongButton = styled(Button)<{ $isLong?: boolean }>`
     $isLong
       ? `--button-textColor: var(--color-green); --button-backgroundColor: var(--color-gradient-positive);`
       : '--button-textColor: var(--color-layer-7); --button-backgroundColor: transparent'}
-
   border-radius: 0.375rem;
 `;
 
@@ -389,46 +383,34 @@ const ShortButton = styled(Button)<{ $isShort?: boolean }>`
     $isShort
       ? `--button-textColor: var(--color-red); --button-backgroundColor: var(--color-gradient-negative);`
       : '--button-textColor: var(--color-layer-7); --button-backgroundColor: transparent'}
-
   border-radius: 0.375rem;
 `;
 
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
-
   width: 100%;
 `;
 
 const AvailableRow = styled.div`
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
-  padding: 8 px 4 px;
-
-  margin-bottom: 8 px;
-
+  padding: 0.5rem 0.25rem;
+  margin-bottom: 0.5rem;
   width: 100%;
 `;
 
 const ToggleRow = styled.div`
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
-  padding: 0px 0px;
-
+  padding: 0rem 0rem;
   width: 100%;
 `;
+
 const ToggleLabel = styled.span`
-  color: #9ca3af;
-
-  font-size: 16 px;
-
+  color: var(--color-text-0);
+  font-size: 1rem;
   font-weight: 400;
 `;
 
