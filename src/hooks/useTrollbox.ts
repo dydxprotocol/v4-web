@@ -7,11 +7,31 @@ import { type TrollboxChatMessage, type TrollboxUpdate, signTrollboxMessage } fr
 import { useAccounts } from './useAccounts';
 
 const MAX_MESSAGES_IN_MEMORY = 1000;
+const TOAST_AUTO_CLOSE_MS = 5_000;
+
+export type ChatToast = {
+  id: string;
+  message: string;
+};
 
 export const useTrollbox = () => {
   const { dydxAddress, hdKey } = useAccounts();
   const [messages, setMessages] = useState<TrollboxChatMessage[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [toasts, setToasts] = useState<ChatToast[]>([]);
+
+  const pushToast = useCallback((message: string) => {
+    const id = `chat-toast-${Date.now()}`;
+    setToasts((prev) => [...prev, { id, message }]);
+
+    globalThis.setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, TOAST_AUTO_CLOSE_MS);
+  }, []);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   useEffect(() => {
     const unsubscribe = subscribeToTrollbox((update: TrollboxUpdate) => {
@@ -29,8 +49,7 @@ export const useTrollbox = () => {
           });
           break;
         case 'error':
-          // eslint-disable-next-line no-console
-          console.error('Dydx chat error:', update.error);
+          pushToast(update.error);
           break;
         default:
           assertNever(update);
@@ -38,7 +57,7 @@ export const useTrollbox = () => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [pushToast]);
 
   const handleSendMessage = useCallback(
     async (text: string) => {
@@ -48,12 +67,11 @@ export const useTrollbox = () => {
         const payload = await signTrollboxMessage(text, dydxAddress, hdKey.privateKey);
         sendTrollboxMessage(payload);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to sign/send trollbox message:', error);
+        pushToast(`Failed to send message: ${error}`);
       }
     },
-    [dydxAddress, hdKey?.privateKey]
+    [dydxAddress, hdKey?.privateKey, pushToast]
   );
 
-  return { messages, handleSendMessage, isLoaded };
+  return { messages, handleSendMessage, isLoaded, toasts, pushToast, dismissToast };
 };

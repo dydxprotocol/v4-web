@@ -3,10 +3,10 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isEmpty } from 'lodash';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
-import { ButtonAction, ButtonShape } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 
 import { useAutoScrollToBottom } from '@/hooks/useAutoScrollToBottom';
 import { useTrollbox } from '@/hooks/useTrollbox';
@@ -21,7 +21,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getColorForString } from '@/lib/colorUtils';
 import { truncateAddress } from '@/lib/wallet';
 
-import { IconName } from './Icon';
+import { Icon, IconName } from './Icon';
 import { IconButton } from './IconButton';
 import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
@@ -30,7 +30,7 @@ const VOLUME_THRESHOLD = 100;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { messages, handleSendMessage, isLoaded } = useTrollbox();
+  const { messages, handleSendMessage, isLoaded, toasts, dismissToast } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -60,28 +60,47 @@ export const GlobalChatBodyContent = () => {
 
   return (
     <$Content>
-      <$Messages ref={scrollRef} onScroll={onScroll}>
-        <$VirtualList $height={rowVirtualizer.getTotalSize()}>
-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const msg = messages[virtualRow.index]!;
-            return (
-              <$VirtualMessage
-                key={msg.id}
-                data-index={virtualRow.index}
-                ref={rowVirtualizer.measureElement}
-                $translateY={virtualRow.start}
-              >
-                <span>
-                  <$Username $color={getColorForString(msg.from)}>
-                    {truncateAddress(msg.from)}:
-                  </$Username>
-                  {msg.message}
-                </span>
-              </$VirtualMessage>
-            );
-          })}
-        </$VirtualList>
-      </$Messages>
+      <$MessagesContainer>
+        <$Messages ref={scrollRef} onScroll={onScroll}>
+          <$VirtualList $height={rowVirtualizer.getTotalSize()}>
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const msg = messages[virtualRow.index]!;
+              return (
+                <$VirtualMessage
+                  key={msg.id}
+                  data-index={virtualRow.index}
+                  ref={rowVirtualizer.measureElement}
+                  $translateY={virtualRow.start}
+                >
+                  <span>
+                    <$Username $color={getColorForString(msg.from)}>
+                      {truncateAddress(msg.from)}:
+                    </$Username>
+                    {msg.message}
+                  </span>
+                </$VirtualMessage>
+              );
+            })}
+          </$VirtualList>
+        </$Messages>
+        {toasts.length > 0 && (
+          <$ToastContainer>
+            {toasts.map((toast) => (
+              <$Toast key={toast.id}>
+                <Icon iconName={IconName.Warning} tw="text-[1rem] text-color-warning" />
+                <$ToastMessage>{toast.message}</$ToastMessage>
+                <IconButton
+                  iconName={IconName.Close}
+                  shape={ButtonShape.Square}
+                  size={ButtonSize.XSmall}
+                  onClick={() => dismissToast(toast.id)}
+                  tw="[--button-border:none] [--button-textColor:var(--color-text-0)]"
+                />
+              </$Toast>
+            ))}
+          </$ToastContainer>
+        )}
+      </$MessagesContainer>
       <ChatFooter onSendMessage={handleSendMessage} />
     </$Content>
   );
@@ -186,8 +205,15 @@ const $Content = styled.div`
   height: 100%;
 `;
 
+const $MessagesContainer = styled.div`
+  position: relative;
+  flex: 1;
+  min-height: 0;
+`;
+
 const $Messages = styled.div`
   ${layoutMixins.scrollArea}
+  height: 100%;
   padding: 0 1rem;
 `;
 
@@ -282,4 +308,41 @@ const $ChatInput = styled.input`
   &::placeholder {
     color: var(--color-text-0);
   }
+`;
+
+const toastSlideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+`;
+
+const $ToastContainer = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.5rem;
+  position: absolute;
+  top: 0;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  padding-top: 0.5rem;
+`;
+
+const $Toast = styled.div`
+  ${layoutMixins.row}
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-layer-3);
+  backdrop-filter: saturate(120%) blur(6px);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 0.5rem 0.1rem var(--color-layer-2);
+  animation: ${toastSlideIn} 0.3s var(--ease-out-expo);
+`;
+
+const $ToastMessage = styled.span`
+  flex: 1;
+  font: var(--font-small-book);
+  color: var(--color-text-1);
 `;
