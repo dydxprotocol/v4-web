@@ -8,8 +8,8 @@ import styled from 'styled-components';
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape } from '@/constants/buttons';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useAutoScrollToBottom } from '@/hooks/useAutoScrollToBottom';
+import { useTrollbox } from '@/hooks/useTrollbox';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -26,26 +26,11 @@ import { IconButton } from './IconButton';
 import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
 
-const VOLUME_THRESHOLD = 100_000;
+const VOLUME_THRESHOLD = 100;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { dydxAddress } = useAccounts();
-  const [messages, setMessages] = useState(DUMMY_MESSAGES);
-
-  const handleSendMessage = useCallback(
-    (message: string) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: String(Date.now()),
-          username: dydxAddress ?? '',
-          message,
-        },
-      ]);
-    },
-    [dydxAddress]
-  );
+  const { messages, sendMessage, isLoaded } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -65,6 +50,14 @@ export const GlobalChatBodyContent = () => {
     itemCount: messages.length,
   });
 
+  if (!isLoaded) {
+    return (
+      <$LoadingContent>
+        <LoadingSpinner size="32" />
+      </$LoadingContent>
+    );
+  }
+
   return (
     <$Content>
       <$Messages ref={scrollRef} onScroll={onScroll}>
@@ -79,8 +72,8 @@ export const GlobalChatBodyContent = () => {
                 $translateY={virtualRow.start}
               >
                 <span>
-                  <$Username $color={getColorForString(msg.username)}>
-                    {truncateAddress(msg.username)}:
+                  <$Username $color={getColorForString(msg.from)}>
+                    {truncateAddress(msg.from)}:
                   </$Username>
                   {msg.message}
                 </span>
@@ -89,7 +82,7 @@ export const GlobalChatBodyContent = () => {
           })}
         </$VirtualList>
       </$Messages>
-      <ChatFooter onSendMessage={handleSendMessage} />
+      <ChatFooter onSendMessage={sendMessage} />
     </$Content>
   );
 };
@@ -180,6 +173,13 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
     </$Footer>
   );
 };
+
+const $LoadingContent = styled.div`
+  ${layoutMixins.flexColumn}
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
 
 const $Content = styled.div`
   ${layoutMixins.flexColumn}
@@ -283,121 +283,3 @@ const $ChatInput = styled.input`
     color: var(--color-text-0);
   }
 `;
-
-const DUMMY_MESSAGES = [
-  { id: '1', username: 'dydx1a4r7f6stq2dce9hkv5pz3gy8kdu0t7gvq4n2m', message: 'ape this shit now' },
-  { id: '2', username: 'dydx1k9w2hf4jp6rdnc5tq8vxm3ey7zu0s6la8b3fp', message: 'to the moon!!!!!' },
-  {
-    id: '3',
-    username: 'dydx1v7c3xe2qn9fwh4pkl6ty8mrd0j5az3su2g9kb',
-    message: 'long at 64k with a tp at 71k, sl at 61k. lock in frens',
-  },
-  {
-    id: '4',
-    username: 'dydx1p2n8rj5wm4qxk6lfv0ty3hd9cz7ea8ug6s4bw',
-    message: 'aping this shit now',
-  },
-  { id: '5', username: 'dydx1h6t9yq3xr8fwn2kvd5mcj7pa4ez0lg6su1b8c', message: 'yolofam' },
-  { id: '6', username: 'dydx1a4r7f6stq2dce9hkv5pz3gy8kdu0t7gvq4n2m', message: 'ape this shit now' },
-  {
-    id: '7',
-    username: 'dydx1v7c3xe2qn9fwh4pkl6ty8mrd0j5az3su2g9kb',
-    message: 'long at 64k with a tp at 71k, sl at 61k. lock in frens',
-  },
-  {
-    id: '8',
-    username: 'dydx1m3w6rj8qy5fpn2xkv4tld9hc7ea0zs6gu1b3f',
-    message: 'just longed ETH lets gooo',
-  },
-  {
-    id: '9',
-    username: 'dydx1f8n2tc5xr7qwk3pvd6mhj4ya9ez0lg1su8b4c',
-    message: 'who else is shorting this pump?',
-  },
-  {
-    id: '10',
-    username: 'dydx1d5k8rn2wq3fxm7pyv6tlj4hc9ea0zs1gu3b6f',
-    message: 'BTC 100k end of month no cap',
-  },
-  {
-    id: '11',
-    username: 'dydx1j7m4tc9xr2qwn5fkd8vhp3ya6ez0lg1su4b7c',
-    message: 'closed my short at 62k, taking profits while i can',
-  },
-  {
-    id: '12',
-    username: 'dydx1q9p6rk3wy5fxn8tvd2mlj7hc4ea0zs1gu6b3f',
-    message: 'degen hours rn fr fr',
-  },
-  {
-    id: '13',
-    username: 'dydx1t2v8nc5xr3qwk7fmd6yhp4ja9ez0lg1su7b2c',
-    message: 'this dip is free money',
-  },
-  {
-    id: '14',
-    username: 'dydx1w4x6rp8qy9ftn2mkd3vlj5hc7ea0zs1gu2b8f',
-    message: 'opened a 10x long on SOL, wish me luck boys',
-  },
-  {
-    id: '15',
-    username: 'dydx1z6b3nc7xr5qwm9fkd8thp2ya4ez0lg1su9b5c',
-    message: 'bears in shambles lmaooo',
-  },
-  { id: '16', username: 'dydx1c8d2rj4wy7fxp6tvn3mlk9hc5ea0zs1gu4b6f', message: 'gm degens' },
-  {
-    id: '17',
-    username: 'dydx1e3f9nc6xr8qwt2fkd5vhp7ya1ez0lg4su2b3c',
-    message: 'funding rate is crazy rn be careful',
-  },
-  {
-    id: '18',
-    username: 'dydx1g5h4rk8qy2fxn7tmd9wlj3hc6ea0zs1gu7b9f',
-    message: 'shorted the top at 69k, tp at 63k. ez money',
-  },
-  {
-    id: '19',
-    username: 'dydx1l7n6tc3xr4qwp5fkd2yhm8ja9ez0lg1su5b4c',
-    message: 'diamond hands only no paper hands allowed',
-  },
-  {
-    id: '20',
-    username: 'dydx1n9q8rj5wy6fxt3tvd7mlp4hc2ea0zs1gu3b7f',
-    message: 'who got liquidated on that wick lol',
-  },
-  {
-    id: '21',
-    username: 'dydx1r2s4nc8xr7qwy9fkd6vht5ja3ez0lg1su8b6c',
-    message: 'accumulating more on every dip',
-  },
-  {
-    id: '22',
-    username: 'dydx1u4w6rp3qy8fxn5tmd2klj9hc7ea0zs1gu5b2f',
-    message: 'entry at 64.5k with 5x leverage, sl at 62k. not financial advice',
-  },
-  {
-    id: '23',
-    username: 'dydx1x6y3nc5xr9qwt7fkd4vhm2pa8ez0lg1su6b9c',
-    message: 'alts about to send it watch',
-  },
-  {
-    id: '24',
-    username: 'dydx1b8a2rj7wy4fxp6tvn9mlk3hc5ea0zs1gu9b4f',
-    message: 'just woke up what did i miss',
-  },
-  {
-    id: '25',
-    username: 'dydx1k9w2hf4jp6rdnc5tq8vxm3ey7zu0s6la8b3fp',
-    message: 'told yall to buy the dip yesterday',
-  },
-  {
-    id: '26',
-    username: 'dydx1e3f8nc2xr6qwt4fkd7vhp9ya5ez0lg1su3b8c',
-    message: 'this chat is bullish af',
-  },
-  {
-    id: '27',
-    username: 'dydx1g7h5rk9qy3fxn8tmd4wlj6hc2ea0zs1gu6b5f',
-    message: 'ngmi if you are not longing here',
-  },
-];
