@@ -2,7 +2,7 @@ import {
   type ITrollboxServerData,
   type TrollboxUpdate,
   type TrollboxUserMessage,
-} from '@/lib/trollbox';
+} from '@/lib/trollboxUtils';
 
 import { BaseSocketIOManager } from './BaseSocketIOManager';
 
@@ -61,6 +61,10 @@ class TrollboxSocketManager extends BaseSocketIOManager {
 
   send(payload: TrollboxUserMessage): void {
     if (this.socket == null || !this.socket.connected) {
+      this.notifyHandlers(TROLLBOX_CHANNEL, {
+        type: 'error',
+        error: 'Not connected to trollbox server',
+      } satisfies TrollboxUpdate);
       return;
     }
 
@@ -78,11 +82,4 @@ export const subscribeToTrollbox = (onUpdate: (data: TrollboxUpdate) => void): (
 
 export const sendTrollboxMessage = (payload: TrollboxUserMessage): void => {
   trollboxManager?.send(payload);
-};
-
-export const disconnectTrollbox = (): void => {
-  if (trollboxManager == null) return;
-
-  trollboxManager.disconnect();
-  trollboxManager = null;
 };

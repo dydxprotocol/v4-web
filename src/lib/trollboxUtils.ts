@@ -40,18 +40,11 @@ export type ITrollboxServerData =
   | ITrollboxServerDataMessage
   | ITrollboxServerDataError;
 
+// Parsed clientside data formats
 export interface TrollboxChatMessage {
   id: string;
   from: string;
   message: string;
-  timestamp: number;
-}
-
-export interface TrollboxUserMessage {
-  message: string;
-  signature: string;
-  address: string;
-  timestamp: number;
 }
 
 export interface TrollboxUpdateHistory {
@@ -71,17 +64,24 @@ export interface TrollboxUpdateError {
 
 export type TrollboxUpdate = TrollboxUpdateHistory | TrollboxUpdateMessage | TrollboxUpdateError;
 
-// -- Signing --
+// Signing
+export interface TrollboxUserMessage {
+  message: string;
+  signature: string;
+  address: string;
+  timestamp: number;
+}
 
 export async function signTrollboxMessage(
   message: string,
   address: string,
   privateKey: Uint8Array
 ): Promise<TrollboxUserMessage> {
-  const timestamp = Math.floor(Date.now() / 1000);
+  const timestamp = Math.floor(Date.now() / 1000); // Server expects timestamp in seconds
   const payload = JSON.stringify({ message, address, timestamp });
   const digest = sha256(new TextEncoder().encode(payload));
   const sig = await Secp256k1.createSignature(digest, privateKey);
   const signature = toHex(sig.toFixedLength());
+
   return { message, signature, address, timestamp };
 }

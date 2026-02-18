@@ -2,7 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { assertNever } from '@/lib/assertNever';
 import { sendTrollboxMessage, subscribeToTrollbox } from '@/lib/streaming/trollboxStreaming';
-import { type TrollboxChatMessage, type TrollboxUpdate, signTrollboxMessage } from '@/lib/trollbox';
+import {
+  type TrollboxChatMessage,
+  type TrollboxUpdate,
+  signTrollboxMessage,
+} from '@/lib/trollboxUtils';
 
 import { useAccounts } from './useAccounts';
 

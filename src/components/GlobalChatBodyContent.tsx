@@ -12,6 +12,7 @@ import { useAutoScrollToBottom } from '@/hooks/useAutoScrollToBottom';
 import { useTrollbox } from '@/hooks/useTrollbox';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -26,7 +27,7 @@ import { IconButton } from './IconButton';
 import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
 
-const VOLUME_THRESHOLD = 100;
+const VOLUME_THRESHOLD = 1000;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
@@ -60,47 +61,45 @@ export const GlobalChatBodyContent = () => {
 
   return (
     <$Content>
-      <$MessagesContainer>
-        <$Messages ref={scrollRef} onScroll={onScroll}>
-          <$VirtualList $height={rowVirtualizer.getTotalSize()}>
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const msg = messages[virtualRow.index]!;
-              return (
-                <$VirtualMessage
-                  key={msg.id}
-                  data-index={virtualRow.index}
-                  ref={rowVirtualizer.measureElement}
-                  $translateY={virtualRow.start}
-                >
-                  <span>
-                    <$Username $color={getColorForString(msg.from)}>
-                      {truncateAddress(msg.from)}:
-                    </$Username>
-                    {msg.message}
-                  </span>
-                </$VirtualMessage>
-              );
-            })}
-          </$VirtualList>
-        </$Messages>
-        {toasts.length > 0 && (
-          <$ToastContainer>
-            {toasts.map((toast) => (
-              <$Toast key={toast.id}>
-                <Icon iconName={IconName.Warning} tw="text-[1rem] text-color-warning" />
-                <$ToastMessage>{toast.message}</$ToastMessage>
-                <IconButton
-                  iconName={IconName.Close}
-                  shape={ButtonShape.Square}
-                  size={ButtonSize.XSmall}
-                  onClick={() => dismissToast(toast.id)}
-                  tw="[--button-border:none] [--button-textColor:var(--color-text-0)]"
-                />
-              </$Toast>
-            ))}
-          </$ToastContainer>
-        )}
-      </$MessagesContainer>
+      {toasts.length > 0 && (
+        <$ToastContainer>
+          {toasts.map((toast) => (
+            <$Toast key={toast.id}>
+              <Icon iconName={IconName.Warning} tw="text-[1rem] text-color-warning" />
+              <$ToastMessage>{toast.message}</$ToastMessage>
+              <IconButton
+                iconName={IconName.Close}
+                shape={ButtonShape.Square}
+                size={ButtonSize.XSmall}
+                onClick={() => dismissToast(toast.id)}
+                tw="[--button-border:none] [--button-textColor:var(--color-text-0)]"
+              />
+            </$Toast>
+          ))}
+        </$ToastContainer>
+      )}
+      <$Messages ref={scrollRef} onScroll={onScroll}>
+        <$VirtualList $height={rowVirtualizer.getTotalSize()}>
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const msg = messages[virtualRow.index]!;
+            return (
+              <$VirtualMessage
+                key={msg.id}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                $translateY={virtualRow.start}
+              >
+                <span>
+                  <$Username $color={getColorForString(msg.from)}>
+                    {truncateAddress(msg.from)}:
+                  </$Username>
+                  {msg.message}
+                </span>
+              </$VirtualMessage>
+            );
+          })}
+        </$VirtualList>
+      </$Messages>
       <ChatFooter onSendMessage={handleSendMessage} />
     </$Content>
   );
@@ -202,18 +201,14 @@ const $LoadingContent = styled.div`
 
 const $Content = styled.div`
   ${layoutMixins.flexColumn}
-  height: 100%;
-`;
-
-const $MessagesContainer = styled.div`
   position: relative;
-  flex: 1;
-  min-height: 0;
+  height: 100%;
 `;
 
 const $Messages = styled.div`
   ${layoutMixins.scrollArea}
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   padding: 0 1rem;
 `;
 
@@ -329,20 +324,17 @@ const $ToastContainer = styled.div`
 `;
 
 const $Toast = styled.div`
+  ${popoverMixins.popover}
   ${layoutMixins.row}
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
   gap: 0.5rem;
   align-items: center;
-  padding: 0.625rem 0.75rem;
-  border-radius: 0.5rem;
-  background-color: var(--color-layer-3);
-  backdrop-filter: saturate(120%) blur(6px);
-  border: 1px solid var(--color-border);
   box-shadow: 0 0 0.5rem 0.1rem var(--color-layer-2);
   animation: ${toastSlideIn} 0.3s var(--ease-out-expo);
 `;
 
 const $ToastMessage = styled.span`
   flex: 1;
-  font: var(--font-small-book);
   color: var(--color-text-1);
 `;
