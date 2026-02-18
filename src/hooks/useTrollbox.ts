@@ -79,7 +79,10 @@ export const useTrollbox = () => {
 
   const handleSendMessage = useCallback(
     async (text: string) => {
-      if (dydxAddress == null || hdKey?.privateKey == null) return;
+      if (dydxAddress == null || hdKey?.privateKey == null) {
+        pushToast('Wallet not connected');
+        return;
+      }
 
       try {
         const payload = await signTrollboxMessage(text, dydxAddress, hdKey.privateKey);
