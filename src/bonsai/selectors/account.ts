@@ -30,7 +30,7 @@ import { calculateTransfers } from '../calculators/transfers';
 import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import { SubaccountTransfer } from '../types/summaryTypes';
+import { isTWAPOrder, SubaccountFillType, SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawAccountStakingTierData,
@@ -164,6 +164,18 @@ export const selectOrderHistory = createAppSelector([selectAccountOrders], (orde
   return calculateOrderHistory(orders);
 });
 
+export const selectTWAPOrders = createAppSelector([selectAccountOrders], (orders) => {
+  return orders.filter(isTWAPOrder);
+});
+
+export const selectActiveTWAPOrders = createAppSelector([selectTWAPOrders], (twapOrders) => {
+  return calculateOpenOrders(twapOrders);
+});
+
+export const selectTWAPOrderHistory = createAppSelector([selectTWAPOrders], (twapOrders) => {
+  return calculateOrderHistory(twapOrders);
+});
+
 export const selectCurrentMarketOpenOrders = createAppSelector(
   [getCurrentMarketIdIfTradeable, selectOpenOrders],
   (currentMarketId, orders) =>
@@ -218,6 +230,10 @@ export const selectAccountFills = createAppSelector(
     return calculateFills(rest?.fills, live);
   }
 );
+
+export const selectTWAPFills = createAppSelector([selectAccountFills], (fills) => {
+  return fills.filter((f) => f.type === SubaccountFillType.TWAP);
+});
 
 export const selectAccountBlockTradingRewards = createAppSelector(
   [selectRawBlockTradingRewardsRestData, selectRawBlockTradingRewardsLiveData],

@@ -57,6 +57,10 @@ export interface IndexerCompositeOrderObject {
   subaccountNumber: number;
   removalReason?: string;
   totalOptimisticFilled?: string;
+  // TWAP order parameters
+  duration?: string | null;
+  interval?: string | null;
+  priceTolerance?: string | null;
 }
 
 export interface IndexerCompositeMarketObject {
