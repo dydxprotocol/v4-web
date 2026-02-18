@@ -48,6 +48,7 @@ import {
   selectRawOrdersRestData,
   selectRawParentSubaccount,
   selectRawParentSubaccountData,
+  selectRawSelectedMarketLeverages,
   selectRawSelectedMarketLeveragesData,
   selectRawTransfersLiveData,
   selectRawTransfersRest,
@@ -102,6 +103,11 @@ export const selectParentSubaccountSummary = createAppSelector(
   }
 );
 
+export const selectParentSubaccountSummaryLoading = createAppSelector(
+  [selectRawParentSubaccount, selectRawMarkets, selectRawSelectedMarketLeverages],
+  mergeLoadableStatus
+);
+
 export const selectParentSubaccountPositions = createAppSelector(
   [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
   (parentSubaccount, markets, selectedMarketLeverages) => {
@@ -127,11 +133,6 @@ export const selectParentSubaccountAndMarkets = createAppSelector(
         isEqual(prev.markets, next.markets),
     },
   }
-);
-
-export const selectParentSubaccountSummaryLoading = createAppSelector(
-  [selectRawParentSubaccount, selectRawMarkets],
-  mergeLoadableStatus
 );
 
 export const selectParentSubaccountOpenPositions = createAppSelector(

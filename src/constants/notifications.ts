@@ -24,6 +24,7 @@ export enum NotificationType {
   CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
   DepositAddressEvents = 'DepositAddressEvents', // lifecycle events for deposit notifications
   Swap = 'Swap',
+  SpotTrade = 'SpotTrade',
 }
 
 export enum NotificationCategoryPreferences {
@@ -59,6 +60,7 @@ export const NotificationTypeCategory: {
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
   [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
   [NotificationType.DepositAddressEvents]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.SpotTrade]: NotificationCategoryPreferences.Trading,
 };
 
 export const SingleSessionNotificationTypes = [

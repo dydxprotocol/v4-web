@@ -3,7 +3,7 @@
     {
       "source": "/entry-points/index.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     },
     {
@@ -27,7 +27,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!.*\\.[^/]+$).*)",
+      "source": "/((?!assets/|tradingview/|currencies/|favicon.ico|robots.txt|sitemap.xml).*)",
       "destination": "/entry-points/index.html"
     }
   ]
