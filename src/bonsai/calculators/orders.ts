@@ -19,13 +19,13 @@ import { OrdersData } from '../types/rawTypes';
 import { OrderStatus, SubaccountOrder } from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
 
-export function calculateOpenOrders(orders: SubaccountOrder[]) {
+export function calculateOpenOrders<T extends SubaccountOrder>(orders: T[]): T[] {
   return orders.filter(
     (order) => order.status == null || getSimpleOrderStatus(order.status) === OrderStatus.Open
   );
 }
 
-export function calculateOrderHistory(orders: SubaccountOrder[]) {
+export function calculateOrderHistory<T extends SubaccountOrder>(orders: T[]): T[] {
   return orders.filter(
     (order) => order.status != null && getSimpleOrderStatus(order.status) !== OrderStatus.Open
   );
