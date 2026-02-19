@@ -2,7 +2,7 @@ import {
   type ITrollboxServerData,
   type TrollboxUpdate,
   type TrollboxUserMessage,
-} from '@/lib/trollboxUtils';
+} from '@/types/trollbox';
 
 import { assertNever } from '../assertNever';
 import { BaseSocketIOManager } from './BaseSocketIOManager';

@@ -13,6 +13,7 @@ export const useTrollboxOnlineCount = () => {
       const json = await response.json();
       return json.count;
     },
+    enabled: !!TROLLBOX_URL,
     refetchInterval: POLLING_INTERVAL,
   });
 

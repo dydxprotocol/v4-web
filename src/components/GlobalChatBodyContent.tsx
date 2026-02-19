@@ -32,7 +32,7 @@ const VOLUME_THRESHOLD = 1000;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { messages, handleSendMessage, toasts, pushToast, dismissToast } = useTrollbox();
+  const { messages, isLoading, handleSendMessage, toasts, pushToast, dismissToast } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +52,7 @@ export const GlobalChatBodyContent = () => {
     itemCount: messages.length,
   });
 
-  if (isEmpty(messages)) {
+  if (isLoading) {
     return (
       <$LoadingContent>
         <LoadingSpinner size="32" />
@@ -135,14 +135,14 @@ const ChatFooter = ({
     const trimmed = inputValue.trim();
     if (isEmpty(trimmed)) return;
 
-    if (inputValue.length > MESSAGE_CHARACTER_LIMIT) {
+    if (isOverLimit) {
       pushToast(`Message is too long. Please keep it under ${MESSAGE_CHARACTER_LIMIT} characters.`);
       return;
     }
 
     onSendMessage(inputValue);
     setInputValue('');
-  }, [inputValue, onSendMessage, pushToast]);
+  }, [inputValue, isOverLimit, onSendMessage, pushToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -229,9 +229,11 @@ const $VirtualList = styled.div<{ $height: number }>`
 const $VirtualMessage = styled.div<{ $translateY: number }>`
   ${layoutMixins.row}
   position: absolute;
+  width: 100%;
   align-items: flex-start;
   font: var(--font-small-book);
   color: var(--color-text-1);
+  word-break: break-word;
   transform: translateY(${({ $translateY }) => $translateY}px);
 `;
 
@@ -243,9 +245,20 @@ const $Username = styled.span<{ $color: string }>`
 
 const $Footer = styled.div`
   ${layoutMixins.flexColumn}
+  position: relative;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-top: 1px solid var(--color-border);
+  padding: 0.15rem 1rem 0.75rem 1rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 1rem;
+    background: linear-gradient(to top, var(--color-layer-1), transparent);
+    pointer-events: none;
+  }
 `;
 
 const $VolumeCard = styled.div`

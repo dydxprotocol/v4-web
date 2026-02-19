@@ -58,7 +58,7 @@ const $ChatArea = styled.div`
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
   width: 100%;
-  background-color: var(--color-layer-3);
+  background-color: var(--color-layer-1);
   border-radius: 0.5rem 0.5rem 0 0;
   border: 1px solid var(--color-border);
   overflow: hidden;
@@ -67,7 +67,7 @@ const $Container = styled.div`
 const $Header = styled.header`
   ${layoutMixins.spacedRow}
   padding: 0.625rem 1rem;
-  background-color: var(--color-layer-2);
+  background-color: var(--color-layer-3);
   font: var(--font-small-book);
   color: var(--color-text-2);
   cursor: pointer;

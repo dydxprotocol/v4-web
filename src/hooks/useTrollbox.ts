@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { assertNever } from '@/lib/assertNever';
-import { sendTrollboxMessage, subscribeToTrollbox } from '@/lib/streaming/trollboxStreaming';
 import {
   ITrollboxErrorType,
   type TrollboxChatMessage,
   type TrollboxUpdate,
-  signTrollboxMessage,
-} from '@/lib/trollboxUtils';
+} from '@/types/trollbox';
+
+import { assertNever } from '@/lib/assertNever';
+import { sendTrollboxMessage, subscribeToTrollbox } from '@/lib/streaming/trollboxStreaming';
+import { signTrollboxMessage } from '@/lib/trollboxUtils';
 
 import { useAccounts } from './useAccounts';
 
@@ -35,6 +36,7 @@ export type ChatToast = {
 export const useTrollbox = () => {
   const { dydxAddress, hdKey } = useAccounts();
   const [messages, setMessages] = useState<TrollboxChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [toasts, setToasts] = useState<ChatToast[]>([]);
 
   const pushToast = useCallback((message: string) => {
@@ -55,6 +57,7 @@ export const useTrollbox = () => {
       switch (update.type) {
         case 'history':
           setMessages(update.messages);
+          setIsLoading(false);
           break;
         case 'message':
           setMessages((prev) => {
@@ -94,5 +97,5 @@ export const useTrollbox = () => {
     [dydxAddress, hdKey?.privateKey, pushToast]
   );
 
-  return { messages, handleSendMessage, toasts, pushToast, dismissToast };
+  return { messages, isLoading, handleSendMessage, toasts, pushToast, dismissToast };
 };
