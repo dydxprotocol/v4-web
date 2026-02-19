@@ -153,6 +153,8 @@ export enum OrderFlags {
   SHORT_TERM = '0',
   LONG_TERM = '64',
   CONDITIONAL = '32',
+  TWAP = '128',
+  TWAP_SUBORDER = '256',
 }
 
 export type SubaccountOrder = {
@@ -185,6 +187,18 @@ export type SubaccountOrder = {
   removalReason: string | undefined;
   marginMode: MarginMode | undefined;
 };
+
+export type TWAPSubaccountOrder = SubaccountOrder & {
+  type: IndexerOrderType.TWAP;
+  orderFlags: typeof OrderFlags.TWAP;
+  duration: string | undefined;
+  interval: string | undefined;
+  priceTolerance: string | undefined;
+};
+
+export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
+  return order.orderFlags === OrderFlags.TWAP && order.type === IndexerOrderType.TWAP;
+}
 
 export enum SubaccountFillType {
   LIMIT = 'LIMIT',
