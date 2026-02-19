@@ -74,6 +74,7 @@ export enum TradeFormType {
   LIMIT = 'LIMIT',
   TRIGGER_MARKET = 'TRIGGER_MARKET',
   TRIGGER_LIMIT = 'TRIGGER_LIMIT',
+  TWAP = 'TWAP',
 }
 
 type OrderMatcher<T> = {
@@ -117,6 +118,11 @@ export type TradeForm = {
   // Time-related fields
   goodTil: GoodUntilTime | undefined;
 
+  // Duration fields
+  durationHours: string | undefined;
+  durationMinutes: string | undefined;
+  frequencySeconds: string | undefined;
+
   // additional triggers
   stopLossOrder: TriggerOrderState | undefined;
   takeProfitOrder: TriggerOrderState | undefined;
@@ -159,6 +165,8 @@ export type TradeFormOptions = {
   needsTriggerPrice: boolean;
   needsExecution: boolean;
   needsGoodTil: boolean;
+  needsDuration: boolean;
+  needsFrequency: boolean;
 
   // these mean show + allow editing this field
   showSize: boolean;
@@ -170,6 +178,8 @@ export type TradeFormOptions = {
   showTriggerPrice: boolean;
   showExecution: boolean;
   showGoodTil: boolean;
+  showDuration: boolean;
+  showFrequency: boolean;
 
   showReduceOnlyTooltip: boolean;
   showPostOnlyTooltip: boolean;
