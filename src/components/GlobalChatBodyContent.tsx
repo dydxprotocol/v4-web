@@ -3,15 +3,16 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isEmpty } from 'lodash';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
-import { ButtonAction, ButtonShape } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useAutoScrollToBottom } from '@/hooks/useAutoScrollToBottom';
+import { useTrollbox } from '@/hooks/useTrollbox';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -21,31 +22,17 @@ import { useAppSelector } from '@/state/appTypes';
 import { getColorForString } from '@/lib/colorUtils';
 import { truncateAddress } from '@/lib/wallet';
 
-import { IconName } from './Icon';
+import { Icon, IconName } from './Icon';
 import { IconButton } from './IconButton';
 import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
 
-const VOLUME_THRESHOLD = 100_000;
+const MESSAGE_CHARACTER_LIMIT = 255;
+const VOLUME_THRESHOLD = 1000;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
-  const { dydxAddress } = useAccounts();
-  const [messages, setMessages] = useState(DUMMY_MESSAGES);
-
-  const handleSendMessage = useCallback(
-    (message: string) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: String(Date.now()),
-          username: dydxAddress ?? '',
-          message,
-        },
-      ]);
-    },
-    [dydxAddress]
-  );
+  const { messages, isLoading, handleSendMessage, toasts, pushToast, dismissToast } = useTrollbox();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -65,8 +52,32 @@ export const GlobalChatBodyContent = () => {
     itemCount: messages.length,
   });
 
+  if (isLoading) {
+    return (
+      <$LoadingContent>
+        <LoadingSpinner size="32" />
+      </$LoadingContent>
+    );
+  }
+
   return (
     <$Content>
+      {toasts.length > 0 && (
+        <$ToastContainer>
+          {toasts.map((toast) => (
+            <$Toast key={toast.id}>
+              <$ToastIcon iconName={IconName.Warning} />
+              <$ToastMessage>{toast.message}</$ToastMessage>
+              <$ToastDismissButton
+                iconName={IconName.Close}
+                shape={ButtonShape.Square}
+                size={ButtonSize.XSmall}
+                onClick={() => dismissToast(toast.id)}
+              />
+            </$Toast>
+          ))}
+        </$ToastContainer>
+      )}
       <$Messages ref={scrollRef} onScroll={onScroll}>
         <$VirtualList $height={rowVirtualizer.getTotalSize()}>
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -79,8 +90,8 @@ export const GlobalChatBodyContent = () => {
                 $translateY={virtualRow.start}
               >
                 <span>
-                  <$Username $color={getColorForString(msg.username)}>
-                    {truncateAddress(msg.username)}:
+                  <$Username $color={getColorForString(msg.from)}>
+                    {truncateAddress(msg.from)}:
                   </$Username>
                   {msg.message}
                 </span>
@@ -89,12 +100,18 @@ export const GlobalChatBodyContent = () => {
           })}
         </$VirtualList>
       </$Messages>
-      <ChatFooter onSendMessage={handleSendMessage} />
+      <ChatFooter onSendMessage={handleSendMessage} pushToast={pushToast} />
     </$Content>
   );
 };
 
-const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => void }) => {
+const ChatFooter = ({
+  onSendMessage,
+  pushToast,
+}: {
+  onSendMessage: (message: string) => void;
+  pushToast: (message: string) => void;
+}) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const userStats = useAppSelector(BonsaiCore.account.stats.data);
   const statsStatus = useAppSelector((s) => s.raw.account.stats.status);
@@ -103,24 +120,29 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
   const isLoggedIn = onboardingState === OnboardingState.AccountConnected;
   const isStatsLoading = statsStatus === 'pending' && userStats.makerVolume30D == null;
 
-  const volume30D = useMemo(() => {
-    if (userStats.makerVolume30D == null || userStats.takerVolume30D == null) {
-      return 0;
-    }
-
-    return userStats.makerVolume30D + userStats.takerVolume30D;
-  }, [userStats.makerVolume30D, userStats.takerVolume30D]);
+  const volume30D = useMemo(
+    () => (userStats.makerVolume30D ?? 0) + (userStats.takerVolume30D ?? 0),
+    [userStats.makerVolume30D, userStats.takerVolume30D]
+  );
 
   const progressPercent = Math.min((volume30D / VOLUME_THRESHOLD) * 100, 100);
   const isChatLocked = !isStatsLoading && volume30D < VOLUME_THRESHOLD;
   const volumeRemaining = Math.max(VOLUME_THRESHOLD - volume30D, 0);
 
+  const isOverLimit = inputValue.length > MESSAGE_CHARACTER_LIMIT;
+
   const handleSend = useCallback(() => {
     const trimmed = inputValue.trim();
     if (isEmpty(trimmed)) return;
+
+    if (isOverLimit) {
+      pushToast(`Message is too long. Please keep it under ${MESSAGE_CHARACTER_LIMIT} characters.`);
+      return;
+    }
+
     onSendMessage(inputValue);
     setInputValue('');
-  }, [inputValue, onSendMessage]);
+  }, [inputValue, isOverLimit, onSendMessage, pushToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -168,12 +190,12 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
             onChange={handleOnChange}
             onKeyDown={handleKeyDown}
           />
-          <IconButton
+          <$SendButton
             iconName={IconName.Send}
             onClick={handleSend}
             shape={ButtonShape.Square}
             action={ButtonAction.Base}
-            state={{ isDisabled: isEmpty(inputValue.trim()) }}
+            state={{ isDisabled: isEmpty(inputValue.trim()) || isOverLimit }}
           />
         </$InputRow>
       )}
@@ -181,8 +203,16 @@ const ChatFooter = ({ onSendMessage }: { onSendMessage: (message: string) => voi
   );
 };
 
+const $LoadingContent = styled.div`
+  ${layoutMixins.flexColumn}
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+
 const $Content = styled.div`
   ${layoutMixins.flexColumn}
+  position: relative;
   height: 100%;
 `;
 
@@ -199,9 +229,11 @@ const $VirtualList = styled.div<{ $height: number }>`
 const $VirtualMessage = styled.div<{ $translateY: number }>`
   ${layoutMixins.row}
   position: absolute;
+  width: 100%;
   align-items: flex-start;
   font: var(--font-small-book);
-  color: var(--color-text-0);
+  color: var(--color-text-1);
+  word-break: break-word;
   transform: translateY(${({ $translateY }) => $translateY}px);
 `;
 
@@ -213,9 +245,20 @@ const $Username = styled.span<{ $color: string }>`
 
 const $Footer = styled.div`
   ${layoutMixins.flexColumn}
+  position: relative;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-top: 1px solid var(--color-border);
+  padding: 0.15rem 1rem 0.75rem 1rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 1rem;
+    background: linear-gradient(to top, var(--color-layer-1), transparent);
+    pointer-events: none;
+  }
 `;
 
 const $VolumeCard = styled.div`
@@ -269,6 +312,11 @@ const $InputRow = styled.div`
   gap: 0.5rem;
 `;
 
+const $SendButton = styled(IconButton)`
+  --button-width: 2.25rem;
+  --button-height: 2.25rem;
+`;
+
 const $ChatInput = styled.input`
   flex: 1;
   height: 2.25rem;
@@ -277,127 +325,53 @@ const $ChatInput = styled.input`
   border: 1px solid var(--color-border);
   background-color: var(--color-layer-4);
   font: var(--font-small-book);
-  color: var(--color-text-0);
+  color: var(--color-text-1);
 
   &::placeholder {
     color: var(--color-text-0);
   }
 `;
 
-const DUMMY_MESSAGES = [
-  { id: '1', username: 'dydx1a4r7f6stq2dce9hkv5pz3gy8kdu0t7gvq4n2m', message: 'ape this shit now' },
-  { id: '2', username: 'dydx1k9w2hf4jp6rdnc5tq8vxm3ey7zu0s6la8b3fp', message: 'to the moon!!!!!' },
-  {
-    id: '3',
-    username: 'dydx1v7c3xe2qn9fwh4pkl6ty8mrd0j5az3su2g9kb',
-    message: 'long at 64k with a tp at 71k, sl at 61k. lock in frens',
-  },
-  {
-    id: '4',
-    username: 'dydx1p2n8rj5wm4qxk6lfv0ty3hd9cz7ea8ug6s4bw',
-    message: 'aping this shit now',
-  },
-  { id: '5', username: 'dydx1h6t9yq3xr8fwn2kvd5mcj7pa4ez0lg6su1b8c', message: 'yolofam' },
-  { id: '6', username: 'dydx1a4r7f6stq2dce9hkv5pz3gy8kdu0t7gvq4n2m', message: 'ape this shit now' },
-  {
-    id: '7',
-    username: 'dydx1v7c3xe2qn9fwh4pkl6ty8mrd0j5az3su2g9kb',
-    message: 'long at 64k with a tp at 71k, sl at 61k. lock in frens',
-  },
-  {
-    id: '8',
-    username: 'dydx1m3w6rj8qy5fpn2xkv4tld9hc7ea0zs6gu1b3f',
-    message: 'just longed ETH lets gooo',
-  },
-  {
-    id: '9',
-    username: 'dydx1f8n2tc5xr7qwk3pvd6mhj4ya9ez0lg1su8b4c',
-    message: 'who else is shorting this pump?',
-  },
-  {
-    id: '10',
-    username: 'dydx1d5k8rn2wq3fxm7pyv6tlj4hc9ea0zs1gu3b6f',
-    message: 'BTC 100k end of month no cap',
-  },
-  {
-    id: '11',
-    username: 'dydx1j7m4tc9xr2qwn5fkd8vhp3ya6ez0lg1su4b7c',
-    message: 'closed my short at 62k, taking profits while i can',
-  },
-  {
-    id: '12',
-    username: 'dydx1q9p6rk3wy5fxn8tvd2mlj7hc4ea0zs1gu6b3f',
-    message: 'degen hours rn fr fr',
-  },
-  {
-    id: '13',
-    username: 'dydx1t2v8nc5xr3qwk7fmd6yhp4ja9ez0lg1su7b2c',
-    message: 'this dip is free money',
-  },
-  {
-    id: '14',
-    username: 'dydx1w4x6rp8qy9ftn2mkd3vlj5hc7ea0zs1gu2b8f',
-    message: 'opened a 10x long on SOL, wish me luck boys',
-  },
-  {
-    id: '15',
-    username: 'dydx1z6b3nc7xr5qwm9fkd8thp2ya4ez0lg1su9b5c',
-    message: 'bears in shambles lmaooo',
-  },
-  { id: '16', username: 'dydx1c8d2rj4wy7fxp6tvn3mlk9hc5ea0zs1gu4b6f', message: 'gm degens' },
-  {
-    id: '17',
-    username: 'dydx1e3f9nc6xr8qwt2fkd5vhp7ya1ez0lg4su2b3c',
-    message: 'funding rate is crazy rn be careful',
-  },
-  {
-    id: '18',
-    username: 'dydx1g5h4rk8qy2fxn7tmd9wlj3hc6ea0zs1gu7b9f',
-    message: 'shorted the top at 69k, tp at 63k. ez money',
-  },
-  {
-    id: '19',
-    username: 'dydx1l7n6tc3xr4qwp5fkd2yhm8ja9ez0lg1su5b4c',
-    message: 'diamond hands only no paper hands allowed',
-  },
-  {
-    id: '20',
-    username: 'dydx1n9q8rj5wy6fxt3tvd7mlp4hc2ea0zs1gu3b7f',
-    message: 'who got liquidated on that wick lol',
-  },
-  {
-    id: '21',
-    username: 'dydx1r2s4nc8xr7qwy9fkd6vht5ja3ez0lg1su8b6c',
-    message: 'accumulating more on every dip',
-  },
-  {
-    id: '22',
-    username: 'dydx1u4w6rp3qy8fxn5tmd2klj9hc7ea0zs1gu5b2f',
-    message: 'entry at 64.5k with 5x leverage, sl at 62k. not financial advice',
-  },
-  {
-    id: '23',
-    username: 'dydx1x6y3nc5xr9qwt7fkd4vhm2pa8ez0lg1su6b9c',
-    message: 'alts about to send it watch',
-  },
-  {
-    id: '24',
-    username: 'dydx1b8a2rj7wy4fxp6tvn9mlk3hc5ea0zs1gu9b4f',
-    message: 'just woke up what did i miss',
-  },
-  {
-    id: '25',
-    username: 'dydx1k9w2hf4jp6rdnc5tq8vxm3ey7zu0s6la8b3fp',
-    message: 'told yall to buy the dip yesterday',
-  },
-  {
-    id: '26',
-    username: 'dydx1e3f8nc2xr6qwt4fkd7vhp9ya5ez0lg1su3b8c',
-    message: 'this chat is bullish af',
-  },
-  {
-    id: '27',
-    username: 'dydx1g7h5rk9qy3fxn8tmd4wlj6hc2ea0zs1gu6b5f',
-    message: 'ngmi if you are not longing here',
-  },
-];
+const toastSlideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+`;
+
+const $ToastContainer = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.5rem;
+  position: absolute;
+  top: 0;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  padding-top: 0.5rem;
+`;
+
+const $Toast = styled.div`
+  ${popoverMixins.popover}
+  ${layoutMixins.row}
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  gap: 0.5rem;
+  align-items: center;
+  box-shadow: 0 0 0.5rem 0.1rem var(--color-layer-2);
+  animation: ${toastSlideIn} 0.3s var(--ease-out-expo);
+`;
+
+const $ToastIcon = styled(Icon)`
+  font-size: 1rem;
+  color: var(--color-warning);
+`;
+
+const $ToastDismissButton = styled(IconButton)`
+  --button-border: none;
+  --button-textColor: var(--color-text-0);
+`;
+
+const $ToastMessage = styled.span`
+  flex: 1;
+  color: var(--color-text-1);
+`;

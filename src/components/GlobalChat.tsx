@@ -2,6 +2,8 @@ import { useCallback, useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
+import { useTrollboxOnlineCount } from '@/hooks/useTrollboxOnlineCount';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { GlobalChatBodyContent } from './GlobalChatBodyContent';
@@ -10,6 +12,8 @@ import { Icon, IconName } from './Icon';
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const hasBeenOpened = useRef(false);
+  const onlineCount = useTrollboxOnlineCount();
+
   if (isOpen) hasBeenOpened.current = true;
 
   const handleToggle = useCallback(() => {
@@ -24,6 +28,12 @@ export const GlobalChat = () => {
             <Icon iconName={IconName.Chat} />
             {/* TODO: Replace with localization all at once feature is complete */}
             Global Chat
+            {onlineCount != null && (
+              <$OnlineIndicator>
+                <$OnlineDot />
+                {onlineCount.toLocaleString()} Online
+              </$OnlineIndicator>
+            )}
           </$IconRow>
           <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
         </$Header>
@@ -33,7 +43,7 @@ export const GlobalChat = () => {
   );
 };
 
-const BODY_HEIGHT = '60vh';
+const BODY_HEIGHT = '55vh';
 const BODY_WIDTH = '25rem';
 
 const $ChatArea = styled.div`
@@ -48,7 +58,7 @@ const $ChatArea = styled.div`
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
   width: 100%;
-  background-color: var(--color-layer-3);
+  background-color: var(--color-layer-1);
   border-radius: 0.5rem 0.5rem 0 0;
   border: 1px solid var(--color-border);
   overflow: hidden;
@@ -57,7 +67,7 @@ const $Container = styled.div`
 const $Header = styled.header`
   ${layoutMixins.spacedRow}
   padding: 0.625rem 1rem;
-  background-color: var(--color-layer-2);
+  background-color: var(--color-layer-3);
   font: var(--font-small-book);
   color: var(--color-text-2);
   cursor: pointer;
@@ -75,6 +85,19 @@ const $IconRow = styled.div`
     width: 1rem;
     height: 1rem;
   }
+`;
+
+const $OnlineIndicator = styled.span`
+  ${layoutMixins.row}
+  gap: 0.375rem;
+  color: var(--color-text-0);
+`;
+
+const $OnlineDot = styled.span`
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-green);
 `;
 
 const $Icon = styled(Icon)<{ $isOpen: boolean }>`
