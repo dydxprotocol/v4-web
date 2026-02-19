@@ -340,6 +340,7 @@ function createPlaceOrderPayload(
     postOnly: false,
     triggerPrice,
     marketInfo,
+    twapParameters: undefined,
   };
 }
 

@@ -31,6 +31,9 @@ const DEFAULT_GOOD_TIL_TIME: GoodUntilTime = {
   duration: '28',
   unit: TimeUnit.DAY,
 };
+const DEFAULT_DURATION_HOURS = '0';
+const DEFAULT_DURATION_MINUTES = '5';
+const DEFAULT_FREQUENCY_SECONDS = '30';
 
 export function getTradeFormFieldStates(
   form: TradeForm,
@@ -74,9 +77,9 @@ export function getTradeFormFieldStates(
     triggerPrice: '',
     execution: ExecutionType.GOOD_TIL_DATE,
     goodTil: DEFAULT_GOOD_TIL_TIME,
-    durationHours: undefined,
-    durationMinutes: undefined,
-    frequencySeconds: undefined,
+    durationHours: DEFAULT_DURATION_HOURS,
+    durationMinutes: DEFAULT_DURATION_MINUTES,
+    frequencySeconds: DEFAULT_FREQUENCY_SECONDS,
     stopLossOrder: undefined,
     takeProfitOrder: undefined,
   };

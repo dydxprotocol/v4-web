@@ -397,6 +397,7 @@ export class AccountTransactionSupervisor {
           transferToSubaccountAmount: undefined,
           marketInfo,
           currentHeight,
+          twapParameters: undefined,
         };
       })
       .filter(isPresent);
@@ -478,6 +479,7 @@ export class AccountTransactionSupervisor {
           marketInfo,
           currentHeight,
           memo,
+          twapParameters,
         } = innerPayload;
 
         // Set timeout for order to be considered failed if not committed
@@ -489,6 +491,16 @@ export class AccountTransactionSupervisor {
           localWallet,
           subaccountNumberToUse
         );
+
+        // eslint-disable-next-line no-console
+        console.log('[TWAP DEBUG] placeOrder payload:', { type, timeInForce, postOnly, goodTilTimeInSeconds, twapParameters, execution });
+
+        // DEBUG: also log the encoded message to verify twapParameters is in the protobuf
+        try {
+          const debugMsg = await (compositeClient as any).validatorClient.post.composer.composeMsgPlaceOrder;
+          // eslint-disable-next-line no-console
+          console.log('[TWAP DEBUG] composer available:', !!debugMsg);
+        } catch (_e) { /* ignore */ }
 
         // Place order
         const tx = await compositeClient.placeOrder(
@@ -509,8 +521,12 @@ export class AccountTransactionSupervisor {
           currentHeight ?? undefined,
           goodTilBlock ?? undefined,
           memo,
-          Method.BroadcastTxSync
+          Method.BroadcastTxSync,
+          twapParameters ?? undefined
         );
+
+        // eslint-disable-next-line no-console
+        console.log('[TWAP DEBUG] tx response:', JSON.stringify(tx, (_k, v) => typeof v === 'bigint' ? v.toString() : v));
 
         if ((tx as IndexedTx | undefined)?.code !== 0) {
           throw new StatefulOrderError('Stateful order has failed to commit.', tx);

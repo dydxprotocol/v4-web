@@ -270,9 +270,7 @@ function validateFieldsBasic(
   }
 
   if (options.needsDuration) {
-    const hours = AttemptNumber(state.durationHours) ?? 0;
-    const minutes = AttemptNumber(state.durationMinutes) ?? 0;
-    const totalMinutes = hours * 60 + minutes;
+    const totalMinutes = getTotalDurationMinutes(state);
 
     if (totalMinutes <= 0) {
       errors.push(
@@ -315,6 +313,23 @@ function validateFieldsBasic(
           type: ErrorType.error,
           fields: ['duration.frequencySeconds'],
           titleKey: STRING_KEYS.ENTER_AMOUNT,
+        })
+      );
+    }
+  }
+
+  if (options.needsDuration && options.needsFrequency) {
+    const totalMinutes = getTotalDurationMinutes(state);
+    const frequency = AttemptNumber(state.frequencySeconds) ?? 0;
+
+    if (totalMinutes > 0 && frequency > 0 && (totalMinutes * 60) % frequency !== 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'TWAP_DURATION_NOT_INTERVAL_OF_FREQUENCY',
+          type: ErrorType.error,
+          fields: ['duration.hours', 'duration.minutes'],
+          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
         })
       );
     }
@@ -1179,6 +1194,12 @@ function validateBracketOrders(
     }
   }
   return errors;
+}
+
+function getTotalDurationMinutes(state: TradeForm): number {
+  const hours = AttemptNumber(state.durationHours) ?? 0;
+  const minutes = AttemptNumber(state.durationMinutes) ?? 0;
+  return hours * 60 + minutes;
 }
 
 function isAttempingBracketOperation(state: TriggerOrderState | undefined): boolean {
