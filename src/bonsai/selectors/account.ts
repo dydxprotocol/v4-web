@@ -30,7 +30,11 @@ import { calculateTransfers } from '../calculators/transfers';
 import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import { isTWAPOrder, SubaccountFillType, SubaccountTransfer } from '../types/summaryTypes';
+import {
+  isTWAPOrder,
+  SubaccountFillType,
+  SubaccountTransfer,
+} from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawAccountStakingTierData,
@@ -165,6 +169,7 @@ export const selectOrderHistory = createAppSelector([selectAccountOrders], (orde
 });
 
 export const selectTWAPOrders = createAppSelector([selectAccountOrders], (orders) => {
+  console.log('orders', orders);
   return orders.filter(isTWAPOrder);
 });
 
@@ -232,6 +237,7 @@ export const selectAccountFills = createAppSelector(
 );
 
 export const selectTWAPFills = createAppSelector([selectAccountFills], (fills) => {
+  console.log('fills', fills);
   return fills.filter((f) => f.type === SubaccountFillType.TWAP);
 });
 

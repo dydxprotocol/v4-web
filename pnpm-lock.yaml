@@ -30,14 +30,14 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.4.0
-    version: 3.4.0
+    specifier: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.5.0.tgz
+    version: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.5.0.tgz
   '@dydxprotocol/v4-localization':
     specifier: 1.1.386
     version: 1.1.386
   '@dydxprotocol/v4-proto':
-    specifier: ^7.0.0-dev.0
-    version: 7.0.5
+    specifier: ^9.5.0
+    version: 9.5.0
   '@emotion/is-prop-valid':
     specifier: ^1.3.0
     version: 1.4.0
@@ -1671,45 +1671,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.4.0:
-    resolution: {integrity: sha512-dMEcqfJAreiDQjrgJyUNGqxUH3sh5J5LG5fKItCRIM7MsygAvf5/kpedQByh6nO6ov+tUw4zgT4OFc9vKN+cMQ==}
-    dependencies:
-      '@cosmjs/amino': 0.32.4
-      '@cosmjs/encoding': 0.32.4
-      '@cosmjs/math': 0.32.4
-      '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4
-      '@cosmjs/tendermint-rpc': 0.32.4
-      '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.5.0
-      '@osmonauts/lcd': 0.6.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      axios: 1.1.3
-      bech32: 1.1.4
-      bignumber.js: 9.3.1
-      cosmjs-types: 0.9.0
-      ethereum-cryptography: 2.2.1
-      ethers: 6.15.0
-      https-proxy-agent: 7.0.6
-      long: 4.0.0
-      protobufjs: 7.5.4
-      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
-    dev: false
-
   /@dydxprotocol/v4-localization@1.1.386:
     resolution: {integrity: sha512-+G6a4F57HXWZDbFlBj9/lPPjupvU2fVRYY89jQC0u/VqSClyGpgzmXzNulKn+WB5PAEadJWYtYVK2B2mtMPjWw==}
-    dev: false
-
-  /@dydxprotocol/v4-proto@7.0.5:
-    resolution: {integrity: sha512-V4Ii+oRuAAO2wXK9xLt4ztnxMa8pfDzsTXMtPi01cDPVncM5albcttrBzVrzob/YO1nmXwe8ku1LtISoI3BjNg==}
-    dependencies:
-      protobufjs: 6.11.4
     dev: false
 
   /@dydxprotocol/v4-proto@9.5.0:
@@ -16689,8 +16652,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /ethers@6.15.0:
-    resolution: {integrity: sha512-Kf/3ZW54L4UT0pZtsY/rf+EkBU7Qi5nnhonjUb8yTXcxH3cdcWrV2cRyk0Xk/4jK6OoHhxxZHriyhje20If2hQ==}
+  /ethers@6.16.0:
+    resolution: {integrity: sha512-U1wulmetNymijEhpSEQ7Ct/P/Jw9/e7R1j5XIbPRydgV2DjLVMsULDlNksq3RQnFgKoLlZf88ijYtWEXcPa07A==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
@@ -26735,3 +26698,36 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.5.0.tgz:
+    resolution: {integrity: sha512-ql5u1ZNCFtz0JetCqGr0YBo1eyZt2eQM3k+JHu6iogfHy7VY+zhAy2EUpwAJNTtpYtS0aXi3/lcHy1Vylqci4g==, tarball: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.5.0.tgz}
+    name: '@dydxprotocol/v4-client-js'
+    version: 3.5.0
+    dependencies:
+      '@cosmjs/amino': 0.32.4
+      '@cosmjs/encoding': 0.32.4
+      '@cosmjs/math': 0.32.4
+      '@cosmjs/proto-signing': 0.32.4
+      '@cosmjs/stargate': 0.32.4
+      '@cosmjs/tendermint-rpc': 0.32.4
+      '@cosmjs/utils': 0.32.4
+      '@dydxprotocol/v4-proto': 9.5.0
+      '@osmonauts/lcd': 0.6.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      axios: 1.1.3
+      bech32: 1.1.4
+      bignumber.js: 9.3.1
+      cosmjs-types: 0.9.0
+      ethereum-cryptography: 2.2.1
+      ethers: 6.16.0
+      https-proxy-agent: 7.0.6
+      long: 4.0.0
+      protobufjs: 7.5.4
+      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - supports-color
+      - utf-8-validate
+    dev: false

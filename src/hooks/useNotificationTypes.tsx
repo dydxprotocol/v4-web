@@ -116,6 +116,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
 
           const marketInfo = allMarkets[order.marketId];
+          if (order.type == null) {
+            return;
+          }
           const orderTypeKey = getIndexerOrderTypeStringKey(order.type);
           const latestUpdateMs = max([
             ...relevantFills.map((f) =>

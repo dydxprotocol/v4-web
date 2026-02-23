@@ -31,6 +31,9 @@ const DEFAULT_GOOD_TIL_TIME: GoodUntilTime = {
   duration: '28',
   unit: TimeUnit.DAY,
 };
+const DEFAULT_DURATION_HOURS = '0';
+const DEFAULT_DURATION_MINUTES = '5';
+const DEFAULT_FREQUENCY_SECONDS = '30';
 
 export function getTradeFormFieldStates(
   form: TradeForm,
@@ -74,6 +77,9 @@ export function getTradeFormFieldStates(
     triggerPrice: '',
     execution: ExecutionType.GOOD_TIL_DATE,
     goodTil: DEFAULT_GOOD_TIL_TIME,
+    durationHours: DEFAULT_DURATION_HOURS,
+    durationMinutes: DEFAULT_DURATION_MINUTES,
+    frequencySeconds: DEFAULT_FREQUENCY_SECONDS,
     stopLossOrder: undefined,
     takeProfitOrder: undefined,
   };
@@ -215,6 +221,22 @@ export function getTradeFormFieldStates(
 
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);
+        return result;
+      case TradeFormType.TWAP:
+        makeVisible(result, [
+          'marketId',
+          'side',
+          'size',
+          'marginMode',
+          'durationHours',
+          'durationMinutes',
+          'frequencySeconds',
+          'reduceOnly',
+          'goodTil',
+          'execution',
+        ]);
+        setMarginMode(result);
+        disableReduceOnlyIfIncreasingMarketOrder(result);
         return result;
       default:
         assertNever(type);

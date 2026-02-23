@@ -120,6 +120,9 @@ export const TradeForm = ({
       rawInput.execution,
       rawInput.postOnly,
       rawInput.timeInForce,
+      rawInput.durationHours,
+      rawInput.durationMinutes,
+      rawInput.frequencySeconds,
     ].some((v) => v != null && v !== '') || (rawInput.size?.value.value.trim() ?? '') !== '';
 
   const orderSideAction = {

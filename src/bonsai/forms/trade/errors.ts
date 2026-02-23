@@ -130,7 +130,9 @@ function validateNonMarketInputData(
   const state = summary.effectiveTrade;
   if (
     inputData.currentTradeMarketOrderbook == null &&
-    (state.type === TradeFormType.MARKET || state.type === TradeFormType.TRIGGER_MARKET)
+    (state.type === TradeFormType.MARKET ||
+      state.type === TradeFormType.TRIGGER_MARKET ||
+      state.type === TradeFormType.TWAP)
   ) {
     errors.push(
       simpleValidationError({
@@ -267,6 +269,72 @@ function validateFieldsBasic(
     }
   }
 
+  if (options.needsDuration) {
+    const totalMinutes = getTotalDurationMinutes(state);
+
+    if (totalMinutes <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_TWAP_DURATION',
+          type: ErrorType.error,
+          fields: ['duration.hours'],
+          titleKey: STRING_KEYS.ENTER_AMOUNT,
+        })
+      );
+    } else if (totalMinutes < 5) {
+      errors.push(
+        simpleValidationError({
+          code: 'TWAP_DURATION_TOO_SHORT',
+          type: ErrorType.error,
+          fields: ['duration.hours', 'duration.minutes'],
+          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
+        })
+      );
+    } else if (totalMinutes > 24 * 60) {
+      errors.push(
+        simpleValidationError({
+          code: 'TWAP_DURATION_TOO_LONG',
+          type: ErrorType.error,
+          fields: ['duration.hours', 'duration.minutes'],
+          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
+        })
+      );
+    }
+  }
+
+  if (options.needsFrequency) {
+    const frequency = AttemptNumber(state.frequencySeconds) ?? 0;
+    if (frequency <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_TWAP_FREQUENCY',
+          type: ErrorType.error,
+          fields: ['duration.frequencySeconds'],
+          titleKey: STRING_KEYS.ENTER_AMOUNT,
+        })
+      );
+    }
+  }
+
+  if (options.needsDuration && options.needsFrequency) {
+    const totalMinutes = getTotalDurationMinutes(state);
+    const frequency = AttemptNumber(state.frequencySeconds) ?? 0;
+
+    if (totalMinutes > 0 && frequency > 0 && (totalMinutes * 60) % frequency !== 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'TWAP_DURATION_NOT_INTERVAL_OF_FREQUENCY',
+          type: ErrorType.error,
+          fields: ['duration.hours', 'duration.minutes'],
+          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
+        })
+      );
+    }
+  }
+
   if (options.needsExecution && options.executionOptions.length > 0) {
     if (state.execution == null) {
       errors.push(
@@ -370,6 +438,12 @@ function validateAdvancedTradeConditions(
     const slippageError = validateOrderbookOrIndexSlippage(summary);
     if (slippageError) {
       errors.push(slippageError);
+    }
+  } else if (state.type === TradeFormType.TWAP) {
+    // TWAP orders use market suborders - basic validation only
+    const liquidityError = validateLiquidity(summary);
+    if (liquidityError) {
+      errors.push(liquidityError);
     }
     // For limit orders, validate isolated margin requirements
   } else if (
@@ -1120,6 +1194,12 @@ function validateBracketOrders(
     }
   }
   return errors;
+}
+
+function getTotalDurationMinutes(state: TradeForm): number {
+  const hours = AttemptNumber(state.durationHours) ?? 0;
+  const minutes = AttemptNumber(state.durationMinutes) ?? 0;
+  return hours * 60 + minutes;
 }
 
 function isAttempingBracketOperation(state: TriggerOrderState | undefined): boolean {

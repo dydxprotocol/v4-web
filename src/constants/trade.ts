@@ -104,6 +104,9 @@ export enum TradeBoxKeys {
   LimitPrice = 'price.limitPrice',
   TrailingPercent = 'price.trailingPercent',
   TriggerPrice = 'price.triggerPrice',
+  DurationHours = 'duration.hours',
+  DurationMinutes = 'duration.minutes',
+  FrequencySeconds = 'duration.frequencySeconds',
 }
 
 export type InputErrorData = {

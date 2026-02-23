@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -16,7 +16,7 @@ export enum TwapTableTab {
   Fills = 'Fills',
 }
 
-export const TWAPTable: React.FC = () => {
+export const TWAPTable = forwardRef((_props, _ref) => {
   const [tab, setTab] = useState<TwapTableTab>(TwapTableTab.Active);
   const stringGetter = useStringGetter();
 
@@ -88,4 +88,4 @@ export const TWAPTable: React.FC = () => {
       dividerStyle="underline"
     />
   );
-};
+});
