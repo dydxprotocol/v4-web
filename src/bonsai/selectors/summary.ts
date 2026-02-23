@@ -9,7 +9,11 @@ import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { calculateEffectiveSelectedLeverage, createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
-import { PerpetualMarketSummary } from '../types/summaryTypes';
+import {
+  PerpetualMarketSummary,
+  StablePerpetualMarketSummaries,
+  StablePerpetualMarketSummary,
+} from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
 import {
   selectRawAssets,
@@ -52,7 +56,26 @@ const unstablePaths = [
   'openInterestUSDC',
 ] satisfies Array<keyof PerpetualMarketSummary>;
 type UnstablePaths = (typeof unstablePaths)[number];
-export type StablePerpetualMarketSummary = Omit<PerpetualMarketSummary, UnstablePaths>;
+
+export const selectAllMarketSummariesStable = createAppSelector(
+  [selectAllMarketSummaries],
+  (summaries): StablePerpetualMarketSummaries | undefined => {
+    if (summaries == null) return summaries;
+
+    return Object.entries(summaries).reduce<StablePerpetualMarketSummaries>(
+      (acc, [marketId, summary]) => {
+        acc[marketId] = omit(summary, ...unstablePaths);
+        return acc;
+      },
+      {}
+    );
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
+);
 
 export const selectCurrentMarketInfoStable = createAppSelector(
   [selectCurrentMarketInfo],

@@ -113,6 +113,7 @@ import {
 import {
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
+  selectAllMarketSummariesStable,
   selectCurrentMarketAssetId,
   selectCurrentMarketAssetLogoUrl,
   selectCurrentMarketAssetName,
@@ -121,7 +122,6 @@ import {
   selectCurrentMarketInfoStable,
   selectEffectiveSelectedMarketLeverage,
   selectMarketSummaryById,
-  StablePerpetualMarketSummary,
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
 import { selectClientInitializationError } from './socketSelectors';
@@ -141,6 +141,8 @@ import {
   PendingIsolatedPosition,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
+  StablePerpetualMarketSummaries,
+  StablePerpetualMarketSummary,
   RewardParamsSummary,
   StakingTiers,
   SubaccountFill,
@@ -211,6 +213,7 @@ interface BonsaiCoreShape {
     currentMarketId: BasicSelector<string | undefined>;
     markets: {
       data: BasicSelector<PerpetualMarketSummaries | undefined>;
+      stableData: BasicSelector<StablePerpetualMarketSummaries | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
     assets: {
@@ -318,6 +321,7 @@ export const BonsaiCore: BonsaiCoreShape = {
     currentMarketId: getCurrentMarketId,
     markets: {
       data: selectAllMarketSummaries,
+      stableData: selectAllMarketSummariesStable,
       loading: selectAllMarketSummariesLoading,
     },
     assets: {
