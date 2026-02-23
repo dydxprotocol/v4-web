@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { STRING_KEYS } from '@/constants/localization';
 import {
   ITrollboxErrorType,
   type TrollboxChatMessage,
@@ -11,21 +12,22 @@ import { sendTrollboxMessage, subscribeToTrollbox } from '@/lib/streaming/trollb
 import { signTrollboxMessage } from '@/lib/trollboxUtils';
 
 import { useAccounts } from './useAccounts';
+import { useStringGetter } from './useStringGetter';
 
+export const VOLUME_THRESHOLD = 1000;
 const MAX_MESSAGES_IN_MEMORY = 1000;
 const TOAST_AUTO_CLOSE_MS = 5_000;
 
-// TODO: Replace with localization
-const TROLLBOX_BACKEND_ERROR_TYPES: Record<ITrollboxErrorType, string> = {
-  message_too_large: 'Your message is too long. Please keep it under 255 characters.',
-  message_empty: 'Message cannot be empty.',
-  missing_field: 'Message is missing required fields.',
-  invalid_address: 'Invalid dYdX address.',
-  invalid_signature: 'Signature verification failed. Please try again.',
-  invalid_timestamp: 'Message expired. Please try again.',
-  rate_limit: "You're sending messages too fast. Please wait before trying again.",
-  insufficient_volume: 'You need at least $1,000 in trading volume to chat.',
-  validation_error: 'Failed to send message. Please try again.',
+const TROLLBOX_ERROR_STRING_KEYS: Record<ITrollboxErrorType, string> = {
+  message_too_large: STRING_KEYS.ERROR_MESSAGE_TOO_LARGE,
+  message_empty: STRING_KEYS.ERROR_MESSAGE_EMPTY,
+  missing_field: STRING_KEYS.ERROR_MISSING_FIELD,
+  invalid_address: STRING_KEYS.ERROR_INVALID_ADDRESS,
+  invalid_signature: STRING_KEYS.ERROR_INVALID_SIGNATURE,
+  invalid_timestamp: STRING_KEYS.ERROR_INVALID_TIMESTAMP,
+  rate_limit: STRING_KEYS.ERROR_RATE_LIMIT,
+  insufficient_volume: STRING_KEYS.ERROR_INSUFFICIENT_VOLUME,
+  validation_error: STRING_KEYS.ERROR_VALIDATION,
 };
 
 export type ChatToast = {
@@ -34,6 +36,7 @@ export type ChatToast = {
 };
 
 export const useTrollbox = () => {
+  const stringGetter = useStringGetter();
   const { dydxAddress, hdKey } = useAccounts();
   const [messages, setMessages] = useState<TrollboxChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,7 +72,15 @@ export const useTrollbox = () => {
           break;
         case 'error':
           pushToast(
-            update.errorType != null ? TROLLBOX_BACKEND_ERROR_TYPES[update.errorType] : update.error
+            update.errorType != null
+              ? stringGetter({
+                  key: TROLLBOX_ERROR_STRING_KEYS[update.errorType],
+                  params:
+                    update.errorType === 'insufficient_volume'
+                      ? { MINIMUM_VOLUME: `$${VOLUME_THRESHOLD.toLocaleString()}` }
+                      : undefined,
+                })
+              : update.error
           );
           break;
         default:
@@ -78,12 +89,12 @@ export const useTrollbox = () => {
     });
 
     return unsubscribe;
-  }, [pushToast]);
+  }, [pushToast, stringGetter]);
 
   const handleSendMessage = useCallback(
     async (text: string) => {
       if (dydxAddress == null || hdKey?.privateKey == null) {
-        pushToast('Wallet not connected');
+        pushToast(stringGetter({ key: STRING_KEYS.WALLET_NOT_CONNECTED }));
         return;
       }
 
@@ -91,10 +102,15 @@ export const useTrollbox = () => {
         const payload = await signTrollboxMessage(text, dydxAddress, hdKey.privateKey);
         sendTrollboxMessage(payload);
       } catch (error) {
-        pushToast(`Failed to send message: ${error}`);
+        pushToast(
+          stringGetter({
+            key: STRING_KEYS.FAILED_TO_SEND_MESSAGE,
+            params: { ERROR: String(error) },
+          })
+        );
       }
     },
-    [dydxAddress, hdKey?.privateKey, pushToast]
+    [dydxAddress, hdKey?.privateKey, pushToast, stringGetter]
   );
 
   return { messages, isLoading, handleSendMessage, toasts, pushToast, dismissToast };
