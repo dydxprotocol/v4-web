@@ -6,12 +6,13 @@ import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
-import { InputErrorData, TradeBoxKeys } from '@/constants/trade';
+import { INTEGER_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { InputErrorData, MAX_SCALE_ORDERS, TradeBoxKeys } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
@@ -37,6 +38,8 @@ type TradeBoxInputConfig = {
   value: string | number;
   decimals?: number;
   slotRight?: React.ReactNode;
+  /** When set, consecutive inputs sharing the same group are rendered in an inline row. */
+  group?: string;
 };
 
 export const TradeFormInputs = () => {
@@ -44,9 +47,25 @@ export const TradeFormInputs = () => {
   const stringGetter = useStringGetter();
 
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
-  const { showLimitPrice, showTriggerPrice } = tradeSummary.options;
+  const {
+    showLimitPrice,
+    showTriggerPrice,
+    showScaleStartPrice,
+    showScaleEndPrice,
+    showScaleTotalOrders,
+    showScaleSkew,
+  } = tradeSummary.options;
   const tradeFormValues = useAppSelector(getTradeFormValues);
-  const { limitPrice, triggerPrice, marketId, type } = tradeFormValues;
+  const {
+    limitPrice,
+    triggerPrice,
+    scaleStartPrice,
+    scaleEndPrice,
+    scaleTotalOrders,
+    scaleSkew,
+    marketId,
+    type,
+  } = tradeFormValues;
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -128,34 +147,133 @@ export const TradeFormInputs = () => {
     });
   }
 
-  return tradeFormInputs.map(
-    ({
-      key,
-      inputType,
-      label,
-      onChange,
-      onInput,
-      validationConfig,
-      value,
-      decimals,
-      slotRight,
-    }) => (
-      <FormInput
-        key={key}
-        id={key}
-        type={inputType}
-        label={label}
-        onChange={onChange}
-        onInput={onInput}
-        validationConfig={validationConfig}
-        value={value}
-        decimals={decimals}
-        slotRight={slotRight}
-      />
-    )
-  );
+  if (showScaleStartPrice) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.ScaleStartPrice,
+      inputType: InputType.Currency,
+      label: (
+        <>
+          Start
+          <Tag>USD</Tag>
+        </>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setScaleStartPrice(value));
+      },
+      value: scaleStartPrice ?? '',
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
+      group: 'scale-price',
+    });
+  }
+
+  if (showScaleEndPrice) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.ScaleEndPrice,
+      inputType: InputType.Currency,
+      label: (
+        <>
+          End
+          <Tag>USD</Tag>
+        </>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setScaleEndPrice(value));
+      },
+      value: scaleEndPrice ?? '',
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
+      group: 'scale-price',
+    });
+  }
+
+  if (showScaleTotalOrders) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.ScaleTotalOrders,
+      inputType: InputType.Number,
+      label: 'Total Orders',
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setScaleTotalOrders(value));
+      },
+      value: scaleTotalOrders ?? '',
+      decimals: INTEGER_DECIMALS,
+      group: 'scale-params',
+    });
+  }
+
+  if (showScaleSkew) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.ScaleSkew,
+      inputType: InputType.Number,
+      label: 'Skew',
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setScaleSkew(value));
+      },
+      value: scaleSkew ?? '',
+      decimals: 2,
+      group: 'scale-params',
+    });
+  }
+
+  return renderInputs(tradeFormInputs);
 };
+
+function renderInputs(inputs: TradeBoxInputConfig[]) {
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < inputs.length) {
+    const input = inputs[i]!;
+
+    if (input.group != null) {
+      // Collect consecutive inputs with the same group
+      const grouped: TradeBoxInputConfig[] = [input];
+      while (i + 1 < inputs.length && inputs[i + 1]!.group === input.group) {
+        i += 1;
+        grouped.push(inputs[i]!);
+      }
+      elements.push(
+        <$InlineRow key={input.group}>{grouped.map((cfg) => renderSingleInput(cfg))}</$InlineRow>
+      );
+    } else {
+      elements.push(renderSingleInput(input));
+    }
+    i += 1;
+  }
+
+  return elements;
+}
+
+function renderSingleInput({
+  key,
+  inputType,
+  label,
+  onChange,
+  onInput,
+  validationConfig,
+  value,
+  decimals,
+  slotRight,
+}: TradeBoxInputConfig) {
+  return (
+    <FormInput
+      key={key}
+      id={key}
+      type={inputType}
+      label={label}
+      onChange={onChange}
+      onInput={onInput}
+      validationConfig={validationConfig}
+      value={value}
+      decimals={decimals}
+      slotRight={slotRight}
+    />
+  );
+}
 
 const $MidPriceButton = styled(Button)`
   ${formMixins.inputInnerButton}
+`;
+
+const $InlineRow = styled.span`
+  ${layoutMixins.flexEqualColumns}
+  gap: 1ch;
 `;

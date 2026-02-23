@@ -76,6 +76,10 @@ export function getTradeFormFieldStates(
     goodTil: DEFAULT_GOOD_TIL_TIME,
     stopLossOrder: undefined,
     takeProfitOrder: undefined,
+    scaleStartPrice: '',
+    scaleEndPrice: '',
+    scaleTotalOrders: '5',
+    scaleSkew: '1',
   };
 
   // Initialize all fields as not visible
@@ -215,6 +219,28 @@ export function getTradeFormFieldStates(
 
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);
+        return result;
+      case TradeFormType.SCALE:
+        makeVisible(result, [
+          'marketId',
+          'side',
+          'size',
+          'marginMode',
+          'scaleStartPrice',
+          'scaleEndPrice',
+          'scaleTotalOrders',
+          'scaleSkew',
+          'timeInForce',
+          'postOnly',
+          'reduceOnly',
+          'goodTil',
+        ]);
+        defaultSizeIfSizeInputIsInvalid(result);
+        setMarginMode(result);
+
+        // Scale orders are always GTT
+        forceValueAndDisable(result.reduceOnly, false);
+
         return result;
       default:
         assertNever(type);

@@ -126,7 +126,9 @@ export const useTradeForm = ({
     setPlaceOrderError(undefined);
     const payload = summary.tradePayload;
     const tradePayload = payload?.orderPayload;
-    if (payload == null || tradePayload == null || hasValidationErrors) {
+    const isScaleOrder =
+      tradePayload == null && (payload?.scaleOrderPayloads?.length ?? 0) > 0;
+    if (payload == null || (tradePayload == null && !isScaleOrder) || hasValidationErrors) {
       return;
     }
 
@@ -138,7 +140,9 @@ export const useTradeForm = ({
       if (impliedMarket === undefined) return;
 
       const positionSubaccountNumber = summary.accountDetailsAfter?.position?.subaccountNumber;
-      const clobPairId = summary.tradePayload?.orderPayload?.clobPairId;
+      const clobPairId =
+        summary.tradePayload?.orderPayload?.clobPairId ??
+        summary.tradePayload?.scaleOrderPayloads?.[0]?.clobPairId;
       const rawSelectedLeverage = inputData?.rawSelectedMarketLeverages[impliedMarket];
       const hasExistingPosition = currentPosition !== undefined;
       if (
@@ -158,22 +162,26 @@ export const useTradeForm = ({
       }
     });
 
-    onPlaceOrder?.(tradePayload);
-    track(
-      AnalyticsEvents.TradePlaceOrderClick({
-        ...tradePayload,
-        isClosePosition: source === TradeFormSource.ClosePositionForm,
-        isSimpleUi: source === TradeFormSource.SimpleTradeForm,
-        source,
-        volume: tradePayload.size * tradePayload.price,
-      })
-    );
+    if (tradePayload != null) {
+      onPlaceOrder?.(tradePayload);
+      track(
+        AnalyticsEvents.TradePlaceOrderClick({
+          ...tradePayload,
+          isClosePosition: source === TradeFormSource.ClosePositionForm,
+          isSimpleUi: source === TradeFormSource.SimpleTradeForm,
+          source,
+          volume: tradePayload.size * tradePayload.price,
+        })
+      );
+    }
     dispatch(tradeFormActions.resetPrimaryInputs());
     logBonsaiInfo(
       source,
-      source === TradeFormSource.ClosePositionForm
-        ? 'attempting close position'
-        : 'attempting place order',
+      isScaleOrder
+        ? 'attempting place scale order'
+        : source === TradeFormSource.ClosePositionForm
+          ? 'attempting close position'
+          : 'attempting place order',
       {
         fullTradeFormState: purgeBigNumbers(fullFormSummary),
       }
@@ -181,7 +189,11 @@ export const useTradeForm = ({
 
     const result = await accountTransactionManager.placeCompoundOrder(payload, source);
     if (isOperationSuccess(result)) {
-      setUnIndexedClientId(tradePayload.clientId.toString());
+      const clientIdToTrack =
+        tradePayload?.clientId ?? payload?.scaleOrderPayloads?.[0]?.clientId;
+      if (clientIdToTrack != null) {
+        setUnIndexedClientId(clientIdToTrack.toString());
+      }
       onSuccess?.();
     } else {
       const errorParams = operationFailureToErrorParams(result);

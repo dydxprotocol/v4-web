@@ -74,6 +74,7 @@ export enum TradeFormType {
   LIMIT = 'LIMIT',
   TRIGGER_MARKET = 'TRIGGER_MARKET',
   TRIGGER_LIMIT = 'TRIGGER_LIMIT',
+  SCALE = 'SCALE',
 }
 
 type OrderMatcher<T> = {
@@ -120,6 +121,12 @@ export type TradeForm = {
   // additional triggers
   stopLossOrder: TriggerOrderState | undefined;
   takeProfitOrder: TriggerOrderState | undefined;
+
+  // Scale order fields
+  scaleStartPrice: string | undefined;
+  scaleEndPrice: string | undefined;
+  scaleTotalOrders: string | undefined;
+  scaleSkew: string | undefined;
 };
 
 // Define the FieldState type with conditional properties
@@ -159,6 +166,10 @@ export type TradeFormOptions = {
   needsTriggerPrice: boolean;
   needsExecution: boolean;
   needsGoodTil: boolean;
+  needsScaleStartPrice: boolean;
+  needsScaleEndPrice: boolean;
+  needsScaleTotalOrders: boolean;
+  needsScaleSkew: boolean;
 
   // these mean show + allow editing this field
   showSize: boolean;
@@ -170,6 +181,10 @@ export type TradeFormOptions = {
   showTriggerPrice: boolean;
   showExecution: boolean;
   showGoodTil: boolean;
+  showScaleStartPrice: boolean;
+  showScaleEndPrice: boolean;
+  showScaleTotalOrders: boolean;
+  showScaleSkew: boolean;
 
   showReduceOnlyTooltip: boolean;
   showPostOnlyTooltip: boolean;
@@ -216,6 +231,7 @@ export type TradeSummary = {
 export type TradeFormPayload = {
   orderPayload: PlaceOrderPayload | undefined;
   triggersPayloads: TriggerOrderActions[] | undefined;
+  scaleOrderPayloads: PlaceOrderPayload[] | undefined;
 };
 
 export type TradeFormSummary = {

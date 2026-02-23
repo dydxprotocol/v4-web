@@ -284,6 +284,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       {
         orderPayload: undefined,
         triggersPayloads: payload.payloads,
+        scaleOrderPayloads: undefined,
       },
       'TriggersForm'
     );

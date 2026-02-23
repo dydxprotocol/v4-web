@@ -272,6 +272,7 @@ export function calculateTradeInfo(
             ),
           };
         });
+      case TradeFormType.SCALE:
       case TradeFormType.LIMIT:
       case TradeFormType.TRIGGER_LIMIT:
         return calc((): TradeSummary => {
@@ -279,6 +280,7 @@ export function calculateTradeInfo(
           const execution = trade.execution;
           const isMaker =
             (trade.type === TradeFormType.LIMIT && timeInForce === TimeInForce.GTT) ||
+            (trade.type === TradeFormType.SCALE && timeInForce === TimeInForce.GTT) ||
             execution === ExecutionType.POST_ONLY;
 
           const feeRate = isMaker
@@ -1052,6 +1054,7 @@ function calculateIsolatedMarginTransferAmount(
       case TradeFormType.MARKET:
         return oraclePrice;
       case TradeFormType.LIMIT:
+      case TradeFormType.SCALE:
       case TradeFormType.TRIGGER_LIMIT:
         return tradePrice;
       case TradeFormType.TRIGGER_MARKET:
@@ -1071,7 +1074,9 @@ function calculateIsolatedMarginTransferAmount(
     marketMaxLeverage,
     tradeSize,
     positionIncreasingAmount,
-    trade.type === TradeFormType.LIMIT || trade.type === TradeFormType.TRIGGER_LIMIT
+    trade.type === TradeFormType.LIMIT ||
+      trade.type === TradeFormType.SCALE ||
+      trade.type === TradeFormType.TRIGGER_LIMIT
   );
 }
 

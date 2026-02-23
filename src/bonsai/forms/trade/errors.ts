@@ -10,6 +10,7 @@ import { OrderType } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
+import { MAX_SCALE_ORDERS } from '@/constants/trade';
 import {
   IndexerOrderSide,
   IndexerOrderType,
@@ -280,6 +281,73 @@ function validateFieldsBasic(
     }
   }
 
+  if (options.needsScaleTotalOrders) {
+    const totalOrders = AttemptNumber(state.scaleTotalOrders) ?? 0;
+    if (totalOrders < 2 || totalOrders > MAX_SCALE_ORDERS || !Number.isInteger(totalOrders)) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_TOTAL_ORDERS',
+          type: ErrorType.error,
+          fields: ['scaleTotalOrders'],
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleStartPrice) {
+    const startPrice = AttemptNumber(state.scaleStartPrice) ?? 0;
+    if (startPrice <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_START_PRICE',
+          type: ErrorType.error,
+          fields: ['scaleStartPrice'],
+          titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleEndPrice) {
+    const endPrice = AttemptNumber(state.scaleEndPrice) ?? 0;
+    if (endPrice <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_END_PRICE',
+          type: ErrorType.error,
+          fields: ['scaleEndPrice'],
+          titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleTotalOrders) {
+    const totalOrders = AttemptNumber(state.scaleTotalOrders) ?? 0;
+    if (totalOrders < 2 || totalOrders > MAX_SCALE_ORDERS || !Number.isInteger(totalOrders)) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_TOTAL_ORDERS',
+          type: ErrorType.error,
+          fields: ['scaleTotalOrders'],
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleSkew) {
+    const skew = AttemptNumber(state.scaleSkew) ?? 0;
+    if (skew <= 0 || skew >= 100) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_SKEW',
+          type: ErrorType.error,
+          fields: ['scaleSkew'],
+        })
+      );
+    }
+  }
+
   if (state.side == null) {
     errors.push(
       simpleValidationError({
@@ -374,6 +442,7 @@ function validateAdvancedTradeConditions(
     // For limit orders, validate isolated margin requirements
   } else if (
     state.type === TradeFormType.LIMIT ||
+    state.type === TradeFormType.SCALE ||
     state.type === TradeFormType.TRIGGER_LIMIT ||
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     state.type === TradeFormType.TRIGGER_MARKET
@@ -945,7 +1014,11 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
     errors.push(simpleValidationError({ code: 'MISSING_TRADE_PAYLOAD' }));
   }
 
-  if (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null) {
+  const isScaleOrder = summary.effectiveTrade.type === TradeFormType.SCALE;
+  if (
+    !isScaleOrder &&
+    (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null)
+  ) {
     errors.push(simpleValidationError({ code: 'MISSING__METRICS' }));
   }
 
@@ -961,7 +1034,9 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
 }
 
 function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSummary) {
-  const subaccountToUse = summary.tradePayload?.orderPayload?.subaccountNumber;
+  const subaccountToUse =
+    summary.tradePayload?.orderPayload?.subaccountNumber ??
+    summary.tradePayload?.scaleOrderPayloads?.[0]?.subaccountNumber;
   if (subaccountToUse == null) {
     return [];
   }
