@@ -279,15 +279,18 @@ export type PerpetualMarketSummaries = {
   [marketId: string]: PerpetualMarketSummary;
 };
 
-type UnstableMarketSummaryFields =
-  | 'oraclePrice'
-  | 'priceChange24H'
-  | 'percentChange24h'
-  | 'nextFundingRate'
-  | 'volume24H'
-  | 'trades24H'
-  | 'openInterest'
-  | 'openInterestUSDC';
+export const unstableMarketSummaryFields = [
+  'oraclePrice',
+  'priceChange24H',
+  'percentChange24h',
+  'nextFundingRate',
+  'volume24H',
+  'trades24H',
+  'openInterest',
+  'openInterestUSDC',
+] satisfies ReadonlyArray<keyof PerpetualMarketSummary>;
+
+export type UnstableMarketSummaryFields = (typeof unstableMarketSummaryFields)[number];
 
 export type StablePerpetualMarketSummary = Omit<
   PerpetualMarketSummary,

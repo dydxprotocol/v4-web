@@ -10,9 +10,10 @@ import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { calculateEffectiveSelectedLeverage, createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import {
-  PerpetualMarketSummary,
   StablePerpetualMarketSummaries,
   StablePerpetualMarketSummary,
+  unstableMarketSummaryFields,
+  UnstableMarketSummaryFields,
 } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
 import {
@@ -45,18 +46,6 @@ export const selectCurrentMarketInfo = createAppSelector(
   (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
 );
 
-const unstablePaths = [
-  'oraclePrice',
-  'priceChange24H',
-  'percentChange24h',
-  'nextFundingRate',
-  'volume24H',
-  'trades24H',
-  'openInterest',
-  'openInterestUSDC',
-] satisfies Array<keyof PerpetualMarketSummary>;
-type UnstablePaths = (typeof unstablePaths)[number];
-
 export const selectAllMarketSummariesStable = createAppSelector(
   [selectAllMarketSummaries],
   (summaries): StablePerpetualMarketSummaries | undefined => {
@@ -64,7 +53,7 @@ export const selectAllMarketSummariesStable = createAppSelector(
 
     return Object.entries(summaries).reduce<StablePerpetualMarketSummaries>(
       (acc, [marketId, summary]) => {
-        acc[marketId] = omit(summary, ...unstablePaths);
+        acc[marketId] = omit(summary, ...unstableMarketSummaryFields);
         return acc;
       },
       {}
@@ -80,7 +69,7 @@ export const selectAllMarketSummariesStable = createAppSelector(
 export const selectCurrentMarketInfoStable = createAppSelector(
   [selectCurrentMarketInfo],
   (market): undefined | StablePerpetualMarketSummary =>
-    market == null ? market : omit(market, ...unstablePaths),
+    market == null ? market : omit(market, ...unstableMarketSummaryFields),
   {
     memoizeOptions: {
       resultEqualityCheck: shallowEqual,
@@ -88,7 +77,10 @@ export const selectCurrentMarketInfoStable = createAppSelector(
   }
 );
 
-export type StableIndexerWsBaseMarketObject = Omit<IndexerWsBaseMarketObject, UnstablePaths>;
+export type StableIndexerWsBaseMarketObject = Omit<
+  IndexerWsBaseMarketObject,
+  UnstableMarketSummaryFields
+>;
 
 export const selectAllMarketsInfoStable = createAppSelector(
   [selectRawMarketsData],
@@ -97,7 +89,7 @@ export const selectAllMarketsInfoStable = createAppSelector(
 
     return Object.entries(markets).reduce<Record<string, StableIndexerWsBaseMarketObject>>(
       (acc, [marketId, market]) => {
-        acc[marketId] = omit(market, ...unstablePaths);
+        acc[marketId] = omit(market, ...unstableMarketSummaryFields);
         return acc;
       },
       {}
