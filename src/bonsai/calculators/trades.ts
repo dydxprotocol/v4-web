@@ -2,8 +2,15 @@ import { keyBy, maxBy, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { EMPTY_ARR } from '@/constants/objects';
-import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
-import { IndexerCompositeTradeObject } from '@/types/indexer/indexerManual';
+import {
+  IndexerOrderSide,
+  IndexerOrderType,
+  IndexerPositionSide,
+} from '@/types/indexer/indexerApiGen';
+import {
+  IndexerCompositeTradeHistoryObject,
+  IndexerTradeAction,
+} from '@/types/indexer/indexerManual';
 
 import { MustBigNumber, MustNumber } from '@/lib/numbers';
 
@@ -11,10 +18,10 @@ import { mergeObjects } from '../lib/mergeObjects';
 import { SubaccountTrade, TradeAction } from '../types/summaryTypes';
 
 export function calculateTrades(
-  restTrades: IndexerCompositeTradeObject[] | undefined,
-  liveTrades: IndexerCompositeTradeObject[] | undefined
+  restTrades: IndexerCompositeTradeHistoryObject[] | undefined,
+  liveTrades: IndexerCompositeTradeHistoryObject[] | undefined
 ): SubaccountTrade[] {
-  const getTradesById = (data: IndexerCompositeTradeObject[]) =>
+  const getTradesById = (data: IndexerCompositeTradeHistoryObject[]) =>
     keyBy(data, (trade) => trade.id ?? '');
 
   const merged = mergeObjects(
@@ -27,55 +34,77 @@ export function calculateTrades(
 }
 
 const calculateTrade = weakMapMemoize(
-  (base: IndexerCompositeTradeObject): SubaccountTrade => ({
+  (base: IndexerCompositeTradeHistoryObject): SubaccountTrade => ({
     id: base.id ?? '',
     marketId: base.marketId ?? '',
-    positionId: base.positionId ?? '',
-    orderId: base.orderId ?? '',
-    side: base.side,
+    orderId: base.orderId,
+    positionUniqueId: undefined,
+    side: base.side as IndexerOrderSide | undefined,
+    positionSide: base.positionSide as IndexerPositionSide | null | undefined,
     action: deriveTradeAction(base),
-    price: base.executionPrice,
-    size: (MustNumber(base.additionalSize ?? 0) + MustNumber(base.prevSize ?? 0)).toString(),
-    value:
-      MustNumber(base.executionPrice ?? 0) * MustNumber(base.additionalSize ?? 0) +
-      MustNumber(base.prevSize ?? '0'),
+    price: Number(base.executionPrice),
+    entryPrice: base.entryPrice ? Number(base.entryPrice) : undefined,
+    size:
+      Number(base.executionPrice) *
+      (MustNumber(base.additionalSize ?? 0) + MustNumber(base.prevSize ?? 0)),
+    prevSize: base.prevSize ? Number(base.prevSize) : undefined,
+    additionalSize: base.additionalSize ? Number(base.additionalSize) : undefined,
+    value: MustNumber(base.value ?? 0),
     fee: base.netFee,
     closedPnl: base.netRealizedPnl != null ? MustNumber(base.netRealizedPnl) : undefined,
-    closedPnlPercent:
-      base.netRealizedPnl != null
-        ? MustNumber(base.netRealizedPnl) /
-          (Math.abs(MustNumber(base.additionalSize ?? 0)) * MustNumber(base.executionPrice ?? 0))
-        : undefined,
+    closedPnlPercent: derivePerTradePnlPercent(base),
+    netClosedPnlPercent:
+      base.netRealizedPnlPercent != null ? MustNumber(base.netRealizedPnlPercent) : undefined,
     createdAt: base.time,
     marginMode: base.marginMode === 'ISOLATED' ? 'ISOLATED' : 'CROSS',
-    orderType: undefined, // map from base.orderType when API contract is known
+    orderType: base.orderType as IndexerOrderType | undefined,
+    subaccountNumber: base.subaccountNumber,
   })
 );
 
-function deriveTradeAction(trade: IndexerCompositeTradeObject): TradeAction {
-  // If the API sends `action` directly, use it:
-  // if (trade.action) return trade.action as TradeAction;
-
-  // Otherwise derive from position context (same logic you had):
-  const positionSizeBefore = MustNumber(trade.prevSize ?? '0');
-  const tradeSize = MustNumber(trade.additionalSize ?? 0) + MustNumber(trade.prevSize ?? 0);
+function deriveTradeAction(trade: IndexerCompositeTradeHistoryObject): TradeAction {
   const isLong =
     trade.positionSide === IndexerPositionSide.LONG ||
     (trade.side === IndexerOrderSide.BUY && trade.action === 'OPEN');
   const isExtend = trade.action === 'EXTEND';
   const isBuy = trade.side === IndexerOrderSide.BUY;
+  const isLiquidated =
+    trade.action === 'LIQUIDATION_CLOSE' || trade.action === 'LIQUIDATION_PARTIAL_CLOSE';
 
-  if (positionSizeBefore === 0) {
-    return isBuy ? TradeAction.OPEN_LONG : TradeAction.OPEN_SHORT;
+  if (isLiquidated) {
+    return TradeAction.LIQUIDATION;
   }
 
-  if ((isExtend && isBuy) || (isExtend && !isBuy)) {
+  if (trade.action === IndexerTradeAction.PARTIAL_CLOSE) {
+    return isBuy ? TradeAction.PARTIAL_CLOSE_SHORT : TradeAction.PARTIAL_CLOSE_LONG;
+  }
+
+  if (isExtend) {
     return isLong ? TradeAction.ADD_TO_LONG : TradeAction.ADD_TO_SHORT;
   }
 
-  const isFullClose = tradeSize >= positionSizeBefore;
-  if (isLong) {
-    return isFullClose ? TradeAction.CLOSE_LONG : TradeAction.PARTIAL_CLOSE_LONG;
+  if (trade.action === IndexerTradeAction.CLOSE) {
+    return trade.side === IndexerOrderSide.SELL || isLong
+      ? TradeAction.CLOSE_LONG
+      : TradeAction.CLOSE_SHORT;
   }
-  return isFullClose ? TradeAction.CLOSE_SHORT : TradeAction.PARTIAL_CLOSE_SHORT;
+
+  return trade.action === IndexerTradeAction.OPEN && (trade.side === IndexerOrderSide.BUY || isLong)
+    ? TradeAction.OPEN_LONG
+    : TradeAction.OPEN_SHORT;
+}
+
+function derivePerTradePnlPercent(trade: IndexerCompositeTradeHistoryObject): number | undefined {
+  if (!trade.entryPrice || !trade.executionPrice) {
+    return undefined;
+  }
+
+  const entryPrice = MustNumber(trade.entryPrice);
+  const executionPrice = MustNumber(trade.executionPrice);
+  const pnl =
+    trade.positionSide === IndexerPositionSide.LONG
+      ? executionPrice - entryPrice
+      : entryPrice - executionPrice;
+  const pnlPercent = pnl / entryPrice;
+  return pnlPercent;
 }

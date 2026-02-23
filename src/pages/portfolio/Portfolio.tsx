@@ -127,7 +127,6 @@ const PortfolioPage = () => {
                       ]
                     : [
                         TradeHistoryTableColumnKey.Market,
-                        TradeHistoryTableColumnKey.Leverage,
                         TradeHistoryTableColumnKey.Type,
                         TradeHistoryTableColumnKey.Action,
                         TradeHistoryTableColumnKey.Price,

@@ -1,19 +1,13 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import {
-  PerpetualMarketSummary,
-  SubaccountFillType,
-  SubaccountTrade,
-  TradeAction,
-} from '@/bonsai/types/summaryTypes';
+import { PerpetualMarketSummary, SubaccountTrade } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
-import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,7 +17,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-// import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -32,8 +25,8 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 
 import { getMarginModeStringKey } from '@/lib/enumToStringKeyHelpers';
-import { getNumberSign, MustBigNumber } from '@/lib/numbers';
-// import { MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber } from '@/lib/numbers';
+import { getTradeActionDisplayInfo } from '@/lib/tradeHistoryHelpers';
 import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 import { TradeHistoryActionsCell } from './TradeHistoryTable/TradeHistoryActionsCell';
@@ -41,7 +34,6 @@ import { TradeHistoryActionsCell } from './TradeHistoryTable/TradeHistoryActions
 export enum TradeHistoryTableColumnKey {
   Time = 'Time',
   Market = 'Market',
-  Leverage = 'Leverage',
   Type = 'Type',
   Action = 'Action',
   Side = 'Side',
@@ -63,33 +55,9 @@ export type TradeTableRow = {
   tickSizeDecimals: number;
 } & SubaccountTrade;
 
-function getActionDisplayInfo(action: TradeAction) {
-  switch (action) {
-    case TradeAction.OPEN_LONG:
-      return { label: 'Open Long', color: 'var(--color-positive)' };
-    case TradeAction.OPEN_SHORT:
-      return { label: 'Open Short', color: 'var(--color-negative)' };
-    case TradeAction.CLOSE_LONG:
-      return { label: 'Close Long', color: 'var(--color-negative)' };
-    case TradeAction.CLOSE_SHORT:
-      return { label: 'Close Short', color: 'var(--color-positive)' };
-    case TradeAction.PARTIAL_CLOSE_LONG:
-      return { label: 'Partial Close Long', color: 'var(--color-negative)' };
-    case TradeAction.PARTIAL_CLOSE_SHORT:
-      return { label: 'Partial Close Short', color: 'var(--color-positive)' };
-    case TradeAction.ADD_TO_LONG:
-      return { label: 'Add to Long', color: 'var(--color-positive)' };
-    case TradeAction.ADD_TO_SHORT:
-      return { label: 'Add to Short', color: 'var(--color-negative)' };
-    default:
-      return { label: '', color: 'var(--color-text-0)' };
-  }
-}
-
 const getTradeHistoryTableColumnDef = ({
   key,
   stringGetter,
-  symbol = '',
   width,
 }: {
   key: TradeHistoryTableColumnKey;
@@ -133,24 +101,6 @@ const getTradeHistoryTableColumnDef = ({
         ),
       },
 
-      [TradeHistoryTableColumnKey.Leverage]: {
-        columnKey: 'leverage',
-        getCellValue: (row) => row.leverage,
-        label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
-        renderCell: ({ leverage, positionSide }) => (
-          <TableCell>
-            <$OutputSigned
-              sign={getNumberSign(
-                positionSide === IndexerPositionSide.SHORT ? -1 * (leverage ?? 0) : (leverage ?? 0)
-              )}
-              type={OutputType.Multiple}
-              value={leverage}
-              showSign={ShowSign.None}
-            />
-          </TableCell>
-        ),
-      },
-
       [TradeHistoryTableColumnKey.Type]: {
         columnKey: 'type',
         getCellValue: (row) => row.marginMode,
@@ -167,7 +117,7 @@ const getTradeHistoryTableColumnDef = ({
         getCellValue: (row) => row.action,
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         renderCell: ({ action }) => {
-          const { label, color } = getActionDisplayInfo(action);
+          const { label, color } = getTradeActionDisplayInfo(action, stringGetter);
           return <span css={{ color }}>{label}</span>;
         },
       },
@@ -198,11 +148,14 @@ const getTradeHistoryTableColumnDef = ({
 
       [TradeHistoryTableColumnKey.Size]: {
         columnKey: 'size',
-        getCellValue: (row) => row.size,
+        getCellValue: (row) => row.additionalSize,
         label: stringGetter({ key: STRING_KEYS.AMOUNT }),
-        tag: symbol,
-        renderCell: ({ size, stepSizeDecimals }) => (
-          <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
+        renderCell: ({ additionalSize, stepSizeDecimals }) => (
+          <Output
+            type={OutputType.Asset}
+            value={Math.abs(Number(additionalSize))}
+            fractionDigits={stepSizeDecimals}
+          />
         ),
       },
 
@@ -231,10 +184,10 @@ const getTradeHistoryTableColumnDef = ({
       [TradeHistoryTableColumnKey.ClosedPnl]: {
         columnKey: 'closedPnl',
         getCellValue: (row) => row.closedPnl,
-        label: stringGetter({ key: STRING_KEYS.PNL }),
-        renderCell: ({ closedPnl, closedPnlPercent }) => (
+        label: stringGetter({ key: STRING_KEYS.CLOSED_PNL }),
+        renderCell: ({ closedPnl, netClosedPnlPercent }) => (
           <TableCell>
-            {closedPnl != null ? (
+            {closedPnl != null && closedPnl !== 0 ? (
               <>
                 <Output
                   type={OutputType.Fiat}
@@ -243,9 +196,9 @@ const getTradeHistoryTableColumnDef = ({
                   withSignedValueColor
                 />
                 <$HighlightOutput
-                  isNegative={MustBigNumber(closedPnlPercent).isNegative()}
+                  isNegative={MustBigNumber(netClosedPnlPercent).isNegative()}
                   type={OutputType.Percent}
-                  value={closedPnlPercent}
+                  value={netClosedPnlPercent}
                   showSign={ShowSign.Both}
                   withParentheses
                   withSignedValueColor
@@ -259,7 +212,6 @@ const getTradeHistoryTableColumnDef = ({
       },
 
       // --- Tablet stacked columns ---
-
       [TradeHistoryTableColumnKey.ActionAmount]: {
         columnKey: 'actionAmount',
         getCellValue: (row) => row.size,
@@ -270,7 +222,7 @@ const getTradeHistoryTableColumnDef = ({
           </TableColumnHeader>
         ),
         renderCell: ({ action, size, stepSizeDecimals, marketSummary }) => {
-          const { label, color } = getActionDisplayInfo(action);
+          const { label, color } = getTradeActionDisplayInfo(action, stringGetter);
           return (
             <TableCell
               stacked
@@ -354,8 +306,9 @@ export const TradeHistoryTable = forwardRef(
     _ref
   ) => {
     const stringGetter = useStringGetter();
-
-    const allTrades = MOCK_TRADES; // useAppSelector(BonsaiCore.account.trades.data);
+    const allTrades = useAppSelector(BonsaiCore.account.tradeHistory.data);
+    const tradesStatus = useAppSelector(BonsaiCore.account.tradeHistory.loading);
+    const isError = tradesStatus === 'error';
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
     const tradesData = useMemo(
@@ -373,9 +326,9 @@ export const TradeHistoryTable = forwardRef(
 
     return (
       <$Table
-        key="all-trades"
+        key="trade-history"
         label="Trades"
-        tableId="trades"
+        tableId="tradeHistory"
         data={tradesData}
         getRowKey={(row: TradeTableRow) => row.id}
         columns={columnKeys.map((key: TradeHistoryTableColumnKey) =>
@@ -386,10 +339,22 @@ export const TradeHistoryTable = forwardRef(
           })
         )}
         slotEmpty={
-          <>
-            <Icon iconName={IconName.History} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
-          </>
+          isError ? (
+            <>
+              <Icon iconName={IconName.ErrorExclamation} tw="text-[3em]" />
+              <h4>
+                {stringGetter({
+                  key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                  params: { ERROR_MESSAGE: 'Failed to load trades' },
+                })}
+              </h4>
+            </>
+          ) : (
+            <>
+              <Icon iconName={IconName.History} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
+            </>
+          )
         }
         initialPageSize={initialPageSize}
         withOuterBorder={withOuterBorder}
@@ -417,230 +382,6 @@ const $Side = styled.span<{ side: Nullable<IndexerOrderSide> }>`
         color: var(--color-negative);
       `,
     }[side]};
-`;
-
-const MOCK_TRADES: SubaccountTrade[] = [
-  // --- L → Close scenario ---
-  {
-    id: 'trade-001',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.SELL,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.CLOSE_LONG,
-    price: '5000.00',
-    size: '10.05',
-    prevSize: '0.00',
-    additionalSize: '10.05',
-    value: 50250,
-    fee: '0.10',
-    closedPnl: 20293.09,
-    closedPnlPercent: 0.404,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.MARKET,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  {
-    id: 'trade-002',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.BUY,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.OPEN_LONG,
-    price: '3000.00',
-    size: '10.05',
-    prevSize: '0.00',
-    additionalSize: '10.05',
-    value: 30150,
-    fee: '0.10',
-    closedPnl: undefined,
-    closedPnlPercent: undefined,
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.LIMIT,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  // --- L → S (crossing 0) scenario ---
-  {
-    id: 'trade-003',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.SELL,
-    positionSide: IndexerPositionSide.SHORT,
-    action: TradeAction.OPEN_SHORT,
-    price: '3000.00',
-    size: '10.05',
-    prevSize: '0.00',
-    additionalSize: '10.05',
-    value: 30150,
-    fee: '0.10',
-    closedPnl: undefined,
-    closedPnlPercent: undefined,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.MARKET,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  {
-    id: 'trade-004',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.SELL,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.CLOSE_LONG,
-    price: '3000.00',
-    size: '10.05',
-    prevSize: '0.00',
-    additionalSize: '10.05',
-    value: 30150,
-    fee: '0.10',
-    closedPnl: -20293.09,
-    closedPnlPercent: -0.4469,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.MARKET,
-    leverage: 10,
-    entryPrice: 5000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  {
-    id: 'trade-005',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.BUY,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.OPEN_LONG,
-    price: '3000.00',
-    size: '10.05',
-    prevSize: '0.00',
-    additionalSize: '10.05',
-    value: 30150,
-    fee: '0.10',
-    closedPnl: undefined,
-    closedPnlPercent: undefined,
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.LIMIT,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  // --- L → Partial Close scenario ---
-  {
-    id: 'trade-006',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.SELL,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.PARTIAL_CLOSE_LONG,
-    price: '5000.00',
-    size: '5.00',
-    prevSize: '6.00',
-    additionalSize: '-5.00',
-    value: 25000,
-    fee: '0.10',
-    closedPnl: 5293.09,
-    closedPnlPercent: 0.0212,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.MARKET,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  {
-    id: 'trade-007',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.BUY,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.OPEN_LONG,
-    price: '3000.00',
-    size: '10.00',
-    prevSize: '0.00',
-    additionalSize: '10.00',
-    value: 30000,
-    fee: '0.10',
-    closedPnl: undefined,
-    closedPnlPercent: undefined,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.LIMIT,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-
-  // --- Add to Long scenario ---
-  {
-    id: 'trade-008',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.BUY,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.ADD_TO_LONG,
-    price: '3000.00',
-    size: '5.00',
-    prevSize: '10.00',
-    additionalSize: '5.00',
-    value: 15000,
-    fee: '0.10',
-    closedPnl: undefined,
-    closedPnlPercent: undefined,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.LIMIT,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-  {
-    id: 'trade-009',
-    marketId: 'ETH-USD',
-    side: IndexerOrderSide.BUY,
-    positionSide: IndexerPositionSide.LONG,
-    action: TradeAction.OPEN_LONG,
-    price: '3000.00',
-    size: '10.00',
-    prevSize: '0.00',
-    additionalSize: '10.00',
-    value: 30000,
-    fee: '0.10',
-    closedPnl: undefined,
-    closedPnlPercent: undefined,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    marginMode: 'CROSS',
-    orderType: SubaccountFillType.LIMIT,
-    leverage: 10,
-    entryPrice: 3000.01,
-    liquidationPrice: 2000.01,
-    orderId: '',
-    positionId: '',
-  },
-];
-
-const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
-  color: ${({ sign }) =>
-    ({
-      [NumberSign.Positive]: `var(--color-positive)`,
-      [NumberSign.Negative]: `var(--color-negative)`,
-      [NumberSign.Neutral]: `var(--color-text-2)`,
-    })[sign]};
 `;
 
 const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`

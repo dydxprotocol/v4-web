@@ -167,36 +167,36 @@ export enum IndexerTradeAction {
   CLOSE = 'CLOSE',
   PARTIAL_CLOSE = 'PARTIAL_CLOSE',
   EXTEND = 'EXTEND',
+  LIQUIDATION_CLOSE = 'LIQUIDATION_CLOSE',
+  LIQUIDATION_PARTIAL_CLOSE = 'LIQUIDATION_PARTIAL_CLOSE',
 }
 
-// TODO: DWJ -- review this
-export interface IndexerCompositeTradeObject {
+export interface IndexerCompositeTradeHistoryObject {
   id?: string;
   marketId?: string;
   orderId?: string;
-  positionId?: string;
-  side?: IndexerOrderSide;
-  positionSide?: IndexerPositionSide;
-  type?: IndexerFillType; // or a new trade-specific type enum
+  side?: string | IndexerOrderSide;
+  positionSide?: string | IndexerPositionSide | null;
+  entryPrice?: string;
   executionPrice?: string;
   value?: string;
   prevSize?: string;
   additionalSize?: string;
   netFee?: string;
   time?: string;
-  // Fields the new endpoint will likely add:
-  action?: IndexerTradeAction;
-  leverage?: string;
-  marginMode?: string; // "CROSS" | "ISOLATED"
-  orderType?: string;
-  netRealizedPnl?: string;
+  action?: string | IndexerTradeAction;
+  marginMode?: string;
+  orderType?: string | IndexerOrderType;
+  netRealizedPnl?: string | null;
+  netRealizedPnlPercent?: string | null;
+  subaccountNumber?: number;
 }
 
-export interface IndexerCompositeTradeResponse {
+export interface IndexerCompositeTradeHistoryResponse {
   pageSize?: number;
   totalResults?: number;
   offset?: number;
-  trades?: IndexerCompositeTradeObject[];
+  tradeHistory?: IndexerCompositeTradeHistoryObject[];
 }
 
 export interface IndexerWsParentSubaccountSubscribedResponse {

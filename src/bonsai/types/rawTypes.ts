@@ -7,7 +7,7 @@ import {
 import {
   IndexerCompositeFillObject,
   IndexerCompositeOrderObject,
-  IndexerCompositeTradeObject,
+  IndexerCompositeTradeHistoryObject,
   IndexerTransferCommonResponseObject,
   IndexerWsBaseMarketObject,
 } from '@/types/indexer/indexerManual';
@@ -32,7 +32,7 @@ export interface ParentSubaccountData {
     tradingRewards?: IndexerHistoricalBlockTradingReward[];
     fills?: IndexerCompositeFillObject[];
     orders?: OrdersData;
-    trades?: IndexerCompositeTradeObject[];
+    tradeHistory?: IndexerCompositeTradeHistoryObject[];
     transfers?: IndexerTransferCommonResponseObject[];
   };
 }

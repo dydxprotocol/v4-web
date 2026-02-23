@@ -210,30 +210,33 @@ export enum TradeAction {
   PARTIAL_CLOSE_SHORT = 'PARTIAL_CLOSE_SHORT',
   ADD_TO_LONG = 'ADD_TO_LONG',
   ADD_TO_SHORT = 'ADD_TO_SHORT',
+  LIQUIDATION = 'LIQUIDATION',
 }
 
 export type SubaccountTrade = {
   id: string;
   marketId: string;
-  orderId: string;
-  positionId: string;
-  side: IndexerOrderSide | undefined;
-  positionSide?: IndexerPositionSide | undefined;
+  orderId: string | undefined;
+  positionUniqueId: PositionUniqueId | undefined;
+  side?: IndexerOrderSide | undefined;
+  positionSide?: IndexerPositionSide | undefined | null;
   action: TradeAction;
-  price: string | undefined;
-  size: string | undefined;
-  prevSize?: string | undefined;
-  additionalSize?: string | undefined;
+  price: number | undefined;
+  entryPrice?: number | undefined;
+  size?: number | undefined;
+  prevSize?: number | undefined;
+  additionalSize?: number | undefined;
   value: number | undefined;
   fee: string | undefined;
-  closedPnl: number | undefined;
+  closedPnl?: number | undefined;
   closedPnlPercent?: number | undefined;
+  netClosedPnlPercent?: number | undefined;
   createdAt: string | undefined;
   marginMode: MarginMode;
-  orderType: SubaccountFillType | undefined;
+  orderType: IndexerOrderType | undefined;
   leverage?: number;
-  entryPrice?: number;
   liquidationPrice?: number;
+  subaccountNumber?: number;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;

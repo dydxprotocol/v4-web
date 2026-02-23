@@ -1,4 +1,4 @@
-import { isParentSubaccountTradeResponse } from '@/types/indexer/indexerChecks';
+import { isParentSubaccountTradeHistoryResponse } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
 import { setAccountTradesRaw } from '@/state/raw';
@@ -12,25 +12,33 @@ import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
-export function setUpTradesQuery(store: RootStore) {
-  const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'trades']);
+export function setUpTradeHistoryQuery(store: RootStore) {
+  const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'tradeHistory']);
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
-    name: 'trades',
+    name: 'tradeHistory',
     selector: selectParentSubaccountInfo,
-    getQueryKey: (data) => ['account', 'trades', data.wallet, data.subaccount],
+    getQueryKey: (data) => ['account', 'tradeHistory', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
       if (!isTruthy(data.wallet) || data.subaccount == null || data.isPerpsGeoRestricted) {
         return null;
       }
-      // TODO: DWJ -- Replace with real trades endpoint when available
-      // e.g. indexerClient.account.getParentSubaccountNumberTrades(data.wallet!, data.subaccount!)
       return () =>
-        indexerClient.account.getParentSubaccountNumberFills(data.wallet!, data.subaccount!);
+        indexerClient.account.getParentSubaccountNumberTradeHistory(
+          data.wallet!,
+          data.subaccount!,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        );
     },
-    onResult: (trades) => {
+    onResult: (tradeHistory) => {
       store.dispatch(
         setAccountTradesRaw(
-          mapLoadableData(queryResultToLoadable(trades), isParentSubaccountTradeResponse)
+          mapLoadableData(
+            queryResultToLoadable(tradeHistory),
+            isParentSubaccountTradeHistoryResponse
+          )
         )
       );
     },

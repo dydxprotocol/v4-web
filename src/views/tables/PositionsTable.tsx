@@ -421,7 +421,6 @@ const getPositionsTableColumnDef = ({
             oraclePrice={MaybeBigNumber(marketSummary?.oraclePrice)}
             entryPrice={entryPrice}
             unrealizedPnl={unrealizedPnl}
-            sideLabel={stringGetter({ key: getIndexerPositionSideStringKey(side) })}
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
           />

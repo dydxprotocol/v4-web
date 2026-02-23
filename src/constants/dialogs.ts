@@ -69,7 +69,7 @@ export type SharePNLAnalyticsDialogProps = {
   marketId?: string;
   isLong: boolean;
   isCross: boolean;
-  shareType?: 'open' | 'close' | 'liquidated' | 'partialClose' | undefined;
+  shareType?: 'open' | 'close' | 'liquidated' | 'partialClose' | 'extend' | undefined;
   leverage?: Nullable<number>;
   size?: Nullable<number>;
   prevSize?: Nullable<number>;
@@ -81,6 +81,7 @@ export type SharePNLAnalyticsDialogProps = {
   liquidationPrice?: Nullable<number>;
   oraclePrice?: Nullable<number>;
   sideLabel?: Nullable<string>;
+  closeType?: Nullable<string>;
 };
 export type SimpleUiTradeDialogProps =
   | {

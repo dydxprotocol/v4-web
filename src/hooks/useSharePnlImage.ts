@@ -22,8 +22,8 @@ export const useSharePnlImage = (data: SharePNLAnalyticsDialogProps) => {
 
     const requestBody = {
       ticker: data.assetId,
-      type: data.shareType ?? 'open',
-      leverage: data.leverage ?? 0,
+      type: data.shareType,
+      leverage: data.leverage,
       username: truncateAddress(dydxAddress),
       isLong: data.isLong,
       isCross: data.isCross,
@@ -37,6 +37,7 @@ export const useSharePnlImage = (data: SharePNLAnalyticsDialogProps) => {
       exitPx: data.exitPrice ?? undefined,
       liquidationPx: data.liquidationPrice ?? undefined,
       markPx: data.oraclePrice ?? undefined,
+      closeType: data.closeType ?? undefined,
     };
 
     const response = await fetch(pnlImageApi, {

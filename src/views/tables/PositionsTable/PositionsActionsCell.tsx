@@ -39,7 +39,6 @@ type ElementProps = {
   entryPrice: Nullable<BigNumber>;
   unrealizedPnl: Nullable<BigNumber>;
   side: Nullable<IndexerPositionSide>;
-  sideLabel: Nullable<string>;
   isDisabled?: boolean;
   showClosePositionAction: boolean;
 };
@@ -53,7 +52,6 @@ export const PositionsActionsCell = ({
   entryPrice,
   unrealizedPnl,
   side,
-  sideLabel,
   isDisabled,
   showClosePositionAction,
 }: ElementProps) => {
@@ -86,24 +84,16 @@ export const PositionsActionsCell = ({
       size: position?.value.toNumber() ?? 0,
       isLong: side === IndexerPositionSide.LONG,
       isCross: position?.marginMode === 'CROSS',
-      shareType: position?.status === 'OPEN' ? 'open' : 'close',
       leverage: leverage?.toNumber(),
       oraclePrice: oraclePrice?.toNumber(),
       entryPrice: entryPrice?.toNumber(),
       unrealizedPnl: unrealizedPnl?.toNumber(),
       pnl: position?.realizedPnl.toNumber(),
-      pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber() ?? 0,
+      pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber(),
       liquidationPrice: position?.liquidationPrice?.toNumber(),
     };
 
-    dispatch(
-      openDialog(
-        DialogTypes.SharePNLAnalytics({
-          ...sharePnlData,
-          sideLabel,
-        })
-      )
-    );
+    dispatch(openDialog(DialogTypes.SharePNLAnalytics(sharePnlData)));
   };
 
   return (
@@ -145,11 +135,9 @@ const $ActionsTableCell = styled(ActionsTableCell)`
 `;
 
 const $TriggersButton = styled(IconButton)`
-  --button-icon-size: 1.25em;
+  --button-icon-size: 1em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
-
-  --button-icon-size: 1em;
 `;
 
 const $CloseButtonToggle = styled(IconButton)`

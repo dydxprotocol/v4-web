@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -16,10 +15,9 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
 import { MaybeBigNumber } from '@/lib/numbers';
 
-import { TradeTableRow } from '../TradeHistoryTable';
+import { type TradeTableRow } from '../TradeHistoryTable';
 
 type ElementProps = {
   trade: TradeTableRow;
@@ -30,12 +28,6 @@ export const TradeHistoryActionsCell = ({ trade, isDisabled }: ElementProps) => 
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const sideLabel =
-    trade.positionSide &&
-    stringGetter({
-      key: getIndexerPositionSideStringKey(trade.positionSide),
-    });
-
   const shareType =
     trade.action === TradeAction.OPEN_LONG || trade.action === TradeAction.OPEN_SHORT
       ? 'open'
@@ -44,33 +36,34 @@ export const TradeHistoryActionsCell = ({ trade, isDisabled }: ElementProps) => 
         ? 'partialClose'
         : trade.action === TradeAction.CLOSE_LONG || trade.action === TradeAction.CLOSE_SHORT
           ? 'close'
-          : undefined;
+          : trade.action === TradeAction.LIQUIDATION
+            ? 'liquidated'
+            : undefined;
+
+  const prevSize = !!trade.prevSize && !!trade.price ? trade.prevSize * trade.price : undefined;
 
   const sharePnlData: SharePNLAnalyticsDialogProps = {
     assetId: trade.marketSummary?.assetId ?? '',
     marketId: trade.marketId,
-    size: trade.value ?? 0,
-    isLong: trade.positionSide === IndexerPositionSide.LONG,
+    size: trade.size ?? trade.value,
+    prevSize,
+    isLong:
+      trade.positionSide === 'LONG' ||
+      trade.action === TradeAction.OPEN_LONG ||
+      trade.action === TradeAction.CLOSE_LONG,
     isCross: trade.marginMode === 'CROSS',
     shareType,
     leverage: trade.leverage,
     oraclePrice: MaybeBigNumber(trade.marketSummary?.oraclePrice)?.toNumber(),
-    entryPrice: MaybeBigNumber(trade.entryPrice)?.toNumber(),
-    exitPrice: MaybeBigNumber(trade.price)?.toNumber(),
+    entryPrice: trade.entryPrice,
+    exitPrice: trade.price,
     pnl: trade.closedPnl,
-    pnlPercentage: trade.closedPnlPercent ?? 0,
+    pnlPercentage: trade.netClosedPnlPercent ?? 0,
     liquidationPrice: trade.liquidationPrice,
   };
 
   const openShareDialog = () => {
-    dispatch(
-      openDialog(
-        DialogTypes.SharePNLAnalytics({
-          ...sharePnlData,
-          sideLabel: sideLabel ?? undefined,
-        })
-      )
-    );
+    dispatch(openDialog(DialogTypes.SharePNLAnalytics(sharePnlData)));
   };
 
   return (
@@ -94,9 +87,7 @@ const $ActionsTableCell = styled(ActionsTableCell)`
 `;
 
 const $TriggersButton = styled(IconButton)`
-  --button-icon-size: 1.25em;
+  --button-icon-size: 1em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
-
-  --button-icon-size: 1em;
 `;
