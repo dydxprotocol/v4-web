@@ -128,7 +128,7 @@ const getOrdersTableColumnDef = ({
               >
                 {status != null && <OrderStatusIconNew status={status} />}
               </WithTooltip>
-              {stringGetter({ key: getIndexerOrderTypeStringKey(type) })}
+              {type != null && stringGetter({ key: getIndexerOrderTypeStringKey(type) })}
             </TableCell>
           );
         },

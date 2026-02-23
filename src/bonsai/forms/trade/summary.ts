@@ -219,11 +219,12 @@ export function calculateTradeSummary(
             assertNever(effectiveTrade.timeInForce);
             return OrderTimeInForce.IOC;
           }),
-          postOnly: effectiveTrade.type === TradeFormType.TWAP
-            ? false
-            : options.needsPostOnly
-              ? effectiveTrade.postOnly
-              : undefined,
+          postOnly:
+            effectiveTrade.type === TradeFormType.TWAP
+              ? false
+              : options.needsPostOnly
+                ? effectiveTrade.postOnly
+                : undefined,
           reduceOnly: options.needsReduceOnly ? effectiveTrade.reduceOnly : undefined,
           triggerPrice: options.needsTriggerPrice ? triggerPrice : undefined,
           execution: calc(() => {
@@ -651,9 +652,7 @@ export function tradeFormTypeToOrderType(
       }
       return OrderType.STOP_LIMIT;
     case TradeFormType.TWAP:
-      // TWAP orders use LIMIT + GTT to get LONG_TERM order flags;
-      // the twapParameters on the order tells the protocol to execute as TWAP
-      return OrderType.LIMIT;
+      return OrderType.TWAP;
     default:
       assertNever(tradeFormType);
       return OrderType.MARKET;

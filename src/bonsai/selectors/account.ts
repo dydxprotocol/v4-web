@@ -3,7 +3,7 @@ import { isEqual, orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
-import { IndexerOrderType, IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
@@ -32,7 +32,6 @@ import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import {
   isTWAPOrder,
-  OrderFlags,
   SubaccountFillType,
   SubaccountTransfer,
 } from '../types/summaryTypes';
@@ -171,49 +170,6 @@ export const selectOrderHistory = createAppSelector([selectAccountOrders], (orde
 
 export const selectTWAPOrders = createAppSelector([selectAccountOrders], (orders) => {
   console.log('orders', orders);
-  // DEBUG: log all orders to check if any have TWAP type/flags
-  if (orders.length > 0) {
-    const twapCandidates = orders.filter(
-      (o) =>
-        o.type === IndexerOrderType.TWAP ||
-        o.type === IndexerOrderType.TWAPSUBORDER ||
-        o.orderFlags === OrderFlags.TWAP ||
-        o.orderFlags === OrderFlags.TWAP_SUBORDER
-    );
-    // eslint-disable-next-line no-console
-    console.log(
-      '[TWAP DEBUG] total orders:',
-      orders.length,
-      'twap candidates:',
-      twapCandidates.length
-    );
-    if (twapCandidates.length > 0) {
-      // eslint-disable-next-line no-console
-      console.log(
-        '[TWAP DEBUG] candidates:',
-        twapCandidates.map((o) => ({
-          id: o.id,
-          type: o.type,
-          orderFlags: o.orderFlags,
-          status: o.status,
-        }))
-      );
-    }
-    // also log any LONG_TERM orders in case TWAP is coming back as LONG_TERM + LIMIT
-    const longTermOrders = orders.filter((o) => o.orderFlags === OrderFlags.LONG_TERM);
-    if (longTermOrders.length > 0) {
-      // eslint-disable-next-line no-console
-      console.log(
-        '[TWAP DEBUG] LONG_TERM orders:',
-        longTermOrders.map((o) => ({
-          id: o.id,
-          type: o.type,
-          orderFlags: o.orderFlags,
-          status: o.status,
-        }))
-      );
-    }
-  }
   return orders.filter(isTWAPOrder);
 });
 

@@ -492,16 +492,6 @@ export class AccountTransactionSupervisor {
           subaccountNumberToUse
         );
 
-        // eslint-disable-next-line no-console
-        console.log('[TWAP DEBUG] placeOrder payload:', { type, timeInForce, postOnly, goodTilTimeInSeconds, twapParameters, execution });
-
-        // DEBUG: also log the encoded message to verify twapParameters is in the protobuf
-        try {
-          const debugMsg = await (compositeClient as any).validatorClient.post.composer.composeMsgPlaceOrder;
-          // eslint-disable-next-line no-console
-          console.log('[TWAP DEBUG] composer available:', !!debugMsg);
-        } catch (_e) { /* ignore */ }
-
         // Place order
         const tx = await compositeClient.placeOrder(
           subaccountClientToUse,
@@ -524,9 +514,6 @@ export class AccountTransactionSupervisor {
           Method.BroadcastTxSync,
           twapParameters ?? undefined
         );
-
-        // eslint-disable-next-line no-console
-        console.log('[TWAP DEBUG] tx response:', JSON.stringify(tx, (_k, v) => typeof v === 'bigint' ? v.toString() : v));
 
         if ((tx as IndexedTx | undefined)?.code !== 0) {
           throw new StatefulOrderError('Stateful order has failed to commit.', tx);
