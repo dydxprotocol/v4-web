@@ -105,6 +105,8 @@ export function calculateTradeInfo(
               }
               return price * (1 - MARKET_ORDER_MAX_SLIPPAGE);
             }),
+            startPrice: undefined,
+            endPrice: undefined,
             slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
@@ -264,6 +266,8 @@ export function calculateTradeInfo(
               accountData.rawSelectedMarketLeverages
             ),
             payloadPrice,
+            startPrice: undefined,
+            endPrice: undefined,
             reward: calculateTakerReward(
               usdcSize,
               totalFees,
@@ -273,6 +277,87 @@ export function calculateTradeInfo(
           };
         });
       case TradeFormType.SCALE:
+        return calc((): TradeSummary => {
+          const timeInForce = trade.timeInForce;
+          const execution = trade.execution;
+          const isMaker = timeInForce === TimeInForce.GTT || execution === ExecutionType.POST_ONLY;
+
+          const feeRate = isMaker
+            ? accountData.userFeeStats.makerFeeRate
+            : accountData.userFeeStats.takerFeeRate;
+
+          const startPrice = AttemptNumber(trade.scaleStartPrice);
+          const endPrice = AttemptNumber(trade.scaleEndPrice);
+          const weightedAvgPrice = calculateScaleWeightedAveragePrice(
+            startPrice,
+            endPrice,
+            AttemptNumber(trade.scaleTotalOrders),
+            AttemptNumber(trade.scaleSkew)
+          );
+          const weightedAvgPriceStr =
+            weightedAvgPrice != null ? String(weightedAvgPrice) : undefined;
+
+          const inputSummary = calculateLimitOrderInputSummary(
+            trade.size,
+            trade.side,
+            weightedAvgPriceStr,
+            trade.reduceOnly,
+            AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+            baseAccount,
+            accountData,
+            subaccountToUse
+          );
+
+          const totalFees = calculateTradeFeeAfterDiscounts(
+            accountData,
+            mapIfPresent(feeRate, inputSummary.size?.usdcSize, (fee, usdc) => fee * usdc)
+          );
+
+          return {
+            subaccountNumber: subaccountToUse,
+            slippage: 0,
+            indexSlippage: 0,
+            filled: true,
+            feeRate,
+            inputSummary,
+            fee: totalFees,
+            payloadPrice: weightedAvgPrice,
+            startPrice,
+            endPrice,
+            isPositionClosed:
+              mapIfPresent(
+                inputSummary.size?.size,
+                baseAccount?.position?.unsignedSize.toNumber(),
+                baseAccount?.position?.side,
+                trade.side,
+                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+                (filled, size, positionSide, orderSide, stepSize) =>
+                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
+                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
+                  Math.abs(filled - size) < stepSize / 2
+              ) ?? false,
+            total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
+            transferToSubaccountAmount: calculateIsolatedTransferAmount(
+              trade,
+              inputSummary.size?.size ?? 0,
+              weightedAvgPrice ?? 0,
+              totalFees ?? 0,
+              subaccountToUse,
+              accountData.rawParentSubaccountData?.parentSubaccount,
+              baseAccount?.position,
+              accountData.currentTradeMarketSummary,
+              accountData.rawSelectedMarketLeverages
+            ),
+            reward: isMaker
+              ? calculateMakerReward(totalFees, accountData.rewardParams)
+              : calculateTakerReward(
+                  inputSummary.size?.usdcSize,
+                  totalFees,
+                  accountData.rewardParams,
+                  accountData.feeTiers
+                ),
+          };
+        });
       case TradeFormType.LIMIT:
       case TradeFormType.TRIGGER_LIMIT:
         return calc((): TradeSummary => {
@@ -280,7 +365,6 @@ export function calculateTradeInfo(
           const execution = trade.execution;
           const isMaker =
             (trade.type === TradeFormType.LIMIT && timeInForce === TimeInForce.GTT) ||
-            (trade.type === TradeFormType.SCALE && timeInForce === TimeInForce.GTT) ||
             execution === ExecutionType.POST_ONLY;
 
           const feeRate = isMaker
@@ -312,6 +396,8 @@ export function calculateTradeInfo(
             inputSummary,
             fee: totalFees,
             payloadPrice: price,
+            startPrice: undefined,
+            endPrice: undefined,
             isPositionClosed:
               mapIfPresent(
                 inputSummary.size?.size,
@@ -1184,6 +1270,33 @@ function getTransferAmountFromTargetLeverage(
     (margin + feesAtFillPriceWithBuffer + slippageLoss) *
     (ignoreSlippageAndOracleDrift ? 1 + FLAT_TRANSFER_BUFFER : 1)
   );
+}
+
+function calculateScaleWeightedAveragePrice(
+  startPrice: number | undefined,
+  endPrice: number | undefined,
+  totalOrders: number | undefined,
+  skew: number | undefined
+): number | undefined {
+  if (startPrice == null || endPrice == null || totalOrders == null || skew == null) {
+    return undefined;
+  }
+  const n = Math.floor(totalOrders);
+  if (n < 1 || skew <= 0) {
+    return undefined;
+  }
+  if (n === 1) {
+    return startPrice;
+  }
+  let totalWeight = 0;
+  let weightedPriceSum = 0;
+  for (let i = 0; i < n; i += 1) {
+    const w = skew ** i;
+    const price = startPrice + ((endPrice - startPrice) * i) / (n - 1);
+    weightedPriceSum += w * price;
+    totalWeight += w;
+  }
+  return totalWeight > 0 ? weightedPriceSum / totalWeight : undefined;
 }
 
 function calculateTradeFeeAfterDiscounts(

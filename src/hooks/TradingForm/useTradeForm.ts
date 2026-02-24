@@ -7,6 +7,7 @@ import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, ValidationError } from '@/bonsai/lib/validationErrors';
 import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { isEmpty } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ComplianceStates } from '@/constants/compliance';
@@ -126,9 +127,11 @@ export const useTradeForm = ({
     setPlaceOrderError(undefined);
     const payload = summary.tradePayload;
     const tradePayload = payload?.orderPayload;
-    const isScaleOrder =
-      tradePayload == null && (payload?.scaleOrderPayloads?.length ?? 0) > 0;
-    if (payload == null || (tradePayload == null && !isScaleOrder) || hasValidationErrors) {
+    if (
+      payload == null ||
+      (tradePayload == null && isEmpty(payload.scaleOrderPayloads)) ||
+      hasValidationErrors
+    ) {
       return;
     }
 
@@ -177,11 +180,9 @@ export const useTradeForm = ({
     dispatch(tradeFormActions.resetPrimaryInputs());
     logBonsaiInfo(
       source,
-      isScaleOrder
-        ? 'attempting place scale order'
-        : source === TradeFormSource.ClosePositionForm
-          ? 'attempting close position'
-          : 'attempting place order',
+      source === TradeFormSource.ClosePositionForm
+        ? 'attempting close position'
+        : 'attempting place order',
       {
         fullTradeFormState: purgeBigNumbers(fullFormSummary),
       }
@@ -189,8 +190,7 @@ export const useTradeForm = ({
 
     const result = await accountTransactionManager.placeCompoundOrder(payload, source);
     if (isOperationSuccess(result)) {
-      const clientIdToTrack =
-        tradePayload?.clientId ?? payload?.scaleOrderPayloads?.[0]?.clientId;
+      const clientIdToTrack = tradePayload?.clientId ?? payload?.scaleOrderPayloads?.[0]?.clientId;
       if (clientIdToTrack != null) {
         setUnIndexedClientId(clientIdToTrack.toString());
       }

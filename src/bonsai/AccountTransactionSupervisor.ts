@@ -1079,7 +1079,8 @@ export class AccountTransactionSupervisor {
       // if order is not compound, just do placeOrder so metrics are clean
       order.orderPayload != null &&
       (order.orderPayload.transferToSubaccountAmount ?? 0) <= 0 &&
-      (order.triggersPayloads ?? []).length === 0
+      (order.triggersPayloads ?? []).length === 0 &&
+      isEmpty(order.scaleOrderPayloads)
     ) {
       return this.placeOrder(order.orderPayload, source);
     }
@@ -1390,7 +1391,7 @@ export class AccountTransactionSupervisor {
                 // Send remaining batches sequentially, waiting at least one block between each
                 await remainingBatches.reduce(async (prevBatch, batch) => {
                   await prevBatch;
-                  await sleep(ESTIMATED_BLOCK_TIME);
+                  await sleep(ESTIMATED_BLOCK_TIME + 500);
 
                   const tx = await compositeClient.bulkCancelAndTransferAndPlaceStatefulOrders(
                     subaccountInfo,

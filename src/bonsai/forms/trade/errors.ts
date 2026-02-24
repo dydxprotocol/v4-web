@@ -1001,11 +1001,17 @@ function validateRestrictions(
 function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationError[] {
   const errors: ValidationError[] = [];
 
+  const hasScaleOrderPayloads = (summary.tradePayload?.scaleOrderPayloads?.length ?? 0) > 0;
+
   if (summary.tradePayload == null) {
     errors.push(simpleValidationError({ code: 'MISSING_TRADE_PAYLOAD' }));
   }
 
-  if (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null) {
+  const hasPriceInfo = hasScaleOrderPayloads
+    ? summary.tradeInfo.startPrice != null && summary.tradeInfo.endPrice != null
+    : summary.tradeInfo.payloadPrice != null;
+
+  if (summary.tradeInfo.inputSummary.size?.size == null || !hasPriceInfo) {
     errors.push(simpleValidationError({ code: 'MISSING__METRICS' }));
   }
 

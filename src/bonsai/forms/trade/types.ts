@@ -214,6 +214,10 @@ export type TradeSummary = {
   transferToSubaccountAmount: number;
   payloadPrice: number | undefined;
 
+  // only for scale orders (mutually exclusive with payloadPrice for display)
+  startPrice: number | undefined;
+  endPrice: number | undefined;
+
   slippage: number | undefined;
   fee: number | undefined;
   total: number | undefined;

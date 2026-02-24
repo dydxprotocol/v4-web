@@ -140,6 +140,9 @@ export function calculateTradeSummary(
   });
 
   const tradePayload = calc((): PlaceOrderPayload | undefined => {
+    if (effectiveTrade.type === TradeFormType.SCALE) {
+      return undefined;
+    }
     return mapIfPresent(
       accountData.currentTradeMarketSummary,
       effectiveTrade.marketId,
@@ -308,7 +311,6 @@ export function calculateTradeSummary(
         const n = AttemptNumber(totalOrders) ?? 0;
         const clobPairId = AttemptNumber(market.clobPairId);
         const stepSize = AttemptNumber(market.stepSize);
-
         if (
           n < 2 ||
           totalSize <= 0 ||
@@ -476,6 +478,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       subaccountNumber: 0,
       transferToSubaccountAmount: 0,
       payloadPrice: undefined,
+      startPrice: undefined,
+      endPrice: undefined,
       slippage: undefined,
       fee: undefined,
       total: undefined,
