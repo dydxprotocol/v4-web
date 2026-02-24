@@ -32,7 +32,7 @@ import {
   isFieldStateEnabled,
   isFieldStateRelevant,
 } from './fields';
-import { calculateTradeInfo } from './tradeInfo';
+import { calculateTradeInfo, generateSkewedPrices } from './tradeInfo';
 import {
   ExecutionType,
   GoodUntilTime,
@@ -702,40 +702,6 @@ function calculateTradeOperationsForSimulation(
       })
     ),
   };
-}
-
-export function generateGeometricWeights(
-  n: number,
-  skew: number
-): { weights: number[]; totalWeight: number } {
-  const weights: number[] = [];
-  let totalWeight = 0;
-  for (let i = 0; i < n; i += 1) {
-    const w = skew ** i;
-    weights.push(w);
-    totalWeight += w;
-  }
-  return { weights, totalWeight };
-}
-
-export function generateSkewedPrices(
-  startPrice: number,
-  endPrice: number,
-  n: number,
-  skew: number
-): number[] {
-  if (n < 2) return [startPrice];
-  // Use n-1 gap weights to create non-linearly spaced prices
-  const { weights } = generateGeometricWeights(n - 1, skew);
-  const totalGapWeight = weights.reduce((a, b) => a + b, 0);
-
-  const prices: number[] = [startPrice];
-  let cumulative = 0;
-  for (let i = 0; i < n - 1; i += 1) {
-    cumulative += weights[i]!;
-    prices.push(startPrice + (endPrice - startPrice) * (cumulative / totalGapWeight));
-  }
-  return prices;
 }
 
 function floorToStep(value: number, step: number): number {
