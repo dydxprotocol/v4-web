@@ -35,7 +35,7 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
   const allTradeTypeItems = useMemo((): Array<MenuItem<TradeFormType>> | undefined => {
     const allItems = typeOptions.map(({ value, stringKey }) => ({
       value,
-      label: value === TradeFormType.SCALE ? 'Scale' : stringGetter({ key: stringKey }),
+      label: stringGetter({ key: stringKey }),
       slotBefore:
         showAssetIcon && selectedTradeType === value ? (
           <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
@@ -59,7 +59,7 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
               selectedTradeType === TradeFormType.TRIGGER_MARKET
                 ? stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT })
                 : selectedTradeType === TradeFormType.SCALE
-                  ? 'Scale'
+                  ? stringGetter({ key: STRING_KEYS.SCALE })
                   : stringGetter({ key: STRING_KEYS.ADVANCED }),
             value: '' as TradeFormType,
             subitems: allTradeTypeItems.slice(2),

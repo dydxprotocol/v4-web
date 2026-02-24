@@ -131,47 +131,51 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const items = (
     [
-      isScaleOrder
-        ? {
-            key: 'start-price',
-            label: stringGetter({ key: STRING_KEYS.PRICE }) + ' (Start)',
-            value: (
-              <Output
-                useGrouping
-                fractionDigits={tickSizeDecimals}
-                type={OutputType.Fiat}
-                value={startPrice}
-              />
-            ),
-          }
-        : {
-            key: 'expected-price',
-            label: (
-              <WithTooltip tooltip="expected-price" side="right">
-                {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
-              </WithTooltip>
-            ),
-            value: (
-              <Output
-                useGrouping
-                fractionDigits={tickSizeDecimals}
-                type={OutputType.Fiat}
-                value={expectedPrice}
-              />
-            ),
-          },
-      isScaleOrder && {
-        key: 'end-price',
-        label: stringGetter({ key: STRING_KEYS.PRICE }) + ' (End)',
-        value: (
-          <Output
-            useGrouping
-            fractionDigits={tickSizeDecimals}
-            type={OutputType.Fiat}
-            value={endPrice}
-          />
-        ),
-      },
+      ...(isScaleOrder
+        ? [
+            {
+              key: 'start-price',
+              label: stringGetter({ key: STRING_KEYS.START_PRICE }),
+              value: (
+                <Output
+                  useGrouping
+                  fractionDigits={tickSizeDecimals}
+                  type={OutputType.Fiat}
+                  value={startPrice}
+                />
+              ),
+            },
+            {
+              key: 'end-price',
+              label: stringGetter({ key: STRING_KEYS.END_PRICE }),
+              value: (
+                <Output
+                  useGrouping
+                  fractionDigits={tickSizeDecimals}
+                  type={OutputType.Fiat}
+                  value={endPrice}
+                />
+              ),
+            },
+          ]
+        : [
+            {
+              key: 'expected-price',
+              label: (
+                <WithTooltip tooltip="expected-price" side="right">
+                  {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
+                </WithTooltip>
+              ),
+              value: (
+                <Output
+                  useGrouping
+                  fractionDigits={tickSizeDecimals}
+                  type={OutputType.Fiat}
+                  value={expectedPrice}
+                />
+              ),
+            },
+          ]),
       {
         key: 'liquidation-price',
         label: (

@@ -1293,7 +1293,7 @@ function calculateScaleWeightedAveragePrice(
   return n > 0 ? priceSum / n : undefined;
 }
 
-export function generateGeometricWeights(
+function generateGeometricWeights(
   n: number,
   skew: number
 ): { weights: number[]; totalWeight: number } {
@@ -1305,6 +1305,20 @@ export function generateGeometricWeights(
     totalWeight += w;
   }
   return { weights, totalWeight };
+}
+
+function calculateTradeFeeAfterDiscounts(
+  accountData: TradeFormInputData,
+  feeUsdc: number | undefined
+) {
+  const marketDiscountMultiplier =
+    accountData.currentTradeMarketSummary?.marketFeeDiscountMultiplier;
+
+  if (feeUsdc == null) return undefined;
+
+  const feeAfterMarketDiscount =
+    marketDiscountMultiplier != null ? feeUsdc * marketDiscountMultiplier : feeUsdc;
+  return feeAfterMarketDiscount;
 }
 
 export function generateSkewedPrices(
@@ -1325,18 +1339,4 @@ export function generateSkewedPrices(
     prices.push(startPrice + (endPrice - startPrice) * (cumulative / totalGapWeight));
   }
   return prices;
-}
-
-function calculateTradeFeeAfterDiscounts(
-  accountData: TradeFormInputData,
-  feeUsdc: number | undefined
-) {
-  const marketDiscountMultiplier =
-    accountData.currentTradeMarketSummary?.marketFeeDiscountMultiplier;
-
-  if (feeUsdc == null) return undefined;
-
-  const feeAfterMarketDiscount =
-    marketDiscountMultiplier != null ? feeUsdc * marketDiscountMultiplier : feeUsdc;
-  return feeAfterMarketDiscount;
 }

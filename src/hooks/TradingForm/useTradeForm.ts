@@ -177,6 +177,7 @@ export const useTradeForm = ({
         })
       );
     }
+
     dispatch(tradeFormActions.resetPrimaryInputs());
     logBonsaiInfo(
       source,

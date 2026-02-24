@@ -25,7 +25,7 @@ export const MAX_STATEFUL_ORDERS_PER_BLOCK = 10;
 export const MIN_SCALE_ORDERS = 2;
 export const MAX_SCALE_ORDERS = 20;
 export const MIN_SCALE_SKEW = 0.1;
-export const MAX_SCALE_SKEW = 10;
+export const MAX_SCALE_SKEW = 2;
 
 export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.None]: STRING_KEYS.NONE,
@@ -62,8 +62,8 @@ export const ORDER_TYPE_STRINGS: Record<
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
   [TradeFormType.SCALE]: {
-    orderTypeKeyShort: 'Scale' as string,
-    orderTypeKey: 'Scale Order' as string,
+    orderTypeKeyShort: STRING_KEYS.SCALE,
+    orderTypeKey: STRING_KEYS.SCALE,
     descriptionKey: null,
   },
   [IndexerOrderType.STOPMARKET]: {

@@ -270,7 +270,7 @@ const $MidPriceButton = styled(Button)`
 
 const $InlineRow = styled.span`
   ${layoutMixins.flexEqualColumns}
-  gap: 1ch;
+  gap: 1rem;
 `;
 
 const $Muted = styled.span`

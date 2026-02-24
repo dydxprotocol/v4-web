@@ -312,15 +312,8 @@ export function calculateTradeSummary(
         const n = AttemptNumber(totalOrders) ?? 0;
         const clobPairId = AttemptNumber(market.clobPairId);
         const stepSize = AttemptNumber(market.stepSize);
-        if (
-          n < 2 ||
-          totalSize <= 0 ||
-          startPrice <= 0 ||
-          endPrice <= 0 ||
-          skew <= 0 ||
-          clobPairId == null ||
-          stepSize == null
-        ) {
+
+        if (clobPairId == null || stepSize == null) {
           return undefined;
         }
 
@@ -496,7 +489,7 @@ const orderTypeOptions: SelectionOption<TradeFormType>[] = [
   { value: TradeFormType.MARKET, stringKey: 'APP.TRADE.MARKET_ORDER_SHORT' },
   { value: TradeFormType.TRIGGER_LIMIT, stringKey: 'APP.TRADE.STOP_LIMIT' },
   { value: TradeFormType.TRIGGER_MARKET, stringKey: 'APP.TRADE.STOP_MARKET' },
-  { value: TradeFormType.SCALE, stringKey: 'APP.TRADE.SCALE_ORDER_SHORT' },
+  { value: TradeFormType.SCALE, stringKey: 'APP.TRADE.SCALE' },
 ];
 
 const goodTilUnitOptions: SelectionOption<TimeUnit>[] = [
