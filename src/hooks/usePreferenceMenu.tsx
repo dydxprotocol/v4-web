@@ -18,8 +18,12 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import {
   OtherPreference,
   setDefaultToAllMarketsInPositionsOrdersFills,
+  setIsChatEnabled,
 } from '@/state/appUiConfigs';
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
+import {
+  getDefaultToAllMarketsInPositionsOrdersFills,
+  getIsChatEnabled,
+} from '@/state/appUiConfigsSelectors';
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
@@ -41,16 +45,23 @@ export const usePreferenceMenu = (): MenuConfig<
   );
   const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
 
+  const currentChatEnabled = useAppSelector(getIsChatEnabled);
+  const [chatEnabled, setChatEnabled] = useState(currentChatEnabled);
+
   const toggleNotifPreference = (type: NotificationCategoryPreferences) =>
     setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
 
   useEffect(() => {
     setNotificationPreferences(enabledNotifs);
-  }, [enabledNotifs]);
+  }, [enabledNotifs, setNotificationPreferences]);
 
   useEffect(() => {
     setDefaultToAllMarkets(currentDisplayAllMarketDefault);
   }, [currentDisplayAllMarketDefault]);
+
+  useEffect(() => {
+    setChatEnabled(currentChatEnabled);
+  }, [currentChatEnabled]);
 
   const getItem = (
     notificationCategory: NotificationCategoryPreferences,
@@ -114,6 +125,20 @@ export const usePreferenceMenu = (): MenuConfig<
             dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
           },
         },
+        {
+          value: OtherPreference.EnableChat,
+          label: 'Enable Chat',
+          slotAfter: (
+            <Switch
+              name={OtherPreference.EnableChat}
+              checked={chatEnabled}
+              onCheckedChange={() => null}
+            />
+          ),
+          onSelect: () => {
+            dispatch(setIsChatEnabled(!chatEnabled));
+          },
+        },
         ...(isDev
           ? [
               {
@@ -161,6 +186,7 @@ export const usePreferenceMenu = (): MenuConfig<
     [
       stringGetter,
       defaultToAllMarkets,
+      chatEnabled,
       selectedGasDenom,
       setSelectedGasDenom,
       dispatch,

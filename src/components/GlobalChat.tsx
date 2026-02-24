@@ -1,24 +1,45 @@
 import { useCallback, useRef, useState } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
+import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
+
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useTrollboxOnlineCount } from '@/hooks/useTrollboxOnlineCount';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { useAppDispatch } from '@/state/appTypes';
+import { setIsChatEnabled } from '@/state/appUiConfigs';
+
 import { GlobalChatBodyContent } from './GlobalChatBodyContent';
 import { Icon, IconName } from './Icon';
+import { IconButton } from './IconButton';
 
 export const GlobalChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const hasBeenOpened = useRef(false);
   const onlineCount = useTrollboxOnlineCount();
+  const dispatch = useAppDispatch();
+  const notify = useCustomNotification();
 
   if (isOpen) hasBeenOpened.current = true;
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
+
+  const handleClose = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      dispatch(setIsChatEnabled(false));
+      notify({
+        title: 'Chat hidden',
+        body: 'You can re-enable chat from your Preferences.',
+      });
+    },
+    [dispatch, notify]
+  );
 
   return (
     <$ChatArea>
@@ -35,7 +56,13 @@ export const GlobalChat = () => {
               </$OnlineIndicator>
             )}
           </$IconRow>
-          <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
+          <$CloseButton
+            iconName={IconName.Close}
+            shape={ButtonShape.Square}
+            size={ButtonSize.XSmall}
+            buttonStyle={ButtonStyle.WithoutBackground}
+            onClick={handleClose}
+          />
         </$Header>
         <$Body $isOpen={isOpen}>{hasBeenOpened.current && <GlobalChatBodyContent />}</$Body>
       </$Container>
@@ -66,7 +93,7 @@ const $Container = styled.div`
 
 const $Header = styled.header`
   ${layoutMixins.spacedRow}
-  padding: 0.625rem 1rem;
+  padding: 0.4rem 1rem;
   background-color: var(--color-layer-3);
   font: var(--font-small-book);
   color: var(--color-text-2);
@@ -100,17 +127,14 @@ const $OnlineDot = styled.span`
   background-color: var(--color-green);
 `;
 
-const $Icon = styled(Icon)<{ $isOpen: boolean }>`
-  width: 0.625rem;
-  height: 0.625rem;
-  color: var(--color-text-0);
-  transition: rotate 0.3s var(--ease-out-expo);
+const $CloseButton = styled(IconButton)`
+  --button-icon-size: 0.75rem;
+  --button-border: none;
+  --button-textColor: var(--color-text-0);
 
-  ${({ $isOpen }) =>
-    !$isOpen &&
-    css`
-      rotate: -0.5turn;
-    `}
+  &:hover {
+    --button-textColor: var(--color-text-2);
+  }
 `;
 
 const $Body = styled.div<{ $isOpen: boolean }>`

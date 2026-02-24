@@ -23,7 +23,8 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getIsChatEnabled } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isPresent } from '@/lib/typeUtils';
@@ -45,6 +46,7 @@ export const FooterDesktop = () => {
   const deployerName = useEnvConfig('deployerName');
   const { statusPage } = useURLConfigs();
   const isChatEnabled = useStatsigGateValue(StatsigFlags.ffDydxChat);
+  const isChatPreferenceEnabled = useAppSelector(getIsChatEnabled);
 
   const isStatusLoading = !status && !statusErrorMessage;
 
@@ -65,7 +67,7 @@ export const FooterDesktop = () => {
 
   return (
     <$Footer>
-      {isChatEnabled && <GlobalChat />}
+      {isChatEnabled && isChatPreferenceEnabled && <GlobalChat />}
 
       <$Row>
         <WithTooltip
