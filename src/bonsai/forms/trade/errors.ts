@@ -7,9 +7,16 @@ import {
 } from '@/bonsai/lib/validationErrors';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 import { OrderType } from '@dydxprotocol/v4-client-js';
+import { isEmpty } from 'lodash';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
+import {
+  MAX_SCALE_ORDERS,
+  MAX_SCALE_SKEW,
+  MIN_SCALE_ORDERS,
+  MIN_SCALE_SKEW,
+} from '@/constants/trade';
 import {
   IndexerOrderSide,
   IndexerOrderType,
@@ -280,6 +287,75 @@ function validateFieldsBasic(
     }
   }
 
+  if (options.needsScaleStartPrice) {
+    const startPrice = AttemptNumber(state.scaleStartPrice) ?? 0;
+    if (startPrice <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_START_PRICE',
+          type: ErrorType.error,
+          fields: ['scaleStartPrice'],
+          titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleEndPrice) {
+    const endPrice = AttemptNumber(state.scaleEndPrice) ?? 0;
+    if (endPrice <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_END_PRICE',
+          type: ErrorType.error,
+          fields: ['scaleEndPrice'],
+          titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleTotalOrders) {
+    const totalOrders = AttemptNumber(state.scaleTotalOrders) ?? 0;
+    if (
+      totalOrders < MIN_SCALE_ORDERS ||
+      totalOrders > MAX_SCALE_ORDERS ||
+      !Number.isInteger(totalOrders)
+    ) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_TOTAL_ORDERS',
+          type: ErrorType.error,
+          fields: ['scaleTotalOrders'],
+          titleKey: STRING_KEYS.TOTAL_ORDERS,
+          textKey: STRING_KEYS.TOTAL_ORDERS_MUST_BE_WITHIN_RANGE,
+          textParams: {
+            MIN: { value: MIN_SCALE_ORDERS },
+            MAX: { value: MAX_SCALE_ORDERS },
+          },
+        })
+      );
+    }
+  }
+
+  if (options.needsScaleSkew) {
+    const skew = AttemptNumber(state.scaleSkew) ?? 0;
+    if (skew < MIN_SCALE_SKEW || skew > MAX_SCALE_SKEW) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_SCALE_SKEW',
+          type: ErrorType.error,
+          fields: ['scaleSkew'],
+          titleKey: STRING_KEYS.SKEW,
+          textParams: {
+            MIN: { value: MIN_SCALE_SKEW },
+            MAX: { value: MAX_SCALE_SKEW },
+          },
+        })
+      );
+    }
+  }
+
   if (state.side == null) {
     errors.push(
       simpleValidationError({
@@ -374,6 +450,7 @@ function validateAdvancedTradeConditions(
     // For limit orders, validate isolated margin requirements
   } else if (
     state.type === TradeFormType.LIMIT ||
+    state.type === TradeFormType.SCALE ||
     state.type === TradeFormType.TRIGGER_LIMIT ||
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     state.type === TradeFormType.TRIGGER_MARKET
@@ -945,7 +1022,11 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
     errors.push(simpleValidationError({ code: 'MISSING_TRADE_PAYLOAD' }));
   }
 
-  if (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null) {
+  const hasPriceInfo = !isEmpty(summary.tradePayload?.scaleOrderPayloads)
+    ? summary.tradeInfo.startPrice != null && summary.tradeInfo.endPrice != null
+    : summary.tradeInfo.payloadPrice != null;
+
+  if (summary.tradeInfo.inputSummary.size?.size == null || !hasPriceInfo) {
     errors.push(simpleValidationError({ code: 'MISSING__METRICS' }));
   }
 

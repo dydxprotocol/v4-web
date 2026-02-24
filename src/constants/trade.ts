@@ -21,6 +21,11 @@ export const UNCOMMITTED_ORDER_TIMEOUT_MS = 10_000;
 export const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
 export const SHORT_TERM_ORDER_DURATION = 20;
 export const POST_TRANSFER_PLACE_ORDER_DELAY = 250;
+export const MAX_STATEFUL_ORDERS_PER_BLOCK = 10;
+export const MIN_SCALE_ORDERS = 2;
+export const MAX_SCALE_ORDERS = 20;
+export const MIN_SCALE_SKEW = 0.1;
+export const MAX_SCALE_SKEW = 10;
 
 export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.None]: STRING_KEYS.NONE,
@@ -55,6 +60,11 @@ export const ORDER_TYPE_STRINGS: Record<
     orderTypeKeyShort: STRING_KEYS.STOP_MARKET,
     orderTypeKey: STRING_KEYS.STOP_MARKET,
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
+  },
+  [TradeFormType.SCALE]: {
+    orderTypeKeyShort: 'Scale' as string,
+    orderTypeKey: 'Scale Order' as string,
+    descriptionKey: null,
   },
   [IndexerOrderType.STOPMARKET]: {
     orderTypeKeyShort: STRING_KEYS.STOP_MARKET,
@@ -104,6 +114,10 @@ export enum TradeBoxKeys {
   LimitPrice = 'price.limitPrice',
   TrailingPercent = 'price.trailingPercent',
   TriggerPrice = 'price.triggerPrice',
+  ScaleStartPrice = 'scale.startPrice',
+  ScaleEndPrice = 'scale.endPrice',
+  ScaleTotalOrders = 'scale.totalOrders',
+  ScaleSkew = 'scale.skew',
 }
 
 export type InputErrorData = {

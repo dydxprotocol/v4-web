@@ -105,6 +105,8 @@ export function calculateTradeInfo(
               }
               return price * (1 - MARKET_ORDER_MAX_SLIPPAGE);
             }),
+            startPrice: undefined,
+            endPrice: undefined,
             slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
@@ -264,12 +266,96 @@ export function calculateTradeInfo(
               accountData.rawSelectedMarketLeverages
             ),
             payloadPrice,
+            startPrice: undefined,
+            endPrice: undefined,
             reward: calculateTakerReward(
               usdcSize,
               totalFees,
               accountData.rewardParams,
               accountData.feeTiers
             ),
+          };
+        });
+      case TradeFormType.SCALE:
+        return calc((): TradeSummary => {
+          const timeInForce = trade.timeInForce;
+          const execution = trade.execution;
+          const isMaker = timeInForce === TimeInForce.GTT || execution === ExecutionType.POST_ONLY;
+
+          const feeRate = isMaker
+            ? accountData.userFeeStats.makerFeeRate
+            : accountData.userFeeStats.takerFeeRate;
+
+          const startPrice = AttemptNumber(trade.scaleStartPrice);
+          const endPrice = AttemptNumber(trade.scaleEndPrice);
+          const weightedAvgPrice = calculateScaleWeightedAveragePrice(
+            startPrice,
+            endPrice,
+            AttemptNumber(trade.scaleTotalOrders),
+            AttemptNumber(trade.scaleSkew)
+          );
+          const weightedAvgPriceStr =
+            weightedAvgPrice != null ? String(weightedAvgPrice) : undefined;
+
+          const inputSummary = calculateLimitOrderInputSummary(
+            trade.size,
+            trade.side,
+            weightedAvgPriceStr,
+            trade.reduceOnly,
+            AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+            baseAccount,
+            accountData,
+            subaccountToUse
+          );
+
+          const totalFees = calculateTradeFeeAfterDiscounts(
+            accountData,
+            mapIfPresent(feeRate, inputSummary.size?.usdcSize, (fee, usdc) => fee * usdc)
+          );
+
+          return {
+            subaccountNumber: subaccountToUse,
+            slippage: 0,
+            indexSlippage: 0,
+            filled: true,
+            feeRate,
+            inputSummary,
+            fee: totalFees,
+            payloadPrice: weightedAvgPrice,
+            startPrice,
+            endPrice,
+            isPositionClosed:
+              mapIfPresent(
+                inputSummary.size?.size,
+                baseAccount?.position?.unsignedSize.toNumber(),
+                baseAccount?.position?.side,
+                trade.side,
+                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+                (filled, size, positionSide, orderSide, stepSize) =>
+                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
+                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
+                  Math.abs(filled - size) < stepSize / 2
+              ) ?? false,
+            total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
+            transferToSubaccountAmount: calculateIsolatedTransferAmount(
+              trade,
+              inputSummary.size?.size ?? 0,
+              weightedAvgPrice ?? 0,
+              totalFees ?? 0,
+              subaccountToUse,
+              accountData.rawParentSubaccountData?.parentSubaccount,
+              baseAccount?.position,
+              accountData.currentTradeMarketSummary,
+              accountData.rawSelectedMarketLeverages
+            ),
+            reward: isMaker
+              ? calculateMakerReward(totalFees, accountData.rewardParams)
+              : calculateTakerReward(
+                  inputSummary.size?.usdcSize,
+                  totalFees,
+                  accountData.rewardParams,
+                  accountData.feeTiers
+                ),
           };
         });
       case TradeFormType.LIMIT:
@@ -310,6 +396,8 @@ export function calculateTradeInfo(
             inputSummary,
             fee: totalFees,
             payloadPrice: price,
+            startPrice: undefined,
+            endPrice: undefined,
             isPositionClosed:
               mapIfPresent(
                 inputSummary.size?.size,
@@ -1052,6 +1140,7 @@ function calculateIsolatedMarginTransferAmount(
       case TradeFormType.MARKET:
         return oraclePrice;
       case TradeFormType.LIMIT:
+      case TradeFormType.SCALE:
       case TradeFormType.TRIGGER_LIMIT:
         return tradePrice;
       case TradeFormType.TRIGGER_MARKET:
@@ -1071,7 +1160,9 @@ function calculateIsolatedMarginTransferAmount(
     marketMaxLeverage,
     tradeSize,
     positionIncreasingAmount,
-    trade.type === TradeFormType.LIMIT || trade.type === TradeFormType.TRIGGER_LIMIT
+    trade.type === TradeFormType.LIMIT ||
+      trade.type === TradeFormType.SCALE ||
+      trade.type === TradeFormType.TRIGGER_LIMIT
   );
 }
 
@@ -1179,6 +1270,61 @@ function getTransferAmountFromTargetLeverage(
     (margin + feesAtFillPriceWithBuffer + slippageLoss) *
     (ignoreSlippageAndOracleDrift ? 1 + FLAT_TRANSFER_BUFFER : 1)
   );
+}
+
+function calculateScaleWeightedAveragePrice(
+  startPrice: number | undefined,
+  endPrice: number | undefined,
+  totalOrders: number | undefined,
+  skew: number | undefined
+): number | undefined {
+  if (
+    startPrice == null ||
+    endPrice == null ||
+    totalOrders == null ||
+    totalOrders < 2 ||
+    skew == null
+  ) {
+    return undefined;
+  }
+  const n = Math.floor(totalOrders);
+  const prices = generateSkewedPrices(startPrice, endPrice, n, skew);
+  const priceSum = prices.reduce((a, b) => a + b, 0);
+  return n > 0 ? priceSum / n : undefined;
+}
+
+export function generateGeometricWeights(
+  n: number,
+  skew: number
+): { weights: number[]; totalWeight: number } {
+  const weights: number[] = [];
+  let totalWeight = 0;
+  for (let i = 0; i < n; i += 1) {
+    const w = skew ** i;
+    weights.push(w);
+    totalWeight += w;
+  }
+  return { weights, totalWeight };
+}
+
+export function generateSkewedPrices(
+  startPrice: number,
+  endPrice: number,
+  n: number,
+  skew: number
+): number[] {
+  if (n < 2) return [startPrice];
+  // Use n-1 gap weights to create non-linearly spaced prices
+  const { weights } = generateGeometricWeights(n - 1, skew);
+  const totalGapWeight = weights.reduce((a, b) => a + b, 0);
+
+  const prices: number[] = [startPrice];
+  let cumulative = 0;
+  for (let i = 0; i < n - 1; i += 1) {
+    cumulative += weights[i]!;
+    prices.push(startPrice + (endPrice - startPrice) * (cumulative / totalGapWeight));
+  }
+  return prices;
 }
 
 function calculateTradeFeeAfterDiscounts(

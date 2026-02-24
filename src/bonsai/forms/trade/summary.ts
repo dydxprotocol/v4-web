@@ -12,7 +12,7 @@ import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationT
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { OrderExecution, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
-import { mapValues, orderBy } from 'lodash';
+import { isEmpty, mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { TransactionMemo } from '@/constants/analytics';
@@ -32,7 +32,7 @@ import {
   isFieldStateEnabled,
   isFieldStateRelevant,
 } from './fields';
-import { calculateTradeInfo } from './tradeInfo';
+import { calculateTradeInfo, generateSkewedPrices } from './tradeInfo';
 import {
   ExecutionType,
   GoodUntilTime,
@@ -140,6 +140,10 @@ export function calculateTradeSummary(
   });
 
   const tradePayload = calc((): PlaceOrderPayload | undefined => {
+    if (effectiveTrade.type === TradeFormType.SCALE) {
+      return undefined;
+    }
+
     return mapIfPresent(
       accountData.currentTradeMarketSummary,
       effectiveTrade.marketId,
@@ -282,6 +286,106 @@ export function calculateTradeSummary(
     }
   );
 
+  const scaleOrderPayloads = calc((): PlaceOrderPayload[] | undefined => {
+    if (effectiveTrade.type !== TradeFormType.SCALE) {
+      return undefined;
+    }
+    return mapIfPresent(
+      accountData.currentTradeMarketSummary,
+      effectiveTrade.marketId,
+      effectiveTrade.side,
+      AttemptNumber(tradeInfo.inputSummary.size?.size),
+      AttemptNumber(effectiveTrade.scaleStartPrice),
+      AttemptNumber(effectiveTrade.scaleEndPrice),
+      AttemptNumber(effectiveTrade.scaleTotalOrders),
+      AttemptNumber(effectiveTrade.scaleSkew),
+      (
+        market,
+        marketId,
+        side,
+        totalSize,
+        startPrice,
+        endPrice,
+        totalOrders,
+        skew
+      ): PlaceOrderPayload[] | undefined => {
+        const n = AttemptNumber(totalOrders) ?? 0;
+        const clobPairId = AttemptNumber(market.clobPairId);
+        const stepSize = AttemptNumber(market.stepSize);
+        if (
+          n < 2 ||
+          totalSize <= 0 ||
+          startPrice <= 0 ||
+          endPrice <= 0 ||
+          skew <= 0 ||
+          clobPairId == null ||
+          stepSize == null
+        ) {
+          return undefined;
+        }
+
+        const marketInfo: PlaceOrderMarketInfo = {
+          clobPairId,
+          atomicResolution: market.atomicResolution,
+          stepBaseQuantums: market.stepBaseQuantums,
+          quantumConversionExponent: market.quantumConversionExponent,
+          subticksPerTick: market.subticksPerTick,
+        };
+
+        const goodTilTimeParsed = AttemptNumber(getGoodTilInSeconds(effectiveTrade.goodTil));
+
+        const prices = generateSkewedPrices(startPrice, endPrice, n, skew);
+
+        const timeInForce = calc(() => {
+          if (effectiveTrade.timeInForce === TimeInForce.IOC) {
+            return OrderTimeInForce.IOC;
+          }
+          return OrderTimeInForce.GTT;
+        });
+
+        // Generate payloads with equal sizes and skewed prices
+        const payloads: PlaceOrderPayload[] = [];
+        let remainingSize = totalSize;
+        const equalSize = totalSize / n;
+
+        for (let i = 0; i < n; i += 1) {
+          const price = prices[i]!;
+          const isLast = i === n - 1;
+          const size = isLast
+            ? floorToStep(remainingSize, stepSize)
+            : floorToStep(equalSize, stepSize);
+
+          if (size <= 0) continue;
+          remainingSize -= size;
+
+          payloads.push({
+            subaccountNumber: tradeInfo.subaccountNumber,
+            transferToSubaccountAmount: i === 0 ? tradeInfo.transferToSubaccountAmount : undefined,
+            marketId,
+            clobPairId,
+            type: OrderType.LIMIT,
+            side,
+            price,
+            size,
+            clientId: Math.floor(Math.random() * MAX_INT_ROUGHLY),
+            timeInForce,
+            postOnly: options.needsPostOnly ? effectiveTrade.postOnly : undefined,
+            reduceOnly: options.needsReduceOnly ? effectiveTrade.reduceOnly : undefined,
+            triggerPrice: undefined,
+            execution: undefined,
+            goodTilTimeInSeconds: options.needsGoodTil ? goodTilTimeParsed : undefined,
+            marketInfo,
+            goodTilBlock: undefined,
+            currentHeight: undefined,
+            memo: TransactionMemo.placeOrder,
+          });
+        }
+
+        return !isEmpty(payloads) ? payloads : undefined;
+      }
+    );
+  });
+
   return {
     effectiveTrade,
     options,
@@ -291,6 +395,7 @@ export function calculateTradeSummary(
     tradePayload: {
       orderPayload: tradePayload,
       triggersPayloads: triggersData?.payloads,
+      scaleOrderPayloads,
     },
 
     accountDetailsBefore: baseAccount,
@@ -315,6 +420,10 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       goodTil: undefined,
       stopLossOrder: undefined,
       takeProfitOrder: undefined,
+      scaleStartPrice: undefined,
+      scaleEndPrice: undefined,
+      scaleTotalOrders: undefined,
+      scaleSkew: undefined,
     },
     options: {
       orderTypeOptions: [],
@@ -336,6 +445,10 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showPostOnlyTooltip: false,
       needsTimeInForce: false,
       needsExecution: false,
+      needsScaleStartPrice: false,
+      needsScaleEndPrice: false,
+      needsScaleTotalOrders: false,
+      needsScaleSkew: false,
 
       showSize: false,
       showReduceOnly: false,
@@ -346,6 +459,10 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showTriggerPrice: false,
       showExecution: false,
       showGoodTil: false,
+      showScaleStartPrice: false,
+      showScaleEndPrice: false,
+      showScaleTotalOrders: false,
+      showScaleSkew: false,
     },
     tradePayload: undefined,
     triggersSummary: undefined,
@@ -360,6 +477,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       subaccountNumber: 0,
       transferToSubaccountAmount: 0,
       payloadPrice: undefined,
+      startPrice: undefined,
+      endPrice: undefined,
       slippage: undefined,
       fee: undefined,
       total: undefined,
@@ -377,6 +496,7 @@ const orderTypeOptions: SelectionOption<TradeFormType>[] = [
   { value: TradeFormType.MARKET, stringKey: 'APP.TRADE.MARKET_ORDER_SHORT' },
   { value: TradeFormType.TRIGGER_LIMIT, stringKey: 'APP.TRADE.STOP_LIMIT' },
   { value: TradeFormType.TRIGGER_MARKET, stringKey: 'APP.TRADE.STOP_MARKET' },
+  { value: TradeFormType.SCALE, stringKey: 'APP.TRADE.SCALE_ORDER_SHORT' },
 ];
 
 const goodTilUnitOptions: SelectionOption<TimeUnit>[] = [
@@ -431,6 +551,7 @@ function calculateTradeFormOptions(
 
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.TRIGGER_MARKET]: () => iocOnlyExecutionOptions,
+        [TradeFormType.SCALE]: () => allExecutionOptions,
       })
     : emptyExecutionOptions;
 
@@ -449,8 +570,13 @@ function calculateTradeFormOptions(
     needsPostOnly: isFieldStateRelevant(fields.postOnly),
     needsTimeInForce: isFieldStateRelevant(fields.timeInForce),
     needsExecution: isFieldStateRelevant(fields.execution),
+    needsScaleStartPrice: isFieldStateRelevant(fields.scaleStartPrice),
+    needsScaleEndPrice: isFieldStateRelevant(fields.scaleEndPrice),
+    needsScaleTotalOrders: isFieldStateRelevant(fields.scaleTotalOrders),
+    needsScaleSkew: isFieldStateRelevant(fields.scaleSkew),
 
-    showAllocationSlider: orderType !== TradeFormType.TRIGGER_MARKET,
+    showAllocationSlider:
+      orderType !== TradeFormType.TRIGGER_MARKET && orderType !== TradeFormType.SCALE,
     showTriggerOrders:
       isFieldStateEnabled(fields.takeProfitOrder) && isFieldStateEnabled(fields.stopLossOrder),
     triggerOrdersChecked:
@@ -465,6 +591,10 @@ function calculateTradeFormOptions(
     showExecution: isFieldStateEnabled(fields.execution),
     showReduceOnly: isFieldStateEnabled(fields.reduceOnly),
     showPostOnly: isFieldStateEnabled(fields.postOnly),
+    showScaleStartPrice: isFieldStateEnabled(fields.scaleStartPrice),
+    showScaleEndPrice: isFieldStateEnabled(fields.scaleEndPrice),
+    showScaleTotalOrders: isFieldStateEnabled(fields.scaleTotalOrders),
+    showScaleSkew: isFieldStateEnabled(fields.scaleSkew),
 
     showPostOnlyTooltip:
       fields.type.effectiveValue !== TradeFormType.MARKET && fields.postOnly.state === 'disabled',
@@ -574,6 +704,10 @@ function calculateTradeOperationsForSimulation(
   };
 }
 
+function floorToStep(value: number, step: number): number {
+  return Math.floor(value / step) * step;
+}
+
 export function tradeFormTypeToOrderType(
   tradeFormType: TradeFormType,
   oraclePrice: number | undefined,
@@ -613,6 +747,8 @@ export function tradeFormTypeToOrderType(
         return OrderType.TAKE_PROFIT_LIMIT;
       }
       return OrderType.STOP_LIMIT;
+    case TradeFormType.SCALE:
+      return OrderType.LIMIT;
     default:
       assertNever(tradeFormType);
       return OrderType.MARKET;
