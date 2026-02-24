@@ -281,19 +281,6 @@ function validateFieldsBasic(
     }
   }
 
-  if (options.needsScaleTotalOrders) {
-    const totalOrders = AttemptNumber(state.scaleTotalOrders) ?? 0;
-    if (totalOrders < 2 || totalOrders > MAX_SCALE_ORDERS || !Number.isInteger(totalOrders)) {
-      errors.push(
-        simpleValidationError({
-          code: 'REQUIRED_SCALE_TOTAL_ORDERS',
-          type: ErrorType.error,
-          fields: ['scaleTotalOrders'],
-        })
-      );
-    }
-  }
-
   if (options.needsScaleStartPrice) {
     const startPrice = AttemptNumber(state.scaleStartPrice) ?? 0;
     if (startPrice <= 0) {
@@ -330,6 +317,8 @@ function validateFieldsBasic(
           code: 'REQUIRED_SCALE_TOTAL_ORDERS',
           type: ErrorType.error,
           fields: ['scaleTotalOrders'],
+          titleKey: STRING_KEYS.ENTER_AMOUNT,
+          textKey: STRING_KEYS.ENTER_AMOUNT,
         })
       );
     }
@@ -343,6 +332,8 @@ function validateFieldsBasic(
           code: 'REQUIRED_SCALE_SKEW',
           type: ErrorType.error,
           fields: ['scaleSkew'],
+          titleKey: STRING_KEYS.ENTER_AMOUNT,
+          textKey: STRING_KEYS.ENTER_AMOUNT,
         })
       );
     }
@@ -1014,11 +1005,7 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
     errors.push(simpleValidationError({ code: 'MISSING_TRADE_PAYLOAD' }));
   }
 
-  const isScaleOrder = summary.effectiveTrade.type === TradeFormType.SCALE;
-  if (
-    !isScaleOrder &&
-    (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null)
-  ) {
+  if (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null) {
     errors.push(simpleValidationError({ code: 'MISSING__METRICS' }));
   }
 
@@ -1034,9 +1021,7 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
 }
 
 function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSummary) {
-  const subaccountToUse =
-    summary.tradePayload?.orderPayload?.subaccountNumber ??
-    summary.tradePayload?.scaleOrderPayloads?.[0]?.subaccountNumber;
+  const subaccountToUse = summary.tradePayload?.orderPayload?.subaccountNumber;
   if (subaccountToUse == null) {
     return [];
   }

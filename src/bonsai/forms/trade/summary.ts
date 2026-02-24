@@ -12,7 +12,7 @@ import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationT
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { OrderExecution, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
-import { mapValues, orderBy } from 'lodash';
+import { isEmpty, mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { TransactionMemo } from '@/constants/analytics';
@@ -333,6 +333,16 @@ export function calculateTradeSummary(
 
         const { weights, totalWeight } = generateGeometricWeights(n, skew);
 
+        const timeInForce = calc(() => {
+          if (effectiveTrade.timeInForce == null) {
+            return OrderTimeInForce.GTT;
+          }
+          if (effectiveTrade.timeInForce === TimeInForce.IOC) {
+            return OrderTimeInForce.IOC;
+          }
+          return OrderTimeInForce.GTT;
+        });
+
         // Generate payloads
         const payloads: PlaceOrderPayload[] = [];
         let remainingSize = totalSize;
@@ -346,16 +356,6 @@ export function calculateTradeSummary(
 
           if (size <= 0) continue;
           remainingSize -= size;
-
-          const timeInForce = calc(() => {
-            if (effectiveTrade.timeInForce == null) {
-              return OrderTimeInForce.GTT;
-            }
-            if (effectiveTrade.timeInForce === TimeInForce.IOC) {
-              return OrderTimeInForce.IOC;
-            }
-            return OrderTimeInForce.GTT;
-          });
 
           payloads.push({
             subaccountNumber: tradeInfo.subaccountNumber,
@@ -380,7 +380,7 @@ export function calculateTradeSummary(
           });
         }
 
-        return payloads.length > 0 ? payloads : undefined;
+        return !isEmpty(payloads) ? payloads : undefined;
       }
     );
   });
@@ -392,9 +392,9 @@ export function calculateTradeSummary(
     tradeInfo,
     triggersSummary: triggersData?.summary,
     tradePayload: {
-      orderPayload: effectiveTrade.type === TradeFormType.SCALE ? undefined : tradePayload,
+      orderPayload: tradePayload,
       triggersPayloads: triggersData?.payloads,
-      scaleOrderPayloads: scaleOrderPayloads ?? undefined,
+      scaleOrderPayloads,
     },
 
     accountDetailsBefore: baseAccount,
@@ -508,10 +508,6 @@ const timeInForceOptions: SelectionOption<TimeInForce>[] = [
   { value: TimeInForce.IOC, stringKey: 'APP.TRADE.IMMEDIATE_OR_CANCEL' },
 ];
 
-const gttOnlyTimeInForceOptions: SelectionOption<TimeInForce>[] = [
-  { value: TimeInForce.GTT, stringKey: 'APP.TRADE.GOOD_TIL_TIME' },
-];
-
 // Define execution option arrays
 const allExecutionOptions: SelectionOption<ExecutionType>[] = [
   { value: ExecutionType.GOOD_TIL_DATE, stringKey: 'APP.TRADE.GOOD_TIL_DATE' },
@@ -556,13 +552,10 @@ function calculateTradeFormOptions(
       })
     : emptyExecutionOptions;
 
-  const resolvedTimeInForceOptions =
-    orderType === TradeFormType.SCALE ? gttOnlyTimeInForceOptions : timeInForceOptions;
-
   const options: TradeFormOptions = {
     orderTypeOptions,
     executionOptions,
-    timeInForceOptions: resolvedTimeInForceOptions,
+    timeInForceOptions,
     goodTilUnitOptions,
 
     needsMarginMode: isFieldStateRelevant(fields.marginMode),

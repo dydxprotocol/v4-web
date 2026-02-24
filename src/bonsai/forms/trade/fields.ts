@@ -233,13 +233,17 @@ export function getTradeFormFieldStates(
           'timeInForce',
           'postOnly',
           'reduceOnly',
-          'goodTil',
         ]);
         defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
 
-        // Scale orders are always GTT
-        forceValueAndDisable(result.reduceOnly, false);
+        // goodTil is only visible for GTT
+        if (result.timeInForce.effectiveValue === TimeInForce.GTT) {
+          makeVisible(result, ['goodTil']);
+          forceValueAndDisable(result.reduceOnly, false);
+        } else if (result.timeInForce.effectiveValue === TimeInForce.IOC) {
+          forceValueAndDisable(result.postOnly, false);
+        }
 
         return result;
       default:
