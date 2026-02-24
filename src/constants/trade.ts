@@ -21,8 +21,11 @@ export const UNCOMMITTED_ORDER_TIMEOUT_MS = 10_000;
 export const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
 export const SHORT_TERM_ORDER_DURATION = 20;
 export const POST_TRANSFER_PLACE_ORDER_DELAY = 250;
-export const MAX_STATEFUL_ORDERS_PER_BLOCK = 2;
+export const MAX_STATEFUL_ORDERS_PER_BLOCK = 10;
+export const MIN_SCALE_ORDERS = 2;
 export const MAX_SCALE_ORDERS = 20;
+export const MIN_SCALE_SKEW = 0.1;
+export const MAX_SCALE_SKEW = 10;
 
 export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.None]: STRING_KEYS.NONE,

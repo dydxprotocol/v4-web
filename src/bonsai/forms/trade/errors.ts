@@ -11,7 +11,12 @@ import { isEmpty } from 'lodash';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
-import { MAX_SCALE_ORDERS } from '@/constants/trade';
+import {
+  MAX_SCALE_ORDERS,
+  MAX_SCALE_SKEW,
+  MIN_SCALE_ORDERS,
+  MIN_SCALE_SKEW,
+} from '@/constants/trade';
 import {
   IndexerOrderSide,
   IndexerOrderType,
@@ -312,14 +317,22 @@ function validateFieldsBasic(
 
   if (options.needsScaleTotalOrders) {
     const totalOrders = AttemptNumber(state.scaleTotalOrders) ?? 0;
-    if (totalOrders < 2 || totalOrders > MAX_SCALE_ORDERS || !Number.isInteger(totalOrders)) {
+    if (
+      totalOrders < MIN_SCALE_ORDERS ||
+      totalOrders > MAX_SCALE_ORDERS ||
+      !Number.isInteger(totalOrders)
+    ) {
       errors.push(
         simpleValidationError({
           code: 'REQUIRED_SCALE_TOTAL_ORDERS',
           type: ErrorType.error,
           fields: ['scaleTotalOrders'],
-          titleKey: STRING_KEYS.ENTER_AMOUNT,
-          textKey: STRING_KEYS.ENTER_AMOUNT,
+          titleKey: STRING_KEYS.TOTAL_ORDERS,
+          textKey: STRING_KEYS.TOTAL_ORDERS_MUST_BE_WITHIN_RANGE,
+          textParams: {
+            MIN: { value: MIN_SCALE_ORDERS },
+            MAX: { value: MAX_SCALE_ORDERS },
+          },
         })
       );
     }
@@ -327,14 +340,17 @@ function validateFieldsBasic(
 
   if (options.needsScaleSkew) {
     const skew = AttemptNumber(state.scaleSkew) ?? 0;
-    if (skew <= 0 || skew >= 100) {
+    if (skew < MIN_SCALE_SKEW || skew > MAX_SCALE_SKEW) {
       errors.push(
         simpleValidationError({
           code: 'REQUIRED_SCALE_SKEW',
           type: ErrorType.error,
           fields: ['scaleSkew'],
-          titleKey: STRING_KEYS.ENTER_AMOUNT,
-          textKey: STRING_KEYS.ENTER_AMOUNT,
+          titleKey: STRING_KEYS.SKEW,
+          textParams: {
+            MIN: { value: MIN_SCALE_SKEW },
+            MAX: { value: MAX_SCALE_SKEW },
+          },
         })
       );
     }

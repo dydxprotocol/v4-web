@@ -4,7 +4,6 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
 import styled from 'styled-components';
 
-import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { INTEGER_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -154,7 +153,7 @@ export const TradeFormInputs = () => {
       inputType: InputType.Currency,
       label: (
         <>
-          <span>Start</span>
+          <span>{stringGetter({ key: STRING_KEYS.START })}</span>
           <Tag>USD</Tag>
         </>
       ),
@@ -168,7 +167,7 @@ export const TradeFormInputs = () => {
         inputType: InputType.Currency,
         label: (
           <>
-            <span>End</span>
+            <span>{stringGetter({ key: STRING_KEYS.END })}</span>
             <Tag>USD</Tag>
           </>
         ),
@@ -187,7 +186,7 @@ export const TradeFormInputs = () => {
       inputType: InputType.Number,
       label: (
         <>
-          Total Orders <$Muted>(2 - 20)</$Muted>
+          {stringGetter({ key: STRING_KEYS.TOTAL_ORDERS })} <$Muted>(2 - 20)</$Muted>
         </>
       ),
       onChange: ({ value }: NumberFormatValues) => {
@@ -200,18 +199,12 @@ export const TradeFormInputs = () => {
         inputType: InputType.Number,
         label: (
           <>
-            Skew <$Muted>(0.1 - 10)</$Muted>
+            {stringGetter({ key: STRING_KEYS.SKEW })} <$Muted>(0.1 - 10)</$Muted>
           </>
         ),
         onChange: ({ value }: NumberFormatValues) => {
           dispatch(tradeFormActions.setScaleSkew(value));
         },
-        validationConfig:
-          scaleSkew != null &&
-          scaleSkew !== '' &&
-          (Number(scaleSkew) < 0.1 || Number(scaleSkew) > 10)
-            ? { attached: true, message: 'Must be between 0.1 and 10', type: AlertType.Error }
-            : undefined,
         value: scaleSkew ?? '',
         decimals: 1,
       },
