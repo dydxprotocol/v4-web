@@ -143,6 +143,7 @@ export function calculateTradeSummary(
     if (effectiveTrade.type === TradeFormType.SCALE) {
       return undefined;
     }
+
     return mapIfPresent(
       accountData.currentTradeMarketSummary,
       effectiveTrade.marketId,
@@ -333,28 +334,26 @@ export function calculateTradeSummary(
 
         const goodTilTimeParsed = AttemptNumber(getGoodTilInSeconds(effectiveTrade.goodTil));
 
-        const { weights, totalWeight } = generateGeometricWeights(n, skew);
+        const prices = generateSkewedPrices(startPrice, endPrice, n, skew);
 
         const timeInForce = calc(() => {
-          if (effectiveTrade.timeInForce == null) {
-            return OrderTimeInForce.GTT;
-          }
           if (effectiveTrade.timeInForce === TimeInForce.IOC) {
             return OrderTimeInForce.IOC;
           }
           return OrderTimeInForce.GTT;
         });
 
-        // Generate payloads
+        // Generate payloads with equal sizes and skewed prices
         const payloads: PlaceOrderPayload[] = [];
         let remainingSize = totalSize;
+        const equalSize = totalSize / n;
 
         for (let i = 0; i < n; i += 1) {
-          const price = startPrice + ((endPrice - startPrice) * i) / (n - 1);
+          const price = prices[i]!;
           const isLast = i === n - 1;
           const size = isLast
             ? floorToStep(remainingSize, stepSize)
-            : floorToStep((totalSize * weights[i]!) / totalWeight, stepSize);
+            : floorToStep(equalSize, stepSize);
 
           if (size <= 0) continue;
           remainingSize -= size;
@@ -705,7 +704,7 @@ function calculateTradeOperationsForSimulation(
   };
 }
 
-function generateGeometricWeights(
+export function generateGeometricWeights(
   n: number,
   skew: number
 ): { weights: number[]; totalWeight: number } {
@@ -717,6 +716,26 @@ function generateGeometricWeights(
     totalWeight += w;
   }
   return { weights, totalWeight };
+}
+
+export function generateSkewedPrices(
+  startPrice: number,
+  endPrice: number,
+  n: number,
+  skew: number
+): number[] {
+  if (n < 2) return [startPrice];
+  // Use n-1 gap weights to create non-linearly spaced prices
+  const { weights } = generateGeometricWeights(n - 1, skew);
+  const totalGapWeight = weights.reduce((a, b) => a + b, 0);
+
+  const prices: number[] = [startPrice];
+  let cumulative = 0;
+  for (let i = 0; i < n - 1; i += 1) {
+    cumulative += weights[i]!;
+    prices.push(startPrice + (endPrice - startPrice) * (cumulative / totalGapWeight));
+  }
+  return prices;
 }
 
 function floorToStep(value: number, step: number): number {

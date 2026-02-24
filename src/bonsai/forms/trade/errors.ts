@@ -7,6 +7,7 @@ import {
 } from '@/bonsai/lib/validationErrors';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 import { OrderType } from '@dydxprotocol/v4-client-js';
+import { isEmpty } from 'lodash';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
@@ -1001,13 +1002,11 @@ function validateRestrictions(
 function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationError[] {
   const errors: ValidationError[] = [];
 
-  const hasScaleOrderPayloads = (summary.tradePayload?.scaleOrderPayloads?.length ?? 0) > 0;
-
   if (summary.tradePayload == null) {
     errors.push(simpleValidationError({ code: 'MISSING_TRADE_PAYLOAD' }));
   }
 
-  const hasPriceInfo = hasScaleOrderPayloads
+  const hasPriceInfo = !isEmpty(summary.tradePayload?.scaleOrderPayloads)
     ? summary.tradeInfo.startPrice != null && summary.tradeInfo.endPrice != null
     : summary.tradeInfo.payloadPrice != null;
 

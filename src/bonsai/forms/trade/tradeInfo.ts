@@ -30,6 +30,7 @@ import {
   toStepSize,
 } from '@/lib/numbers';
 
+import { generateSkewedPrices } from './summary';
 import {
   ExecutionType,
   MarginMode,
@@ -1278,25 +1279,19 @@ function calculateScaleWeightedAveragePrice(
   totalOrders: number | undefined,
   skew: number | undefined
 ): number | undefined {
-  if (startPrice == null || endPrice == null || totalOrders == null || skew == null) {
+  if (
+    startPrice == null ||
+    endPrice == null ||
+    totalOrders == null ||
+    totalOrders < 2 ||
+    skew == null
+  ) {
     return undefined;
   }
   const n = Math.floor(totalOrders);
-  if (n < 1 || skew <= 0) {
-    return undefined;
-  }
-  if (n === 1) {
-    return startPrice;
-  }
-  let totalWeight = 0;
-  let weightedPriceSum = 0;
-  for (let i = 0; i < n; i += 1) {
-    const w = skew ** i;
-    const price = startPrice + ((endPrice - startPrice) * i) / (n - 1);
-    weightedPriceSum += w * price;
-    totalWeight += w;
-  }
-  return totalWeight > 0 ? weightedPriceSum / totalWeight : undefined;
+  const prices = generateSkewedPrices(startPrice, endPrice, n, skew);
+  const priceSum = prices.reduce((a, b) => a + b, 0);
+  return n > 0 ? priceSum / n : undefined;
 }
 
 function calculateTradeFeeAfterDiscounts(
