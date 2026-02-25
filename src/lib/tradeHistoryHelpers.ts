@@ -17,8 +17,8 @@ export const TRADE_ACTION_TO_SHARE_TYPE_MAP: Record<TradeAction, ShareType | und
   [TradeAction.CLOSE_SHORT]: 'close',
   [TradeAction.PARTIAL_CLOSE_LONG]: 'partialClose',
   [TradeAction.PARTIAL_CLOSE_SHORT]: 'partialClose',
-  [TradeAction.ADD_TO_LONG]: 'extend',
-  [TradeAction.ADD_TO_SHORT]: 'extend',
+  [TradeAction.ADD_TO_LONG]: 'extended',
+  [TradeAction.ADD_TO_SHORT]: 'extended',
   [TradeAction.LIQUIDATION]: 'liquidated',
 };
 

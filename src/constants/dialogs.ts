@@ -64,7 +64,7 @@ export type SelectMarginModeDialogProps = {};
 export type SetMarketLeverageDialogProps = { marketId: string };
 export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
-export type SharePNLShareType = 'open' | 'close' | 'liquidated' | 'partialClose' | 'extend';
+export type SharePNLShareType = 'open' | 'close' | 'liquidated' | 'partialClose' | 'extended';
 export type SharePNLAnalyticsDialogProps = {
   assetId: string;
   marketId?: string;
