@@ -3,8 +3,8 @@ import { getSimpleOrderStatus } from '@/bonsai/calculators/orders';
 import {
   SubaccountOrder as NewSubaccountOrder,
   OrderStatus as OrderStatusNew,
-  PerpetualMarketSummaries,
-  PerpetualMarketSummary,
+  StablePerpetualMarketSummaries,
+  StablePerpetualMarketSummary,
   SubaccountFill as SubaccountFillNew,
 } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
@@ -111,7 +111,7 @@ export const isSellOrderNew = (order: NewSubaccountOrder) => {
 };
 
 type NewAddedProps = {
-  marketSummary: PerpetualMarketSummary | undefined;
+  marketSummary: StablePerpetualMarketSummary | undefined;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 };
@@ -121,7 +121,7 @@ export const getHydratedOrder = ({
   marketSummaries,
 }: {
   data: NewSubaccountOrder;
-  marketSummaries: PerpetualMarketSummaries;
+  marketSummaries: StablePerpetualMarketSummaries;
 }): NewSubaccountOrder & NewAddedProps => {
   return {
     ...data,
@@ -136,7 +136,7 @@ export const getHydratedFill = ({
   marketSummaries,
 }: {
   data: SubaccountFillNew;
-  marketSummaries: PerpetualMarketSummaries;
+  marketSummaries: StablePerpetualMarketSummaries;
 }): SubaccountFillNew & NewAddedProps => {
   return {
     ...data,

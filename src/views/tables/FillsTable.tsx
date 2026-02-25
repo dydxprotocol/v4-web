@@ -1,7 +1,7 @@
 import { forwardRef, Key, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { PerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
+import { StablePerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -65,7 +65,7 @@ export enum FillsTableColumnKey {
 }
 
 export type FillTableRow = {
-  marketSummary: Nullable<PerpetualMarketSummary>;
+  marketSummary: Nullable<StablePerpetualMarketSummary>;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 } & SubaccountFill;
@@ -318,7 +318,7 @@ export const FillsTable = forwardRef(
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
     const fills = currentMarket ? marketFills : allFills;
 
-    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.stableData));
 
     useViewPanel(currentMarket, 'fills');
 

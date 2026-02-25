@@ -3,7 +3,9 @@ import { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 
+import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTrollboxOnlineCount } from '@/hooks/useTrollboxOnlineCount';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -16,6 +18,7 @@ import { Icon, IconName } from './Icon';
 import { IconButton } from './IconButton';
 
 export const GlobalChat = () => {
+  const stringGetter = useStringGetter();
   const [isOpen, setIsOpen] = useState(false);
   const hasBeenOpened = useRef(false);
   const onlineCount = useTrollboxOnlineCount();
@@ -41,12 +44,14 @@ export const GlobalChat = () => {
         <$Header onClick={handleToggle}>
           <$IconRow>
             <Icon iconName={IconName.Chat} />
-            {/* TODO: Replace with localization all at once feature is complete. */}
-            Global Chat
+            {stringGetter({ key: STRING_KEYS.GLOBAL_CHAT })}
             {onlineCount != null && (
               <$OnlineIndicator>
                 <$OnlineDot />
-                {onlineCount.toLocaleString()} Online
+                {stringGetter({
+                  key: STRING_KEYS.COUNT_ONLINE,
+                  params: { COUNT: onlineCount.toLocaleString() },
+                })}
               </$OnlineIndicator>
             )}
           </$IconRow>
