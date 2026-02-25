@@ -51,6 +51,8 @@ export const getSelectedDisplayUnit = (state: RootState) => state.appUiConfigs.d
 export const getShouldHideLaunchableMarkets = (state: RootState) =>
   state.appUiConfigs.shouldHideLaunchableMarkets;
 
+export const getIsChatEnabled = (state: RootState) => state.appUiConfigs.isChatEnabled;
+
 export const getFavoritedMarkets = (state: RootState) => state.appUiConfigs.favoritedMarkets;
 export const getSpotFavorites = (state: RootState) => state.appUiConfigs.spotFavorites;
 

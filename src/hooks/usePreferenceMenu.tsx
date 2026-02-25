@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
@@ -18,8 +18,12 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import {
   OtherPreference,
   setDefaultToAllMarketsInPositionsOrdersFills,
+  setIsChatEnabled,
 } from '@/state/appUiConfigs';
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
+import {
+  getDefaultToAllMarketsInPositionsOrdersFills,
+  getIsChatEnabled,
+} from '@/state/appUiConfigsSelectors';
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
@@ -34,39 +38,35 @@ export const usePreferenceMenu = (): MenuConfig<
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();
-  const [enabledNotifs, setEnabledNotifs] = useState(notificationPreferences);
 
-  const currentDisplayAllMarketDefault = useAppSelector(
-    getDefaultToAllMarketsInPositionsOrdersFills
+  const defaultToAllMarkets = useAppSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const chatEnabled = useAppSelector(getIsChatEnabled);
+
+  const toggleNotifPreference = useCallback(
+    (type: NotificationCategoryPreferences) => {
+      setNotificationPreferences({
+        ...notificationPreferences,
+        [type]: !notificationPreferences[type],
+      });
+    },
+    [notificationPreferences, setNotificationPreferences]
   );
-  const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
 
-  const toggleNotifPreference = (type: NotificationCategoryPreferences) =>
-    setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
-
-  useEffect(() => {
-    setNotificationPreferences(enabledNotifs);
-  }, [enabledNotifs]);
-
-  useEffect(() => {
-    setDefaultToAllMarkets(currentDisplayAllMarketDefault);
-  }, [currentDisplayAllMarketDefault]);
-
-  const getItem = (
-    notificationCategory: NotificationCategoryPreferences,
-    labelStringKey: string
-  ) => ({
-    value: notificationCategory,
-    label: stringGetter({ key: labelStringKey }),
-    slotAfter: (
-      <Switch
-        name={notificationCategory}
-        checked={enabledNotifs[notificationCategory]}
-        onCheckedChange={() => null}
-      />
-    ),
-    onSelect: () => toggleNotifPreference(notificationCategory),
-  });
+  const getItem = useCallback(
+    (notificationCategory: NotificationCategoryPreferences, labelStringKey: string) => ({
+      value: notificationCategory,
+      label: stringGetter({ key: labelStringKey }),
+      slotAfter: (
+        <Switch
+          name={notificationCategory}
+          checked={notificationPreferences[notificationCategory]}
+          onCheckedChange={() => null}
+        />
+      ),
+      onSelect: () => toggleNotifPreference(notificationCategory),
+    }),
+    [stringGetter, notificationPreferences, toggleNotifPreference]
+  );
 
   const notificationSection = useMemo(
     () => ({
@@ -89,7 +89,7 @@ export const usePreferenceMenu = (): MenuConfig<
         .filter(isTruthy)
         .map(({ value, labelStringKey }) => getItem(value, labelStringKey)),
     }),
-    [stringGetter, enabledNotifs]
+    [stringGetter, getItem]
   );
 
   const { setSelectedGasDenom, selectedGasDenom } = useDydxClient();
@@ -112,6 +112,20 @@ export const usePreferenceMenu = (): MenuConfig<
           ),
           onSelect: () => {
             dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
+          },
+        },
+        {
+          value: OtherPreference.EnableChat,
+          label: stringGetter({ key: STRING_KEYS.ENABLE_CHAT }),
+          slotAfter: (
+            <Switch
+              name={OtherPreference.EnableChat}
+              checked={chatEnabled}
+              onCheckedChange={() => null}
+            />
+          ),
+          onSelect: () => {
+            dispatch(setIsChatEnabled(!chatEnabled));
           },
         },
         ...(isDev
@@ -161,6 +175,7 @@ export const usePreferenceMenu = (): MenuConfig<
     [
       stringGetter,
       defaultToAllMarkets,
+      chatEnabled,
       selectedGasDenom,
       setSelectedGasDenom,
       dispatch,
