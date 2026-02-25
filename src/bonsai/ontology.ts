@@ -48,6 +48,8 @@ import {
   selectAccountOrders,
   selectAccountOrdersLoading,
   selectAccountStakingTier,
+  selectAccountTradesWithLeverage,
+  selectAccountTradeHistoryLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectChildSubaccountSummaries,
@@ -148,6 +150,7 @@ import {
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
+  SubaccountTrade,
   SubaccountTransfer,
   UserStakingTierSummary,
   UserStats,
@@ -186,6 +189,10 @@ interface BonsaiCoreShape {
     };
     fills: {
       data: BasicSelector<SubaccountFill[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    tradeHistory: {
+      data: BasicSelector<SubaccountTrade[]>;
       loading: BasicSelector<LoadableStatus>;
     };
     transfers: {
@@ -295,6 +302,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     fills: {
       data: selectAccountFills,
       loading: selectAccountFillsLoading,
+    },
+    tradeHistory: {
+      data: selectAccountTradesWithLeverage,
+      loading: selectAccountTradeHistoryLoading,
     },
     transfers: {
       data: selectAccountTransfers,
@@ -410,6 +421,7 @@ interface BonsaiHelpersShape {
       openOrders: BasicSelector<SubaccountOrder[]>;
       orderHistory: BasicSelector<SubaccountOrder[]>;
       fills: BasicSelector<SubaccountFill[]>;
+      tradeHistory: BasicSelector<SubaccountTrade[]>;
     };
     orderbook: {
       selectGroupedData: BasicSelector<
@@ -480,6 +492,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,
       fills: getCurrentMarketAccountFills,
+      tradeHistory: selectAccountTradesWithLeverage,
     },
   },
   assets: {

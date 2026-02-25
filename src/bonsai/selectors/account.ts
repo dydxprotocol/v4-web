@@ -1,5 +1,5 @@
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { isEqual, orderBy, pick } from 'lodash';
+import { isEqual, keyBy, orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
@@ -9,7 +9,7 @@ import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber } from '@/lib/numbers';
 
 import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
@@ -26,11 +26,12 @@ import {
   calculateParentSubaccountSummary,
   calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
+import { calculateTrades } from '../calculators/trades';
 import { calculateTransfers } from '../calculators/transfers';
 import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import { SubaccountTransfer } from '../types/summaryTypes';
+import { SubaccountTrade, SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawAccountStakingTierData,
@@ -50,6 +51,9 @@ import {
   selectRawParentSubaccountData,
   selectRawSelectedMarketLeverages,
   selectRawSelectedMarketLeveragesData,
+  selectRawTradeHistoryLiveData,
+  selectRawTradeHistoryRest,
+  selectRawTradeHistoryRestData,
   selectRawTransfersLiveData,
   selectRawTransfersRest,
   selectRawTransfersRestData,
@@ -305,4 +309,40 @@ export const selectAccountNobleWalletAddress = createAppSelector(
 export const selectAccountStakingTier = createAppSelector(
   [selectRawAccountStakingTierData],
   (stakingTier) => calculateAccountStakingTier(stakingTier)
+);
+
+export const selectAccountTradeHistory = createAppSelector(
+  [selectRawTradeHistoryRestData, selectRawTradeHistoryLiveData],
+  (rest, live) => {
+    return calculateTrades(rest?.tradeHistory, live);
+  }
+);
+
+export const selectAccountTradeHistoryLoading = createAppSelector(
+  [selectRawTradeHistoryRest, selectRawParentSubaccount],
+  mergeLoadableStatus
+);
+
+export const selectAccountTradesWithLeverage = createAppSelector(
+  [selectAccountTradeHistory, selectAccountOrders, selectParentSubaccountPositions],
+  (trades, orders, positions): SubaccountTrade[] => {
+    const orderById = keyBy(orders, (o) => o.id);
+    const positionByUniqueId = keyBy(positions ?? [], (p) => p.uniqueId);
+
+    return trades.map((trade) => {
+      const order = trade.orderId ? orderById[trade.orderId] : undefined;
+      const position = order ? positionByUniqueId[order.positionUniqueId] : undefined;
+
+      if (!position) {
+        return trade;
+      }
+
+      return {
+        ...trade,
+        positionUniqueId: position.uniqueId,
+        leverage: MaybeBigNumber(position.effectiveSelectedLeverage)?.toNumber(),
+        liquidationPrice: MaybeBigNumber(position.liquidationPrice)?.toNumber(),
+      };
+    });
+  }
 );

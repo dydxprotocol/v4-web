@@ -11,18 +11,21 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { useAppSelector } from '@/state/appTypes';
 
-import { TradeRow } from './TradeRow';
+import { TradeHistoryRow } from './TradeHistoryRow';
 
 const FILL_HEIGHT = 64;
 
 export const TradeHistoryList = () => {
-  const isLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
-  const fills = useAppSelector(BonsaiCore.account.fills.data);
+  const loadingStatus = useAppSelector(BonsaiCore.account.tradeHistory.loading);
+  const trades = useAppSelector(BonsaiCore.account.tradeHistory.data);
   const parentRef = useRef<HTMLDivElement>(null);
   const stringGetter = useStringGetter();
 
+  const isLoading = loadingStatus === 'pending';
+  const isError = loadingStatus === 'error';
+
   const rowVirtualizer = useVirtualizer({
-    count: fills.length,
+    count: trades.length,
     estimateSize: (_index: number) => FILL_HEIGHT,
     getScrollElement: () => parentRef.current,
     rangeExtractor: (range) => {
@@ -30,17 +33,31 @@ export const TradeHistoryList = () => {
     },
   });
 
+  if (isError) {
+    return (
+      <div tw="flex h-full w-full flex-col items-center justify-center gap-3">
+        <div tw="text-color-text-0">
+          {stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: 'Failed to load trades' },
+          })}
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <LoadingSpace id="trade-history-list" />;
   }
 
-  if (fills.length === 0) {
+  if (trades.length === 0) {
     return (
       <div tw="flex h-full w-full flex-col items-center justify-center">
-        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FILLS_EMPTY_STATE })}</div>
+        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</div>
       </div>
     );
   }
+
   return (
     <div ref={parentRef} tw="relative h-full max-h-full w-full max-w-full overflow-auto">
       <div
@@ -59,7 +76,10 @@ export const TradeHistoryList = () => {
               transform: `translateY(${virtualRow.start}px)`,
             }}
           >
-            <TradeRow css={{ height: `${virtualRow.size}px` }} fill={fills[virtualRow.index]!} />
+            <TradeHistoryRow
+              css={{ height: `${virtualRow.size}px` }}
+              trade={trades[virtualRow.index]!}
+            />
           </div>
         ))}
       </div>

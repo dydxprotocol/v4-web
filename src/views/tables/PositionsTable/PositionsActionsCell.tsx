@@ -1,13 +1,19 @@
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
-import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
+import {
+  DialogTypes,
+  SharePNLAnalyticsDialogProps,
+  TradeBoxDialogTypes,
+} from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { IconName } from '@/components/Icon';
@@ -15,6 +21,7 @@ import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closePositionFormActions } from '@/state/closePositionForm';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
@@ -24,6 +31,7 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
+  positionId: PositionUniqueId;
   marketId: string;
   assetId: string;
   leverage: Nullable<BigNumber>;
@@ -31,12 +39,12 @@ type ElementProps = {
   entryPrice: Nullable<BigNumber>;
   unrealizedPnl: Nullable<BigNumber>;
   side: Nullable<IndexerPositionSide>;
-  sideLabel: Nullable<string>;
   isDisabled?: boolean;
   showClosePositionAction: boolean;
 };
 
 export const PositionsActionsCell = ({
+  positionId,
   marketId,
   assetId,
   leverage,
@@ -44,7 +52,6 @@ export const PositionsActionsCell = ({
   entryPrice,
   unrealizedPnl,
   side,
-  sideLabel,
   isDisabled,
   showClosePositionAction,
 }: ElementProps) => {
@@ -54,6 +61,8 @@ export const PositionsActionsCell = ({
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const stringGetter = useStringGetter();
+
+  const position = useAppSelectorWithArgs(getOpenPositionFromId, positionId);
 
   const onCloseButtonToggle = (isPressed: boolean) => {
     navigate(`${AppRoute.Trade}/${marketId}`);
@@ -69,20 +78,22 @@ export const PositionsActionsCell = ({
   };
 
   const openShareDialog = () => {
-    dispatch(
-      openDialog(
-        DialogTypes.SharePNLAnalytics({
-          marketId,
-          assetId,
-          leverage: leverage?.toNumber(),
-          oraclePrice: oraclePrice?.toNumber(),
-          entryPrice: entryPrice?.toNumber(),
-          unrealizedPnl: unrealizedPnl?.toNumber(),
-          side,
-          sideLabel,
-        })
-      )
-    );
+    const sharePnlData: SharePNLAnalyticsDialogProps = {
+      assetId,
+      marketId,
+      size: position?.value.toNumber() ?? 0,
+      isLong: side === IndexerPositionSide.LONG,
+      isCross: position?.marginMode === 'CROSS',
+      leverage: leverage?.toNumber(),
+      oraclePrice: oraclePrice?.toNumber(),
+      entryPrice: entryPrice?.toNumber(),
+      unrealizedPnl: unrealizedPnl?.toNumber(),
+      pnl: position?.realizedPnl.toNumber(),
+      pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber(),
+      liquidationPrice: position?.liquidationPrice?.toNumber(),
+    };
+
+    dispatch(openDialog(DialogTypes.SharePNLAnalytics(sharePnlData)));
   };
 
   return (
@@ -124,11 +135,9 @@ const $ActionsTableCell = styled(ActionsTableCell)`
 `;
 
 const $TriggersButton = styled(IconButton)`
-  --button-icon-size: 1.25em;
+  --button-icon-size: 1em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
-
-  --button-icon-size: 1em;
 `;
 
 const $CloseButtonToggle = styled(IconButton)`
