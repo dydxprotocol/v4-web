@@ -279,6 +279,26 @@ export type PerpetualMarketSummaries = {
   [marketId: string]: PerpetualMarketSummary;
 };
 
+export const unstableMarketSummaryFields = [
+  'oraclePrice',
+  'priceChange24H',
+  'percentChange24h',
+  'nextFundingRate',
+  'volume24H',
+  'trades24H',
+  'openInterest',
+  'openInterestUSDC',
+] satisfies ReadonlyArray<keyof PerpetualMarketSummary>;
+
+export type UnstableMarketSummaryFields = (typeof unstableMarketSummaryFields)[number];
+
+export type StablePerpetualMarketSummary = Omit<
+  PerpetualMarketSummary,
+  UnstableMarketSummaryFields
+>;
+
+export type StablePerpetualMarketSummaries = Record<string, StablePerpetualMarketSummary>;
+
 export type PerpetualMarketFeeDiscount = NonNullable<
   ToPrimitives<FeeTierModule.QueryAllMarketFeeDiscountParamsResponse['params']>
 >;

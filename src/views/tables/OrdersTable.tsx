@@ -1,7 +1,11 @@
 import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { OrderStatus, PerpetualMarketSummary, SubaccountOrder } from '@/bonsai/types/summaryTypes';
+import {
+  OrderStatus,
+  StablePerpetualMarketSummary,
+  SubaccountOrder,
+} from '@/bonsai/types/summaryTypes';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import styled, { css } from 'styled-components';
@@ -77,7 +81,7 @@ export enum OrdersTableColumnKey {
 }
 
 export type OrderTableRow = {
-  marketSummary: Nullable<PerpetualMarketSummary>;
+  marketSummary: Nullable<StablePerpetualMarketSummary>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 } & SubaccountOrder;
@@ -399,7 +403,7 @@ export const OrdersTable = forwardRef(
       [allOrders, currentMarket, marketOrders, marketTypeFilter]
     );
 
-    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.stableData));
     useViewPanel(currentMarket, tableType === 'OPEN' ? 'openOrders' : 'orderHistory');
 
     const symbol = mapIfPresent(
