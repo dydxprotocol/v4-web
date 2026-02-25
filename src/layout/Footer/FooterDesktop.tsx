@@ -24,6 +24,7 @@ import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setIsChatEnabled } from '@/state/appUiConfigs';
 import { getIsChatEnabled } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
@@ -90,6 +91,12 @@ export const FooterDesktop = () => {
             {label}
           </$FooterButton>
         </WithTooltip>
+
+        {isChatEnabled && !isChatPreferenceEnabled && (
+          <$FooterButton size={ButtonSize.XSmall} onClick={() => dispatch(setIsChatEnabled(true))}>
+            {stringGetter({ key: STRING_KEYS.CHAT })}
+          </$FooterButton>
+        )}
 
         {globalThis.Intercom && (
           <$FooterButton

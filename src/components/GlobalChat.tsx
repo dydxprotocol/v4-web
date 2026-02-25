@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 
-import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useTrollboxOnlineCount } from '@/hooks/useTrollboxOnlineCount';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -21,7 +20,6 @@ export const GlobalChat = () => {
   const hasBeenOpened = useRef(false);
   const onlineCount = useTrollboxOnlineCount();
   const dispatch = useAppDispatch();
-  const notify = useCustomNotification();
 
   if (isOpen) hasBeenOpened.current = true;
 
@@ -33,12 +31,8 @@ export const GlobalChat = () => {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       dispatch(setIsChatEnabled(false));
-      notify({
-        title: 'Chat hidden',
-        body: 'You can re-enable chat from your Preferences.',
-      });
     },
-    [dispatch, notify]
+    [dispatch]
   );
 
   return (
