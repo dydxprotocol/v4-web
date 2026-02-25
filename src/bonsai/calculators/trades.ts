@@ -15,14 +15,23 @@ import {
 import { MustBigNumber, MustNumber } from '@/lib/numbers';
 
 import { mergeObjects } from '../lib/mergeObjects';
+import { logBonsaiError } from '../logs';
 import { SubaccountTrade, TradeAction } from '../types/summaryTypes';
 
 export function calculateTrades(
   restTrades: IndexerCompositeTradeHistoryObject[] | undefined,
   liveTrades: IndexerCompositeTradeHistoryObject[] | undefined
 ): SubaccountTrade[] {
-  const getTradesById = (data: IndexerCompositeTradeHistoryObject[]) =>
-    keyBy(data, (trade) => trade.id ?? '');
+  const getTradesById = (data: IndexerCompositeTradeHistoryObject[]) => {
+    const tradesWithIds = data.filter((trade) => {
+      if (!trade.id) {
+        logBonsaiError('calculateTrades', 'Trade missing id, skipping', { trade });
+        return false;
+      }
+      return true;
+    });
+    return keyBy(tradesWithIds, (trade) => trade.id!);
+  };
 
   const merged = mergeObjects(
     getTradesById(restTrades ?? EMPTY_ARR),
@@ -44,9 +53,7 @@ const calculateTrade = weakMapMemoize(
     action: deriveTradeAction(base),
     price: Number(base.executionPrice),
     entryPrice: base.entryPrice ? Number(base.entryPrice) : undefined,
-    size:
-      Number(base.executionPrice) *
-      (MustNumber(base.additionalSize ?? 0) + MustNumber(base.prevSize ?? 0)),
+    size: MustNumber(base.additionalSize ?? 0),
     prevSize: base.prevSize ? Number(base.prevSize) : undefined,
     additionalSize: base.additionalSize ? Number(base.additionalSize) : undefined,
     value: MustNumber(base.value ?? 0),

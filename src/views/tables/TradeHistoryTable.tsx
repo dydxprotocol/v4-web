@@ -17,6 +17,8 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import { DateAgeOutput } from '@/components/Table/DateAgeToggleHeader';
+import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -36,7 +38,6 @@ export enum TradeHistoryTableColumnKey {
   Market = 'Market',
   Type = 'Type',
   Action = 'Action',
-  Side = 'Side',
   Price = 'Price',
   Size = 'Size',
   Value = 'Value',
@@ -73,11 +74,9 @@ const getTradeHistoryTableColumnDef = ({
         getCellValue: (row) => row.createdAt,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt != null ? new Date(createdAt).getTime() : undefined}
-            tw="text-color-text-0"
+          <DateAgeOutput
+            value={createdAt != null ? new Date(createdAt).getTime() : null}
+            relativeTimeFormat="singleCharacter"
           />
         ),
       },
@@ -87,17 +86,7 @@ const getTradeHistoryTableColumnDef = ({
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         renderCell: ({ marketSummary }) => (
-          <TableCell
-            slotLeft={
-              <AssetIcon
-                logoUrl={marketSummary?.logo}
-                symbol={marketSummary?.assetId}
-                tw="[--asset-icon-size:1.25rem]"
-              />
-            }
-          >
-            <span tw="font-bold text-color-text-2">{marketSummary?.displayableAsset ?? ''}</span>
-          </TableCell>
+          <MarketSummaryTableCell marketSummary={marketSummary ?? undefined} />
         ),
       },
 
@@ -120,16 +109,6 @@ const getTradeHistoryTableColumnDef = ({
           const { label, color } = getTradeActionDisplayInfo(action, stringGetter);
           return <span css={{ color }}>{label}</span>;
         },
-      },
-
-      [TradeHistoryTableColumnKey.Side]: {
-        columnKey: 'side',
-        getCellValue: (row) => row.side,
-        label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ side }) =>
-          side != null ? (
-            <$Side side={side}>{side === IndexerOrderSide.BUY ? 'Buy' : 'Sell'}</$Side>
-          ) : null,
       },
 
       [TradeHistoryTableColumnKey.Price]: {

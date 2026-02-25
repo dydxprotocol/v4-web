@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { TradeAction } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
@@ -15,7 +17,8 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { MaybeBigNumber } from '@/lib/numbers';
+import { MaybeBigNumber, MustNumber } from '@/lib/numbers';
+import { TRADE_ACTION_TO_SHARE_TYPE_MAP } from '@/lib/tradeHistoryHelpers';
 
 import { type TradeTableRow } from '../TradeHistoryTable';
 
@@ -28,43 +31,33 @@ export const TradeHistoryActionsCell = ({ trade, isDisabled }: ElementProps) => 
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const shareType =
-    trade.action === TradeAction.OPEN_LONG || trade.action === TradeAction.OPEN_SHORT
-      ? 'open'
-      : trade.action === TradeAction.PARTIAL_CLOSE_LONG ||
-          trade.action === TradeAction.PARTIAL_CLOSE_SHORT
-        ? 'partialClose'
-        : trade.action === TradeAction.CLOSE_LONG || trade.action === TradeAction.CLOSE_SHORT
-          ? 'close'
-          : trade.action === TradeAction.LIQUIDATION
-            ? 'liquidated'
-            : undefined;
+  const shareType = TRADE_ACTION_TO_SHARE_TYPE_MAP[trade.action] ?? undefined;
 
   const prevSize = !!trade.prevSize && !!trade.price ? trade.prevSize * trade.price : undefined;
 
-  const sharePnlData: SharePNLAnalyticsDialogProps = {
-    assetId: trade.marketSummary?.assetId ?? '',
-    marketId: trade.marketId,
-    size: trade.size ?? trade.value,
-    prevSize,
-    isLong:
-      trade.positionSide === 'LONG' ||
-      trade.action === TradeAction.OPEN_LONG ||
-      trade.action === TradeAction.CLOSE_LONG,
-    isCross: trade.marginMode === 'CROSS',
-    shareType,
-    leverage: trade.leverage,
-    oraclePrice: MaybeBigNumber(trade.marketSummary?.oraclePrice)?.toNumber(),
-    entryPrice: trade.entryPrice,
-    exitPrice: trade.price,
-    pnl: trade.closedPnl,
-    pnlPercentage: trade.netClosedPnlPercent ?? 0,
-    liquidationPrice: trade.liquidationPrice,
-  };
+  const openShareDialog = useCallback(() => {
+    const sharePnlData: SharePNLAnalyticsDialogProps = {
+      assetId: trade.marketSummary?.assetId ?? '',
+      marketId: trade.marketId,
+      size: Number(trade.price) * MustNumber(trade.additionalSize ?? 0) + (prevSize ?? 0),
+      prevSize,
+      isLong:
+        trade.positionSide === 'LONG' ||
+        trade.action === TradeAction.OPEN_LONG ||
+        trade.action === TradeAction.CLOSE_LONG,
+      isCross: trade.marginMode === 'CROSS',
+      shareType,
+      leverage: trade.leverage,
+      oraclePrice: MaybeBigNumber(trade.marketSummary?.oraclePrice)?.toNumber(),
+      entryPrice: trade.entryPrice,
+      exitPrice: trade.price,
+      pnl: trade.closedPnl,
+      pnlPercentage: trade.netClosedPnlPercent ?? 0,
+      liquidationPrice: trade.liquidationPrice,
+    };
 
-  const openShareDialog = () => {
     dispatch(openDialog(DialogTypes.SharePNLAnalytics(sharePnlData)));
-  };
+  }, [dispatch, trade, prevSize, shareType]);
 
   return (
     <$ActionsTableCell tw="mr-[-0.5rem]">

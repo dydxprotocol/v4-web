@@ -64,12 +64,13 @@ export type SelectMarginModeDialogProps = {};
 export type SetMarketLeverageDialogProps = { marketId: string };
 export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
+export type SharePNLShareType = 'open' | 'close' | 'liquidated' | 'partialClose' | 'extend';
 export type SharePNLAnalyticsDialogProps = {
   assetId: string;
   marketId?: string;
   isLong: boolean;
   isCross: boolean;
-  shareType?: 'open' | 'close' | 'liquidated' | 'partialClose' | 'extend' | undefined;
+  shareType?: SharePNLShareType | undefined;
   leverage?: Nullable<number>;
   size?: Nullable<number>;
   prevSize?: Nullable<number>;
