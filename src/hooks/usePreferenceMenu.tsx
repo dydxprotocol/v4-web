@@ -116,7 +116,7 @@ export const usePreferenceMenu = (): MenuConfig<
         },
         {
           value: OtherPreference.EnableChat,
-          label: 'Enable Chat',
+          label: stringGetter({ key: STRING_KEYS.ENABLE_CHAT }),
           slotAfter: (
             <Switch
               name={OtherPreference.EnableChat}
