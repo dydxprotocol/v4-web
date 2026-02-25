@@ -15,6 +15,8 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { MenuConfig, MenuItem } from '@/constants/menus';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -63,11 +65,12 @@ const NavItemWithRef = <MenuItemValue extends string>(
   ref: Ref<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>
 ) => {
   const location = useLocation();
+  const { isTablet } = useBreakpoints();
 
   const children = (
     <>
       {slotBefore}
-      <span>
+      <span css={isTablet ? { fontSize: 16 } : undefined}>
         {label}
         {tag && (
           <>
@@ -95,7 +98,7 @@ const NavItemWithRef = <MenuItemValue extends string>(
         tw="whitespace-nowrap"
         {...props}
       >
-        {children}
+        {isTablet ? <div tw="mx-auto flex items-center gap-0.25">{children}</div> : children}
       </NavLink>
     </Link>
   ) : props.onClick ? (

@@ -1,81 +1,107 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { OnboardingState } from '@/constants/account';
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 
+import { useAccounts } from '@/hooks/useAccounts';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { LogoShortIcon } from '@/icons/logo-short';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { DropdownHeaderMenu } from '@/components/DropdownHeaderMenu';
+import { Button } from '@/components/Button';
+import { DropdownMenu } from '@/components/DropdownMenu';
+import { Icon, IconName } from '@/components/Icon';
+import { UnseenIndicator } from '@/views/Lists/Alerts/UnseenIndicator';
+
+import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
+import { openDialog, setIsUserMenuOpen } from '@/state/dialogs';
+
+import { truncateAddress } from '@/lib/wallet';
 
 export const PortfolioNavMobile = () => {
   const stringGetter = useStringGetter();
-  const { pathname } = useLocation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const onboardingState = useAppSelector(getOnboardingState);
+  const { hasUnreadNotifications } = useNotifications();
+  const { dydxAddress } = useAccounts();
 
-  const portfolioRouteItems = [
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.Overview}`,
-      label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
-      description: stringGetter({ key: STRING_KEYS.OVERVIEW_DESCRIPTION }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.Positions}`,
-      label: stringGetter({ key: STRING_KEYS.POSITIONS }),
-      description: stringGetter({ key: STRING_KEYS.POSITIONS_DESCRIPTION }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.Orders}`,
-      label: stringGetter({ key: STRING_KEYS.ORDERS }),
-      description: stringGetter({ key: STRING_KEYS.ORDERS_DESCRIPTION }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.Fees}`,
-      label: stringGetter({ key: STRING_KEYS.FEES }),
-      description: stringGetter({ key: STRING_KEYS.FEE_STRUCTURE }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.EquityTiers}`,
-      label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
-      description: stringGetter({ key: STRING_KEYS.EQUITY_TIERS_DESCRIPTION }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`,
-      label: stringGetter({ key: STRING_KEYS.TRADES }),
-      description: stringGetter({ key: STRING_KEYS.TRADES_DESCRIPTION }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Transfers}`,
-      label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
-      description: stringGetter({ key: STRING_KEYS.TRANSFERS_DESCRIPTION }),
-    },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.VaultTransfers}`,
-      label: stringGetter({ key: STRING_KEYS.VAULT_TRANSFERS }),
-      description: stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS_DESCRIPTION }),
-    },
-  ];
-
-  const routeMap = Object.fromEntries(
-    portfolioRouteItems.map(({ value, label }) => [value, { value, label }])
-  );
-
-  const currentRoute = routeMap[pathname];
+  const openUserMenu = () => {
+    dispatch(setIsUserMenuOpen(true));
+  };
 
   return (
     <$MobilePortfolioHeader>
-      <DropdownHeaderMenu
-        key="portfolioRoute"
-        items={portfolioRouteItems.filter(({ value }) => value !== currentRoute?.value)}
-        onValueChange={navigate}
-      >
-        {currentRoute?.label}
-      </DropdownHeaderMenu>
+      <$LogoLink to="/">
+        <LogoShortIcon />
+      </$LogoLink>
+
+      <div tw="flex items-center gap-0.5">
+        {onboardingState === OnboardingState.AccountConnected && (
+          <Button
+            tw="relative size-2.25 min-w-2.25 rounded-[50%] border border-solid border-[color:var(--color-border)]"
+            shape={ButtonShape.Circle}
+            size={ButtonSize.XSmall}
+            onClick={() => {
+              navigate(AppRoute.Alerts);
+            }}
+          >
+            <Icon iconName={IconName.BellStroked} />
+            {hasUnreadNotifications && (
+              <UnseenIndicator tw="absolute right-[-2px] top-0 size-0.875 min-h-0.875 min-w-0.875 border-2 border-solid border-[color:var(--color-layer-3)]" />
+            )}
+          </Button>
+        )}
+
+        <DropdownMenu
+          items={[
+            {
+              label: (
+                <div tw="flex w-9 items-center justify-between gap-0.25">
+                  <p>{truncateAddress(dydxAddress)}</p>
+                  <Icon iconName={IconName.Copy} />
+                </div>
+              ),
+              value: 'copy',
+              onSelect: () => navigator.clipboard.writeText(dydxAddress ?? ''),
+            },
+            {
+              label: (
+                <div tw="flex w-9 items-center justify-between gap-0.25 text-color-negative">
+                  <p>{stringGetter({ key: STRING_KEYS.SIGN_OUT })}</p>
+                  <Icon iconName={IconName.Close} />
+                </div>
+              ),
+              value: 'sign-out',
+              onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
+            },
+          ]}
+        >
+          <Icon iconName={IconName.Wallet3} />
+          {truncateAddress(dydxAddress)}
+        </DropdownMenu>
+
+        <Button
+          tw="size-2.25 min-w-2.25 rounded-[50%] border border-solid border-[color:var(--color-border)]"
+          shape={ButtonShape.Circle}
+          size={ButtonSize.XSmall}
+          onClick={openUserMenu}
+        >
+          <Icon iconName={IconName.Menu} />
+        </Button>
+      </div>
     </$MobilePortfolioHeader>
   );
 };
+
 const $MobilePortfolioHeader = styled.div`
   ${layoutMixins.stickyHeader}
   ${layoutMixins.withOuterBorder}
@@ -84,4 +110,17 @@ const $MobilePortfolioHeader = styled.div`
   padding: 1rem;
   background-color: var(--color-layer-2);
   z-index: 2;
+
+  justify-content: space-between;
+`;
+
+const $LogoLink = styled(Link)`
+  display: flex;
+  align-self: stretch;
+
+  > svg {
+    margin: auto;
+    width: 1.6rem;
+    height: 1.6rem;
+  }
 `;

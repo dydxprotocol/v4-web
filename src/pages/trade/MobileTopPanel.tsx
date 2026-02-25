@@ -5,15 +5,13 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
 import { ToggleButton } from '@/components/ToggleButton';
-import { AccountInfo } from '@/views/AccountInfo';
-import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
@@ -35,14 +33,19 @@ enum Tab {
   LiveTrades = 'LiveTrades',
 }
 
-const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: IconName }) => (
+const TabButton = ({ value, label }: { value: Tab; label: string }) => (
   <Trigger asChild value={value}>
     <$TabButton>
-      <Icon iconName={icon} size="1.375rem" />
       <span>{label}</span>
     </$TabButton>
   </Trigger>
 );
+
+enum HeightMode {
+  Short = 'Short',
+  Normal = 'Normal',
+  Mobile = 'Mobile',
+}
 
 export const MobileTopPanel = ({
   isViewingUnlaunchedMarket,
@@ -51,44 +54,21 @@ export const MobileTopPanel = ({
 }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { isTablet } = useBreakpoints();
 
   const [value, setValue] = useState(Tab.Price);
 
   const items = [
     {
-      content: <AccountInfo tw="flex-1" />,
-      label: stringGetter({ key: STRING_KEYS.WALLET }),
-      value: Tab.Account,
-      icon: IconName.Coins,
-    },
-    {
       content: <TvChart />,
       forceMount: true,
-      label: stringGetter({ key: STRING_KEYS.PRICE }),
+      label: 'Chart', // TODO: stringGetter({ key: STRING_KEYS.CHART }),
       value: Tab.Price,
-      icon: IconName.PriceChart,
     },
     !isViewingUnlaunchedMarket && {
       content: <DepthChart stringGetter={stringGetter} selectedLocale={selectedLocale} />,
       label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
       value: Tab.Depth,
-      icon: IconName.DepthChart,
-    },
-    !isViewingUnlaunchedMarket && {
-      content: <FundingChart selectedLocale={selectedLocale} />,
-      label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
-      value: Tab.Funding,
-      icon: IconName.FundingChart,
-    },
-    !isViewingUnlaunchedMarket && {
-      content: (
-        <$ScrollableTableContainer>
-          <CanvasOrderbook histogramSide="right" layout="horizontal" hideHeader />
-        </$ScrollableTableContainer>
-      ),
-      label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),
-      value: Tab.OrderBook,
-      icon: IconName.Orderbook,
     },
     !isViewingUnlaunchedMarket && {
       content: (
@@ -96,33 +76,42 @@ export const MobileTopPanel = ({
           <LiveTrades histogramSide="left" />
         </$ScrollableTableContainer>
       ),
-      label: stringGetter({ key: STRING_KEYS.RECENT }),
+      label: stringGetter({ key: STRING_KEYS.TRADES }),
       value: Tab.LiveTrades,
-      icon: IconName.Clock,
+    },
+    !isViewingUnlaunchedMarket && {
+      content: <FundingChart selectedLocale={selectedLocale} />,
+      label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
+      value: Tab.Funding,
     },
   ].filter(isTruthy);
 
   return (
     <$Tabs
       value={value}
-      $shortMode={value === Tab.Account}
+      $heightMode={
+        isTablet ? HeightMode.Mobile : value === Tab.Account ? HeightMode.Short : HeightMode.Normal
+      }
       onValueChange={setValue}
       items={items.map((item) => ({
         ...item,
-        customTrigger: (
-          <TabButton key={item.value} label={item.label} value={item.value} icon={item.icon} />
-        ),
+        customTrigger: <TabButton key={item.value} label={item.label} value={item.value} />,
       }))}
-      side="bottom"
+      side="top"
     />
   );
 };
 
-type TabsStyleProps = { $shortMode?: boolean };
+type TabsStyleProps = { $heightMode?: HeightMode };
 const TabsTypeTemp = getSimpleStyledOutputType(Tabs, {} as TabsStyleProps);
 
 const $Tabs = styled(Tabs)<TabsStyleProps>`
-  --scrollArea-height: ${({ $shortMode }) => ($shortMode ? '19rem' : '38rem')};
+  --scrollArea-height: ${({ $heightMode }) =>
+    $heightMode === HeightMode.Mobile
+      ? '23rem'
+      : $heightMode === HeightMode.Short
+        ? '19rem'
+        : '27rem'};
   --stickyArea0-background: var(--color-layer-2);
   --tabContent-height: calc(var(--scrollArea-height) - 2rem - var(--tabs-currentHeight));
 
@@ -131,7 +120,7 @@ const $Tabs = styled(Tabs)<TabsStyleProps>`
   gap: var(--border-width);
 
   > div > header {
-    padding: 1rem 1.25rem;
+    ${({ $heightMode }) => ($heightMode !== HeightMode.Mobile ? 'padding: 1rem 1.25rem;' : '')}
 
     > [role='tablist'] {
       margin: auto;
@@ -143,20 +132,10 @@ const $Tabs = styled(Tabs)<TabsStyleProps>`
 
 const $TabButton = styled(ToggleButton)`
   padding: 0 0.5rem;
+  height: 2.25rem;
 
   span {
     transition: 0.25s var(--ease-out-expo);
-  }
-
-  &[data-state='inactive'] {
-    --button-width: var(--button-height);
-
-    gap: 0;
-
-    span {
-      font-size: 0;
-      opacity: 0;
-    }
   }
 `;
 const $ScrollableTableContainer = styled.div`

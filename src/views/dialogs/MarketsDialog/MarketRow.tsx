@@ -1,0 +1,92 @@
+import { Link } from 'react-router-dom';
+
+import { STRING_KEYS } from '@/constants/localization';
+import { MarketData } from '@/constants/markets';
+import { AppRoute } from '@/constants/routes';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { AssetIcon } from '@/components/AssetIcon';
+import { Output, OutputType } from '@/components/Output';
+import { Tag } from '@/components/Tag';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { setIsMarketsMenuOpen } from '@/state/dialogs';
+
+import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
+
+export const MarketRow = ({ className, market }: { className?: string; market: MarketData }) => {
+  const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
+
+  const closeMarketsMenu = () => {
+    dispatch(setIsMarketsMenuOpen(false));
+  };
+
+  const percentChangeColor = market.percentChange24h
+    ? market.percentChange24h >= 0
+      ? 'var(--color-positive)'
+      : 'var(--color-negative)'
+    : 'var(--color-text-1)';
+
+  return (
+    <Link
+      className={className}
+      tw="row cursor-pointer justify-between gap-0.5 hover:bg-color-layer-4"
+      to={`${AppRoute.Trade}/${market.id}`}
+      onClick={closeMarketsMenu}
+    >
+      <div tw="row min-w-0 flex-grow-0 gap-0.5">
+        <AssetIcon logoUrl={market.logo} tw="size-[2.25rem] min-w-[2.25rem]" />
+        <div tw="flexColumn gap-0.25">
+          <div tw="row gap-0.25 leading-[1rem]">
+            <span tw="overflow-hidden text-ellipsis whitespace-nowrap">
+              {market.displayableAsset}
+            </span>
+
+            <Tag tw="bg-color-layer-4">
+              <Output
+                tw="text-color-text-1"
+                type={OutputType.Multiple}
+                value={calculateMarketMaxLeverage({
+                  effectiveInitialMarginFraction: market.effectiveInitialMarginFraction,
+                  initialMarginFraction: market.initialMarginFraction,
+                })}
+                fractionDigits={0}
+              />
+            </Tag>
+          </div>
+          <Output
+            tw="text-color-text-1 font-small-book"
+            type={OutputType.CompactFiat}
+            value={market.marketCap}
+            slotLeft={
+              <span tw="mr-0.25 text-color-text-0">
+                {stringGetter({ key: STRING_KEYS.MARKET })}
+              </span>
+            }
+          />
+        </div>
+      </div>
+
+      <div tw="flex flex-col items-end gap-0.25 text-end">
+        <Output
+          tw="text-color-text-2"
+          useGrouping
+          withSubscript
+          type={OutputType.Fiat}
+          value={market.oraclePrice}
+          fractionDigits={market.tickSizeDecimals}
+        />
+        <Output
+          tw="font-small-book"
+          css={{
+            color: percentChangeColor,
+          }}
+          type={OutputType.Percent}
+          value={market.percentChange24h}
+        />
+      </div>
+    </Link>
+  );
+};

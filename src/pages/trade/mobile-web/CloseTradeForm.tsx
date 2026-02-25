@@ -1,0 +1,276 @@
+import { FormEvent, useCallback, useEffect } from 'react';
+
+import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
+import { BonsaiHelpers } from '@/bonsai/ontology';
+import BigNumber from 'bignumber.js';
+import styled, { css } from 'styled-components';
+
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+
+import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
+import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
+import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { formMixins } from '@/styles/formMixins';
+
+import { Button } from '@/components/Button';
+import { FormInput } from '@/components/FormInput';
+import { InputType } from '@/components/Input';
+import { DropdownMenuTrigger, MobileDropdownMenu } from '@/components/MobileDropdownMenu';
+import { Tag } from '@/components/Tag';
+import { WithTooltip } from '@/components/WithTooltip';
+import { TradeFormMessages } from '@/views/TradeFormMessages/TradeFormMessages';
+import { AllocationSlider } from '@/views/forms/TradeForm/AllocationSlider';
+import { PlaceOrderButtonAndReceipt } from '@/views/forms/TradeForm/PlaceOrderButtonAndReceipt';
+
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closePositionFormActions } from '@/state/closePositionForm';
+import {
+  getClosePositionFormSummary,
+  getClosePositionFormValues,
+} from '@/state/tradeFormSelectors';
+
+import { mapIfPresent } from '@/lib/do';
+import { AttemptBigNumber, MaybeBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
+
+import { TradeFormHeaderMobile } from './TradeFormHeader';
+
+type Props = {
+  market: string;
+};
+
+const CloseTradeForm = ({ market }: Props) => {
+  const dispatch = useAppDispatch();
+  const stringGetter = useStringGetter();
+
+  const { stepSizeDecimals, tickSizeDecimals, displayableAsset } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
+  const { signedSize: positionSize } = orEmptyObj(useAppSelector(getCurrentMarketPositionData));
+
+  const tradeValues = useAppSelector(getClosePositionFormValues);
+  const fullSummary = useAppSelector(getClosePositionFormSummary);
+  const { summary } = fullSummary;
+  const { showLimitPrice } = summary.options;
+  const effectiveSizes = summary.tradeInfo.inputSummary.size;
+
+  const {
+    amountInput,
+    onAmountInput,
+    setLimitPriceToMidPrice,
+    limitPriceInput,
+    onLimitPriceInput,
+  } = useClosePositionFormInputs();
+
+  // default to market
+  useEffect(() => {
+    dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
+    dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(closePositionFormActions.setMarketId(market));
+    dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
+  }, [market, dispatch]);
+
+  const onLastOrderIndexed = useCallback(() => {}, []);
+
+  const {
+    placeOrderError: closePositionError,
+    placeOrder,
+    shouldEnableTrade,
+    tradingUnavailable,
+    hasValidationErrors,
+  } = useTradeForm({
+    source: TradeFormSource.ClosePositionForm,
+    fullFormSummary: fullSummary,
+    onLastOrderIndexed,
+  });
+
+  const { isErrorShownInOrderStatusToast, primaryAlert, shortAlertKey } = useTradeErrors({
+    placeOrderError: closePositionError,
+    isClosingPosition: true,
+  });
+
+  const { type: selectedTradeType, side = OrderSide.BUY } = tradeValues;
+
+  const onTradeTypeChange = useCallback(
+    (tradeType: TradeFormType) => {
+      dispatch(closePositionFormActions.setOrderType(tradeType));
+    },
+    [dispatch, side]
+  );
+
+  const onClearInputs = () => {
+    dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
+    dispatch(closePositionFormActions.reset());
+  };
+
+  const midMarketPriceButton = (
+    <$MidPriceButton onClick={setLimitPriceToMidPrice} size={ButtonSize.XSmall}>
+      {stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })}
+    </$MidPriceButton>
+  );
+
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    placeOrder({
+      onPlaceOrder: () => {
+        onClearInputs();
+      },
+    });
+  };
+
+  return (
+    <form tw="flexColumn items-center gap-[0.75em] pb-[12.5rem] pt-0" onSubmit={onSubmit}>
+      <TradeFormHeaderMobile />
+      <div tw="flexColumn w-full items-center gap-0.75 px-1">
+        <div tw="w-full text-medium">Close {displayableAsset} Position</div>
+        <MobileDropdownMenu
+          withPortal={false}
+          align="end"
+          items={[
+            {
+              value: TradeFormType.MARKET,
+              active: selectedTradeType === TradeFormType.MARKET,
+              label: stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT }),
+              onSelect: () => onTradeTypeChange(TradeFormType.MARKET),
+            },
+            {
+              value: TradeFormType.LIMIT,
+              active: selectedTradeType === TradeFormType.LIMIT,
+              label: stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT }),
+              onSelect: () => onTradeTypeChange(TradeFormType.LIMIT),
+            },
+          ]}
+        >
+          <DropdownMenuTrigger
+            tw="w-full bg-[var(--simpleUi-dialog-secondaryColor)]"
+            shape={ButtonShape.Pill}
+            size={ButtonSize.Base}
+          >
+            {selectedTradeType === TradeFormType.MARKET
+              ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
+              : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
+          </DropdownMenuTrigger>
+        </MobileDropdownMenu>
+
+        <div tw="flex w-full justify-between">
+          <p tw="text-small text-color-text-0">Current Position</p>
+          <$PositionSize isLong={positionSize?.isGreaterThanOrEqualTo(0) ?? false}>
+            {Math.abs(positionSize?.toNumber() ?? 0)} {displayableAsset}
+          </$PositionSize>
+        </div>
+
+        <FormInput
+          id="close-position-amount"
+          label={<span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>}
+          decimals={stepSizeDecimals ?? TOKEN_DECIMALS}
+          onInput={onAmountInput}
+          type={InputType.Number}
+          value={amountInput}
+          tw="w-full"
+        />
+
+        {showLimitPrice && (
+          <FormInput
+            key="close-position-limit-price"
+            id="close-position-limit-price"
+            type={InputType.Currency}
+            label={
+              <>
+                <WithTooltip tooltip="limit-price" side="right">
+                  {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
+                </WithTooltip>
+                <Tag>USD</Tag>
+              </>
+            }
+            onChange={onLimitPriceInput}
+            value={limitPriceInput}
+            decimals={tickSizeDecimals ?? USD_DECIMALS}
+            slotRight={setLimitPriceToMidPrice ? midMarketPriceButton : undefined}
+            tw="w-full"
+          />
+        )}
+
+        <AllocationSlider
+          allocationPercentInput={
+            tradeValues.size != null && OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
+              ? (AttemptBigNumber(tradeValues.size.value.value)
+                  ?.times(100)
+                  .toFixed(0, BigNumber.ROUND_FLOOR) ?? '')
+              : tradeValues.size == null || tradeValues.size.value.value === ''
+                ? ''
+                : (AttemptBigNumber(effectiveSizes?.allocationPercent)
+                    ?.times(100)
+                    .toFixed(0, BigNumber.ROUND_FLOOR) ?? '')
+          }
+          setAllocationInput={(value: string | undefined) => {
+            dispatch(
+              closePositionFormActions.setSizeAvailablePercent(
+                mapIfPresent(value, (v) => MaybeBigNumber(v)?.div(100).toFixed(2)) ?? ''
+              )
+            );
+          }}
+        />
+
+        <div
+          tw="flexColumn w-full max-w-[calc(100vw-2rem)] gap-1 py-1.25"
+          css={{
+            background:
+              'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',
+          }}
+        >
+          <TradeFormMessages
+            isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
+            placeOrderError={closePositionError}
+            primaryAlert={primaryAlert}
+            shouldPromptUserToPlaceLimitOrder={false}
+          />
+          {/* {receiptArea} */}
+          <$PlaceOrderButtonAndReceipt
+            summary={summary}
+            actionStringKey={shortAlertKey}
+            hasInput={!!amountInput}
+            hasValidationErrors={hasValidationErrors}
+            onClearInputs={onClearInputs}
+            shouldEnableTrade={shouldEnableTrade}
+            showDeposit={false}
+            tradingUnavailable={tradingUnavailable}
+            confirmButtonConfig={{
+              stringKey: STRING_KEYS.CLOSE_ORDER,
+              buttonTextStringKey: STRING_KEYS.CLOSE_POSITION,
+              buttonAction: ButtonAction.Destroy,
+            }}
+          />
+        </div>
+      </div>
+    </form>
+  );
+};
+
+export default CloseTradeForm;
+
+const $PlaceOrderButtonAndReceipt = styled(PlaceOrderButtonAndReceipt)`
+  --withReceipt-backgroundColor: transparent;
+`;
+
+const $PositionSize = styled.div<{ isLong: boolean }>`
+  ${({ isLong }) =>
+    isLong
+      ? css`
+          color: var(--color-positive) !important;
+        `
+      : css`
+          color: var(--color-negative) !important;
+        `}
+`;
+
+const $MidPriceButton = styled(Button)`
+  ${formMixins.inputInnerButton}
+`;

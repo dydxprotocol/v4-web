@@ -80,7 +80,7 @@ export function calculateTradeSummary(
 
   const fieldStates = getTradeFormFieldStates(state, accountData, baseAccount);
 
-  const effectiveTrade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
+  const effectiveTrade = mapValues(fieldStates, (s) => s?.effectiveValue) as TradeForm;
 
   const options = calculateTradeFormOptions(state.type, fieldStates, baseAccount);
 

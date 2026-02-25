@@ -5,3 +5,5 @@ export const getActiveDialog = (state: RootState) => state.dialogs.activeDialog;
 export const getActiveTradeBoxDialog = (state: RootState) => state.dialogs.activeTradeBoxDialog;
 
 export const getIsUserMenuOpen = (state: RootState) => state.dialogs.isUserMenuOpen;
+
+export const getIsMarketsMenuOpen = (state: RootState) => state.dialogs.isMarketsMenuOpen;

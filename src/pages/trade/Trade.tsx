@@ -30,10 +30,9 @@ import { InnerPanel } from './InnerPanel';
 import LaunchableMarket from './LaunchableMarket';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
 import { MobileBottomPanel } from './MobileBottomPanel';
-import { MobileTopPanel } from './MobileTopPanel';
 import { TradeDialogTrigger } from './TradeDialogTrigger';
-import { TradeHeaderMobile } from './TradeHeaderMobile';
 import { VerticalPanel } from './VerticalPanel';
+import { TradeHeaderMobile } from './mobile-web/TradeHeader';
 import { useResizablePanel } from './useResizablePanel';
 
 const TradePage = () => {
@@ -53,9 +52,9 @@ const TradePage = () => {
     [dispatch]
   );
   const {
-    handleMouseDown,
     panelHeight: horizontalPanelHeight,
     isDragging,
+    handleMouseDown,
   } = useResizablePanel(horizontalPanelHeightPxBase, setPanelHeight, {
     min: HORIZONTAL_PANEL_MIN_HEIGHT,
     max: HORIZONTAL_PANEL_MAX_HEIGHT,
@@ -73,10 +72,6 @@ const TradePage = () => {
       <TradeHeaderMobile />
 
       <div>
-        <DetachedSection>
-          <MobileTopPanel />
-        </DetachedSection>
-
         <DetachedSection>
           <HorizontalPanel handleStartResize={handleMouseDown} />
         </DetachedSection>

@@ -9,7 +9,7 @@ import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketA
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
-import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
@@ -21,7 +21,7 @@ export const TvChart = () => {
 
   const [tvWidget, setTvWidget] = useState<TvWidget>();
 
-  const isSimpleUi = useSimpleUiEnabled();
+  const { isTablet } = useBreakpoints();
 
   const orderLineToggleRef = useRef<HTMLElement | null>(null);
   const orderLineToggle = orderLineToggleRef.current;
@@ -64,5 +64,5 @@ export const TvChart = () => {
   });
   useTradingViewTheme({ tvWidget, chartLines });
 
-  return <BaseTvChart tvWidget={tvWidget} isSimpleUi={isSimpleUi} />;
+  return <BaseTvChart tvWidget={tvWidget} isSimpleUi={isTablet} />;
 };
