@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
@@ -38,46 +38,35 @@ export const usePreferenceMenu = (): MenuConfig<
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();
-  const [enabledNotifs, setEnabledNotifs] = useState(notificationPreferences);
 
-  const currentDisplayAllMarketDefault = useAppSelector(
-    getDefaultToAllMarketsInPositionsOrdersFills
+  const defaultToAllMarkets = useAppSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const chatEnabled = useAppSelector(getIsChatEnabled);
+
+  const toggleNotifPreference = useCallback(
+    (type: NotificationCategoryPreferences) => {
+      setNotificationPreferences({
+        ...notificationPreferences,
+        [type]: !notificationPreferences[type],
+      });
+    },
+    [notificationPreferences, setNotificationPreferences]
   );
-  const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
 
-  const currentChatEnabled = useAppSelector(getIsChatEnabled);
-  const [chatEnabled, setChatEnabled] = useState(currentChatEnabled);
-
-  const toggleNotifPreference = (type: NotificationCategoryPreferences) =>
-    setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
-
-  useEffect(() => {
-    setNotificationPreferences(enabledNotifs);
-  }, [enabledNotifs, setNotificationPreferences]);
-
-  useEffect(() => {
-    setDefaultToAllMarkets(currentDisplayAllMarketDefault);
-  }, [currentDisplayAllMarketDefault]);
-
-  useEffect(() => {
-    setChatEnabled(currentChatEnabled);
-  }, [currentChatEnabled]);
-
-  const getItem = (
-    notificationCategory: NotificationCategoryPreferences,
-    labelStringKey: string
-  ) => ({
-    value: notificationCategory,
-    label: stringGetter({ key: labelStringKey }),
-    slotAfter: (
-      <Switch
-        name={notificationCategory}
-        checked={enabledNotifs[notificationCategory]}
-        onCheckedChange={() => null}
-      />
-    ),
-    onSelect: () => toggleNotifPreference(notificationCategory),
-  });
+  const getItem = useCallback(
+    (notificationCategory: NotificationCategoryPreferences, labelStringKey: string) => ({
+      value: notificationCategory,
+      label: stringGetter({ key: labelStringKey }),
+      slotAfter: (
+        <Switch
+          name={notificationCategory}
+          checked={notificationPreferences[notificationCategory]}
+          onCheckedChange={() => null}
+        />
+      ),
+      onSelect: () => toggleNotifPreference(notificationCategory),
+    }),
+    [stringGetter, notificationPreferences, toggleNotifPreference]
+  );
 
   const notificationSection = useMemo(
     () => ({
@@ -100,7 +89,7 @@ export const usePreferenceMenu = (): MenuConfig<
         .filter(isTruthy)
         .map(({ value, labelStringKey }) => getItem(value, labelStringKey)),
     }),
-    [stringGetter, enabledNotifs]
+    [stringGetter, getItem]
   );
 
   const { setSelectedGasDenom, selectedGasDenom } = useDydxClient();
