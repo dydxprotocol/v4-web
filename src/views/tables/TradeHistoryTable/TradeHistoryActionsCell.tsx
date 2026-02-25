@@ -33,14 +33,15 @@ export const TradeHistoryActionsCell = ({ trade, isDisabled }: ElementProps) => 
 
   const shareType = TRADE_ACTION_TO_SHARE_TYPE_MAP[trade.action] ?? undefined;
 
-  const prevSize = !!trade.prevSize && !!trade.price ? trade.prevSize * trade.price : undefined;
+  const prevSizeDollar =
+    !!trade.prevSize && !!trade.price ? trade.prevSize * trade.price : undefined;
 
   const openShareDialog = useCallback(() => {
     const sharePnlData: SharePNLAnalyticsDialogProps = {
       assetId: trade.marketSummary?.assetId ?? '',
       marketId: trade.marketId,
-      size: Number(trade.price) * MustNumber(trade.additionalSize ?? 0) + (prevSize ?? 0),
-      prevSize,
+      size: Number(trade.price) * MustNumber(trade.additionalSize ?? 0) + (prevSizeDollar ?? 0),
+      prevSize: prevSizeDollar,
       isLong:
         trade.positionSide === 'LONG' ||
         trade.action === TradeAction.OPEN_LONG ||
@@ -57,7 +58,7 @@ export const TradeHistoryActionsCell = ({ trade, isDisabled }: ElementProps) => 
     };
 
     dispatch(openDialog(DialogTypes.SharePNLAnalytics(sharePnlData)));
-  }, [dispatch, trade, prevSize, shareType]);
+  }, [dispatch, trade, prevSizeDollar, shareType]);
 
   return (
     <$ActionsTableCell tw="mr-[-0.5rem]">

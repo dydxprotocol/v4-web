@@ -23,13 +23,15 @@ export function calculateTrades(
   liveTrades: IndexerCompositeTradeHistoryObject[] | undefined
 ): SubaccountTrade[] {
   const getTradesById = (data: IndexerCompositeTradeHistoryObject[]) => {
-    const tradesWithIds = data.filter((trade) => {
-      if (!trade.id) {
-        logBonsaiError('calculateTrades', 'Trade missing id, skipping', { trade });
-        return false;
+    const tradesWithIds = data.filter(
+      (trade): trade is IndexerCompositeTradeHistoryObject & { id: string } => {
+        if (!trade.id) {
+          logBonsaiError('calculateTrades', 'Trade missing id, skipping', { trade });
+          return false;
+        }
+        return true;
       }
-      return true;
-    });
+    );
     return keyBy(tradesWithIds, (trade) => trade.id!);
   };
 

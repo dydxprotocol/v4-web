@@ -3,8 +3,6 @@ import { isParentSubaccountTradeHistoryResponse } from '@/types/indexer/indexerC
 import { type RootStore } from '@/state/_store';
 import { setAccountTradesRaw } from '@/state/raw';
 
-import { isTruthy } from '@/lib/isTruthy';
-
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
@@ -18,14 +16,14 @@ export function setUpTradeHistoryQuery(store: RootStore) {
     name: 'tradeHistory',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'tradeHistory', data.wallet, data.subaccount],
-    getQueryFn: (indexerClient, data) => {
-      if (!isTruthy(data.wallet) || data.subaccount == null || data.isPerpsGeoRestricted) {
+    getQueryFn: (indexerClient, { wallet, subaccount, isPerpsGeoRestricted }) => {
+      if (wallet == null || subaccount == null || isPerpsGeoRestricted) {
         return null;
       }
       return () =>
         indexerClient.account.getParentSubaccountNumberTradeHistory(
-          data.wallet!,
-          data.subaccount!,
+          wallet,
+          subaccount,
           undefined,
           undefined,
           undefined,
