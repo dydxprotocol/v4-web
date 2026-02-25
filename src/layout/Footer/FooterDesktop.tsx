@@ -92,7 +92,7 @@ export const FooterDesktop = () => {
           </$FooterButton>
         </WithTooltip>
 
-        {isChatEnabled && !isChatPreferenceEnabled && (
+        {!isChatPreferenceEnabled && (
           <$FooterButton size={ButtonSize.XSmall} onClick={() => dispatch(setIsChatEnabled(true))}>
             {stringGetter({ key: STRING_KEYS.CHAT })}
           </$FooterButton>
