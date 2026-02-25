@@ -41,7 +41,7 @@ export const GlobalChat = () => {
         <$Header onClick={handleToggle}>
           <$IconRow>
             <Icon iconName={IconName.Chat} />
-            {/* TODO: Replace with localization all at once feature is complete */}
+            {/* TODO: Replace with localization all at once feature is complete. */}
             Global Chat
             {onlineCount != null && (
               <$OnlineIndicator>
