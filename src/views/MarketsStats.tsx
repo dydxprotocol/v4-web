@@ -5,7 +5,6 @@ import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
-import { FEB_2026_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -52,20 +51,22 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         </$Section>
       )}
       <$LiquidationRebatesBanner>
-        <div tw="z-[1] flex max-w-[65%] flex-col gap-2">
-          <span tw="text-white font-extra-bold">
-            {stringGetter({
-              key: STRING_KEYS.COMPETITION_HEADLINE_FEB_2026,
-              params: { REWARD_AMOUNT: FEB_2026_COMPETITION_DETAILS.rewardAmount },
-            })}
-          </span>
+        <div tw="z-[1] flex max-w-[75%] flex-col justify-between gap-2">
+          <div tw="flex flex-col justify-start gap-0.5">
+            <h3 tw="text-white font-extra-bold">
+              {stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES_BANNER_TITLE })}
+            </h3>
+            <h4 tw="text-color-text-1 font-medium-medium">
+              {stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES_BANNER_SUBTITLE })}
+            </h4>
+          </div>
           <Button
             action={ButtonAction.Primary}
             type={ButtonType.Link}
             href="https://www.dydx.xyz/liquidation-rebates"
             tw="self-start"
           >
-            {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })}
+            {stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES_BANNER_CTA })} →
           </Button>
         </div>
       </$LiquidationRebatesBanner>
