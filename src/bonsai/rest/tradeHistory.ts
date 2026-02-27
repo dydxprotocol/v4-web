@@ -41,6 +41,7 @@ export function setUpTradeHistoryQuery(store: RootStore) {
       );
     },
     onNoQuery: () => store.dispatch(setAccountTradesRaw(loadableIdle())),
+    retry: false,
   });
   return () => {
     cleanupListener();
