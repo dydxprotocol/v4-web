@@ -129,11 +129,8 @@ const PortfolioPage = () => {
                     isTablet
                       ? [
                           FillsTableColumnKey.Time,
-                          FillsTableColumnKey.Market,
-                          FillsTableColumnKey.Action,
                           FillsTableColumnKey.TypeAmount,
                           FillsTableColumnKey.PriceFee,
-                          FillsTableColumnKey.ClosedPnl,
                         ]
                       : [
                           FillsTableColumnKey.Market,
