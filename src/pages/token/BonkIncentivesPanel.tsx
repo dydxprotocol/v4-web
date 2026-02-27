@@ -12,7 +12,11 @@ import {
   useBonkPnlDistribution,
   useFeeLeaderboard,
 } from '@/hooks/rewards/hooks';
-import { CURRENT_BONK_REWARDS_DETAILS, positionToBonkRewards } from '@/hooks/rewards/util';
+import {
+  CURRENT_BONK_REWARDS_DETAILS,
+  positionToBonkRewards,
+  simpleDateString,
+} from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -22,7 +26,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
-import { SuccessTag, TagSize } from '@/components/Tag';
+import { PrivateTag, SuccessTag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -41,45 +45,90 @@ export const BonkIncentivesPanel = () => {
 const BonkIncentivesRewardsPanel = () => {
   const stringGetter = useStringGetter();
 
+  const { rewardAmount, topPrizeAmount, startTime, endTime, titleStringKey, leaderboardSize } =
+    CURRENT_BONK_REWARDS_DETAILS;
+
+  const isActive = new Date(startTime) <= new Date() && new Date(endTime) >= new Date();
+
   return (
     <$Panel>
       <div tw="flex gap-3 pb-0.25 pt-0.5">
         <div tw="flex flex-1 flex-col gap-1.5">
           <div tw="flex flex-col gap-0.5">
-            <div tw="flex items-center gap-0.5">
+            <div tw="flex flex-wrap items-center gap-0.5 gap-y-0.25">
               <div tw="font-medium-bold">
                 <span tw="font-bold">
-                  {stringGetter({ key: STRING_KEYS.BONK_REWARDS_HEADLINE })}
+                  {stringGetter({
+                    key: STRING_KEYS.BONK_PNL_REWARDS_HEADLINE,
+                    params: {
+                      COMPETITION_NAME: stringGetter({ key: titleStringKey }),
+                    },
+                  })}
                 </span>
               </div>
-              <SuccessTag size={TagSize.Medium}>
-                {stringGetter({ key: STRING_KEYS.ACTIVE })}
-              </SuccessTag>
+              {isActive ? (
+                <SuccessTag size={TagSize.Medium}>
+                  {stringGetter({ key: STRING_KEYS.ACTIVE })}
+                </SuccessTag>
+              ) : (
+                <PrivateTag size={TagSize.Medium}>
+                  {stringGetter({ key: STRING_KEYS.INACTIVE })}
+                </PrivateTag>
+              )}
             </div>
             <span>
               <span tw="text-color-text-0">
-                {stringGetter({ key: STRING_KEYS.BONK_REWARDS_BODY })}
+                {stringGetter({
+                  key: STRING_KEYS.BONK_PNL_REWARDS_BODY,
+                  params: {
+                    REWARD_AMOUNT: rewardAmount,
+                    MONTH: simpleDateString(startTime, { month: 'long' }),
+                  },
+                })}
               </span>
             </span>
 
             <div>
-              <p tw="font-semibold">{stringGetter({ key: STRING_KEYS.BONK_REWARDS_RULES })}</p>
+              <p tw="font-semibold">{stringGetter({ key: STRING_KEYS.BONK_PNL_REWARDS_RULES })}</p>
               <ul tw="list-outside list-disc pl-1.5 text-color-text-0">
-                <li>{stringGetter({ key: STRING_KEYS.BONK_REWARDS_RULE_1 })}</li>
-                <li>{stringGetter({ key: STRING_KEYS.BONK_REWARDS_RULE_2 })}</li>
-                <li>{stringGetter({ key: STRING_KEYS.BONK_REWARDS_RULE_3 })}</li>
+                <li>
+                  {stringGetter({
+                    key: STRING_KEYS.BONK_PNL_REWARDS_RULE_1,
+                    params: {
+                      MONTH: simpleDateString(startTime, { month: 'long' }),
+                    },
+                  })}
+                </li>
+                <li>
+                  {stringGetter({
+                    key: STRING_KEYS.BONK_PNL_REWARDS_RULE_2,
+                    params: {
+                      MONTH_FIRST: `${simpleDateString(startTime, { month: 'short', day: 'numeric' })}`,
+                      MONTH_LAST: `${simpleDateString(endTime, { month: 'short', day: 'numeric' })}`,
+                    },
+                  })}
+                </li>
+                <li>
+                  {stringGetter({
+                    key: STRING_KEYS.BONK_PNL_REWARDS_RULE_3,
+                    params: {
+                      LEADERBOARD_SIZE: leaderboardSize,
+                      TOP_PRIZE_AMOUNT: topPrizeAmount,
+                    },
+                  })}
+                </li>
               </ul>
             </div>
 
             <span tw="text-color-text-0">
-              {stringGetter({ key: STRING_KEYS.BONK_REWARDS_BODY_2 })}
+              {stringGetter({ key: STRING_KEYS.BONK_PNL_REWARDS_BODY_2 })}
             </span>
           </div>
 
           <div tw="flex items-center gap-0.25 self-start rounded-3 bg-color-layer-1 px-0.875 py-0.5">
             <Icon iconName={IconName.Clock} size="1.25rem" tw="text-color-accent" />
             <div tw="flex gap-0.375 px-0.375 leading-none">
-              <MinutesCountdown endTime={CURRENT_BONK_REWARDS_DETAILS.endTime} />
+              <MinutesCountdown endTime={endTime} />
             </div>
           </div>
         </div>

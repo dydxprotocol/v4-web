@@ -11,6 +11,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
+import { CURRENT_BONK_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableBonkPnlLeaderboard } from '@/hooks/useEnableBonkPnlLeaderboard';
@@ -49,6 +50,7 @@ enum Tab {
 }
 
 const RewardsPage = () => {
+  const { titleStringKey } = CURRENT_BONK_REWARDS_DETAILS;
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const enableBonkPnlLeaderboard = useEnableBonkPnlLeaderboard();
@@ -99,7 +101,7 @@ const RewardsPage = () => {
                 <BonkPnlPanel />
               </div>
             ),
-            label: 'BONKuary',
+            label: stringGetter({ key: titleStringKey }),
             value: Tab.BonkPnl,
           },
         ]

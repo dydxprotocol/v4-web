@@ -1,3 +1,5 @@
+import { STRING_KEYS } from '@/constants/localization';
+
 export function pointsToEstimatedDydxRewards(
   points?: number,
   totalPoints?: number,
@@ -23,15 +25,104 @@ export function feesToEstimatedDollarRewards(totalFees?: number): number {
   return totalFees * CURRENT_SURGE_REWARDS_DETAILS.rebateFraction;
 }
 
+type BonkRewardTier = {
+  positionRange: number[];
+  reward: number;
+};
+
+type BonkRewardsDetails = {
+  rewards: BonkRewardTier[];
+  rewardAmount: string;
+  rewardAmountUsd: number;
+  topPrizeAmount: string;
+  startTime: string;
+  endTime: string;
+  titleStringKey: string;
+  leaderboardSize: number;
+};
+
+// returns string derived from current time or timestamp in format: Mar | March | March 1
+export const simpleDateString = (
+  timestamp?: string,
+  options?: {
+    month?: 'long' | 'short' | undefined;
+    day?: 'numeric' | undefined;
+  }
+) => {
+  const date = timestamp ? new Date(timestamp) : new Date();
+  return date.toLocaleString('en-US', {
+    ...options,
+    month: options?.month ?? 'long',
+    timeZone: 'UTC',
+  });
+};
+
+const februaryBonkRewards = [
+  { positionRange: [1, 1], reward: 25000 },
+  { positionRange: [2, 2], reward: 15000 },
+  { positionRange: [3, 3], reward: 10000 },
+  { positionRange: [4, 5], reward: 5000 },
+  { positionRange: [6, 10], reward: 4000 },
+  { positionRange: [11, 20], reward: 2000 },
+];
+
+const marchBonkRewards = [
+  { positionRange: [1, 1], reward: 15000 },
+  { positionRange: [2, 2], reward: 7500 },
+  { positionRange: [3, 3], reward: 5000 },
+  { positionRange: [4, 5], reward: 2500 },
+  { positionRange: [6, 10], reward: 2000 },
+  { positionRange: [11, 15], reward: 1500 },
+];
+
+const BONK_REWARDS_MAP = {
+  February: {
+    rewards: februaryBonkRewards,
+    rewardAmount: '$100K',
+    rewardAmountUsd: 100_000,
+    topPrizeAmount: '$25,000',
+    leaderboardSize: 20,
+    startTime: '2026-02-01T00:00:00.000Z',
+    endTime: '2026-02-28T23:59:59.000Z',
+    titleStringKey: STRING_KEYS.BONK_PNL_COMPETITION_NAME_FEBRUARY,
+  },
+  March: {
+    rewards: marchBonkRewards,
+    rewardAmount: '$50k',
+    rewardAmountUsd: 50_000,
+    topPrizeAmount: '$15,000',
+    leaderboardSize: 15,
+    startTime: '2026-03-01T00:00:00.000Z',
+    endTime: '2026-03-31T23:59:59.000Z',
+    titleStringKey: STRING_KEYS.BONK_PNL_COMPETITION_NAME_MARCH,
+  },
+};
+
+const bonkRewardsMonths = Object.keys(BONK_REWARDS_MAP) as (keyof typeof BONK_REWARDS_MAP)[];
+const lastBonkRewardsMonth = bonkRewardsMonths[
+  bonkRewardsMonths.length - 1
+] as keyof typeof BONK_REWARDS_MAP;
+
+export const CURRENT_BONK_REWARDS_DETAILS: BonkRewardsDetails =
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  BONK_REWARDS_MAP[simpleDateString() as keyof typeof BONK_REWARDS_MAP] ??
+  BONK_REWARDS_MAP[lastBonkRewardsMonth];
+
 export function positionToBonkRewards(position: number | undefined) {
   if (!position) return 0;
-  if (position === 1) return 25000;
-  if (position === 2) return 15000;
-  if (position === 3) return 10000;
-  if (position === 4 || position === 5) return 5000;
-  if (position >= 6 && position <= 10) return 4000;
-  if (position >= 11 && position <= 20) return 2000;
-  return 0;
+
+  const activeBonkRewards = CURRENT_BONK_REWARDS_DETAILS.rewards;
+
+  if (!activeBonkRewards.length) return 0;
+
+  const activeBonkReward = activeBonkRewards.find(
+    (reward) =>
+      !!reward.positionRange[0] &&
+      !!reward.positionRange[1] &&
+      position >= reward.positionRange[0] &&
+      position <= reward.positionRange[1]
+  );
+  return activeBonkReward?.reward ?? 0;
 }
 
 export const CURRENT_SURGE_REWARDS_DETAILS = {
@@ -47,11 +138,6 @@ export const CURRENT_SURGE_REWARDS_DETAILS = {
 export const LIQUIDATION_REBATES_DETAILS = {
   rebateAmount: '$1M',
   rebateAmountUsd: 1_000_000,
-};
-
-export const CURRENT_BONK_REWARDS_DETAILS = {
-  startTime: '2026-02-01T00:00:00.000Z', // start of february 2026
-  endTime: '2026-02-28T23:59:59.000Z', // end of february 2026
 };
 
 export const DEC_2025_COMPETITION_DETAILS = {
