@@ -35,6 +35,9 @@ import {
   TradeFormType,
 } from './types';
 
+export const MIN_TWAP_DURATION_MINUTES = 5;
+export const MAX_TWAP_DURATION_MINUTES = 24 * 60;
+
 const marketOrderErrorSlippage = 0.1;
 const marketOrderWarningSlippage = 0.05;
 const isolatedLimitOrderMinimumEquity = 20.0;
@@ -271,17 +274,7 @@ function validateFieldsBasic(
 
   if (options.needsDuration) {
     const totalMinutes = getTotalDurationMinutes(state);
-
-    if (totalMinutes <= 0) {
-      errors.push(
-        simpleValidationError({
-          code: 'REQUIRED_TWAP_DURATION',
-          type: ErrorType.error,
-          fields: ['duration.hours'],
-          titleKey: STRING_KEYS.ENTER_AMOUNT,
-        })
-      );
-    } else if (totalMinutes < 5) {
+    if (totalMinutes < MIN_TWAP_DURATION_MINUTES) {
       errors.push(
         simpleValidationError({
           code: 'TWAP_DURATION_TOO_SHORT',
@@ -291,7 +284,7 @@ function validateFieldsBasic(
           textKey: STRING_KEYS.MODIFY_GOOD_TIL,
         })
       );
-    } else if (totalMinutes > 24 * 60) {
+    } else if (totalMinutes > MAX_TWAP_DURATION_MINUTES) {
       errors.push(
         simpleValidationError({
           code: 'TWAP_DURATION_TOO_LONG',
@@ -304,8 +297,10 @@ function validateFieldsBasic(
     }
   }
 
-  if (options.needsFrequency) {
+  if (options.needsDuration && options.needsFrequency) {
     const frequency = AttemptNumber(state.frequencySeconds) ?? 0;
+    const totalMinutes = getTotalDurationMinutes(state);
+
     if (frequency <= 0) {
       errors.push(
         simpleValidationError({
@@ -316,11 +311,6 @@ function validateFieldsBasic(
         })
       );
     }
-  }
-
-  if (options.needsDuration && options.needsFrequency) {
-    const totalMinutes = getTotalDurationMinutes(state);
-    const frequency = AttemptNumber(state.frequencySeconds) ?? 0;
 
     if (totalMinutes > 0 && frequency > 0 && (totalMinutes * 60) % frequency !== 0) {
       errors.push(

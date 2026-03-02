@@ -194,10 +194,6 @@ export function calculateTradeSummary(
           size,
           clientId,
           timeInForce: calc(() => {
-            if (effectiveTrade.type === TradeFormType.TWAP) {
-              return OrderTimeInForce.GTT;
-            }
-
             if (options.timeInForceOptions.length === 0) {
               return undefined;
             }
@@ -219,12 +215,7 @@ export function calculateTradeSummary(
             assertNever(effectiveTrade.timeInForce);
             return OrderTimeInForce.IOC;
           }),
-          postOnly:
-            effectiveTrade.type === TradeFormType.TWAP
-              ? false
-              : options.needsPostOnly
-                ? effectiveTrade.postOnly
-                : undefined,
+          postOnly: options.needsPostOnly ? effectiveTrade.postOnly : undefined,
           reduceOnly: options.needsReduceOnly ? effectiveTrade.reduceOnly : undefined,
           triggerPrice: options.needsTriggerPrice ? triggerPrice : undefined,
           execution: calc(() => {
@@ -433,6 +424,7 @@ const iocOnlyExecutionOptions: SelectionOption<ExecutionType>[] = [
 ];
 
 const emptyExecutionOptions: SelectionOption<ExecutionType>[] = [];
+const emptyTimeInForceOptions: SelectionOption<TimeInForce>[] = [];
 
 const memoizedMergeMarkets = weakMapMemoize(
   (
@@ -461,14 +453,25 @@ function calculateTradeFormOptions(
 
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.TRIGGER_MARKET]: () => iocOnlyExecutionOptions,
-        [TradeFormType.TWAP]: () => allExecutionOptions,
+        [TradeFormType.TWAP]: () => emptyExecutionOptions,
       })
     : emptyExecutionOptions;
+
+  const resolvedTimeInForceOptions: SelectionOption<TimeInForce>[] = orderType
+    ? matchOrderType(orderType, {
+        [TradeFormType.LIMIT]: () => timeInForceOptions,
+        [TradeFormType.TRIGGER_LIMIT]: () => timeInForceOptions,
+        [TradeFormType.TRIGGER_MARKET]: () => timeInForceOptions,
+
+        [TradeFormType.MARKET]: () => emptyTimeInForceOptions,
+        [TradeFormType.TWAP]: () => emptyTimeInForceOptions,
+      })
+    : emptyTimeInForceOptions;
 
   const options: TradeFormOptions = {
     orderTypeOptions,
     executionOptions,
-    timeInForceOptions,
+    timeInForceOptions: resolvedTimeInForceOptions,
     goodTilUnitOptions,
 
     needsMarginMode: isFieldStateRelevant(fields.marginMode),
