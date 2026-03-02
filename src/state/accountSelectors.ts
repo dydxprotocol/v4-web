@@ -264,7 +264,7 @@ export const getOnboardingState = (state: RootState) => state.account.onboarding
 /**
  * @returns whether to display the choose wallet step in the onboarding flow
  */
-export const getDisplayChooseWallet = (state: RootState) => state.account.displayChooseWallet;
+export const getChooseWalletDisplay = (state: RootState) => state.account.chooseWalletDisplay;
 
 /**
  * @param state

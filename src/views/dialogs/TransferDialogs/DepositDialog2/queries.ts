@@ -9,7 +9,7 @@ import { Chain, parseUnits } from 'viem';
 import { arbitrum, optimism } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
-import { CosmosChainId } from '@/constants/graz';
+import { CosmosChainId, NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
 import {
@@ -26,13 +26,29 @@ import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { SourceAccount } from '@/state/wallet';
 
+import { convertBech32Address } from '@/lib/addressUtils';
 import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
 export function useBalances() {
-  const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { sourceAccount, dydxAddress, nobleAddress } = useAccounts();
   const { skipClient } = useSkipClient();
+
+  const { osmosisAddress, neutronAddress } = useMemo(() => {
+    if (!dydxAddress) return { osmosisAddress: undefined, neutronAddress: undefined };
+
+    return {
+      osmosisAddress: convertBech32Address({
+        address: dydxAddress as string,
+        bech32Prefix: OSMO_BECH32_PREFIX,
+      }),
+      neutronAddress: convertBech32Address({
+        address: dydxAddress as string,
+        bech32Prefix: NEUTRON_BECH32_PREFIX,
+      }),
+    };
+  }, [dydxAddress]);
 
   return useQuery({
     queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress, neutronAddress],

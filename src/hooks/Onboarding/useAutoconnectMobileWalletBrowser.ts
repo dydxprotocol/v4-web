@@ -17,7 +17,6 @@ import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { sleep } from '@/lib/timeUtils';
 
 import { useAccounts } from '../useAccounts';
-import { useEnableTurnkey } from '../useEnableTurnkey';
 import { useAppSelectorWithArgs } from '../useParameterizedSelector';
 import { useWalletConnection } from '../useWalletConnection';
 import { useGenerateKeys } from './useGenerateKeys';
@@ -25,8 +24,7 @@ import { useGenerateKeys } from './useGenerateKeys';
 export function useAutoconnectMobileWalletBrowser() {
   const { detectedBrowser } = useDetectedWalletBrowser();
   const displayedWallets = useDisplayedWallets();
-  const isTurnkeyEnabled = useEnableTurnkey();
-  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep);
   const isSimpleUi = useSimpleUiEnabled();
   const { hasAttemptedMobileWalletConnect, selectWallet, setHasAttemptedMobileWalletConnect } =
     useWalletConnection();
@@ -84,7 +82,7 @@ export function useAutoconnectMobileWalletBrowser() {
       isSimpleUi &&
       isUsingWalletBrowser &&
       hasValidWallet &&
-      currentOnboardingStep === OnboardingSteps.ChooseWallet
+      currentOnboardingStep === OnboardingSteps.SignIn
     );
   }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep, walletToConnect]);
 

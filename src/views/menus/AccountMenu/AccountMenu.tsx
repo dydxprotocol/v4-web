@@ -411,7 +411,7 @@ export const AccountMenu = () => {
         onboardingState === OnboardingState.AccountConnected &&
           hdKey && {
             value: 'MobileQrSignIn',
-            icon: <Icon iconName={IconName.Qr} />,
+            icon: <Icon iconName={IconName.DevicesStroke} />,
             label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
             onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn({}))),
           },

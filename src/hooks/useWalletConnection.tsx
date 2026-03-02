@@ -12,7 +12,6 @@ import {
   useConnect as useConnectWagmi,
   useDisconnect as useDisconnectWagmi,
   usePublicClient as usePublicClientWagmi,
-  useReconnect as useReconnectWagmi,
   useWalletClient as useWalletClientWagmi,
 } from 'wagmi';
 
@@ -149,7 +148,6 @@ export const useWalletConnectionContext = () => {
   );
 
   const { connectAsync: connectWagmi } = useConnectWagmi();
-  const { reconnectAsync: reconnectWagmi } = useReconnectWagmi();
   const { connectAsync: connectGraz } = useConnectGraz();
   const { ready, authenticated } = usePrivy();
 
@@ -174,15 +172,7 @@ export const useWalletConnectionContext = () => {
   const { logout } = useLogout();
 
   const connectWallet = useCallback(
-    async ({
-      wallet,
-      forceConnect,
-      isEvmAccountConnected,
-    }: {
-      wallet: WalletInfo | undefined;
-      forceConnect?: boolean;
-      isEvmAccountConnected?: boolean;
-    }) => {
+    async ({ wallet }: { wallet: WalletInfo | undefined }) => {
       if (!wallet) return;
 
       try {
@@ -205,12 +195,11 @@ export const useWalletConnectionContext = () => {
         } else if (wallet.connectorType === ConnectorType.PhantomSolana) {
           await connectPhantom();
         } else if (isWagmiConnectorType(wallet)) {
-          if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
+          if (!isConnectedWagmi) {
             const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
             // This could happen in the mipd case if the user has uninstalled or disabled the injected wallet they've previously selected
             // TODO: add analytics to see how often this happens?
             if (!connector) return;
-
             await connectWagmi({ connector });
           }
         }
@@ -255,45 +244,6 @@ export const useWalletConnectionContext = () => {
   // Wallet selection
   const [selectedWalletError, setSelectedWalletError] = useState<string>();
 
-  // Auto-reconnect to wallet from last browser session
-  useEffect(() => {
-    (async () => {
-      setSelectedWalletError(undefined);
-
-      if (selectedWallet) {
-        if (selectedWallet.connectorType === ConnectorType.Turnkey) {
-          // Turnkey does not initiate a wallet connection, so we should no op.
-          return;
-        }
-
-        const isEvmAccountConnected =
-          sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature;
-
-        if (isWagmiConnectorType(selectedWallet) && !isConnectedWagmi && !isEvmAccountConnected) {
-          const connector = resolveWagmiConnector({ wallet: selectedWallet, walletConnectConfig });
-          if (!connector) return;
-
-          await reconnectWagmi({
-            connectors: [connector],
-          });
-        } else if (
-          selectedWallet.connectorType === ConnectorType.PhantomSolana &&
-          !sourceAccount.address
-        ) {
-          await connectPhantom();
-        }
-      }
-    })();
-  }, [
-    selectedWallet,
-    signerWagmi,
-    sourceAccount,
-    reconnectWagmi,
-    isConnectedWagmi,
-    walletConnectConfig,
-    connectPhantom,
-  ]);
-
   const selectWallet = useCallback(
     async (wallet: WalletInfo | undefined) => {
       // Disconnect all wallets prior to selecting a new wallet.
@@ -311,9 +261,6 @@ export const useWalletConnectionContext = () => {
           } else {
             await connectWallet({
               wallet,
-              isEvmAccountConnected: Boolean(
-                sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature
-              ),
             });
 
             dispatch(setWalletInfo(wallet));
@@ -333,14 +280,7 @@ export const useWalletConnectionContext = () => {
         await disconnectWallet();
       }
     },
-    [
-      connectWallet,
-      disconnectWallet,
-      dispatch,
-      sourceAccount.chain,
-      sourceAccount.encryptedSignature,
-      stringGetter,
-    ]
+    [connectWallet, disconnectWallet, dispatch, stringGetter]
   );
 
   // On page load, if testFlag.address is set, connect to the test wallet.
