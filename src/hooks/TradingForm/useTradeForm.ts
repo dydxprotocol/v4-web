@@ -7,7 +7,6 @@ import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, ValidationError } from '@/bonsai/lib/validationErrors';
 import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { isEmpty } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ComplianceStates } from '@/constants/compliance';
@@ -126,12 +125,8 @@ export const useTradeForm = ({
   } = {}) => {
     setPlaceOrderError(undefined);
     const payload = summary.tradePayload;
-    const tradePayload = payload?.orderPayload;
-    if (
-      payload == null ||
-      (tradePayload == null && isEmpty(payload.scaleOrderPayloads)) ||
-      hasValidationErrors
-    ) {
+    const representativePayload = payload?.orderPayload ?? payload?.scaleOrderPayloads?.[0];
+    if (payload == null || representativePayload == null || hasValidationErrors) {
       return;
     }
 
@@ -165,18 +160,20 @@ export const useTradeForm = ({
       }
     });
 
-    if (tradePayload != null) {
-      onPlaceOrder?.(tradePayload);
-      track(
-        AnalyticsEvents.TradePlaceOrderClick({
-          ...tradePayload,
-          isClosePosition: source === TradeFormSource.ClosePositionForm,
-          isSimpleUi: source === TradeFormSource.SimpleTradeForm,
-          source,
-          volume: tradePayload.size * tradePayload.price,
-        })
-      );
-    }
+    onPlaceOrder?.(representativePayload);
+    const volume =
+      payload.scaleOrderPayloads != null && payload.scaleOrderPayloads.length > 0
+        ? payload.scaleOrderPayloads.reduce((sum, o) => sum + o.size * o.price, 0)
+        : representativePayload.size * representativePayload.price;
+    track(
+      AnalyticsEvents.TradePlaceOrderClick({
+        ...representativePayload,
+        isClosePosition: source === TradeFormSource.ClosePositionForm,
+        isSimpleUi: source === TradeFormSource.SimpleTradeForm,
+        source,
+        volume,
+      })
+    );
 
     dispatch(tradeFormActions.resetPrimaryInputs());
     logBonsaiInfo(
@@ -191,10 +188,7 @@ export const useTradeForm = ({
 
     const result = await accountTransactionManager.placeCompoundOrder(payload, source);
     if (isOperationSuccess(result)) {
-      const clientIdToTrack = tradePayload?.clientId ?? payload?.scaleOrderPayloads?.[0]?.clientId;
-      if (clientIdToTrack != null) {
-        setUnIndexedClientId(clientIdToTrack.toString());
-      }
+      setUnIndexedClientId(representativePayload.clientId.toString());
       onSuccess?.();
     } else {
       const errorParams = operationFailureToErrorParams(result);

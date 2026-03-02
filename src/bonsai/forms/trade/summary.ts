@@ -250,41 +250,54 @@ export function calculateTradeSummary(
         };
       }
     );
-    return undefined;
   });
 
-  const triggersData = mapIfPresent(
-    baseAccountAfter?.account,
-    baseAccountAfter?.position,
-    accountData.currentTradeMarketSummary,
-    (accountAfter, positionAfter, market) => {
-      const inputDataToUse = { position: positionAfter, market };
-      const stateToUse = { showLimits: false, size: { checked: false, size: '' } };
-      const slOrder = effectiveTrade.stopLossOrder ?? {};
-      const tpOrder = effectiveTrade.takeProfitOrder ?? {};
-      const stopLossOrder = calculateTriggerOrderDetails(slOrder, true, stateToUse, inputDataToUse);
-      const takeProfitOrder = calculateTriggerOrderDetails(
-        tpOrder,
-        false,
-        stateToUse,
-        inputDataToUse
-      );
-      const payload = calculateTriggerOrderPayload(
-        stopLossOrder,
-        takeProfitOrder,
-        {
-          ...stateToUse,
-          stopLossOrder: slOrder,
-          takeProfitOrder: tpOrder,
-        },
-        inputDataToUse
-      );
-      return {
-        summary: { stopLossOrder, takeProfitOrder },
-        payloads: payload?.payloads,
-      };
+  const triggersData = calc(() => {
+    if (
+      effectiveTrade.type !== TradeFormType.TRIGGER_LIMIT &&
+      effectiveTrade.type !== TradeFormType.TRIGGER_MARKET
+    ) {
+      return undefined;
     }
-  );
+
+    return mapIfPresent(
+      baseAccountAfter?.account,
+      baseAccountAfter?.position,
+      accountData.currentTradeMarketSummary,
+      (accountAfter, positionAfter, market) => {
+        const inputDataToUse = { position: positionAfter, market };
+        const stateToUse = { showLimits: false, size: { checked: false, size: '' } };
+        const slOrder = effectiveTrade.stopLossOrder ?? {};
+        const tpOrder = effectiveTrade.takeProfitOrder ?? {};
+        const stopLossOrder = calculateTriggerOrderDetails(
+          slOrder,
+          true,
+          stateToUse,
+          inputDataToUse
+        );
+        const takeProfitOrder = calculateTriggerOrderDetails(
+          tpOrder,
+          false,
+          stateToUse,
+          inputDataToUse
+        );
+        const payload = calculateTriggerOrderPayload(
+          stopLossOrder,
+          takeProfitOrder,
+          {
+            ...stateToUse,
+            stopLossOrder: slOrder,
+            takeProfitOrder: tpOrder,
+          },
+          inputDataToUse
+        );
+        return {
+          summary: { stopLossOrder, takeProfitOrder },
+          payloads: payload?.payloads,
+        };
+      }
+    );
+  });
 
   const scaleOrderPayloads = calc((): PlaceOrderPayload[] | undefined => {
     if (effectiveTrade.type !== TradeFormType.SCALE) {

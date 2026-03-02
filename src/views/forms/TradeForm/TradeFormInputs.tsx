@@ -7,7 +7,14 @@ import styled from 'styled-components';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { INTEGER_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { InputErrorData, TradeBoxKeys } from '@/constants/trade';
+import {
+  InputErrorData,
+  MAX_SCALE_ORDERS,
+  MAX_SCALE_SKEW,
+  MIN_SCALE_ORDERS,
+  MIN_SCALE_SKEW,
+  TradeBoxKeys,
+} from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -186,7 +193,8 @@ export const TradeFormInputs = () => {
       inputType: InputType.Number,
       label: (
         <>
-          {stringGetter({ key: STRING_KEYS.TOTAL_ORDERS })} <$Muted>(2 - 20)</$Muted>
+          {stringGetter({ key: STRING_KEYS.TOTAL_ORDERS })}{' '}
+          <$Muted>{`(${MIN_SCALE_ORDERS} - ${MAX_SCALE_ORDERS})`}</$Muted>
         </>
       ),
       onChange: ({ value }: NumberFormatValues) => {
@@ -199,7 +207,8 @@ export const TradeFormInputs = () => {
         inputType: InputType.Number,
         label: (
           <>
-            {stringGetter({ key: STRING_KEYS.SKEW })} <$Muted>(0.1 - 10)</$Muted>
+            {stringGetter({ key: STRING_KEYS.SKEW })}{' '}
+            <$Muted>{`(${MIN_SCALE_SKEW} - ${MAX_SCALE_SKEW})`}</$Muted>
           </>
         ),
         onChange: ({ value }: NumberFormatValues) => {

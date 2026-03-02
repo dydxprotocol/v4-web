@@ -118,18 +118,13 @@ export function calculateTradeInfo(
               trade.side
             ),
             filled: calculated.marketOrder?.filled ?? false,
-            isPositionClosed:
-              mapIfPresent(
-                calculated.marketOrder?.size,
-                baseAccount?.position?.unsignedSize.toNumber(),
-                baseAccount?.position?.side,
-                trade.side,
-                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
-                (filled, size, positionSide, orderSide, stepSize) =>
-                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
-                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
-                  Math.abs(filled - size) < stepSize / 2
-              ) ?? false,
+            isPositionClosed: getIsPositionClosed(
+              calculated.marketOrder?.size,
+              baseAccount?.position?.unsignedSize.toNumber(),
+              baseAccount?.position?.side,
+              trade.side,
+              AttemptNumber(accountData.currentTradeMarketSummary?.stepSize)
+            ),
             indexSlippage: mapIfPresent(
               calculated.marketOrder?.worstPrice,
               AttemptNumber(accountData.currentTradeMarketSummary?.oraclePrice),
@@ -324,18 +319,13 @@ export function calculateTradeInfo(
             payloadPrice: weightedAvgPrice,
             startPrice,
             endPrice,
-            isPositionClosed:
-              mapIfPresent(
-                inputSummary.size?.size,
-                baseAccount?.position?.unsignedSize.toNumber(),
-                baseAccount?.position?.side,
-                trade.side,
-                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
-                (filled, size, positionSide, orderSide, stepSize) =>
-                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
-                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
-                  Math.abs(filled - size) < stepSize / 2
-              ) ?? false,
+            isPositionClosed: getIsPositionClosed(
+              inputSummary.size?.size,
+              baseAccount?.position?.unsignedSize.toNumber(),
+              baseAccount?.position?.side,
+              trade.side,
+              AttemptNumber(accountData.currentTradeMarketSummary?.stepSize)
+            ),
             total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
             transferToSubaccountAmount: calculateIsolatedTransferAmount(
               trade,
@@ -398,18 +388,13 @@ export function calculateTradeInfo(
             payloadPrice: price,
             startPrice: undefined,
             endPrice: undefined,
-            isPositionClosed:
-              mapIfPresent(
-                inputSummary.size?.size,
-                baseAccount?.position?.unsignedSize.toNumber(),
-                baseAccount?.position?.side,
-                trade.side,
-                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
-                (filled, size, positionSide, orderSide, stepSize) =>
-                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
-                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
-                  Math.abs(filled - size) < stepSize / 2
-              ) ?? false,
+            isPositionClosed: getIsPositionClosed(
+              inputSummary.size?.size,
+              baseAccount?.position?.unsignedSize.toNumber(),
+              baseAccount?.position?.side,
+              trade.side,
+              AttemptNumber(accountData.currentTradeMarketSummary?.stepSize)
+            ),
             total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
             transferToSubaccountAmount: calculateIsolatedTransferAmount(
               trade,
@@ -1319,6 +1304,28 @@ function calculateTradeFeeAfterDiscounts(
   const feeAfterMarketDiscount =
     marketDiscountMultiplier != null ? feeUsdc * marketDiscountMultiplier : feeUsdc;
   return feeAfterMarketDiscount;
+}
+
+function getIsPositionClosed(
+  filledSize: number | undefined,
+  positionSize: number | undefined,
+  positionSide: IndexerPositionSide | undefined,
+  orderSide: OrderSide | undefined,
+  stepSize: number | undefined
+): boolean {
+  return (
+    mapIfPresent(
+      filledSize,
+      positionSize,
+      positionSide,
+      orderSide,
+      stepSize,
+      (filled, size, posSide, ordSide, step) =>
+        ((posSide === IndexerPositionSide.LONG && ordSide === OrderSide.SELL) ||
+          (posSide === IndexerPositionSide.SHORT && ordSide === OrderSide.BUY)) &&
+        Math.abs(filled - size) < step / 2
+    ) ?? false
+  );
 }
 
 export function generateSkewedPrices(

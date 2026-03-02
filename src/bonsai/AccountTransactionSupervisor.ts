@@ -33,11 +33,9 @@ import {
   TransactionMemo,
 } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
-import { ESTIMATED_BLOCK_TIME } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 import {
   MARKET_ORDER_MAX_SLIPPAGE,
-  MAX_STATEFUL_ORDERS_PER_BLOCK,
   POST_TRANSFER_PLACE_ORDER_DELAY,
   SHORT_TERM_ORDER_DURATION,
   UNCOMMITTED_ORDER_TIMEOUT_MS,
@@ -1146,7 +1144,6 @@ export class AccountTransactionSupervisor {
             if (context.payload.mainOrderPayload) {
               const mainPayload = context.payload.mainOrderPayload;
 
-              // Check if we need a transfer for isolated margin
               const sourceSubaccount = getSubaccountId(this.store.getState());
               const sourceAddress = getUserWalletAddress(this.store.getState());
               const mainTransfer = getIsolatedMarginTransfer(
@@ -1154,6 +1151,7 @@ export class AccountTransactionSupervisor {
                 sourceSubaccount,
                 sourceAddress
               );
+              // Check if we need a transfer for isolated margin
               if (
                 mainPayload.transferToSubaccountAmount != null &&
                 mainPayload.transferToSubaccountAmount > 0 &&
@@ -1357,60 +1355,23 @@ export class AccountTransactionSupervisor {
                   return true;
                 }
 
-                // Batch place payloads to respect chain rate limit (MaxStatefulOrdersPerNBlocks)
-                const batchCount = Math.ceil(
-                  payload.placePayloads.length / MAX_STATEFUL_ORDERS_PER_BLOCK
-                );
-                const placePayloadBatches = Array.from({ length: batchCount }, (_, i) =>
-                  payload.placePayloads.slice(
-                    i * MAX_STATEFUL_ORDERS_PER_BLOCK,
-                    (i + 1) * MAX_STATEFUL_ORDERS_PER_BLOCK
-                  )
-                );
-
-                const firstBatch = placePayloadBatches[0] ?? [];
-                const remainingBatches = placePayloadBatches.slice(1);
-
-                // First batch includes cancels and transfer
-                const firstTx = await compositeClient.bulkCancelAndTransferAndPlaceStatefulOrders(
+                const tx = await compositeClient.bulkCancelAndTransferAndPlaceStatefulOrders(
                   subaccountInfo,
                   cancelRawOrderPayloads,
                   transferToSubaccountPayload,
-                  firstBatch,
+                  payload.placePayloads,
                   TransactionMemo.placeOrder,
                   Method.BroadcastTxSync
                 );
 
-                if ((firstTx as IndexedTx | undefined)?.code !== 0) {
+                if ((tx as IndexedTx | undefined)?.code !== 0) {
                   throw new StatefulOrderError(
                     'Bulk stateful order operation failed to commit.',
-                    firstTx
+                    tx
                   );
                 }
 
-                // Send remaining batches sequentially, waiting at least one block between each
-                await remainingBatches.reduce(async (prevBatch, batch) => {
-                  await prevBatch;
-                  await sleep(ESTIMATED_BLOCK_TIME + 500);
-
-                  const tx = await compositeClient.bulkCancelAndTransferAndPlaceStatefulOrders(
-                    subaccountInfo,
-                    [],
-                    undefined,
-                    batch,
-                    TransactionMemo.placeOrder,
-                    Method.BroadcastTxSync
-                  );
-
-                  if ((tx as IndexedTx | undefined)?.code !== 0) {
-                    throw new StatefulOrderError(
-                      'Bulk stateful order operation failed to commit.',
-                      tx
-                    );
-                  }
-                }, Promise.resolve());
-
-                return firstTx;
+                return tx;
               },
               {
                 selector: BonsaiCore.account.allOrders.data,
