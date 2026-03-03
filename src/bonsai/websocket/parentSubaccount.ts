@@ -82,6 +82,12 @@ function accountWebsocketValueCreator(
             orders: keyBy(message.orders, (o) => o.id),
           },
         };
+        const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+        const recentBaseOrders = message.orders.filter(
+          (o) => o.updatedAt != null && new Date(o.updatedAt).getTime() >= tenMinutesAgo
+        );
+        // eslint-disable-next-line no-console
+        console.log('onResult WS base (last 10min)', recentBaseOrders);
         if (result.childSubaccounts[parentSubaccountNumber] == null) {
           result.childSubaccounts[parentSubaccountNumber] = freshChildSubaccount({
             address,
@@ -180,6 +186,12 @@ function accountWebsocketValueCreator(
               ];
             }
             if (update.orders != null) {
+              const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+              const recentUpdateOrders = update.orders.filter(
+                (o) => o.updatedAt != null && new Date(o.updatedAt).getTime() >= tenMinutesAgo
+              );
+              // eslint-disable-next-line no-console
+              console.log('onResult WS update (last 10min)', recentUpdateOrders);
               returnValue.live.orders = { ...(returnValue.live.orders ?? {}) };
               const allOrders = returnValue.live.orders;
               update.orders.forEach((o) => {

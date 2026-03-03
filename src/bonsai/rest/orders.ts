@@ -39,7 +39,12 @@ export function setUpOrdersQuery(store: RootStore) {
         );
     },
     onResult: (orders) => {
-      console.log('onResult REST', orders);
+      const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+      const recentOrders = isParentSubaccountOrders(orders.data ?? []).filter(
+        (o) => o.updatedAt != null && new Date(o.updatedAt).getTime() >= tenMinutesAgo
+      );
+      // eslint-disable-next-line no-console
+      console.log('onResult REST (last 10min)', recentOrders);
       store.dispatch(
         setAccountOrdersRaw(
           mapLoadableData(queryResultToLoadable(orders), (data) =>
