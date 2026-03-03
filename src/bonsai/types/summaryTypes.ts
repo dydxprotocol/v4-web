@@ -180,6 +180,7 @@ export type SubaccountOrder = {
   goodTilBlockTimeSeconds: number | undefined;
   createdAtHeight: number | undefined;
   expiresAtMilliseconds: number | undefined;
+  createdAtMilliseconds: number | undefined;
   updatedAtMilliseconds: number | undefined;
   updatedAtHeight: number | undefined;
   postOnly: boolean;
@@ -201,7 +202,14 @@ export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrde
 }
 
 export function isActiveTwapOrder(order: SubaccountOrder): boolean {
-  return isTWAPOrder(order) && order.remainingSize != null && order.remainingSize.gt(0);
+  if (!isTWAPOrder(order) || order.remainingSize == null || !order.remainingSize.gt(0)) {
+    return false;
+  }
+  const { createdAtMilliseconds, duration } = order;
+  if (createdAtMilliseconds == null || duration == null) return false;
+  const now = Date.now();
+  const endTime = createdAtMilliseconds + parseInt(duration, 10) * 60 * 1000;
+  return now >= createdAtMilliseconds && now <= endTime;
 }
 
 export enum SubaccountFillType {

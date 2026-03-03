@@ -214,4 +214,5 @@ export const TWAPFillsTable = forwardRef(
 
 const $Table = styled(Table)`
   ${defaultTableMixins}
+  --color-border: var(--color-layer-3);
 ` as typeof Table;

@@ -16,7 +16,14 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../types/rawTypes';
-import { isActiveTwapOrder, OrderFlags, OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+import {
+  isActiveTwapOrder,
+  isTWAPOrder,
+  OrderFlags,
+  OrderStatus,
+  SubaccountOrder,
+  TWAPSubaccountOrder,
+} from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
 
 export function calculateOpenOrders<T extends SubaccountOrder>(orders: T[]): T[] {
@@ -50,12 +57,13 @@ export function calculateAllOrders(
 function calculateSubaccountOrder(
   base: IndexerCompositeOrderObject,
   protocolHeight: HeightResponse
-): SubaccountOrder {
+): SubaccountOrder | TWAPSubaccountOrder {
   let order: SubaccountOrder = {
     marketId: base.ticker,
     status: calculateBaseOrderStatus(base, protocolHeight),
     displayId: getDisplayableTickerFromMarket(base.ticker),
     expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).getTime()),
+    createdAtMilliseconds: mapIfPresent(base.createdAt, (u) => new Date(u).getTime()),
     updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).getTime()),
     updatedAtHeight: MaybeBigNumber(base.updatedAtHeight)?.toNumber(),
     marginMode: base.subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? 'ISOLATED' : 'CROSS',
@@ -84,6 +92,18 @@ function calculateSubaccountOrder(
     removalReason: base.removalReason,
   };
   order = maybeUpdateOrderIfExpired(order, protocolHeight);
+
+  if (isTWAPOrder(order)) {
+    return {
+      ...order,
+      type: IndexerOrderType.TWAP,
+      orderFlags: OrderFlags.TWAP,
+      duration: base.duration ?? undefined,
+      interval: base.interval ?? undefined,
+      priceTolerance: base.priceTolerance ?? undefined,
+    };
+  }
+
   return order;
 }
 
@@ -266,13 +286,10 @@ function mergeTwapMainWithSuborder(
 
 function calculateMergedOrders(liveData: OrdersData, restData: OrdersData) {
   return mergeObjects(liveData, restData, (a, b) => {
-    const aIsMain = a.orderFlags === OrderFlags.TWAP;
-    const bIsMain = b.orderFlags === OrderFlags.TWAP;
-    const aIsSuborder = a.orderFlags === OrderFlags.TWAP_SUBORDER;
-    const bIsSuborder = b.orderFlags === OrderFlags.TWAP_SUBORDER;
-
-    if (aIsMain && bIsSuborder) return mergeTwapMainWithSuborder(a, b);
-    if (bIsMain && aIsSuborder) return mergeTwapMainWithSuborder(b, a);
+    if (a.orderFlags === OrderFlags.TWAP && b.orderFlags === OrderFlags.TWAP_SUBORDER)
+      return mergeTwapMainWithSuborder(a, b);
+    if (b.orderFlags === OrderFlags.TWAP && a.orderFlags === OrderFlags.TWAP_SUBORDER)
+      return mergeTwapMainWithSuborder(b, a);
 
     return maxBy([a, b], (o) => MustBigNumber(o.updatedAtHeight ?? o.createdAtHeight).toNumber())!;
   });

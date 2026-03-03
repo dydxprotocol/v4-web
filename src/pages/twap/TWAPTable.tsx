@@ -1,5 +1,7 @@
 import { forwardRef, useMemo, useState } from 'react';
 
+import styled from 'styled-components';
+
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -80,7 +82,7 @@ export const TWAPTable = forwardRef((_props, _ref) => {
   );
 
   return (
-    <Tabs
+    <$Tabs
       value={tab}
       onValueChange={setTab}
       items={tabItems}
@@ -89,3 +91,7 @@ export const TWAPTable = forwardRef((_props, _ref) => {
     />
   );
 });
+
+const $Tabs = styled(Tabs)`
+  --color-border: var(--color-layer-4);
+` as typeof Tabs;

@@ -39,13 +39,6 @@ export function setUpOrdersQuery(store: RootStore) {
         );
     },
     onResult: (orders) => {
-      const sortedOrders = [...(orders.data ?? [])].sort((a, b) => {
-        const aTime = new Date(a.updatedAt ?? a.createdAt ?? 0).getTime();
-        const bTime = new Date(b.updatedAt ?? b.createdAt ?? 0).getTime();
-        return bTime - aTime;
-      });
-      // eslint-disable-next-line no-console
-      console.log('[REST orders] received', sortedOrders.length, 'orders', sortedOrders);
       store.dispatch(
         setAccountOrdersRaw(
           mapLoadableData(queryResultToLoadable(orders), (data) =>

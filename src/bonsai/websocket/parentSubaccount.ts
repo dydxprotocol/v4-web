@@ -194,8 +194,6 @@ function accountWebsocketValueCreator(
               ];
             }
             if (update.orders != null) {
-              // eslint-disable-next-line no-console
-              console.log('[WS] received', update.orders.length, 'orders', update.orders);
               returnValue.live.orders = { ...(returnValue.live.orders ?? {}) };
               const allOrders = returnValue.live.orders;
               update.orders.forEach((o) => {
@@ -215,7 +213,6 @@ function accountWebsocketValueCreator(
                     ...(o.updatedAtHeight != null ? { updatedAtHeight: o.updatedAtHeight } : {}),
                     subaccountNumber,
                   };
-                  console.log('suborder update main', allOrders[o.id]);
                 } else {
                   allOrders[o.id] = {
                     ...(allOrders[o.id] as IndexerOrderResponseObject),

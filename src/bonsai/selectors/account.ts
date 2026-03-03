@@ -234,7 +234,6 @@ export const selectAccountFills = createAppSelector(
 );
 
 export const selectTWAPFills = createAppSelector([selectAccountFills], (fills) => {
-  console.log('fills', fills);
   return fills.filter((f) => f.type === SubaccountFillType.TWAP);
 });
 

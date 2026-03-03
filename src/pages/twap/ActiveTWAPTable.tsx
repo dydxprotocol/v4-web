@@ -87,8 +87,14 @@ const getActiveTWAPTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.AMOUNT_FILLED }),
         allowsSorting: true,
         renderCell: ({ totalFilled, size, stepSizeDecimals }) => (
-          <TableCell stacked>
-            <Output type={OutputType.Asset} value={totalFilled} fractionDigits={stepSizeDecimals} />
+          <TableCell>
+            <Output
+              tw="text-color-positive"
+              type={OutputType.Asset}
+              value={totalFilled}
+              fractionDigits={stepSizeDecimals}
+            />
+            <span tw="text-color-text-0">/</span>
             <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
           </TableCell>
         ),
@@ -111,12 +117,12 @@ const getActiveTWAPTableColumnDef = ({
         columnKey: 'runtime',
         label: stringGetter({ key: STRING_KEYS.RUNTIME_TOTAL }),
         allowsSorting: false,
-        renderCell: ({ updatedAtMilliseconds, duration }) => {
-          if (updatedAtMilliseconds == null || duration == null)
+        renderCell: ({ createdAtMilliseconds, duration }) => {
+          if (createdAtMilliseconds == null || duration == null)
             return <Output type={OutputType.Text} />;
 
-          const elapsedRuntime = Date.now() - updatedAtMilliseconds;
-          const fullRuntime = parseInt(duration, 10) * 1000;
+          const elapsedRuntime = Date.now() - createdAtMilliseconds;
+          const fullRuntime = parseInt(duration, 10) * 60 * 1000;
 
           return (
             <TableCell stacked>
@@ -218,6 +224,7 @@ export const ActiveTWAPTable = forwardRef(
 
 const $Table = styled(Table)`
   ${defaultTableMixins}
+  --color-border: var(--color-layer-4);
 ` as typeof Table;
 
 const $TerminateButton = styled.button`

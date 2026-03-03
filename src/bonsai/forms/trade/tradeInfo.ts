@@ -1119,6 +1119,7 @@ function calculateIsolatedMarginTransferAmount(
 
   const estOraclePriceAtExecution = calc(() => {
     switch (trade.type) {
+      case TradeFormType.TWAP:
       case TradeFormType.MARKET:
         return oraclePrice;
       case TradeFormType.LIMIT:
@@ -1126,8 +1127,6 @@ function calculateIsolatedMarginTransferAmount(
         return tradePrice;
       case TradeFormType.TRIGGER_MARKET:
         return MustNumber(trade.triggerPrice);
-      case TradeFormType.TWAP:
-        return oraclePrice;
       default:
         assertNever(trade.type);
         return 0;
