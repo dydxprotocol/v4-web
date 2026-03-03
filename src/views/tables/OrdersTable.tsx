@@ -10,7 +10,7 @@ import tw from 'twin.macro';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useViewPanel } from '@/hooks/useSeen';
@@ -114,19 +114,25 @@ const getOrdersTableColumnDef = ({
         columnKey: 'status',
         getCellValue: (row) => row.status,
         label: stringGetter({ key: STRING_KEYS.STATUS }),
-        renderCell: ({ status, type }) => {
+        renderCell: ({ status, type, remainingSize }) => {
+          const derivedStatus =
+            type === IndexerOrderType.TWAP
+              ? remainingSize?.isGreaterThan(0)
+                ? OrderStatus.PartiallyFilled
+                : OrderStatus.Filled
+              : status;
           return (
             <TableCell>
               <WithTooltip
                 tooltipString={
-                  status != null
-                    ? stringGetter({ key: getOrderStatusStringKey(status) })
+                  derivedStatus != null
+                    ? stringGetter({ key: getOrderStatusStringKey(derivedStatus) })
                     : undefined
                 }
                 side="right"
                 tw="[--tooltip-backgroundColor:--color-layer-5]"
               >
-                {status != null && <OrderStatusIconNew status={status} />}
+                {derivedStatus != null && <OrderStatusIconNew status={derivedStatus} />}
               </WithTooltip>
               {type != null && stringGetter({ key: getIndexerOrderTypeStringKey(type) })}
             </TableCell>
@@ -274,8 +280,16 @@ const getOrdersTableColumnDef = ({
             </span>
           </TableColumnHeader>
         ),
-        renderCell: ({ marketSummary, size, status, totalFilled }) => {
-          const { statusIconColor } = getOrderStatusInfoNew({ status: status ?? OrderStatus.Open });
+        renderCell: ({ marketSummary, size, status, totalFilled, type, remainingSize }) => {
+          const derivedStatus =
+            type === IndexerOrderType.TWAP
+              ? remainingSize?.isGreaterThan(0)
+                ? OrderStatus.PartiallyFilled
+                : OrderStatus.Filled
+              : status;
+          const { statusIconColor } = getOrderStatusInfoNew({
+            status: derivedStatus ?? OrderStatus.Open,
+          });
 
           return (
             <TableCell
@@ -288,7 +302,8 @@ const getOrdersTableColumnDef = ({
               }
             >
               <span>
-                {status != null && stringGetter({ key: getOrderStatusStringKey(status) })}
+                {derivedStatus != null &&
+                  stringGetter({ key: getOrderStatusStringKey(derivedStatus) })}
               </span>
               <$InlineRow>
                 <Output

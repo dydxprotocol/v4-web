@@ -197,7 +197,11 @@ export type TWAPSubaccountOrder = SubaccountOrder & {
 };
 
 export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
-  return order.orderFlags === OrderFlags.TWAP && order.type === IndexerOrderType.TWAP;
+  return order.orderFlags === OrderFlags.TWAP;
+}
+
+export function isActiveTwapOrder(order: SubaccountOrder): boolean {
+  return isTWAPOrder(order) && order.remainingSize != null && order.remainingSize.gt(0);
 }
 
 export enum SubaccountFillType {

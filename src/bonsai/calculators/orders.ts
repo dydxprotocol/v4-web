@@ -16,24 +16,30 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../types/rawTypes';
-import { OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+import { isActiveTwapOrder, OrderFlags, OrderStatus, SubaccountOrder } from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
 
 export function calculateOpenOrders<T extends SubaccountOrder>(orders: T[]): T[] {
   return orders.filter(
-    (order) => order.status == null || getSimpleOrderStatus(order.status) === OrderStatus.Open
+    (order) =>
+      order.status == null ||
+      getSimpleOrderStatus(order.status) === OrderStatus.Open ||
+      isActiveTwapOrder(order) // Add check for createdAt
   );
 }
 
 export function calculateOrderHistory<T extends SubaccountOrder>(orders: T[]): T[] {
   return orders.filter(
-    (order) => order.status != null && getSimpleOrderStatus(order.status) !== OrderStatus.Open
+    (order) =>
+      order.status != null &&
+      getSimpleOrderStatus(order.status) !== OrderStatus.Open &&
+      !isActiveTwapOrder(order)
   );
 }
 
 export function calculateAllOrders(
-  liveOrders: OrdersData | undefined,
   restOrders: OrdersData | undefined,
+  liveOrders: OrdersData | undefined,
   height: HeightResponse
 ): SubaccountOrder[] {
   const actuallyMerged = calculateMergedOrders(liveOrders ?? {}, restOrders ?? {});
@@ -238,11 +244,36 @@ function calculateBaseOrderStatus(
   }
 }
 
+function mergeTwapMainWithSuborder(
+  mainOrder: IndexerCompositeOrderObject,
+  suborder: IndexerCompositeOrderObject
+): IndexerCompositeOrderObject {
+  const mainHeight = MustBigNumber(
+    mainOrder.updatedAtHeight ?? mainOrder.createdAtHeight
+  ).toNumber();
+  const subHeight = MustBigNumber(suborder.updatedAtHeight ?? suborder.createdAtHeight).toNumber();
+  if (subHeight <= mainHeight) {
+    return mainOrder;
+  }
+  return {
+    ...mainOrder,
+    status: suborder.status ?? mainOrder.status,
+    totalFilled: suborder.totalFilled,
+    updatedAt: suborder.updatedAt ?? mainOrder.updatedAt,
+    updatedAtHeight: suborder.updatedAtHeight ?? mainOrder.updatedAtHeight,
+  };
+}
+
 function calculateMergedOrders(liveData: OrdersData, restData: OrdersData) {
-  return mergeObjects(
-    liveData,
-    restData,
-    (a, b) =>
-      maxBy([a, b], (o) => MustBigNumber(o.updatedAtHeight ?? o.createdAtHeight).toNumber())!
-  );
+  return mergeObjects(liveData, restData, (a, b) => {
+    const aIsMain = a.orderFlags === OrderFlags.TWAP;
+    const bIsMain = b.orderFlags === OrderFlags.TWAP;
+    const aIsSuborder = a.orderFlags === OrderFlags.TWAP_SUBORDER;
+    const bIsSuborder = b.orderFlags === OrderFlags.TWAP_SUBORDER;
+
+    if (aIsMain && bIsSuborder) return mergeTwapMainWithSuborder(a, b);
+    if (bIsMain && aIsSuborder) return mergeTwapMainWithSuborder(b, a);
+
+    return maxBy([a, b], (o) => MustBigNumber(o.updatedAtHeight ?? o.createdAtHeight).toNumber())!;
+  });
 }
