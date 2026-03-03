@@ -72,7 +72,7 @@ const marchBonkRewards = [
   { positionRange: [3, 3], reward: 5000 },
   { positionRange: [4, 5], reward: 2500 },
   { positionRange: [6, 10], reward: 2000 },
-  { positionRange: [11, 15], reward: 1500 },
+  { positionRange: [11, 20], reward: 1000 },
 ];
 
 const BONK_REWARDS_MAP = {
@@ -88,10 +88,10 @@ const BONK_REWARDS_MAP = {
   },
   March: {
     rewards: marchBonkRewards,
-    rewardAmount: '$50k',
+    rewardAmount: '~$50k',
     rewardAmountUsd: 50_000,
     topPrizeAmount: '$15,000',
-    leaderboardSize: 15,
+    leaderboardSize: 20,
     startTime: '2026-03-01T00:00:00.000Z',
     endTime: '2026-03-31T23:59:59.000Z',
     titleStringKey: STRING_KEYS.BONK_PNL_COMPETITION_NAME_MARCH,
