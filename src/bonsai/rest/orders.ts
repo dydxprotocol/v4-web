@@ -39,6 +39,7 @@ export function setUpOrdersQuery(store: RootStore) {
         );
     },
     onResult: (orders) => {
+      console.log('onResult REST', orders);
       store.dispatch(
         setAccountOrdersRaw(
           mapLoadableData(queryResultToLoadable(orders), (data) =>
