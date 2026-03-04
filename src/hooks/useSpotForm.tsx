@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { spotFormActions } from '@/state/spotForm';
 import { getSpotFormSummary } from '@/state/spotFormSelectors';
-import { addSpotTrade } from '@/state/spotTrades';
+import { addSpotTrade, updateSpotTrade } from '@/state/spotTrades';
 
 import { SpotApiSide } from '@/clients/spotApi';
 
@@ -29,7 +29,7 @@ export function useSpotForm() {
   const dispatch = useAppDispatch();
   const formSummary = useAppSelector(getSpotFormSummary);
   const { canDeriveSolanaWallet } = useAccounts();
-  const { mutateAsync: submitTransactionMutation, isPending } = useSpotTransactionSubmit();
+  const { mutateAsync: submitTransactionMutation } = useSpotTransactionSubmit();
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -50,9 +50,8 @@ export function useSpotForm() {
       canDeriveSolanaWallet &&
       !hasErrors &&
       formSummary.summary.payload != null &&
-      !isPending &&
       complianceState !== ComplianceStates.READ_ONLY,
-    [canDeriveSolanaWallet, complianceState, formSummary.summary.payload, hasErrors, isPending]
+    [canDeriveSolanaWallet, complianceState, formSummary.summary.payload, hasErrors]
   );
 
   const actions = useMemo(
@@ -90,73 +89,87 @@ export function useSpotForm() {
     [dispatch, formSummary.summary.amounts]
   );
 
-  const submitTransaction = useCallback(async () => {
-    try {
-      const result = await submitTransactionMutation();
-      dispatch(spotFormActions.reset());
+  const submitTransaction = useCallback(() => {
+    const tradeId = `spot-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const side = formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL;
+    const tokenSymbol = tokenMetadata?.symbol ?? '';
 
-      appQueryClient.invalidateQueries({
-        queryKey: ['spot', 'portfolioTrades'],
-        exact: false,
+    dispatch(
+      addSpotTrade({
+        trade: {
+          id: tradeId,
+          side,
+          tokenSymbol,
+          tokenAmount: '',
+          solAmount: '',
+          txHash: '',
+          status: 'pending',
+          createdAt: Date.now(),
+        },
+      })
+    );
+
+    // Pass payload as a mutation variable so it's captured at invocation time.
+    // React-Query v5's MutationObserver.setOptions() overwrites an in-flight
+    // mutation's mutationFn when pending, so closure-captured values are unsafe.
+    const mutationPromise = submitTransactionMutation({
+      payload: formSummary.summary.payload!,
+    });
+
+    // Reset form — mutation has the payload as a variable, immune to re-render
+    dispatch(spotFormActions.reset());
+
+    appQueryClient.invalidateQueries({
+      queryKey: ['spot', 'portfolioTrades'],
+      exact: false,
+    });
+
+    mutationPromise
+      .then((result) => {
+        const { landResponse } = result;
+
+        const formattedTokenAmount = formatNumberOutput(
+          landResponse.tokenChange,
+          OutputType.Asset,
+          { decimalSeparator, groupSeparator, selectedLocale }
+        );
+        const formattedSolAmount = formatNumberOutput(landResponse.solChange, OutputType.Asset, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+        });
+
+        dispatch(
+          updateSpotTrade({
+            trade: {
+              id: tradeId,
+              tokenAmount: formattedTokenAmount,
+              solAmount: formattedSolAmount,
+              txHash: landResponse.txHash,
+              status: 'success',
+            },
+          })
+        );
+      })
+      .catch(() => {
+        dispatch(
+          updateSpotTrade({
+            trade: {
+              id: tradeId,
+              status: 'error',
+            },
+          })
+        );
       });
-
-      const { landResponse } = result;
-      const isBuy = landResponse.side === SpotApiSide.BUY;
-      const tokenSymbol = tokenMetadata?.symbol ?? '';
-
-      const formattedTokenAmount = formatNumberOutput(landResponse.tokenChange, OutputType.Asset, {
-        decimalSeparator,
-        groupSeparator,
-        selectedLocale,
-      });
-
-      const formattedSolAmount = formatNumberOutput(landResponse.solChange, OutputType.Asset, {
-        decimalSeparator,
-        groupSeparator,
-        selectedLocale,
-      });
-
-      dispatch(
-        addSpotTrade({
-          trade: {
-            id: `spot-${landResponse.txHash}`,
-            side: isBuy ? SpotApiSide.BUY : SpotApiSide.SELL,
-            tokenSymbol,
-            tokenAmount: formattedTokenAmount,
-            solAmount: formattedSolAmount,
-            txHash: landResponse.txHash,
-            status: 'success',
-            createdAt: Date.now(),
-          },
-        })
-      );
-
-      return result;
-    } catch (error) {
-      dispatch(
-        addSpotTrade({
-          trade: {
-            id: `spot-error-${Date.now()}`,
-            side: formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL,
-            tokenSymbol: tokenMetadata?.symbol ?? '',
-            tokenAmount: '',
-            solAmount: '',
-            txHash: '',
-            status: 'error',
-            createdAt: Date.now(),
-          },
-        })
-      );
-      throw error;
-    }
   }, [
+    formSummary.state.side,
+    formSummary.summary.payload,
+    tokenMetadata?.symbol,
     dispatch,
     submitTransactionMutation,
-    tokenMetadata?.symbol,
     decimalSeparator,
     groupSeparator,
     selectedLocale,
-    formSummary.state.side,
   ]);
 
   return {
@@ -168,7 +181,6 @@ export function useSpotForm() {
     hasErrors,
     primaryAlert,
     canSubmit,
-    isPending,
     handleInputTypeChange,
     submitTransaction,
   };
