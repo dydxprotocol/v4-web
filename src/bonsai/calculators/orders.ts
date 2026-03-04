@@ -31,7 +31,7 @@ export function calculateOpenOrders<T extends SubaccountOrder>(orders: T[]): T[]
     (order) =>
       order.status == null ||
       getSimpleOrderStatus(order.status) === OrderStatus.Open ||
-      isActiveTwapOrder(order) // Add check for createdAt
+      isActiveTwapOrder(order)
   );
 }
 
@@ -268,6 +268,8 @@ function mergeTwapMainWithSuborder(
   mainOrder: IndexerCompositeOrderObject,
   suborder: IndexerCompositeOrderObject
 ): IndexerCompositeOrderObject {
+  console.log('mainOrder', mainOrder);
+  console.log('suborder', suborder);
   const mainHeight = MustBigNumber(
     mainOrder.updatedAtHeight ?? mainOrder.createdAtHeight
   ).toNumber();
@@ -285,6 +287,12 @@ function mergeTwapMainWithSuborder(
 }
 
 function calculateMergedOrders(liveData: OrdersData, restData: OrdersData) {
+  console.log(
+    'restData',
+    Object.values(restData).sort((a, b) =>
+      MustBigNumber(b.createdAtHeight).minus(MustBigNumber(a.createdAtHeight)).toNumber()
+    )
+  );
   return mergeObjects(liveData, restData, (a, b) => {
     if (a.orderFlags === OrderFlags.TWAP && b.orderFlags === OrderFlags.TWAP_SUBORDER)
       return mergeTwapMainWithSuborder(a, b);

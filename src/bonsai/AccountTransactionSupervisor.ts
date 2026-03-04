@@ -222,6 +222,9 @@ export class AccountTransactionSupervisor {
       case '64':
         orderFlags = OrderFlags.LONG_TERM;
         break;
+      case '128':
+        orderFlags = OrderFlags.TWAP;
+        break;
       default:
         logBonsaiError(fnName, 'Unsupported order flags', {
           orderId,
@@ -244,6 +247,7 @@ export class AccountTransactionSupervisor {
 
   private async executeCancelOrder(orderId: string, onConfirmed?: () => void) {
     const cancelPayload = this.createCancelOrderPayload(orderId);
+    console.log('cancelPayload', cancelPayload);
     const fnName = 'AccountTransactionSupervisor/executeCancelOrder';
 
     if (cancelPayload == null) {

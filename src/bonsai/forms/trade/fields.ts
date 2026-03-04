@@ -232,6 +232,7 @@ export function getTradeFormFieldStates(
           'durationMinutes',
           'frequencySeconds',
           'reduceOnly',
+          'goodTil',
         ]);
         setMarginMode(result);
         disableReduceOnlyIfIncreasingMarketOrder(result);

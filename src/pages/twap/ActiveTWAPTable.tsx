@@ -1,7 +1,11 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type PerpetualMarketSummary, type TWAPSubaccountOrder } from '@/bonsai/types/summaryTypes';
+import {
+  OrderStatus,
+  type PerpetualMarketSummary,
+  type TWAPSubaccountOrder,
+} from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
@@ -25,9 +29,12 @@ import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
+import { OrderActionsCell } from '@/views/tables/OrdersTable/OrderActionsCell';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
+import { getDerivedTwapOrderStatus } from '@/lib/orders';
 import { type Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 type ActiveTWAPOrderRow = {
@@ -57,10 +64,12 @@ const getActiveTWAPTableColumnDef = ({
   key,
   stringGetter,
   width,
+  isAccountViewOnly,
 }: {
   key: ActiveTWAPTableColumnKey;
   stringGetter: ReturnType<typeof useStringGetter>;
   width?: ColumnSize;
+  isAccountViewOnly: boolean;
 }): ColumnDef<ActiveTWAPOrderRow> => ({
   width,
   ...(
@@ -167,7 +176,22 @@ const getActiveTWAPTableColumnDef = ({
         label: '',
         allowsSorting: false,
         isActionable: true,
-        renderCell: () => <$TerminateButton>Terminate</$TerminateButton>,
+        renderCell: ({ id, type, status, orderFlags, remainingSize }) => {
+          const derivedStatus = getDerivedTwapOrderStatus(
+            type,
+            status ?? OrderStatus.Open,
+            remainingSize
+          );
+
+          return (
+            <OrderActionsCell
+              orderId={id}
+              status={derivedStatus ?? OrderStatus.Open}
+              orderFlags={orderFlags}
+              isDisabled={isAccountViewOnly}
+            />
+          );
+        },
       },
     } satisfies Record<ActiveTWAPTableColumnKey, ColumnDef<ActiveTWAPOrderRow>>
   )[key],
@@ -178,6 +202,7 @@ export const ActiveTWAPTable = forwardRef(
     const stringGetter = useStringGetter();
     const activeTWAPOrders = useAppSelector(BonsaiCore.account.activeTwapOrders.data);
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
     const twapOrdersData: ActiveTWAPOrderRow[] = useMemo(
       () =>
@@ -203,6 +228,7 @@ export const ActiveTWAPTable = forwardRef(
               key,
               stringGetter,
               width: columnWidths?.[key],
+              isAccountViewOnly,
             })
           )}
           slotEmpty={
@@ -226,7 +252,3 @@ const $Table = styled(Table)`
   ${defaultTableMixins}
   --color-border: var(--color-layer-4);
 ` as typeof Table;
-
-const $TerminateButton = styled.button`
-  color: var(--color-negative);
-`;

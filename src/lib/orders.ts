@@ -73,6 +73,17 @@ export const isNewOrderStatusClearable = (status: OrderStatusNew) =>
 export const isNewOrderStatusCanceled = (status: OrderStatusNew) =>
   getSimpleOrderStatus(status) === OrderStatusNew.Canceled;
 
+export const getDerivedTwapOrderStatus = (
+  type: IndexerOrderType,
+  status: OrderStatusNew | undefined,
+  remainingSize: BigNumber | undefined
+): OrderStatusNew | undefined => {
+  if (type === IndexerOrderType.TWAP && status != null && status === OrderStatusNew.Filled) {
+    return remainingSize?.isGreaterThan(0) ? OrderStatusNew.PartiallyFilled : OrderStatusNew.Filled;
+  }
+  return status;
+};
+
 export const isMarketOrderTypeNew = (type?: IndexerOrderType) =>
   type &&
   [

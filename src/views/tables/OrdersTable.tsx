@@ -10,7 +10,7 @@ import tw from 'twin.macro';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useViewPanel } from '@/hooks/useSeen';
@@ -44,7 +44,12 @@ import { openDialog } from '@/state/dialogs';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
-import { getHydratedOrder, getOrderStatusInfoNew, isMarketOrderTypeNew } from '@/lib/orders';
+import {
+  getDerivedTwapOrderStatus,
+  getHydratedOrder,
+  getOrderStatusInfoNew,
+  isMarketOrderTypeNew,
+} from '@/lib/orders';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
@@ -115,12 +120,8 @@ const getOrdersTableColumnDef = ({
         getCellValue: (row) => row.status,
         label: stringGetter({ key: STRING_KEYS.STATUS }),
         renderCell: ({ status, type, remainingSize }) => {
-          const derivedStatus =
-            type === IndexerOrderType.TWAP
-              ? remainingSize?.isGreaterThan(0)
-                ? OrderStatus.PartiallyFilled
-                : OrderStatus.Filled
-              : status;
+          const derivedStatus = getDerivedTwapOrderStatus(type, status, remainingSize);
+          console.log('derived stats', status, derivedStatus);
           return (
             <TableCell>
               <WithTooltip
@@ -281,12 +282,7 @@ const getOrdersTableColumnDef = ({
           </TableColumnHeader>
         ),
         renderCell: ({ marketSummary, size, status, totalFilled, type, remainingSize }) => {
-          const derivedStatus =
-            type === IndexerOrderType.TWAP
-              ? remainingSize?.isGreaterThan(0)
-                ? OrderStatus.PartiallyFilled
-                : OrderStatus.Filled
-              : status;
+          const derivedStatus = getDerivedTwapOrderStatus(type, status, remainingSize);
           const { statusIconColor } = getOrderStatusInfoNew({
             status: derivedStatus ?? OrderStatus.Open,
           });
