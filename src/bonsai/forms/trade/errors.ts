@@ -37,6 +37,8 @@ import {
 
 export const MIN_TWAP_DURATION_MINUTES = 5;
 export const MAX_TWAP_DURATION_MINUTES = 24 * 60;
+export const MIN_TWAP_FREQUENCY_SECONDS = 30;
+export const MAX_TWAP_FREQUENCY_SECONDS = 3600;
 
 const marketOrderErrorSlippage = 0.1;
 const marketOrderWarningSlippage = 0.05;
@@ -301,13 +303,14 @@ function validateFieldsBasic(
     const frequency = AttemptNumber(state.frequencySeconds) ?? 0;
     const totalMinutes = getTotalDurationMinutes(state);
 
-    if (frequency <= 0) {
+    if (frequency < MIN_TWAP_FREQUENCY_SECONDS || frequency > MAX_TWAP_FREQUENCY_SECONDS) {
       errors.push(
         simpleValidationError({
           code: 'REQUIRED_TWAP_FREQUENCY',
           type: ErrorType.error,
           fields: ['duration.frequencySeconds'],
           titleKey: STRING_KEYS.FREQUENCY_REQUIRED,
+          textKey: STRING_KEYS.FREQUENCY_REQUIRED,
         })
       );
     }
@@ -318,7 +321,7 @@ function validateFieldsBasic(
           code: 'TWAP_DURATION_NOT_INTERVAL_OF_FREQUENCY',
           type: ErrorType.error,
           fields: ['duration.hours', 'duration.minutes'],
-          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          titleKey: STRING_KEYS.FREQUENCY_NOT_INTERVAL_OF_DURATION,
           textKey: STRING_KEYS.FREQUENCY_NOT_INTERVAL_OF_DURATION,
         })
       );
