@@ -38,8 +38,10 @@ type TradeBoxInputConfig = {
   value: string | number;
   decimals?: number;
   slotRight?: React.ReactNode;
-  sectionLabel?: string;
-  companionInput?: TradeBoxInputConfig;
+  section?: {
+    label: string;
+    companionInput?: TradeBoxInputConfig;
+  };
 };
 
 export const TradeFormInputs = () => {
@@ -149,16 +151,18 @@ export const TradeFormInputs = () => {
       },
       value: durationHours ?? '',
       decimals: INTEGER_DECIMALS,
-      sectionLabel: stringGetter({ key: STRING_KEYS.TWAP_RUNNING_TIME }),
-      companionInput: {
-        key: TradeBoxKeys.DurationMinutes,
-        inputType: InputType.Number,
-        label: stringGetter({ key: STRING_KEYS.MINUTES }),
-        onChange: ({ value }: NumberFormatValues) => {
-          dispatch(tradeFormActions.setDurationMinutes(value));
+      section: {
+        label: stringGetter({ key: STRING_KEYS.TWAP_RUNNING_TIME }),
+        companionInput: {
+          key: TradeBoxKeys.DurationMinutes,
+          inputType: InputType.Number,
+          label: stringGetter({ key: STRING_KEYS.MINUTES }),
+          onChange: ({ value }: NumberFormatValues) => {
+            dispatch(tradeFormActions.setDurationMinutes(value));
+          },
+          value: durationMinutes ?? '',
+          decimals: INTEGER_DECIMALS,
         },
-        value: durationMinutes ?? '',
-        decimals: INTEGER_DECIMALS,
       },
     });
   }
@@ -173,7 +177,9 @@ export const TradeFormInputs = () => {
       },
       value: frequencySeconds ?? '',
       decimals: INTEGER_DECIMALS,
-      sectionLabel: stringGetter({ key: STRING_KEYS.TWAP_FREQUENCY }),
+      section: {
+        label: stringGetter({ key: STRING_KEYS.TWAP_FREQUENCY }),
+      },
     });
   }
 
@@ -188,8 +194,7 @@ export const TradeFormInputs = () => {
       value,
       decimals,
       slotRight,
-      sectionLabel,
-      companionInput,
+      section,
     } = config;
 
     const primaryInput = (
@@ -207,27 +212,27 @@ export const TradeFormInputs = () => {
       />
     );
 
-    if (sectionLabel == null) {
+    if (section == null) {
       return primaryInput;
     }
 
     return (
       <$Section key={key}>
-        <$SectionLabel>{sectionLabel}</$SectionLabel>
-        {companionInput != null ? (
+        <$SectionLabel>{section.label}</$SectionLabel>
+        {section.companionInput != null ? (
           <$InputRow>
             {primaryInput}
             <FormInput
-              key={companionInput.key}
-              id={companionInput.key}
-              type={companionInput.inputType}
-              label={companionInput.label}
-              onChange={companionInput.onChange}
-              onInput={companionInput.onInput}
-              validationConfig={companionInput.validationConfig}
-              value={companionInput.value}
-              decimals={companionInput.decimals}
-              slotRight={companionInput.slotRight}
+              key={section.companionInput.key}
+              id={section.companionInput.key}
+              type={section.companionInput.inputType}
+              label={section.companionInput.label}
+              onChange={section.companionInput.onChange}
+              onInput={section.companionInput.onInput}
+              validationConfig={section.companionInput.validationConfig}
+              value={section.companionInput.value}
+              decimals={section.companionInput.decimals}
+              slotRight={section.companionInput.slotRight}
             />
           </$InputRow>
         ) : (
