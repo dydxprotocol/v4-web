@@ -280,8 +280,8 @@ function validateFieldsBasic(
           code: 'TWAP_DURATION_TOO_SHORT',
           type: ErrorType.error,
           fields: ['duration.hours', 'duration.minutes'],
-          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
-          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          titleKey: STRING_KEYS.DURATION_TOO_SHORT,
+          textKey: STRING_KEYS.DURATION_TOO_SHORT,
         })
       );
     } else if (totalMinutes > MAX_TWAP_DURATION_MINUTES) {
@@ -290,8 +290,8 @@ function validateFieldsBasic(
           code: 'TWAP_DURATION_TOO_LONG',
           type: ErrorType.error,
           fields: ['duration.hours', 'duration.minutes'],
-          titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
-          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          titleKey: STRING_KEYS.DURATION_TOO_LONG,
+          textKey: STRING_KEYS.DURATION_TOO_LONG,
         })
       );
     }
@@ -307,7 +307,7 @@ function validateFieldsBasic(
           code: 'REQUIRED_TWAP_FREQUENCY',
           type: ErrorType.error,
           fields: ['duration.frequencySeconds'],
-          titleKey: STRING_KEYS.ENTER_AMOUNT,
+          titleKey: STRING_KEYS.FREQUENCY_REQUIRED,
         })
       );
     }
@@ -319,7 +319,7 @@ function validateFieldsBasic(
           type: ErrorType.error,
           fields: ['duration.hours', 'duration.minutes'],
           titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
-          textKey: STRING_KEYS.MODIFY_GOOD_TIL,
+          textKey: STRING_KEYS.FREQUENCY_NOT_INTERVAL_OF_DURATION,
         })
       );
     }

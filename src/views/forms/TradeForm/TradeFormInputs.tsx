@@ -143,17 +143,17 @@ export const TradeFormInputs = () => {
     tradeFormInputs.push({
       key: TradeBoxKeys.DurationHours,
       inputType: InputType.Number,
-      label: 'Hour(s)',
+      label: stringGetter({ key: STRING_KEYS.HOURS }),
       onChange: ({ value }: NumberFormatValues) => {
         dispatch(tradeFormActions.setDurationHours(value));
       },
       value: durationHours ?? '',
       decimals: INTEGER_DECIMALS,
-      sectionLabel: 'Running Time (5m - 24h)',
+      sectionLabel: stringGetter({ key: STRING_KEYS.TWAP_RUNNING_TIME }),
       companionInput: {
         key: TradeBoxKeys.DurationMinutes,
         inputType: InputType.Number,
-        label: 'Minute(s)',
+        label: stringGetter({ key: STRING_KEYS.MINUTES }),
         onChange: ({ value }: NumberFormatValues) => {
           dispatch(tradeFormActions.setDurationMinutes(value));
         },
@@ -167,13 +167,13 @@ export const TradeFormInputs = () => {
     tradeFormInputs.push({
       key: TradeBoxKeys.FrequencySeconds,
       inputType: InputType.Number,
-      label: 'Seconds',
+      label: stringGetter({ key: STRING_KEYS.SECONDS }),
       onChange: ({ value }: NumberFormatValues) => {
         dispatch(tradeFormActions.setFrequencySeconds(value));
       },
       value: frequencySeconds ?? '',
       decimals: INTEGER_DECIMALS,
-      sectionLabel: 'Frequency',
+      sectionLabel: stringGetter({ key: STRING_KEYS.TWAP_FREQUENCY }),
     });
   }
 
@@ -207,7 +207,7 @@ export const TradeFormInputs = () => {
       />
     );
 
-    if (sectionLabel) {
+    if (sectionLabel == null) {
       return primaryInput;
     }
 
