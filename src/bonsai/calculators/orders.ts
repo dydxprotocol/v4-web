@@ -95,6 +95,8 @@ function calculateSubaccountOrder(
     return {
       ...order,
       status:
+        // HACK: For TWAP orders REST Endpoint will return FILLED so rely on remaingSize to determine status.
+        // Need to still respect status for the PARTIALLY_CANCELLED state so can't always use remainingSize
         order.status === OrderStatus.Filled && order.remainingSize?.gt(0)
           ? OrderStatus.PartiallyFilled
           : order.status,
@@ -300,7 +302,6 @@ function mergeTwapMainWithSuborder(
   }
   return {
     ...mainOrder,
-    status: suborder.status ?? mainOrder.status,
     totalFilled: suborder.totalFilled,
     updatedAt: suborder.updatedAt ?? mainOrder.updatedAt,
     updatedAtHeight: suborder.updatedAtHeight ?? mainOrder.updatedAtHeight,

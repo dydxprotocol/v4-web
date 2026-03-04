@@ -19,7 +19,7 @@ import {
 
 import { assertNever } from '@/lib/assertNever';
 import { mapIfPresent } from '@/lib/do';
-import { AttemptNumber } from '@/lib/numbers';
+import { AttemptNumber, MustNumber } from '@/lib/numbers';
 
 import { validateTriggerOrder } from '../triggers/errors';
 import { TriggerOrderState, TriggerPriceInputType } from '../triggers/types';
@@ -1190,8 +1190,9 @@ function validateBracketOrders(
 }
 
 function getTotalDurationMinutes(state: TradeForm): number {
-  const hours = AttemptNumber(state.durationHours) ?? 0;
-  const minutes = AttemptNumber(state.durationMinutes) ?? 0;
+  const hours = MustNumber(state.durationHours);
+  const minutes = MustNumber(state.durationMinutes);
+
   return hours * 60 + minutes;
 }
 

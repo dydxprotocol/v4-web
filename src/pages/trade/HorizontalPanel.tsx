@@ -391,7 +391,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       asChild: true,
       value: InfoSection.Twap,
       label: stringGetter({ key: STRING_KEYS.TWAP }),
-      slotRight: <Tag type={TagType.Number}>{shortenNumberForDisplay(numActiveTwapOrders)}</Tag>,
+      slotRight: numActiveTwapOrders > 0 && (
+        <Tag type={TagType.Number}>{shortenNumberForDisplay(numActiveTwapOrders)}</Tag>
+      ),
       content: <TWAPTable />,
     }),
     [numActiveTwapOrders, stringGetter]

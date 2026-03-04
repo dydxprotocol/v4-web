@@ -196,6 +196,8 @@ function accountWebsocketValueCreator(
                     ...(o.totalFilled != null ? { totalFilled: o.totalFilled } : {}),
                     ...(o.updatedAt != null ? { updatedAt: o.updatedAt } : {}),
                     ...(o.updatedAtHeight != null ? { updatedAtHeight: o.updatedAtHeight } : {}),
+                    // WS only return TWAP order on creation with status: OPEN, update it with the suborder status to get it off OPEN status
+                    ...(o.status != null ? { status: o.status } : {}),
                     subaccountNumber,
                   };
                 } else {
