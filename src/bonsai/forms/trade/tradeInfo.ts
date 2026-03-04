@@ -68,6 +68,7 @@ export function calculateTradeInfo(
 
   return calc((): TradeSummary => {
     switch (trade.type) {
+      case TradeFormType.TWAP:
       case TradeFormType.MARKET:
         return calc((): TradeSummary => {
           const calculatedMaxTrade = getMaxCrossMarketOrderSizeSummary(
@@ -267,76 +268,6 @@ export function calculateTradeInfo(
             reward: calculateTakerReward(
               usdcSize,
               totalFees,
-              accountData.rewardParams,
-              accountData.feeTiers
-            ),
-          };
-        });
-      case TradeFormType.TWAP:
-        // TWAP uses market order calculation as each suborder is a market order
-        return calc((): TradeSummary => {
-          const calculatedMaxTrade = getMaxCrossMarketOrderSizeSummary(
-            trade,
-            baseAccount,
-            accountData,
-            accountData.rawParentSubaccountData?.parentSubaccount ?? 0
-          );
-          const calculatedMaxUsdc = mapIfPresent(
-            calculatedMaxTrade?.usdcSize,
-            calculatedMaxTrade?.totalFees,
-            (a, b) => a + b
-          );
-
-          const calculated = calculateMarketOrder(
-            trade,
-            baseAccount,
-            accountData,
-            subaccountToUse,
-            calculatedMaxUsdc
-          );
-          const orderbookBase = accountData.currentTradeMarketOrderbook;
-
-          return {
-            inputSummary: calculated.summary ?? {
-              size: undefined,
-              averageFillPrice: undefined,
-              worstFillPrice: undefined,
-            },
-            subaccountNumber: subaccountToUse,
-            payloadPrice: mapIfPresent(calculated.marketOrder?.averagePrice, (price) => {
-              if (trade.side == null || trade.side === OrderSide.BUY) {
-                return price * (1 + MARKET_ORDER_MAX_SLIPPAGE);
-              }
-              return price * (1 - MARKET_ORDER_MAX_SLIPPAGE);
-            }),
-            slippage: calculateMarketOrderSlippage(
-              calculated.marketOrder?.worstPrice,
-              orderbookBase?.midPrice
-            ),
-            fee: calculated.marketOrder?.totalFees,
-            total: calculateOrderTotal(
-              calculated.marketOrder?.usdcSize,
-              calculated.marketOrder?.totalFees,
-              trade.side
-            ),
-            filled: calculated.marketOrder?.filled ?? false,
-            isPositionClosed: false,
-            indexSlippage: mapIfPresent(
-              calculated.marketOrder?.worstPrice,
-              AttemptNumber(accountData.currentTradeMarketSummary?.oraclePrice),
-              trade.side,
-              (worstPrice, oraclePrice, side) => {
-                return (
-                  (side === OrderSide.BUY ? worstPrice - oraclePrice : oraclePrice - worstPrice) /
-                  oraclePrice
-                );
-              }
-            ),
-            feeRate: accountData.userFeeStats.takerFeeRate ?? 0,
-            transferToSubaccountAmount: 0,
-            reward: calculateTakerReward(
-              calculated.marketOrder?.usdcSize,
-              calculated.marketOrder?.totalFees,
               accountData.rewardParams,
               accountData.feeTiers
             ),

@@ -18,6 +18,7 @@ import {
   calculateAllOrders,
   calculateOpenOrders,
   calculateOrderHistory,
+  isTWAPOrder,
 } from '../calculators/orders';
 import {
   calculateChildSubaccountSummaries,
@@ -30,12 +31,7 @@ import { calculateTransfers } from '../calculators/transfers';
 import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import {
-  isActiveTwapOrder,
-  isTWAPOrder,
-  SubaccountFillType,
-  SubaccountTransfer,
-} from '../types/summaryTypes';
+import { SubaccountFillType, SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawAccountStakingTierData,
@@ -174,7 +170,7 @@ export const selectTWAPOrders = createAppSelector([selectAccountOrders], (orders
 });
 
 export const selectActiveTWAPOrders = createAppSelector([selectTWAPOrders], (twapOrders) => {
-  return twapOrders.filter(isActiveTwapOrder);
+  return calculateOpenOrders(twapOrders);
 });
 
 export const selectTWAPOrderHistory = createAppSelector([selectTWAPOrders], (twapOrders) => {

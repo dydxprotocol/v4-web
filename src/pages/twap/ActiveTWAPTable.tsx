@@ -34,7 +34,6 @@ import { OrderActionsCell } from '@/views/tables/OrdersTable/OrderActionsCell';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
-import { getDerivedTwapOrderStatus } from '@/lib/orders';
 import { type Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 type ActiveTWAPOrderRow = {
@@ -131,7 +130,7 @@ const getActiveTWAPTableColumnDef = ({
             return <Output type={OutputType.Text} />;
 
           const elapsedRuntime = Date.now() - createdAtMilliseconds;
-          const fullRuntime = parseInt(duration, 10) * 60 * 1000;
+          const fullRuntime = parseInt(duration, 10) * 1000;
 
           return (
             <TableCell stacked>
@@ -176,17 +175,11 @@ const getActiveTWAPTableColumnDef = ({
         label: '',
         allowsSorting: false,
         isActionable: true,
-        renderCell: ({ id, type, status, orderFlags, remainingSize }) => {
-          const derivedStatus = getDerivedTwapOrderStatus(
-            type,
-            status ?? OrderStatus.Open,
-            remainingSize
-          );
-
+        renderCell: ({ id, status, orderFlags }) => {
           return (
             <OrderActionsCell
               orderId={id}
-              status={derivedStatus ?? OrderStatus.Open}
+              status={status ?? OrderStatus.Open}
               orderFlags={orderFlags}
               isDisabled={isAccountViewOnly}
             />

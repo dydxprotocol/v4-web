@@ -247,7 +247,6 @@ export class AccountTransactionSupervisor {
 
   private async executeCancelOrder(orderId: string, onConfirmed?: () => void) {
     const cancelPayload = this.createCancelOrderPayload(orderId);
-    console.log('cancelPayload', cancelPayload);
     const fnName = 'AccountTransactionSupervisor/executeCancelOrder';
 
     if (cancelPayload == null) {

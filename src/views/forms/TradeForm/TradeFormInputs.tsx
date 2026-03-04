@@ -207,35 +207,33 @@ export const TradeFormInputs = () => {
       />
     );
 
-    if (!sectionLabel) {
+    if (sectionLabel) {
       return primaryInput;
     }
 
-    const inputRow = companionInput ? (
-      <$DurationRow>
-        {primaryInput}
-        <FormInput
-          key={companionInput.key}
-          id={companionInput.key}
-          type={companionInput.inputType}
-          label={companionInput.label}
-          onChange={companionInput.onChange}
-          onInput={companionInput.onInput}
-          validationConfig={companionInput.validationConfig}
-          value={companionInput.value}
-          decimals={companionInput.decimals}
-          slotRight={companionInput.slotRight}
-        />
-      </$DurationRow>
-    ) : (
-      primaryInput
-    );
-
     return (
-      <$TwapSection key={key}>
+      <$Section key={key}>
         <$SectionLabel>{sectionLabel}</$SectionLabel>
-        {inputRow}
-      </$TwapSection>
+        {companionInput != null ? (
+          <$InputRow>
+            {primaryInput}
+            <FormInput
+              key={companionInput.key}
+              id={companionInput.key}
+              type={companionInput.inputType}
+              label={companionInput.label}
+              onChange={companionInput.onChange}
+              onInput={companionInput.onInput}
+              validationConfig={companionInput.validationConfig}
+              value={companionInput.value}
+              decimals={companionInput.decimals}
+              slotRight={companionInput.slotRight}
+            />
+          </$InputRow>
+        ) : (
+          primaryInput
+        )}
+      </$Section>
     );
   });
 };
@@ -244,7 +242,7 @@ const $MidPriceButton = styled(Button)`
   ${formMixins.inputInnerButton}
 `;
 
-const $TwapSection = styled.div`
+const $Section = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.5rem;
 `;
@@ -254,7 +252,7 @@ const $SectionLabel = styled.div`
   color: var(--color-text-0);
 `;
 
-const $DurationRow = styled.div`
+const $InputRow = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: var(--form-input-gap);
 `;

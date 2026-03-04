@@ -106,9 +106,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
   ).length;
 
-  const numActiveTwapOrders = (
-    useAppSelector(BonsaiCore.account.activeTwapOrders.data) ?? EMPTY_ARR
-  ).length;
+  const numActiveTwapOrders = useAppSelector(BonsaiCore.account.activeTwapOrders.data).length;
   const twapTagNumber = shortenNumberForDisplay(numActiveTwapOrders);
 
   const numUnseenFills = useAppSelectorWithArgs(
@@ -394,9 +392,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       asChild: true,
       value: InfoSection.Twap,
       label: stringGetter({ key: STRING_KEYS.TWAP }),
-      slotRight: twapTagNumber && (
-        <Tag type={TagType.Number}>{twapTagNumber}</Tag>
-      ),
+      slotRight: twapTagNumber && <Tag type={TagType.Number}>{twapTagNumber}</Tag>,
       content: <TWAPTable />,
     }),
     [stringGetter, twapTagNumber]

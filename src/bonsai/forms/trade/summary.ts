@@ -52,6 +52,8 @@ import {
   TradeSummary,
 } from './types';
 
+const TWAP_DEFAULT_PPM = 10_000;
+
 export function calculateTradeSummary(
   state: TradeForm,
   accountData: TradeFormInputData
@@ -249,17 +251,14 @@ export function calculateTradeSummary(
             }
             const durationHours = AttemptNumber(effectiveTrade.durationHours) ?? 0;
             const durationMinutes = AttemptNumber(effectiveTrade.durationMinutes) ?? 0;
-            const duration = (durationHours * 60 + durationMinutes) * 60;
-            const interval = AttemptNumber(effectiveTrade.frequencySeconds) ?? 0;
-            if (duration <= 0 || interval <= 0) {
-              return undefined;
-            }
-            return { duration, interval, priceTolerance: 10_000 }; // priceTolerance is in ppm, so this allows for 1% price movement before skipping a TWAP slice
+            const durationSeconds = (durationHours * 60 + durationMinutes) * 60;
+            const interval = AttemptNumber(effectiveTrade.frequencySeconds) ?? 30;
+
+            return { duration: durationSeconds, interval, priceTolerance: TWAP_DEFAULT_PPM }; // priceTolerance is in ppm, so this allows for 1% price movement before skipping a TWAP slice
           }),
         };
       }
     );
-    return undefined;
   });
 
   const triggersData = mapIfPresent(

@@ -21,7 +21,6 @@ import {
 
 import { ToPrimitives } from '@/lib/parseToPrimitives';
 
-import { getSimpleOrderStatus } from '../lib/subaccountUtils';
 import type { SubaccountPnlTick } from '../rest/historicalPnl';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
@@ -197,28 +196,6 @@ export type TWAPSubaccountOrder = SubaccountOrder & {
   interval: string | undefined;
   priceTolerance: string | undefined;
 };
-
-export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
-  return order.orderFlags === OrderFlags.TWAP;
-}
-
-export function isActiveTwapOrder(order: SubaccountOrder): boolean {
-  if (
-    !isTWAPOrder(order) ||
-    order.status == null ||
-    order.remainingSize == null ||
-    !order.remainingSize.gt(0) ||
-    getSimpleOrderStatus(order.status) !== OrderStatus.Open
-  ) {
-    return false;
-  }
-  return true;
-  // const { createdAtMilliseconds, duration } = order;
-  // if (createdAtMilliseconds == null || duration == null) return false;
-  // const now = Date.now();
-  // const endTime = createdAtMilliseconds + parseInt(duration, 10) * 60 * 1000;
-  // return now >= createdAtMilliseconds && now <= endTime;
-}
 
 export enum SubaccountFillType {
   LIMIT = 'LIMIT',

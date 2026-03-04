@@ -17,8 +17,6 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../types/rawTypes';
 import {
-  isActiveTwapOrder,
-  isTWAPOrder,
   OrderFlags,
   OrderStatus,
   SubaccountOrder,
@@ -96,6 +94,10 @@ function calculateSubaccountOrder(
   if (isTWAPOrder(order)) {
     return {
       ...order,
+      status:
+        order.status === OrderStatus.Filled && order.remainingSize?.gt(0)
+          ? OrderStatus.PartiallyFilled
+          : order.status,
       type: IndexerOrderType.TWAP,
       orderFlags: OrderFlags.TWAP,
       duration: base.duration ?? undefined,
@@ -124,6 +126,27 @@ function getOrderType(
     }
   }
   return type;
+}
+
+export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
+  return order.orderFlags === OrderFlags.TWAP;
+}
+
+export function isActiveTwapOrder(order: SubaccountOrder): boolean {
+  // ADD THIS BACK IN ONCE CREATED AT MILLISECONDS BECOMES LIVE
+  // const { createdAtMilliseconds, duration } = order;
+  // if (createdAtMilliseconds == null || duration == null) return false;
+  // const now = Date.now();
+  // const endTime = createdAtMilliseconds + parseInt(duration, 10) * 60 * 1000;
+  // return now >= createdAtMilliseconds && now <= endTime;
+
+  return (
+    isTWAPOrder(order) &&
+    order.remainingSize != null &&
+    order.remainingSize.gt(0) &&
+    order.status != null &&
+    getSimpleOrderStatus(order.status) === OrderStatus.Open
+  );
 }
 
 export function getSimpleOrderStatus(status: OrderStatus) {
@@ -268,8 +291,6 @@ function mergeTwapMainWithSuborder(
   mainOrder: IndexerCompositeOrderObject,
   suborder: IndexerCompositeOrderObject
 ): IndexerCompositeOrderObject {
-  console.log('mainOrder', mainOrder);
-  console.log('suborder', suborder);
   const mainHeight = MustBigNumber(
     mainOrder.updatedAtHeight ?? mainOrder.createdAtHeight
   ).toNumber();
@@ -287,12 +308,6 @@ function mergeTwapMainWithSuborder(
 }
 
 function calculateMergedOrders(liveData: OrdersData, restData: OrdersData) {
-  console.log(
-    'restData',
-    Object.values(restData).sort((a, b) =>
-      MustBigNumber(b.createdAtHeight).minus(MustBigNumber(a.createdAtHeight)).toNumber()
-    )
-  );
   return mergeObjects(liveData, restData, (a, b) => {
     if (a.orderFlags === OrderFlags.TWAP && b.orderFlags === OrderFlags.TWAP_SUBORDER)
       return mergeTwapMainWithSuborder(a, b);

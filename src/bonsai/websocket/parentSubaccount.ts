@@ -82,18 +82,6 @@ function accountWebsocketValueCreator(
             orders: keyBy(message.orders, (o) => o.id),
           },
         };
-        const sortedBaseOrders = [...message.orders].sort((a, b) => {
-          const aTime = new Date(a.updatedAt ?? a.createdAt ?? 0).getTime();
-          const bTime = new Date(b.updatedAt ?? b.createdAt ?? 0).getTime();
-          return bTime - aTime;
-        });
-        // eslint-disable-next-line no-console
-        console.log(
-          '[WS base orders] received',
-          sortedBaseOrders.length,
-          'orders',
-          sortedBaseOrders
-        );
         if (result.childSubaccounts[parentSubaccountNumber] == null) {
           result.childSubaccounts[parentSubaccountNumber] = freshChildSubaccount({
             address,
@@ -103,8 +91,6 @@ function accountWebsocketValueCreator(
         return loadableLoaded(result);
       },
       handleUpdates: (baseUpdates, value, fullMessage) => {
-        console.log('baseUpdates', baseUpdates);
-        console.log('value', value);
         const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
         if (value.data == null) {
@@ -204,8 +190,7 @@ function accountWebsocketValueCreator(
                     subaccountNumber,
                   };
                 } else if (o.orderFlags === '256' && previousOrder.orderFlags === '128') {
-                  // TWAP suborders share the same id as the parent but must not overwrite it.
-                  // Only forward fill-progress fields so the parent order type is preserved.
+                  // TWAP suborders share the same id as the parent but must not overwrite it just update it
                   allOrders[o.id] = {
                     ...(allOrders[o.id] as IndexerOrderResponseObject),
                     ...(o.totalFilled != null ? { totalFilled: o.totalFilled } : {}),
