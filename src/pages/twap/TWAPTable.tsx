@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
+
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -16,7 +18,7 @@ export enum TwapTableTab {
   Fills = 'Fills',
 }
 
-export const TWAPTable: React.FC = () => {
+export const TWAPTable = forwardRef((_props, _ref) => {
   const [tab, setTab] = useState<TwapTableTab>(TwapTableTab.Active);
   const stringGetter = useStringGetter();
 
@@ -80,7 +82,7 @@ export const TWAPTable: React.FC = () => {
   );
 
   return (
-    <Tabs
+    <$Tabs
       value={tab}
       onValueChange={setTab}
       items={tabItems}
@@ -88,4 +90,8 @@ export const TWAPTable: React.FC = () => {
       dividerStyle="underline"
     />
   );
-};
+});
+
+const $Tabs = styled(Tabs)`
+  --color-border: var(--color-layer-4);
+` as typeof Tabs;

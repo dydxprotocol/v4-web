@@ -16,24 +16,35 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../types/rawTypes';
-import { OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+import {
+  OrderFlags,
+  OrderStatus,
+  SubaccountOrder,
+  TWAPSubaccountOrder,
+} from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
 
 export function calculateOpenOrders<T extends SubaccountOrder>(orders: T[]): T[] {
   return orders.filter(
-    (order) => order.status == null || getSimpleOrderStatus(order.status) === OrderStatus.Open
+    (order) =>
+      order.status == null ||
+      getSimpleOrderStatus(order.status) === OrderStatus.Open ||
+      isActiveTwapOrder(order)
   );
 }
 
 export function calculateOrderHistory<T extends SubaccountOrder>(orders: T[]): T[] {
   return orders.filter(
-    (order) => order.status != null && getSimpleOrderStatus(order.status) !== OrderStatus.Open
+    (order) =>
+      order.status != null &&
+      getSimpleOrderStatus(order.status) !== OrderStatus.Open &&
+      !isActiveTwapOrder(order)
   );
 }
 
 export function calculateAllOrders(
-  liveOrders: OrdersData | undefined,
   restOrders: OrdersData | undefined,
+  liveOrders: OrdersData | undefined,
   height: HeightResponse
 ): SubaccountOrder[] {
   const actuallyMerged = calculateMergedOrders(liveOrders ?? {}, restOrders ?? {});
@@ -44,12 +55,13 @@ export function calculateAllOrders(
 function calculateSubaccountOrder(
   base: IndexerCompositeOrderObject,
   protocolHeight: HeightResponse
-): SubaccountOrder {
+): SubaccountOrder | TWAPSubaccountOrder {
   let order: SubaccountOrder = {
     marketId: base.ticker,
     status: calculateBaseOrderStatus(base, protocolHeight),
     displayId: getDisplayableTickerFromMarket(base.ticker),
     expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).getTime()),
+    createdAtMilliseconds: mapIfPresent(base.createdAt, (u) => new Date(u).getTime()),
     updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).getTime()),
     updatedAtHeight: MaybeBigNumber(base.updatedAtHeight)?.toNumber(),
     marginMode: base.subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? 'ISOLATED' : 'CROSS',
@@ -78,6 +90,24 @@ function calculateSubaccountOrder(
     removalReason: base.removalReason,
   };
   order = maybeUpdateOrderIfExpired(order, protocolHeight);
+
+  if (isTWAPOrder(order)) {
+    return {
+      ...order,
+      status:
+        // HACK: For TWAP orders REST Endpoint will return FILLED so rely on remaingSize to determine status.
+        // Need to still respect status for the PARTIALLY_CANCELLED state so can't always use remainingSize
+        order.status === OrderStatus.Filled && order.remainingSize?.gt(0)
+          ? OrderStatus.PartiallyFilled
+          : order.status,
+      type: IndexerOrderType.TWAP,
+      orderFlags: OrderFlags.TWAP,
+      duration: base.duration ?? undefined,
+      interval: base.interval ?? undefined,
+      priceTolerance: base.priceTolerance ?? undefined,
+    };
+  }
+
   return order;
 }
 
@@ -98,6 +128,27 @@ function getOrderType(
     }
   }
   return type;
+}
+
+export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
+  return order.orderFlags === OrderFlags.TWAP;
+}
+
+export function isActiveTwapOrder(order: SubaccountOrder): boolean {
+  // ADD THIS BACK IN ONCE CREATED AT MILLISECONDS BECOMES LIVE
+  // const { createdAtMilliseconds, duration } = order;
+  // if (createdAtMilliseconds == null || duration == null) return false;
+  // const now = Date.now();
+  // const endTime = createdAtMilliseconds + parseInt(duration, 10) * 60 * 1000;
+  // return now >= createdAtMilliseconds && now <= endTime;
+
+  return (
+    isTWAPOrder(order) &&
+    order.remainingSize != null &&
+    order.remainingSize.gt(0) &&
+    order.status != null &&
+    getSimpleOrderStatus(order.status) === OrderStatus.Open
+  );
 }
 
 export function getSimpleOrderStatus(status: OrderStatus) {
@@ -238,11 +289,32 @@ function calculateBaseOrderStatus(
   }
 }
 
+function mergeTwapMainWithSuborder(
+  mainOrder: IndexerCompositeOrderObject,
+  suborder: IndexerCompositeOrderObject
+): IndexerCompositeOrderObject {
+  const mainHeight = MustBigNumber(
+    mainOrder.updatedAtHeight ?? mainOrder.createdAtHeight
+  ).toNumber();
+  const subHeight = MustBigNumber(suborder.updatedAtHeight ?? suborder.createdAtHeight).toNumber();
+  if (subHeight <= mainHeight) {
+    return mainOrder;
+  }
+  return {
+    ...mainOrder,
+    totalFilled: suborder.totalFilled,
+    updatedAt: suborder.updatedAt ?? mainOrder.updatedAt,
+    updatedAtHeight: suborder.updatedAtHeight ?? mainOrder.updatedAtHeight,
+  };
+}
+
 function calculateMergedOrders(liveData: OrdersData, restData: OrdersData) {
-  return mergeObjects(
-    liveData,
-    restData,
-    (a, b) =>
-      maxBy([a, b], (o) => MustBigNumber(o.updatedAtHeight ?? o.createdAtHeight).toNumber())!
-  );
+  return mergeObjects(liveData, restData, (a, b) => {
+    if (a.orderFlags === OrderFlags.TWAP && b.orderFlags === OrderFlags.TWAP_SUBORDER)
+      return mergeTwapMainWithSuborder(a, b);
+    if (b.orderFlags === OrderFlags.TWAP && a.orderFlags === OrderFlags.TWAP_SUBORDER)
+      return mergeTwapMainWithSuborder(b, a);
+
+    return maxBy([a, b], (o) => MustBigNumber(o.updatedAtHeight ?? o.createdAtHeight).toNumber())!;
+  });
 }

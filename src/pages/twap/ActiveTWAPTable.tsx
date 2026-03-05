@@ -1,7 +1,11 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type PerpetualMarketSummary, type TWAPSubaccountOrder } from '@/bonsai/types/summaryTypes';
+import {
+  OrderStatus,
+  type PerpetualMarketSummary,
+  type TWAPSubaccountOrder,
+} from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
@@ -25,7 +29,9 @@ import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
+import { OrderActionsCell } from '@/views/tables/OrdersTable/OrderActionsCell';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 import { type Nullable, orEmptyRecord } from '@/lib/typeUtils';
@@ -57,10 +63,12 @@ const getActiveTWAPTableColumnDef = ({
   key,
   stringGetter,
   width,
+  isAccountViewOnly,
 }: {
   key: ActiveTWAPTableColumnKey;
   stringGetter: ReturnType<typeof useStringGetter>;
   width?: ColumnSize;
+  isAccountViewOnly: boolean;
 }): ColumnDef<ActiveTWAPOrderRow> => ({
   width,
   ...(
@@ -87,8 +95,14 @@ const getActiveTWAPTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.AMOUNT_FILLED }),
         allowsSorting: true,
         renderCell: ({ totalFilled, size, stepSizeDecimals }) => (
-          <TableCell stacked>
-            <Output type={OutputType.Asset} value={totalFilled} fractionDigits={stepSizeDecimals} />
+          <TableCell>
+            <Output
+              tw="text-color-positive"
+              type={OutputType.Asset}
+              value={totalFilled}
+              fractionDigits={stepSizeDecimals}
+            />
+            <span tw="text-color-text-0">/</span>
             <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
           </TableCell>
         ),
@@ -111,11 +125,11 @@ const getActiveTWAPTableColumnDef = ({
         columnKey: 'runtime',
         label: stringGetter({ key: STRING_KEYS.RUNTIME_TOTAL }),
         allowsSorting: false,
-        renderCell: ({ updatedAtMilliseconds, duration }) => {
-          if (updatedAtMilliseconds == null || duration == null)
+        renderCell: ({ createdAtMilliseconds, duration }) => {
+          if (createdAtMilliseconds == null || duration == null)
             return <Output type={OutputType.Text} />;
 
-          const elapsedRuntime = Date.now() - updatedAtMilliseconds;
+          const elapsedRuntime = Date.now() - createdAtMilliseconds;
           const fullRuntime = parseInt(duration, 10) * 1000;
 
           return (
@@ -161,7 +175,16 @@ const getActiveTWAPTableColumnDef = ({
         label: '',
         allowsSorting: false,
         isActionable: true,
-        renderCell: () => <$TerminateButton>Terminate</$TerminateButton>,
+        renderCell: ({ id, status, orderFlags }) => {
+          return (
+            <OrderActionsCell
+              orderId={id}
+              status={status ?? OrderStatus.Open}
+              orderFlags={orderFlags}
+              isDisabled={isAccountViewOnly}
+            />
+          );
+        },
       },
     } satisfies Record<ActiveTWAPTableColumnKey, ColumnDef<ActiveTWAPOrderRow>>
   )[key],
@@ -172,6 +195,7 @@ export const ActiveTWAPTable = forwardRef(
     const stringGetter = useStringGetter();
     const activeTWAPOrders = useAppSelector(BonsaiCore.account.activeTwapOrders.data);
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
     const twapOrdersData: ActiveTWAPOrderRow[] = useMemo(
       () =>
@@ -197,6 +221,7 @@ export const ActiveTWAPTable = forwardRef(
               key,
               stringGetter,
               width: columnWidths?.[key],
+              isAccountViewOnly,
             })
           )}
           slotEmpty={
@@ -218,8 +243,5 @@ export const ActiveTWAPTable = forwardRef(
 
 const $Table = styled(Table)`
   ${defaultTableMixins}
+  --color-border: var(--color-layer-4);
 ` as typeof Table;
-
-const $TerminateButton = styled.button`
-  color: var(--color-negative);
-`;

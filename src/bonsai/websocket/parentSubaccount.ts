@@ -189,6 +189,17 @@ function accountWebsocketValueCreator(
                     ...(o as IndexerOrderResponseObject),
                     subaccountNumber,
                   };
+                } else if (o.orderFlags === '256' && previousOrder.orderFlags === '128') {
+                  // TWAP suborders share the same id as the parent but must not overwrite it just update it
+                  allOrders[o.id] = {
+                    ...(allOrders[o.id] as IndexerOrderResponseObject),
+                    ...(o.totalFilled != null ? { totalFilled: o.totalFilled } : {}),
+                    ...(o.updatedAt != null ? { updatedAt: o.updatedAt } : {}),
+                    ...(o.updatedAtHeight != null ? { updatedAtHeight: o.updatedAtHeight } : {}),
+                    // WS only return TWAP order on creation with status: OPEN, update it with the suborder status to get it off OPEN status
+                    ...(o.status != null ? { status: o.status } : {}),
+                    subaccountNumber,
+                  };
                 } else {
                   allOrders[o.id] = {
                     ...(allOrders[o.id] as IndexerOrderResponseObject),

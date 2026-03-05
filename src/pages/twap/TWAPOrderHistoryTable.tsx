@@ -94,8 +94,14 @@ const getTWAPOrderHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.AMOUNT_FILLED }),
         allowsSorting: true,
         renderCell: ({ totalFilled, size, stepSizeDecimals }) => (
-          <TableCell stacked>
-            <Output type={OutputType.Asset} value={totalFilled} fractionDigits={stepSizeDecimals} />
+          <TableCell>
+            <Output
+              tw="text-color-positive"
+              type={OutputType.Asset}
+              value={totalFilled}
+              fractionDigits={stepSizeDecimals}
+            />
+            <span tw="text-color-text-0">/</span>
             <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
           </TableCell>
         ),
@@ -208,4 +214,5 @@ export const TWAPOrderHistoryTable = forwardRef(
 
 const $Table = styled(Table)`
   ${defaultTableMixins}
+  --color-border: var(--color-layer-3);
 ` as typeof Table;

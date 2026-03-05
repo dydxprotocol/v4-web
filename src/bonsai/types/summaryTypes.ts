@@ -180,6 +180,7 @@ export type SubaccountOrder = {
   goodTilBlockTimeSeconds: number | undefined;
   createdAtHeight: number | undefined;
   expiresAtMilliseconds: number | undefined;
+  createdAtMilliseconds: number | undefined;
   updatedAtMilliseconds: number | undefined;
   updatedAtHeight: number | undefined;
   postOnly: boolean;
@@ -195,10 +196,6 @@ export type TWAPSubaccountOrder = SubaccountOrder & {
   interval: string | undefined;
   priceTolerance: string | undefined;
 };
-
-export function isTWAPOrder(order: SubaccountOrder): order is TWAPSubaccountOrder {
-  return order.orderFlags === OrderFlags.TWAP && order.type === IndexerOrderType.TWAP;
-}
 
 export enum SubaccountFillType {
   LIMIT = 'LIMIT',

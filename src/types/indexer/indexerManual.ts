@@ -52,6 +52,7 @@ export interface IndexerCompositeOrderObject {
   status?: IndexerAPIOrderStatus;
   postOnly?: boolean;
   ticker: string;
+  createdAt?: IndexerIsoString | null;
   updatedAt?: IndexerIsoString | null;
   updatedAtHeight?: string | null;
   subaccountNumber: number;

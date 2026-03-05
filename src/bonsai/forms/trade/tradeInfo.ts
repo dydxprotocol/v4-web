@@ -68,6 +68,7 @@ export function calculateTradeInfo(
 
   return calc((): TradeSummary => {
     switch (trade.type) {
+      case TradeFormType.TWAP:
       case TradeFormType.MARKET:
         return calc((): TradeSummary => {
           const calculatedMaxTrade = getMaxCrossMarketOrderSizeSummary(
@@ -1049,6 +1050,7 @@ function calculateIsolatedMarginTransferAmount(
 
   const estOraclePriceAtExecution = calc(() => {
     switch (trade.type) {
+      case TradeFormType.TWAP:
       case TradeFormType.MARKET:
         return oraclePrice;
       case TradeFormType.LIMIT:

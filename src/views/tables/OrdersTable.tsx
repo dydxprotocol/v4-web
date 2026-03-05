@@ -275,7 +275,9 @@ const getOrdersTableColumnDef = ({
           </TableColumnHeader>
         ),
         renderCell: ({ marketSummary, size, status, totalFilled }) => {
-          const { statusIconColor } = getOrderStatusInfoNew({ status: status ?? OrderStatus.Open });
+          const { statusIconColor } = getOrderStatusInfoNew({
+            status: status ?? OrderStatus.Open,
+          });
 
           return (
             <TableCell
