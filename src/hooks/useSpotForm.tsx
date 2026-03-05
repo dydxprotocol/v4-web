@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { randomUUID } from 'crypto';
 
 import { ComplianceStates } from '@/constants/compliance';
 
@@ -89,10 +90,10 @@ export function useSpotForm() {
     [dispatch, formSummary.summary.amounts]
   );
 
-  const submitTransaction = useCallback(() => {
-    const tradeId = `spot-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  const submitTransaction = useCallback(async () => {
     const side = formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL;
     const tokenSymbol = tokenMetadata?.symbol ?? '';
+    const tradeId = `spot-${Date.now()}-${side}-${tokenSymbol}-${formSummary.summary.payload?.pool ?? randomUUID()}`;
 
     dispatch(
       addSpotTrade({
@@ -124,43 +125,41 @@ export function useSpotForm() {
       exact: false,
     });
 
-    mutationPromise
-      .then((result) => {
-        const { landResponse } = result;
+    try {
+      const { landResponse } = await mutationPromise;
 
-        const formattedTokenAmount = formatNumberOutput(
-          landResponse.tokenChange,
-          OutputType.Asset,
-          { decimalSeparator, groupSeparator, selectedLocale }
-        );
-        const formattedSolAmount = formatNumberOutput(landResponse.solChange, OutputType.Asset, {
-          decimalSeparator,
-          groupSeparator,
-          selectedLocale,
-        });
-
-        dispatch(
-          updateSpotTrade({
-            trade: {
-              id: tradeId,
-              tokenAmount: formattedTokenAmount,
-              solAmount: formattedSolAmount,
-              txHash: landResponse.txHash,
-              status: 'success',
-            },
-          })
-        );
-      })
-      .catch(() => {
-        dispatch(
-          updateSpotTrade({
-            trade: {
-              id: tradeId,
-              status: 'error',
-            },
-          })
-        );
+      const formattedTokenAmount = formatNumberOutput(landResponse.tokenChange, OutputType.Asset, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
       });
+      const formattedSolAmount = formatNumberOutput(landResponse.solChange, OutputType.Asset, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      });
+
+      dispatch(
+        updateSpotTrade({
+          trade: {
+            id: tradeId,
+            tokenAmount: formattedTokenAmount,
+            solAmount: formattedSolAmount,
+            txHash: landResponse.txHash,
+            status: 'success',
+          },
+        })
+      );
+    } catch {
+      dispatch(
+        updateSpotTrade({
+          trade: {
+            id: tradeId,
+            status: 'error',
+          },
+        })
+      );
+    }
   }, [
     formSummary.state.side,
     formSummary.summary.payload,
