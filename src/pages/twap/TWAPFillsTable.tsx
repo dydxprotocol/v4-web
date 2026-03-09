@@ -1,7 +1,7 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type PerpetualMarketSummary, type SubaccountFill } from '@/bonsai/types/summaryTypes';
+import { StablePerpetualMarketSummary, type SubaccountFill } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
@@ -14,7 +14,7 @@ import { defaultTableMixins } from '@/styles/tableMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { type ColumnDef, Table } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
 import {
   DateAgeModeProvider,
   DateAgeOutput,
@@ -29,10 +29,10 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedFill } from '@/lib/orders';
-import { type Nullable, orEmptyRecord } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 type TWAPFillRow = {
-  marketSummary: Nullable<PerpetualMarketSummary>;
+  marketSummary: StablePerpetualMarketSummary | undefined;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 } & SubaccountFill;
