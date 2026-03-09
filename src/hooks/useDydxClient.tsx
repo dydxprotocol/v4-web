@@ -361,14 +361,12 @@ const useDydxClientContext = () => {
     const candlesInRange: Candle[] = [];
 
     while (candlesInRange.length < countBack) {
-      const remaining = countBack - candlesInRange.length;
       // eslint-disable-next-line no-await-in-loop
       const candles = await requestCandles({
         marketId,
         resolution,
         fromIso,
         toIso,
-        limit: remaining,
       });
 
       if (!candles || candles.length === 0) {
