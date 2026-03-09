@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -32,6 +32,7 @@ import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
 import { FundingHistoryList } from '@/views/Lists/Transfers/FundingHistoryList';
 import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
+import { TradeHistoryTable, TradeHistoryTableColumnKey } from '@/views/tables/TradeHistoryTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
@@ -82,6 +83,14 @@ const PortfolioPage = () => {
 
   const usdcBalance = freeCollateral ?? 0;
 
+  const isErrorTradeHistory = useAppSelector(BonsaiCore.account.tradeHistory.loading) === 'error';
+  const tradeHistory = useAppSelector(BonsaiCore.account.tradeHistory.data);
+
+  const showFills = useMemo(
+    () => isErrorTradeHistory || tradeHistory.length === 0,
+    [isErrorTradeHistory, tradeHistory]
+  );
+
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
   const routesComponent = isSimpleUi ? (
@@ -113,30 +122,60 @@ const PortfolioPage = () => {
           <Route
             path={HistoryRoute.Trades}
             element={
-              <FillsTable
-                initialPageSize={initialPageSize}
-                columnKeys={
-                  isTablet
-                    ? [
-                        FillsTableColumnKey.Time,
-                        FillsTableColumnKey.TypeAmount,
-                        FillsTableColumnKey.PriceFee,
-                      ]
-                    : [
-                        FillsTableColumnKey.Market,
-                        FillsTableColumnKey.Time,
-                        FillsTableColumnKey.Type,
-                        FillsTableColumnKey.Side,
-                        FillsTableColumnKey.AmountTag,
-                        FillsTableColumnKey.Price,
-                        FillsTableColumnKey.Total,
-                        FillsTableColumnKey.Fee,
-                        FillsTableColumnKey.ClosedPnl,
-                        FillsTableColumnKey.Liquidity,
-                      ]
-                }
-                withOuterBorder={isNotTablet}
-              />
+              showFills ? (
+                <FillsTable
+                  initialPageSize={initialPageSize}
+                  columnKeys={
+                    isTablet
+                      ? [
+                          FillsTableColumnKey.Time,
+                          FillsTableColumnKey.TypeAmount,
+                          FillsTableColumnKey.PriceFee,
+                        ]
+                      : [
+                          FillsTableColumnKey.Market,
+                          FillsTableColumnKey.Time,
+                          FillsTableColumnKey.Type,
+                          FillsTableColumnKey.Side,
+                          FillsTableColumnKey.AmountTag,
+                          FillsTableColumnKey.Price,
+                          FillsTableColumnKey.Total,
+                          FillsTableColumnKey.Fee,
+                          FillsTableColumnKey.ClosedPnl,
+                          FillsTableColumnKey.Liquidity,
+                        ]
+                  }
+                  withOuterBorder={isNotTablet}
+                />
+              ) : (
+                <TradeHistoryTable
+                  initialPageSize={initialPageSize}
+                  columnKeys={
+                    isTablet
+                      ? [
+                          TradeHistoryTableColumnKey.Time,
+                          TradeHistoryTableColumnKey.Market,
+                          TradeHistoryTableColumnKey.Action,
+                          TradeHistoryTableColumnKey.Size,
+                          TradeHistoryTableColumnKey.Value,
+                          TradeHistoryTableColumnKey.ClosedPnl,
+                        ]
+                      : [
+                          TradeHistoryTableColumnKey.Market,
+                          TradeHistoryTableColumnKey.Type,
+                          TradeHistoryTableColumnKey.Action,
+                          TradeHistoryTableColumnKey.Price,
+                          TradeHistoryTableColumnKey.Size,
+                          TradeHistoryTableColumnKey.Value,
+                          TradeHistoryTableColumnKey.Fee,
+                          TradeHistoryTableColumnKey.ClosedPnl,
+                          TradeHistoryTableColumnKey.Time,
+                          TradeHistoryTableColumnKey.Actions,
+                        ]
+                  }
+                  withOuterBorder={isNotTablet}
+                />
+              )
             }
           />
           <Route

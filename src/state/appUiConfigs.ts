@@ -48,6 +48,7 @@ export enum AppColorMode {
 
 export enum OtherPreference {
   DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
+  EnableChat = 'EnableChat',
   GasToken = 'GasToken',
   ReverseLayout = 'ReverseLayout',
 }
@@ -65,6 +66,7 @@ export interface AppUIConfigsState {
   spotQuickOptions: SpotQuickOptions;
   horizontalPanelHeightPx: number;
   tablePageSizes: { [tableKey: string]: number };
+  isChatEnabled: boolean;
   simpleUI: {
     sortMarketsBy: MarketsSortType;
     sortPositionsBy: PositionSortType;
@@ -83,6 +85,7 @@ export const initialState: AppUIConfigsState = {
   spotQuickOptions: DEFAULT_SPOT_QUICK_OPTIONS,
   horizontalPanelHeightPx: 288,
   tablePageSizes: {},
+  isChatEnabled: true,
   simpleUI: {
     sortMarketsBy: MarketsSortType.MarketCap,
     sortPositionsBy: PositionSortType.Pnl,
@@ -98,6 +101,9 @@ export const appUiConfigsSlice = createSlice({
       { payload }: PayloadAction<boolean>
     ) => {
       state.defaultToAllMarketsInPositionsOrdersFills = payload;
+    },
+    setIsChatEnabled: (state: AppUIConfigsState, { payload }: PayloadAction<boolean>) => {
+      state.isChatEnabled = payload;
     },
     setAppThemeSetting: (state: AppUIConfigsState, { payload }: PayloadAction<AppThemeSetting>) => {
       state.appThemeSetting = payload;
@@ -201,6 +207,7 @@ export const appUiConfigsSlice = createSlice({
 
 export const {
   setDefaultToAllMarketsInPositionsOrdersFills,
+  setIsChatEnabled,
   setAppThemeSetting,
   setAppColorMode,
   markLaunchIncentivesSeen,

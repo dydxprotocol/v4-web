@@ -1,76 +1,43 @@
 import { logBonsaiError } from '@/bonsai/logs';
 import { useQuery } from '@tanstack/react-query';
 
+import { SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { timeUnits } from '@/constants/time';
-import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 
-import { getOpenPositions } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-
-import { Nullable } from '@/lib/typeUtils';
 import { truncateAddress } from '@/lib/wallet';
 
-import { useEndpointsConfig } from './useEndpointsConfig';
-
-export type SharePnlImageParams = {
-  assetId: string;
-  marketId: string;
-  side: Nullable<IndexerPositionSide>;
-  leverage: Nullable<number>;
-  oraclePrice: Nullable<number>;
-  entryPrice: Nullable<number>;
-  unrealizedPnl: Nullable<number>;
-  type?: 'open' | 'close' | 'liquidated' | undefined;
-};
-
-export const useSharePnlImage = ({
-  assetId,
-  marketId,
-  side,
-  leverage,
-  oraclePrice,
-  entryPrice,
-  unrealizedPnl,
-  type = 'open',
-}: SharePnlImageParams) => {
+export const useSharePnlImage = (data: SharePNLAnalyticsDialogProps) => {
   const { pnlImageApi } = useEndpointsConfig();
   const { dydxAddress } = useAccounts();
-  const openPositions = useAppSelector(getOpenPositions);
-
-  const position = openPositions?.find((p) => p.market === marketId);
-
-  const positionType =
-    position?.status === IndexerPerpetualPositionStatus.CLOSED
-      ? 'close'
-      : position?.status === IndexerPerpetualPositionStatus.LIQUIDATED
-        ? 'liquidated'
-        : 'open';
-
-  const pnl = (position?.realizedPnl.toNumber() ?? 0) + (unrealizedPnl ?? 0);
 
   const queryFn = async (): Promise<Blob | undefined> => {
-    if (!dydxAddress) {
+    if (!dydxAddress || !data.marketId) {
       return undefined;
     }
 
+    const totalPnl = (data.pnl ?? 0) + (data.unrealizedPnl ?? 0);
+
     const requestBody = {
-      ticker: assetId,
-      type: positionType,
-      leverage: leverage ?? 0,
+      ticker: data.assetId,
+      type: data.shareType,
+      leverage: data.leverage,
       username: truncateAddress(dydxAddress),
-      isLong: side === IndexerPositionSide.LONG,
-      isCross: position?.marginMode === 'CROSS',
-      // Optional fields - include if available
-      size: position?.value.toNumber(),
-      pnl,
-      uPnl: unrealizedPnl ?? undefined,
-      pnlPercentage: position?.updatedUnrealizedPnlPercent?.toNumber(),
-      entryPx: entryPrice ?? undefined,
-      exitPx: position?.exitPrice?.toNumber(),
-      liquidationPx: position?.liquidationPrice?.toNumber(),
-      markPx: oraclePrice ?? undefined,
+      isLong: data.isLong,
+      isCross: data.isCross,
+      // Optional fields
+      size: data.size ?? undefined,
+      prevSize: data.prevSize ?? undefined,
+      pnl: totalPnl || undefined,
+      uPnl: data.unrealizedPnl ?? undefined,
+      pnlPercentage: data.pnlPercentage ?? undefined,
+      entryPx: data.entryPrice ?? undefined,
+      exitPx: data.exitPrice ?? undefined,
+      liquidationPx: data.liquidationPrice ?? undefined,
+      markPx: data.oraclePrice ?? undefined,
+      closeType: data.closeType ?? undefined,
     };
 
     const response = await fetch(pnlImageApi, {
@@ -92,25 +59,26 @@ export const useSharePnlImage = ({
   return useQuery({
     queryKey: [
       'sharePnlImage',
-      marketId,
+      data.marketId,
       dydxAddress,
-      side,
-      leverage,
-      oraclePrice,
-      entryPrice,
-      unrealizedPnl,
-      type,
-      position?.marginMode,
-      position?.unsignedSize.toString(),
-      position?.liquidationPrice?.toString(),
+      data.isLong,
+      data.isCross,
+      data.shareType,
+      data.leverage,
+      data.size,
+      data.pnl,
+      data.unrealizedPnl,
+      data.entryPrice,
+      data.exitPrice,
+      data.oraclePrice,
     ],
     queryFn,
     enabled: Boolean(dydxAddress),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    staleTime: 2 * timeUnits.minute, // 2 minutes
+    staleTime: 2 * timeUnits.minute,
     retry: 2,
-    retryDelay: 1 * timeUnits.second, // 1 second
+    retryDelay: 1 * timeUnits.second,
     retryOnMount: true,
   });
 };

@@ -7,9 +7,11 @@ import styled, { keyframes } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useAutoScrollToBottom } from '@/hooks/useAutoScrollToBottom';
-import { useTrollbox } from '@/hooks/useTrollbox';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTrollbox, VOLUME_THRESHOLD } from '@/hooks/useTrollbox';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -28,7 +30,6 @@ import { LoadingSpinner } from './Loading/LoadingSpinner';
 import { Output, OutputType } from './Output';
 
 const MESSAGE_CHARACTER_LIMIT = 255;
-const VOLUME_THRESHOLD = 1000;
 const MESSAGE_GAP_DISTANCE = 12;
 
 export const GlobalChatBodyContent = () => {
@@ -112,6 +113,7 @@ const ChatFooter = ({
   onSendMessage: (message: string) => void;
   pushToast: (message: string) => void;
 }) => {
+  const stringGetter = useStringGetter();
   const onboardingState = useAppSelector(getOnboardingState);
   const userStats = useAppSelector(BonsaiCore.account.stats.data);
   const statsStatus = useAppSelector((s) => s.raw.account.stats.status);
@@ -136,13 +138,18 @@ const ChatFooter = ({
     if (isEmpty(trimmed)) return;
 
     if (isOverLimit) {
-      pushToast(`Message is too long. Please keep it under ${MESSAGE_CHARACTER_LIMIT} characters.`);
+      pushToast(
+        stringGetter({
+          key: STRING_KEYS.MESSAGE_TOO_LONG,
+          params: { CHARACTER_LIMIT: MESSAGE_CHARACTER_LIMIT },
+        })
+      );
       return;
     }
 
     onSendMessage(inputValue);
     setInputValue('');
-  }, [inputValue, isOverLimit, onSendMessage, pushToast]);
+  }, [inputValue, isOverLimit, onSendMessage, pushToast, stringGetter]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -164,8 +171,7 @@ const ChatFooter = ({
       ) : isChatLocked ? (
         <$VolumeCard>
           <$VolumeHeader>
-            {/* TODO: Replace with localization all at once feature is complete */}
-            <span>Trade to unlock chat</span>
+            <span>{stringGetter({ key: STRING_KEYS.TRADE_TO_UNLOCK_CHAT })}</span>
             <$Percent>{Math.round(progressPercent)}%</$Percent>
           </$VolumeHeader>
           <$ProgressBar>
@@ -173,19 +179,19 @@ const ChatFooter = ({
           </$ProgressBar>
           <$VolumeDetails>
             <$VolumeDetail>
-              30D Vol:
+              {stringGetter({ key: STRING_KEYS.THIRTY_DAY_VOLUME })}
               <Output type={OutputType.CompactFiat} value={volume30D} />
             </$VolumeDetail>
             <$VolumeDetail>
               <Output type={OutputType.CompactFiat} value={volumeRemaining} />
-              vol. to unlock
+              {stringGetter({ key: STRING_KEYS.VOLUME_TO_UNLOCK })}
             </$VolumeDetail>
           </$VolumeDetails>
         </$VolumeCard>
       ) : (
         <$InputRow>
           <$ChatInput
-            placeholder="Send a message..."
+            placeholder={stringGetter({ key: STRING_KEYS.SEND_A_MESSAGE })}
             value={inputValue}
             onChange={handleOnChange}
             onKeyDown={handleKeyDown}

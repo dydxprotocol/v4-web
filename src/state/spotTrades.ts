@@ -9,7 +9,7 @@ export type SpotTrade = {
   tokenAmount: string;
   solAmount: string;
   txHash: string;
-  status: 'success' | 'error';
+  status: 'pending' | 'success' | 'error';
   createdAt: number;
 };
 
@@ -29,7 +29,14 @@ export const spotTradesSlice = createSlice({
       const { trade } = action.payload;
       state.trades.push(trade);
     },
+    updateSpotTrade: (
+      state,
+      action: PayloadAction<{ trade: Partial<SpotTrade> & { id: string } }>
+    ) => {
+      const { trade } = action.payload;
+      state.trades = state.trades.map((t) => (t.id === trade.id ? { ...t, ...trade } : t));
+    },
   },
 });
 
-export const { addSpotTrade } = spotTradesSlice.actions;
+export const { addSpotTrade, updateSpotTrade } = spotTradesSlice.actions;

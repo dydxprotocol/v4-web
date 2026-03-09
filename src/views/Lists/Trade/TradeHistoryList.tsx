@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
@@ -11,18 +11,33 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { TradeHistoryRow } from './TradeHistoryRow';
 import { TradeRow } from './TradeRow';
 
 const FILL_HEIGHT = 64;
 
 export const TradeHistoryList = () => {
-  const isLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
+  const loadingStatusTrades = useAppSelector(BonsaiCore.account.tradeHistory.loading);
+  const loadingStatusFills = useAppSelector(BonsaiCore.account.fills.loading);
+  const trades = useAppSelector(BonsaiCore.account.tradeHistory.data);
   const fills = useAppSelector(BonsaiCore.account.fills.data);
+
   const parentRef = useRef<HTMLDivElement>(null);
   const stringGetter = useStringGetter();
 
+  const isLoading = loadingStatusTrades === 'pending' && loadingStatusFills === 'pending';
+  const isTradesError = loadingStatusTrades === 'error';
+  const isError = isTradesError || loadingStatusFills === 'error';
+
+  const tradesToDisplay = useMemo(() => {
+    if ((isTradesError && !isLoading) || trades.length === 0) {
+      return fills;
+    }
+    return trades;
+  }, [isTradesError, isLoading, trades, fills]);
+
   const rowVirtualizer = useVirtualizer({
-    count: fills.length,
+    count: tradesToDisplay.length,
     estimateSize: (_index: number) => FILL_HEIGHT,
     getScrollElement: () => parentRef.current,
     rangeExtractor: (range) => {
@@ -30,17 +45,31 @@ export const TradeHistoryList = () => {
     },
   });
 
+  if (isError && !isLoading && tradesToDisplay.length === 0) {
+    return (
+      <div tw="flex h-full w-full flex-col items-center justify-center gap-3">
+        <div tw="text-color-text-0">
+          {stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: 'Failed to load trades' },
+          })}
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <LoadingSpace id="trade-history-list" />;
   }
 
-  if (fills.length === 0) {
+  if (tradesToDisplay.length === 0) {
     return (
       <div tw="flex h-full w-full flex-col items-center justify-center">
-        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FILLS_EMPTY_STATE })}</div>
+        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</div>
       </div>
     );
   }
+
   return (
     <div ref={parentRef} tw="relative h-full max-h-full w-full max-w-full overflow-auto">
       <div
@@ -59,7 +88,14 @@ export const TradeHistoryList = () => {
               transform: `translateY(${virtualRow.start}px)`,
             }}
           >
-            <TradeRow css={{ height: `${virtualRow.size}px` }} fill={fills[virtualRow.index]!} />
+            {trades.length !== 0 ? (
+              <TradeHistoryRow
+                css={{ height: `${virtualRow.size}px` }}
+                trade={trades[virtualRow.index]!}
+              />
+            ) : (
+              <TradeRow css={{ height: `${virtualRow.size}px` }} fill={fills[virtualRow.index]!} />
+            )}
           </div>
         ))}
       </div>

@@ -192,10 +192,17 @@ export const TradeFormInputs = () => {
       key: TradeBoxKeys.ScaleTotalOrders,
       inputType: InputType.Number,
       label: (
-        <>
+        <WithTooltip
+          tooltipString={stringGetter({
+            key: STRING_KEYS.TOTAL_ORDERS_TOOLTIP,
+            params: {
+              MIN: MIN_SCALE_ORDERS,
+              MAX: MAX_SCALE_ORDERS,
+            },
+          })}
+        >
           {stringGetter({ key: STRING_KEYS.TOTAL_ORDERS })}{' '}
-          <$Muted>{`(${MIN_SCALE_ORDERS} - ${MAX_SCALE_ORDERS})`}</$Muted>
-        </>
+        </WithTooltip>
       ),
       onChange: ({ value }: NumberFormatValues) => {
         dispatch(tradeFormActions.setScaleTotalOrders(value));
@@ -206,10 +213,17 @@ export const TradeFormInputs = () => {
         key: TradeBoxKeys.ScaleSkew,
         inputType: InputType.Number,
         label: (
-          <>
-            {stringGetter({ key: STRING_KEYS.SKEW })}{' '}
-            <$Muted>{`(${MIN_SCALE_SKEW} - ${MAX_SCALE_SKEW})`}</$Muted>
-          </>
+          <WithTooltip
+            tooltipString={stringGetter({
+              key: STRING_KEYS.SKEW_TOOLTIP,
+              params: {
+                MIN: MIN_SCALE_SKEW,
+                MAX: MAX_SCALE_SKEW,
+              },
+            })}
+          >
+            {stringGetter({ key: STRING_KEYS.SKEW })}
+          </WithTooltip>
         ),
         onChange: ({ value }: NumberFormatValues) => {
           dispatch(tradeFormActions.setScaleSkew(value));
@@ -280,8 +294,4 @@ const $MidPriceButton = styled(Button)`
 const $InlineRow = styled.span`
   ${layoutMixins.flexEqualColumns}
   gap: 1rem;
-`;
-
-const $Muted = styled.span`
-  color: var(--color-text-0);
 `;

@@ -42,31 +42,17 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 };
 
 export const SharePNLAnalyticsDialog = ({
-  marketId,
-  assetId,
-  side,
-  leverage,
-  oraclePrice,
-  entryPrice,
-  unrealizedPnl,
   setIsOpen,
+  ...sharePnlData
 }: DialogProps<SharePNLAnalyticsDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const symbol = getDisplayableAssetFromBaseAsset(assetId);
+  const symbol = getDisplayableAssetFromBaseAsset(sharePnlData.assetId);
   const [isCopying, setIsCopying] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
-  const getPnlImage = useSharePnlImage({
-    assetId,
-    marketId,
-    side,
-    leverage,
-    oraclePrice,
-    entryPrice,
-    unrealizedPnl,
-  });
+  const getPnlImage = useSharePnlImage(sharePnlData);
 
   const pnlImage = useMemo(() => getPnlImage.data ?? undefined, [getPnlImage.data]);
 
@@ -75,7 +61,7 @@ export const SharePNLAnalyticsDialog = ({
     setIsCopying(true);
     try {
       await copyBlobToClipboard(pnlImage);
-      track(AnalyticsEvents.SharePnlCopied({ asset: assetId }));
+      track(AnalyticsEvents.SharePnlCopied({ asset: sharePnlData.assetId }));
       setIsCopying(false);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
@@ -100,7 +86,7 @@ export const SharePNLAnalyticsDialog = ({
         })}\n\n#dydx #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
       });
-      track(AnalyticsEvents.SharePnlShared({ asset: assetId }));
+      track(AnalyticsEvents.SharePnlShared({ asset: sharePnlData.assetId }));
       setIsSharing(false);
     } catch (error) {
       logBonsaiError('SharePNLAnalyticsDialog/sharePnlImage', 'Failed to share PNL image', {

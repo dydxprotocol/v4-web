@@ -74,7 +74,15 @@ let trollboxManager: TrollboxSocketManager | null = null;
 export const subscribeToTrollbox = (onUpdate: (data: TrollboxUpdate) => void): (() => void) => {
   if (trollboxManager == null) trollboxManager = new TrollboxSocketManager();
 
-  return trollboxManager.subscribe(TROLLBOX_CHANNEL, onUpdate);
+  const unsubscribe = trollboxManager.subscribe(TROLLBOX_CHANNEL, onUpdate);
+
+  return () => {
+    unsubscribe();
+    if (trollboxManager != null) {
+      trollboxManager.disconnect();
+      trollboxManager = null;
+    }
+  };
 };
 
 export const sendTrollboxMessage = (payload: TrollboxUserMessage): void => {
