@@ -31,6 +31,7 @@ import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGe
 
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
 import { FillWithNoOrderNotificationRow } from '@/views/Lists/Alerts/FillWithNoOrderNotificationRow';
 import { OrderCancelNotificationRow } from '@/views/Lists/Alerts/OrderCancelNotificationRow';
@@ -1055,35 +1056,43 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         spotTrades.forEach((trade) => {
+          const isPending = trade.status === 'pending';
           const isSuccess = trade.status === 'success';
+
           trigger({
             id: trade.id,
             displayData: {
-              slotTitleLeft: isSuccess ? (
+              slotTitleLeft: isPending ? (
+                <LoadingSpinner tw="text-color-accent [--spinner-width:0.9375rem]" />
+              ) : isSuccess ? (
                 <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
               ) : (
                 <Icon iconName={IconName.Warning} tw="text-color-error" />
               ),
-              title: isSuccess
-                ? stringGetter({ key: STRING_KEYS.TRADE_SUCCESSFUL })
-                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED }),
-              body: isSuccess
-                ? stringGetter({
-                    key: STRING_KEYS.TRADE_SUCCESSFUL_DESCRIPTION,
-                    params: {
-                      PURCHASE_DIRECTION:
-                        trade.side === SpotApiSide.BUY
-                          ? stringGetter({ key: STRING_KEYS.PURCHASED })
-                          : stringGetter({ key: STRING_KEYS.SOLD }),
-                      AMOUNT: trade.tokenAmount,
-                      ASSET: trade.tokenSymbol,
-                      SOL_AMOUNT: trade.solAmount,
-                    },
-                  })
-                : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
+              title: isPending
+                ? stringGetter({ key: STRING_KEYS.PENDING })
+                : isSuccess
+                  ? stringGetter({ key: STRING_KEYS.TRADE_SUCCESSFUL })
+                  : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED }),
+              body: isPending
+                ? `${trade.side === SpotApiSide.BUY ? stringGetter({ key: STRING_KEYS.BUY }) : stringGetter({ key: STRING_KEYS.SELL })} ${trade.tokenSymbol}`
+                : isSuccess
+                  ? stringGetter({
+                      key: STRING_KEYS.TRADE_SUCCESSFUL_DESCRIPTION,
+                      params: {
+                        PURCHASE_DIRECTION:
+                          trade.side === SpotApiSide.BUY
+                            ? stringGetter({ key: STRING_KEYS.PURCHASED })
+                            : stringGetter({ key: STRING_KEYS.SOLD }),
+                        AMOUNT: trade.tokenAmount,
+                        ASSET: trade.tokenSymbol,
+                        SOL_AMOUNT: trade.solAmount,
+                      },
+                    })
+                  : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
               groupKey: NotificationType.SpotTrade,
               toastSensitivity: 'foreground',
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              toastDuration: isPending ? Infinity : DEFAULT_TOAST_AUTO_CLOSE_MS,
             },
             updateKey: [trade.status],
           });

@@ -1,20 +1,42 @@
 import { useCallback, useRef, useState } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+
+import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTrollboxOnlineCount } from '@/hooks/useTrollboxOnlineCount';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { useAppDispatch } from '@/state/appTypes';
+import { setIsChatEnabled } from '@/state/appUiConfigs';
+
 import { GlobalChatBodyContent } from './GlobalChatBodyContent';
 import { Icon, IconName } from './Icon';
+import { IconButton } from './IconButton';
 
 export const GlobalChat = () => {
+  const stringGetter = useStringGetter();
   const [isOpen, setIsOpen] = useState(false);
   const hasBeenOpened = useRef(false);
+  const onlineCount = useTrollboxOnlineCount();
+  const dispatch = useAppDispatch();
+
   if (isOpen) hasBeenOpened.current = true;
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
+
+  const handleClose = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      dispatch(setIsChatEnabled(false));
+    },
+    [dispatch]
+  );
 
   return (
     <$ChatArea>
@@ -22,10 +44,24 @@ export const GlobalChat = () => {
         <$Header onClick={handleToggle}>
           <$IconRow>
             <Icon iconName={IconName.Chat} />
-            {/* TODO: Replace with localization all at once feature is complete */}
-            Global Chat
+            {stringGetter({ key: STRING_KEYS.GLOBAL_CHAT })}
+            {onlineCount != null && (
+              <$OnlineIndicator>
+                <$OnlineDot />
+                {stringGetter({
+                  key: STRING_KEYS.COUNT_ONLINE,
+                  params: { COUNT: onlineCount.toLocaleString() },
+                })}
+              </$OnlineIndicator>
+            )}
           </$IconRow>
-          <$Icon iconName={IconName.Caret} $isOpen={isOpen} />
+          <$CloseButton
+            iconName={IconName.Close}
+            shape={ButtonShape.Square}
+            size={ButtonSize.XSmall}
+            buttonStyle={ButtonStyle.WithoutBackground}
+            onClick={handleClose}
+          />
         </$Header>
         <$Body $isOpen={isOpen}>{hasBeenOpened.current && <GlobalChatBodyContent />}</$Body>
       </$Container>
@@ -33,7 +69,7 @@ export const GlobalChat = () => {
   );
 };
 
-const BODY_HEIGHT = '60vh';
+const BODY_HEIGHT = '55vh';
 const BODY_WIDTH = '25rem';
 
 const $ChatArea = styled.div`
@@ -48,7 +84,7 @@ const $ChatArea = styled.div`
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
   width: 100%;
-  background-color: var(--color-layer-3);
+  background-color: var(--color-layer-1);
   border-radius: 0.5rem 0.5rem 0 0;
   border: 1px solid var(--color-border);
   overflow: hidden;
@@ -56,8 +92,8 @@ const $Container = styled.div`
 
 const $Header = styled.header`
   ${layoutMixins.spacedRow}
-  padding: 0.625rem 1rem;
-  background-color: var(--color-layer-2);
+  padding: 0.4rem 1rem;
+  background-color: var(--color-layer-3);
   font: var(--font-small-book);
   color: var(--color-text-2);
   cursor: pointer;
@@ -77,17 +113,27 @@ const $IconRow = styled.div`
   }
 `;
 
-const $Icon = styled(Icon)<{ $isOpen: boolean }>`
-  width: 0.625rem;
-  height: 0.625rem;
+const $OnlineIndicator = styled.span`
+  ${layoutMixins.row}
+  gap: 0.375rem;
   color: var(--color-text-0);
-  transition: rotate 0.3s var(--ease-out-expo);
+`;
 
-  ${({ $isOpen }) =>
-    !$isOpen &&
-    css`
-      rotate: -0.5turn;
-    `}
+const $OnlineDot = styled.span`
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-green);
+`;
+
+const $CloseButton = styled(IconButton)`
+  --button-icon-size: 0.75rem;
+  --button-border: none;
+  --button-textColor: var(--color-text-0);
+
+  &:hover {
+    --button-textColor: var(--color-text-2);
+  }
 `;
 
 const $Body = styled.div<{ $isOpen: boolean }>`

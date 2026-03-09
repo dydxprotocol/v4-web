@@ -1,4 +1,4 @@
-import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
+import { StablePerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
@@ -8,7 +8,7 @@ export const MarketSummaryTableCell = ({
   marketSummary,
   onClick,
 }: {
-  marketSummary?: PerpetualMarketSummary;
+  marketSummary?: StablePerpetualMarketSummary;
   onClick?: () => void;
 }) => {
   return (
