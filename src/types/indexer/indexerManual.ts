@@ -52,11 +52,16 @@ export interface IndexerCompositeOrderObject {
   status?: IndexerAPIOrderStatus;
   postOnly?: boolean;
   ticker: string;
+  createdAt?: IndexerIsoString | null;
   updatedAt?: IndexerIsoString | null;
   updatedAtHeight?: string | null;
   subaccountNumber: number;
   removalReason?: string;
   totalOptimisticFilled?: string;
+  // TWAP order parameters
+  duration?: string | null;
+  interval?: string | null;
+  priceTolerance?: string | null;
 }
 
 export interface IndexerCompositeMarketObject {

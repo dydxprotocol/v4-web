@@ -162,6 +162,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     currentHeight: undefined,
     memo: TransactionMemo.placeOrder,
     transferToSubaccountAmount: undefined,
+    twapParameters: undefined,
   };
 };
 

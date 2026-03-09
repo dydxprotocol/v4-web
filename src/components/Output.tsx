@@ -2,7 +2,7 @@
 import { useContext, useMemo } from 'react';
 
 import BigNumber from 'bignumber.js';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import styled, { css } from 'styled-components';
 
 import { SupportedLocales } from '@/constants/localization';
@@ -275,6 +275,8 @@ export enum OutputType {
   DateTime = 'DateTime',
   Date = 'Date',
   Time = 'Time',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  Duration = 'Duration',
 }
 
 export enum ShowSign {
@@ -445,6 +447,28 @@ export const Output = ({
           {slotLeft}
           {dateString}
           {slotRight}
+        </$Text>
+      );
+    }
+    case OutputType.Duration: {
+      if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
+      const milliseconds =
+        typeof value === 'string' ? parseInt(value, 10) : Math.floor(Number(value));
+      if (Number.isNaN(milliseconds)) return null;
+      const durationString = Duration.fromObject({ milliseconds })
+        .rescale()
+        .toHuman({ unitDisplay: 'narrow' });
+
+      return (
+        <$Text
+          key={value?.toString()}
+          title={title ?? `${durationString}${tag ? ` ${tag}` : ''}`}
+          className={className}
+        >
+          {slotLeft}
+          {durationString}
+          {slotRight}
+          {tag && <Tag>{tag}</Tag>}
         </$Text>
       );
     }

@@ -6,12 +6,13 @@ import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
+import { INTEGER_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { InputErrorData, TradeBoxKeys } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
@@ -37,6 +38,10 @@ type TradeBoxInputConfig = {
   value: string | number;
   decimals?: number;
   slotRight?: React.ReactNode;
+  section?: {
+    label: string;
+    companionInput?: TradeBoxInputConfig;
+  };
 };
 
 export const TradeFormInputs = () => {
@@ -44,9 +49,17 @@ export const TradeFormInputs = () => {
   const stringGetter = useStringGetter();
 
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
-  const { showLimitPrice, showTriggerPrice } = tradeSummary.options;
+  const { showLimitPrice, showTriggerPrice, showDuration, showFrequency } = tradeSummary.options;
   const tradeFormValues = useAppSelector(getTradeFormValues);
-  const { limitPrice, triggerPrice, marketId, type } = tradeFormValues;
+  const {
+    limitPrice,
+    triggerPrice,
+    marketId,
+    type,
+    durationHours,
+    durationMinutes,
+    frequencySeconds,
+  } = tradeFormValues;
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -128,8 +141,50 @@ export const TradeFormInputs = () => {
     });
   }
 
-  return tradeFormInputs.map(
-    ({
+  if (showDuration) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.DurationHours,
+      inputType: InputType.Number,
+      label: stringGetter({ key: STRING_KEYS.HOURS }),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setDurationHours(value));
+      },
+      value: durationHours ?? '',
+      decimals: INTEGER_DECIMALS,
+      section: {
+        label: stringGetter({ key: STRING_KEYS.TWAP_RUNNING_TIME }),
+        companionInput: {
+          key: TradeBoxKeys.DurationMinutes,
+          inputType: InputType.Number,
+          label: stringGetter({ key: STRING_KEYS.MINUTES }),
+          onChange: ({ value }: NumberFormatValues) => {
+            dispatch(tradeFormActions.setDurationMinutes(value));
+          },
+          value: durationMinutes ?? '',
+          decimals: INTEGER_DECIMALS,
+        },
+      },
+    });
+  }
+
+  if (showFrequency) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.FrequencySeconds,
+      inputType: InputType.Number,
+      label: stringGetter({ key: STRING_KEYS.SECONDS }),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setFrequencySeconds(value));
+      },
+      value: frequencySeconds ?? '',
+      decimals: INTEGER_DECIMALS,
+      section: {
+        label: stringGetter({ key: STRING_KEYS.TWAP_FREQUENCY }),
+      },
+    });
+  }
+
+  return tradeFormInputs.map((config) => {
+    const {
       key,
       inputType,
       label,
@@ -139,7 +194,10 @@ export const TradeFormInputs = () => {
       value,
       decimals,
       slotRight,
-    }) => (
+      section,
+    } = config;
+
+    const primaryInput = (
       <FormInput
         key={key}
         id={key}
@@ -152,10 +210,54 @@ export const TradeFormInputs = () => {
         decimals={decimals}
         slotRight={slotRight}
       />
-    )
-  );
+    );
+
+    if (section == null) {
+      return primaryInput;
+    }
+
+    return (
+      <$Section key={key}>
+        <$SectionLabel>{section.label}</$SectionLabel>
+        {section.companionInput != null ? (
+          <$InputRow>
+            {primaryInput}
+            <FormInput
+              key={section.companionInput.key}
+              id={section.companionInput.key}
+              type={section.companionInput.inputType}
+              label={section.companionInput.label}
+              onChange={section.companionInput.onChange}
+              onInput={section.companionInput.onInput}
+              validationConfig={section.companionInput.validationConfig}
+              value={section.companionInput.value}
+              decimals={section.companionInput.decimals}
+              slotRight={section.companionInput.slotRight}
+            />
+          </$InputRow>
+        ) : (
+          primaryInput
+        )}
+      </$Section>
+    );
+  });
 };
 
 const $MidPriceButton = styled(Button)`
   ${formMixins.inputInnerButton}
+`;
+
+const $Section = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.5rem;
+`;
+
+const $SectionLabel = styled.div`
+  font: var(--font-small-book);
+  color: var(--color-text-0);
+`;
+
+const $InputRow = styled.div`
+  ${layoutMixins.gridEqualColumns}
+  gap: var(--form-input-gap);
 `;

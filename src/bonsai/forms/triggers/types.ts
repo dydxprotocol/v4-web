@@ -7,6 +7,7 @@ import {
   SubaccountPosition,
 } from '@/bonsai/types/summaryTypes';
 import {
+  type ITwapParameters,
   OrderExecution,
   OrderFlags,
   OrderSide,
@@ -115,6 +116,7 @@ export interface PlaceOrderPayload {
   currentHeight: number | undefined;
   goodTilBlock: number | undefined;
   memo: string | undefined;
+  twapParameters: ITwapParameters | undefined;
 }
 
 // have to hard code because it isn't properly exported from v4-clients
