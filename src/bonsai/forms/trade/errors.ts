@@ -1079,7 +1079,8 @@ function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSu
 
   const ordersToOpen =
     (isShortTerm ? 0 : 1) +
-    (summary.tradePayload?.triggersPayloads?.filter((t) => t.placePayload != null).length ?? 0);
+    (summary.tradePayload?.triggersPayloads?.filter((t) => t.placePayload != null).length ?? 0) +
+    (summary.tradePayload?.scaleOrderPayloads?.length ?? 0);
 
   if (ordersToOpen <= 0) {
     return [];
