@@ -1078,9 +1078,10 @@ function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSu
       summary.effectiveTrade.timeInForce === TimeInForce.IOC);
 
   const ordersToOpen =
-    (isShortTerm ? 0 : 1) +
-    (summary.tradePayload?.triggersPayloads?.filter((t) => t.placePayload != null).length ?? 0) +
-    (summary.tradePayload?.scaleOrderPayloads?.length ?? 0);
+    summary.effectiveTrade.type === TradeFormType.SCALE // Scale order types will only contain scaleOrderPayloads in the payload
+      ? (summary.tradePayload?.scaleOrderPayloads?.length ?? 0)
+      : (isShortTerm ? 0 : 1) +
+        (summary.tradePayload?.triggersPayloads?.filter((t) => t.placePayload != null).length ?? 0);
 
   if (ordersToOpen <= 0) {
     return [];

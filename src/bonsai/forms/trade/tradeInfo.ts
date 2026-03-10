@@ -1336,14 +1336,13 @@ export function generateSkewedPrices(
 ): number[] {
   if (n < 2) return [startPrice];
   // Use n-1 gap weights to create non-linearly spaced prices
-  const { weights } = generateGeometricWeights(n - 1, skew);
-  const totalGapWeight = weights.reduce((a, b) => a + b, 0);
+  const { weights, totalWeight } = generateGeometricWeights(n - 1, skew);
 
   const prices: number[] = [startPrice];
   let cumulative = 0;
   for (let i = 0; i < n - 1; i += 1) {
     cumulative += weights[i]!;
-    prices.push(startPrice + (endPrice - startPrice) * (cumulative / totalGapWeight));
+    prices.push(startPrice + (endPrice - startPrice) * (cumulative / totalWeight));
   }
   return prices;
 }
