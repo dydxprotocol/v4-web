@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { TradeFormSummary } from '@/bonsai/forms/trade/types';
+import { TradeFormSummary, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
@@ -100,9 +100,10 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const hasMissingData = subaccountNumber === undefined;
 
-  const { tradeInfo, tradePayload } = summary;
-  const { fee, inputSummary, reward } = orEmptyObj(tradeInfo);
+  const { tradeInfo, tradePayload, effectiveTrade } = summary;
+  const { fee, inputSummary, reward, startPrice, endPrice } = orEmptyObj(tradeInfo);
   const expectedPrice = inputSummary?.averageFillPrice;
+  const isScaleOrder = effectiveTrade.type === TradeFormType.SCALE;
 
   // approximation for whether inputs are filled by whether summary has been calculated
   const areInputsFilled = tradePayload != null;
@@ -130,22 +131,51 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const items = (
     [
-      {
-        key: 'expected-price',
-        label: (
-          <WithTooltip tooltip="expected-price" side="right">
-            {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
-          </WithTooltip>
-        ),
-        value: (
-          <Output
-            useGrouping
-            fractionDigits={tickSizeDecimals}
-            type={OutputType.Fiat}
-            value={expectedPrice}
-          />
-        ),
-      },
+      ...(isScaleOrder
+        ? [
+            {
+              key: 'start-price',
+              label: stringGetter({ key: STRING_KEYS.START_PRICE }),
+              value: (
+                <Output
+                  useGrouping
+                  fractionDigits={tickSizeDecimals}
+                  type={OutputType.Fiat}
+                  value={startPrice}
+                />
+              ),
+            },
+            {
+              key: 'end-price',
+              label: stringGetter({ key: STRING_KEYS.END_PRICE }),
+              value: (
+                <Output
+                  useGrouping
+                  fractionDigits={tickSizeDecimals}
+                  type={OutputType.Fiat}
+                  value={endPrice}
+                />
+              ),
+            },
+          ]
+        : [
+            {
+              key: 'expected-price',
+              label: (
+                <WithTooltip tooltip="expected-price" side="right">
+                  {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
+                </WithTooltip>
+              ),
+              value: (
+                <Output
+                  useGrouping
+                  fractionDigits={tickSizeDecimals}
+                  type={OutputType.Fiat}
+                  value={expectedPrice}
+                />
+              ),
+            },
+          ]),
       {
         key: 'liquidation-price',
         label: (

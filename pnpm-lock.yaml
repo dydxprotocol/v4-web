@@ -30,14 +30,14 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.5.0
-    version: 3.5.0
+    specifier: 3.6.0
+    version: 3.6.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.394
-    version: 1.1.394
+    specifier: 1.1.396
+    version: 1.1.396
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
-    version: 7.0.5
+    version: 7.0.0-dev.0
   '@emotion/is-prop-valid':
     specifier: ^1.3.0
     version: 1.4.0
@@ -1671,8 +1671,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.5.0:
-    resolution: {integrity: sha512-s751Se22tax9cdWG7ZPpNgHMgrA9HHR/rZndSm/WlDHoQKc0FVmjWG5Vo1D8+tnPbA5CNyyQ8TLLN6IktmpqIQ==}
+  /@dydxprotocol/v4-client-js@3.6.0:
+    resolution: {integrity: sha512-rg9JTE07X7LyfrFadH+jnNXFFSgMfv5TrfOOqowfzyT5l4MGwDbNArRR1LfI4abcbSMCQRhKsCXEqpM3p3oZ+w==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1690,7 +1690,7 @@ packages:
       bignumber.js: 9.3.1
       cosmjs-types: 0.9.0
       ethereum-cryptography: 2.2.1
-      ethers: 6.15.0
+      ethers: 6.16.0
       https-proxy-agent: 7.0.6
       long: 4.0.0
       protobufjs: 7.5.4
@@ -1702,12 +1702,12 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.394:
-    resolution: {integrity: sha512-lttp0q1vjdoAnHYRy8VCqPxxHO6f4DUiUgPgo3PutYGm2utVz86j16oJvTvecSwIteqSL1zWqhsdrbvL9cbjLw==}
+  /@dydxprotocol/v4-localization@1.1.396:
+    resolution: {integrity: sha512-6UehE+uHAZ1h4NLhYTckqZvIBVVQfLDb5X4BRnjyD2K/xSt10plqhL0rSNRN1rOSvP4VqML/dbVD/CWrcGW5Jg==}
     dev: false
 
-  /@dydxprotocol/v4-proto@7.0.5:
-    resolution: {integrity: sha512-V4Ii+oRuAAO2wXK9xLt4ztnxMa8pfDzsTXMtPi01cDPVncM5albcttrBzVrzob/YO1nmXwe8ku1LtISoI3BjNg==}
+  /@dydxprotocol/v4-proto@7.0.0-dev.0:
+    resolution: {integrity: sha512-yQ3xMW8GmKCCwtzXF1E/TMYvPYDPRmAR2T/AFXKlE2YF/P/yQMrz/IySzX4Z+wyAMI+G4Sr+AML7V8ehvAcjog==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -16689,8 +16689,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /ethers@6.15.0:
-    resolution: {integrity: sha512-Kf/3ZW54L4UT0pZtsY/rf+EkBU7Qi5nnhonjUb8yTXcxH3cdcWrV2cRyk0Xk/4jK6OoHhxxZHriyhje20If2hQ==}
+  /ethers@6.16.0:
+    resolution: {integrity: sha512-U1wulmetNymijEhpSEQ7Ct/P/Jw9/e7R1j5XIbPRydgV2DjLVMsULDlNksq3RQnFgKoLlZf88ijYtWEXcPa07A==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.10.1

@@ -125,8 +125,8 @@ export const useTradeForm = ({
   } = {}) => {
     setPlaceOrderError(undefined);
     const payload = summary.tradePayload;
-    const tradePayload = payload?.orderPayload;
-    if (payload == null || tradePayload == null || hasValidationErrors) {
+    const representativePayload = payload?.orderPayload ?? payload?.scaleOrderPayloads?.[0];
+    if (payload == null || representativePayload == null || hasValidationErrors) {
       return;
     }
 
@@ -138,7 +138,9 @@ export const useTradeForm = ({
       if (impliedMarket === undefined) return;
 
       const positionSubaccountNumber = summary.accountDetailsAfter?.position?.subaccountNumber;
-      const clobPairId = summary.tradePayload?.orderPayload?.clobPairId;
+      const clobPairId =
+        summary.tradePayload?.orderPayload?.clobPairId ??
+        summary.tradePayload?.scaleOrderPayloads?.[0]?.clobPairId;
       const rawSelectedLeverage = inputData?.rawSelectedMarketLeverages[impliedMarket];
       const hasExistingPosition = currentPosition !== undefined;
       if (
@@ -158,16 +160,21 @@ export const useTradeForm = ({
       }
     });
 
-    onPlaceOrder?.(tradePayload);
+    onPlaceOrder?.(representativePayload);
+    const volume =
+      payload.scaleOrderPayloads != null && payload.scaleOrderPayloads.length > 0
+        ? payload.scaleOrderPayloads.reduce((sum, o) => sum + o.size * o.price, 0)
+        : representativePayload.size * representativePayload.price;
     track(
       AnalyticsEvents.TradePlaceOrderClick({
-        ...tradePayload,
+        ...representativePayload,
         isClosePosition: source === TradeFormSource.ClosePositionForm,
         isSimpleUi: source === TradeFormSource.SimpleTradeForm,
         source,
-        volume: tradePayload.size * tradePayload.price,
+        volume,
       })
     );
+
     dispatch(tradeFormActions.resetPrimaryInputs());
     logBonsaiInfo(
       source,
@@ -181,7 +188,7 @@ export const useTradeForm = ({
 
     const result = await accountTransactionManager.placeCompoundOrder(payload, source);
     if (isOperationSuccess(result)) {
-      setUnIndexedClientId(tradePayload.clientId.toString());
+      setUnIndexedClientId(representativePayload.clientId.toString());
       onSuccess?.();
     } else {
       const errorParams = operationFailureToErrorParams(result);

@@ -32,6 +32,10 @@ const getMinimumRequiredFields = (
     triggerPrice: undefined,
     stopLossOrder: undefined,
     takeProfitOrder: undefined,
+    scaleStartPrice: undefined,
+    scaleEndPrice: undefined,
+    scaleTotalOrders: undefined,
+    scaleSkew: undefined,
   };
 
   // Add marketId if provided
@@ -111,6 +115,27 @@ export const tradeFormReducer = createVanillaReducer({
     setTriggerPrice: (state, triggerPrice: string) => ({
       ...state,
       triggerPrice,
+    }),
+
+    // Scale order actions
+    setScaleStartPrice: (state, scaleStartPrice: string) => ({
+      ...state,
+      scaleStartPrice,
+    }),
+
+    setScaleEndPrice: (state, scaleEndPrice: string) => ({
+      ...state,
+      scaleEndPrice,
+    }),
+
+    setScaleTotalOrders: (state, scaleTotalOrders: string) => ({
+      ...state,
+      scaleTotalOrders,
+    }),
+
+    setScaleSkew: (state, scaleSkew: string) => ({
+      ...state,
+      scaleSkew,
     }),
 
     // Order execution properties

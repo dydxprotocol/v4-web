@@ -24,6 +24,7 @@ import {
   OrderType,
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
+import { isEmpty } from 'lodash';
 
 import {
   AnalyticsEvents,
@@ -1076,13 +1077,17 @@ export class AccountTransactionSupervisor {
       // if order is not compound, just do placeOrder so metrics are clean
       order.orderPayload != null &&
       (order.orderPayload.transferToSubaccountAmount ?? 0) <= 0 &&
-      (order.triggersPayloads ?? []).length === 0
+      (order.triggersPayloads ?? []).length === 0 &&
+      isEmpty(order.scaleOrderPayloads)
     ) {
       return this.placeOrder(order.orderPayload, source);
     }
 
-    // Handle stateful main order + trigger orders together in bulk
-    const hasStatefulOperations = isMainOrderStateful || (order.triggersPayloads?.length ?? 0) > 0;
+    // Handle stateful main order + trigger orders + scale orders together in bulk
+    const hasStatefulOperations =
+      isMainOrderStateful ||
+      (order.triggersPayloads?.length ?? 0) > 0 ||
+      !isEmpty(order.scaleOrderPayloads);
 
     if (hasStatefulOperations) {
       const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
@@ -1092,6 +1097,7 @@ export class AccountTransactionSupervisor {
           payload: {
             mainOrderPayload: isMainOrderStateful ? order.orderPayload : undefined,
             triggersPayloads: order.triggersPayloads ?? [],
+            scaleOrderPayloads: order.scaleOrderPayloads ?? [],
             source,
           },
         })
@@ -1138,38 +1144,51 @@ export class AccountTransactionSupervisor {
             if (context.payload.mainOrderPayload) {
               const mainPayload = context.payload.mainOrderPayload;
 
+              const sourceSubaccount = getSubaccountId(this.store.getState());
+              const sourceAddress = getUserWalletAddress(this.store.getState());
+              const mainTransfer = getIsolatedMarginTransfer(
+                mainPayload,
+                sourceSubaccount,
+                sourceAddress
+              );
               // Check if we need a transfer for isolated margin
               if (
                 mainPayload.transferToSubaccountAmount != null &&
-                mainPayload.transferToSubaccountAmount > 0
+                mainPayload.transferToSubaccountAmount > 0 &&
+                mainTransfer == null
               ) {
-                const sourceSubaccount = getSubaccountId(this.store.getState());
-                const sourceAddress = getUserWalletAddress(this.store.getState());
-
-                if (sourceSubaccount == null || sourceAddress == null) {
-                  return createMiddlewareFailureResult(
-                    wrapSimpleError(
-                      context.fnName,
-                      'unknown parent subaccount number or address',
-                      STRING_KEYS.SOMETHING_WENT_WRONG
-                    ),
-                    context
-                  );
-                }
-
-                transferPayload = {
-                  fromSubaccount: sourceSubaccount,
-                  toSubaccount: mainPayload.subaccountNumber,
-                  amount: mainPayload.transferToSubaccountAmount,
-                  address: sourceAddress,
-                };
+                return createMiddlewareFailureResult(
+                  wrapSimpleError(
+                    context.fnName,
+                    'unknown parent subaccount number or address',
+                    STRING_KEYS.SOMETHING_WENT_WRONG
+                  ),
+                  context
+                );
               }
+              transferPayload = mainTransfer ?? transferPayload;
 
               placePayloads.push({
                 ...mainPayload,
                 currentHeight,
               });
             }
+
+            // Process scale order payloads
+            context.payload.scaleOrderPayloads.forEach((scalePayload) => {
+              if (transferPayload == null) {
+                transferPayload = getIsolatedMarginTransfer(
+                  scalePayload,
+                  getSubaccountId(this.store.getState()),
+                  getUserWalletAddress(this.store.getState())
+                );
+              }
+
+              placePayloads.push({
+                ...scalePayload,
+                currentHeight,
+              });
+            });
 
             // Process trigger payloads
             context.payload.triggersPayloads.forEach((operationPayload) => {
@@ -1673,6 +1692,32 @@ class SimpleEvent<T> {
   trigger(data: T): void {
     this.listeners.forEach((listener) => listener(data));
   }
+}
+
+type IsolatedMarginTransferPayload = {
+  fromSubaccount: number;
+  toSubaccount: number;
+  amount: number;
+  address: string;
+};
+
+function getIsolatedMarginTransfer(
+  payload: PlaceOrderPayload,
+  sourceSubaccount: number | undefined,
+  sourceAddress: string | undefined
+): IsolatedMarginTransferPayload | undefined {
+  if (payload.transferToSubaccountAmount == null || payload.transferToSubaccountAmount <= 0) {
+    return undefined;
+  }
+  if (sourceSubaccount == null || sourceAddress == null) {
+    return undefined;
+  }
+  return {
+    fromSubaccount: sourceSubaccount,
+    toSubaccount: payload.subaccountNumber,
+    amount: payload.transferToSubaccountAmount,
+    address: sourceAddress,
+  };
 }
 
 function isShortTermOrderPayload(payload: PlaceOrderPayload) {
