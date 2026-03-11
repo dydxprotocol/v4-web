@@ -14,7 +14,6 @@ import { AppRoute } from '@/constants/routes';
 import { CURRENT_BONK_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useEnableBonkPnlLeaderboard } from '@/hooks/useEnableBonkPnlLeaderboard';
 import { useEnableLiquidationRebates } from '@/hooks/useEnableLiquidationRebates';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -53,21 +52,13 @@ const RewardsPage = () => {
   const { titleStringKey } = CURRENT_BONK_REWARDS_DETAILS;
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
-  const enableBonkPnlLeaderboard = useEnableBonkPnlLeaderboard();
-
+  // Bonk is always enabled
   const { complianceState } = useComplianceState();
   const { isTablet } = useBreakpoints();
   const enableLiquidationRebates = useEnableLiquidationRebates();
-
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(
-    enableBonkPnlLeaderboard
-      ? Tab.BonkPnl
-      : enableLiquidationRebates
-        ? Tab.LiquidationRebates
-        : Tab.Competition
-  );
+  const [value, setValue] = useState(Tab.BonkPnl);
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -92,20 +83,16 @@ const RewardsPage = () => {
   );
 
   const tabs = [
-    ...(enableBonkPnlLeaderboard
-      ? [
-          {
-            content: (
-              <div tw="flexColumn gap-1.5">
-                <BonkIncentivesPanel />
-                <BonkPnlPanel />
-              </div>
-            ),
-            label: stringGetter({ key: titleStringKey }),
-            value: Tab.BonkPnl,
-          },
-        ]
-      : []),
+    {
+      content: (
+        <div tw="flexColumn gap-1.5">
+          <BonkIncentivesPanel />
+          <BonkPnlPanel />
+        </div>
+      ),
+      label: stringGetter({ key: titleStringKey }),
+      value: Tab.BonkPnl,
+    },
     ...(enableLiquidationRebates
       ? [
           {

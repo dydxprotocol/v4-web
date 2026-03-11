@@ -21,7 +21,6 @@ export enum StatsigFlags {
   ffOpenInterestFilter = 'ff_open_interest_filter',
   abPopupDeposit = 'ab_popup_deposit',
   ffSpotBonk = 'ff_spot_bonk',
-  ffBonkPnlLeaderboard = 'ff_bonk_pnl_leaderboard',
   ffOnlyShowLiquidationRebates = 'ff_only_show_liquidation_rebates',
 }
 
