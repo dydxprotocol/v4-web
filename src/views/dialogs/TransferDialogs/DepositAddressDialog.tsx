@@ -279,7 +279,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       </SelectMenu>
 
       <DepositAddressCard
-        address={perpsDepositAddress ?? 'dydx1xj4dfrwddquc2848d35q9txqpwvlye7fng3454'}
+        address={perpsDepositAddress}
         supportedAssets={supportedAssets}
         isLoading={isUploadingAddress || isLoadingDepositAddresses}
         error={failedToFetchDepositAddresses}

@@ -46,6 +46,7 @@ import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog
 import { SimpleUiTradeDialog } from '@/views/dialogs/SimpleUiTradeDialog/SimpleUiTradeDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
+import { TestnetFaucetDialog } from '@/views/dialogs/TestnetFaucetDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TradingKeysDialog } from '@/views/dialogs/TradingKeysDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
@@ -104,9 +105,7 @@ export const DialogManager = React.memo(() => {
           <DepositDialog2 {...args} {...modalProps} />
         )
       ) : (
-        <DepositAddressDialog {...args} {...modalProps} />
-        // <DepositDialog2 {...args} {...modalProps} />
-        // <TestnetFaucetDialog {...modalProps} />
+        <TestnetFaucetDialog {...modalProps} />
       ),
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
