@@ -13,7 +13,6 @@ export const useDepositAddress = () => {
   const isTurnkeyConnected = useAppSelector(selectIsTurnkeyConnected);
 
   const canQueryForDepositAddresses = dydxAddress != null && indexerReady && isTurnkeyConnected;
-
   const {
     data: depositAddresses,
     isLoading: isLoadingDepositAddresses,

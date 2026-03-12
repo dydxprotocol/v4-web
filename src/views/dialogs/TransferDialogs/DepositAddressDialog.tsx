@@ -5,6 +5,7 @@ import { avalanche, mainnet, polygon } from 'viem/chains';
 
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
+import { ASSET_ICON_MAP } from '@/constants/assets';
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { ComplianceStates } from '@/constants/compliance';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
@@ -126,17 +127,24 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
+  const isUsdcOnly = CHAIN_INFO[selectedChain]?.gasDenom !== 'ETH';
+
+  const supportedAssets = useMemo(() => {
+    if (isUsdcOnly) {
+      return [{ icon: ASSET_ICON_MAP.USDC, name: 'USDC' }];
+    }
+    return [
+      { icon: ASSET_ICON_MAP.ETH, name: 'ETH' },
+      { icon: ASSET_ICON_MAP.USDC, name: 'USDC' },
+    ];
+  }, [isUsdcOnly]);
+
   const warningMessage = useMemo(() => {
+    const chainName = CHAIN_INFO[selectedChain]?.name;
+
+    const assets = isUsdcOnly ? 'USDC' : `USDC ${stringGetter({ key: STRING_KEYS.OR })} ETH`;
+
     const warningMessageParams = calc(() => {
-      const chainName = CHAIN_INFO[selectedChain]?.name;
-
-      const assets =
-        selectedChain === SOLANA_MAINNET_ID
-          ? 'USDC'
-          : selectedChain === avalanche.id.toString()
-            ? 'USDC'
-            : `USDC ${stringGetter({ key: STRING_KEYS.OR })} ETH`;
-
       const maxDeposit = formatNumberOutput(MAX_DEPOSIT, OutputType.CompactNumber, {
         decimalSeparator,
         groupSeparator,
@@ -162,14 +170,32 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     });
 
     return (
-      <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
-        {stringGetter({
-          key: STRING_KEYS.DEPOSIT_NETWORK_WARNING,
-          params: warningMessageParams,
-        })}
-      </AlertMessage>
+      <>
+        <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
+          {stringGetter({
+            key: STRING_KEYS.DEPOSIT_NETWORK_WARNING,
+            params: warningMessageParams,
+          })}
+        </AlertMessage>
+        <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
+          <div tw="row">
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.DEPOSIT_LOSS_OF_FUNDS_WARNING,
+                params: {
+                  ASSETS: <strong>{assets}</strong>,
+                  NETWORK: <strong>{chainName}</strong>,
+                  LOSS_OF_FUNDS: (
+                    <strong>{stringGetter({ key: STRING_KEYS.LOSS_OF_FUNDS })}</strong>
+                  ),
+                },
+              })}
+            </span>
+          </div>
+        </AlertMessage>
+      </>
     );
-  }, [selectedChain, stringGetter, decimalSeparator, groupSeparator, selectedLocale]);
+  }, [selectedChain, isUsdcOnly, stringGetter, decimalSeparator, groupSeparator, selectedLocale]);
 
   const getAcceptedAssets = (id: string | number) => {
     if (id === SOLANA_MAINNET_ID || id === avalanche.id) {
@@ -253,9 +279,8 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       </SelectMenu>
 
       <DepositAddressCard
-        address={perpsDepositAddress}
-        chainIcon={CHAIN_INFO[selectedChain]?.icon}
-        chainName={CHAIN_INFO[selectedChain]?.name}
+        address={perpsDepositAddress ?? 'dydx1xj4dfrwddquc2848d35q9txqpwvlye7fng3454'}
+        supportedAssets={supportedAssets}
         isLoading={isUploadingAddress || isLoadingDepositAddresses}
         error={failedToFetchDepositAddresses}
         errorMessage={stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
