@@ -17,7 +17,12 @@ export const SpotDepositForm = () => {
     <div tw="flexColumn gap-1">
       <DepositAddressCard
         address={solanaAddress}
-        supportedAssets={[{ icon: '/currencies/sol.png', name: 'SOL' }]}
+        supportedAssets={[
+          {
+            icon: CHAIN_INFO[SOLANA_MAINNET_ID]?.icon ?? '/currencies/sol.png',
+            name: CHAIN_INFO[SOLANA_MAINNET_ID]?.name ?? 'SOL',
+          },
+        ]}
       />
       <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
         Only send SOL on Solana. Assets on other networks will be lost.
