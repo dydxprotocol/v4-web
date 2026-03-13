@@ -47,7 +47,6 @@ type DepositTab = 'spot' | 'perpetuals';
 
 const MIN_DEPOSIT = 20;
 const MAX_DEPOSIT = 100_000;
-const ETH_MIN_DEPOSIT = 20;
 const ETH_MIN_INSTANT_DEPOSIT = 50;
 
 export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
@@ -153,47 +152,39 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
       if (selectedChain === mainnet.id.toString()) {
         return {
-          ASSETS: assets,
-          NETWORK: CHAIN_INFO[mainnet.id]?.name,
-          MIN_DEPOSIT: ETH_MIN_DEPOSIT,
           MIN_INSTANT_DEPOSIT: ETH_MIN_INSTANT_DEPOSIT,
           MAX_DEPOSIT: maxDeposit,
         };
       }
       return {
-        ASSETS: assets,
-        NETWORK: chainName,
-        MIN_DEPOSIT,
         MIN_INSTANT_DEPOSIT: MIN_DEPOSIT,
         MAX_DEPOSIT: maxDeposit,
       };
     });
 
     return (
-      <>
-        <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
-          {stringGetter({
-            key: STRING_KEYS.DEPOSIT_NETWORK_WARNING,
-            params: warningMessageParams,
-          })}
-        </AlertMessage>
-        <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
-          <div tw="row">
-            <span>
-              {stringGetter({
-                key: STRING_KEYS.DEPOSIT_LOSS_OF_FUNDS_WARNING,
-                params: {
-                  ASSETS: <strong>{assets}</strong>,
-                  NETWORK: <strong>{chainName}</strong>,
-                  LOSS_OF_FUNDS: (
-                    <strong>{stringGetter({ key: STRING_KEYS.LOSS_OF_FUNDS })}</strong>
-                  ),
-                },
-              })}
-            </span>
-          </div>
-        </AlertMessage>
-      </>
+      <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
+        <div tw="row">
+          <span>
+            {stringGetter({
+              key: STRING_KEYS.DEPOSIT_LOSS_OF_FUNDS_WARNING,
+              params: {
+                ASSETS: <strong>{assets}</strong>,
+                NETWORK: <strong>{chainName}</strong>,
+                MIN_INSTANT_DEPOSIT: warningMessageParams.MIN_INSTANT_DEPOSIT,
+                MAX_DEPOSIT: warningMessageParams.MAX_DEPOSIT,
+                LOSS_OF_FUNDS: (
+                  <strong>
+                    {stringGetter({
+                      key: STRING_KEYS.LOSS_OF_FUNDS,
+                    })}
+                  </strong>
+                ),
+              },
+            })}
+          </span>
+        </div>
+      </AlertMessage>
     );
   }, [selectedChain, isUsdcOnly, stringGetter, decimalSeparator, groupSeparator, selectedLocale]);
 
