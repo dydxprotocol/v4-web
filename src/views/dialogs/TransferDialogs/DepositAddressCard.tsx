@@ -11,10 +11,14 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { QrCode } from '@/components/QrCode';
 
+type SupportedAsset = {
+  icon: string;
+  name: string;
+};
+
 type DepositAddressCardProps = {
   address: string | undefined;
-  chainIcon: string | undefined;
-  chainName: string | undefined;
+  supportedAssets: SupportedAsset[];
   isLoading?: boolean;
   error?: boolean;
   errorMessage?: string;
@@ -22,8 +26,7 @@ type DepositAddressCardProps = {
 
 export const DepositAddressCard = ({
   address,
-  chainIcon,
-  chainName,
+  supportedAssets,
   isLoading = false,
   error = false,
   errorMessage,
@@ -76,7 +79,22 @@ export const DepositAddressCard = ({
   return (
     <$AddressCard onClick={copy} tabIndex={0} role="button">
       <div tw="flexColumn min-w-0 justify-between">
-        <img tw="size-2.25 rounded-[50%]" src={chainIcon} alt={chainName} />
+        <div tw="flexColumn gap-0.375">
+          <span tw="text-color-text-0 font-mini-book">
+            {stringGetter({ key: STRING_KEYS.SUPPORTED_ASSETS })}
+          </span>
+          <div tw="flex">
+            {supportedAssets.map((asset, idx) => (
+              <img
+                key={asset.name}
+                tw="size-2 rounded-[50%] ring-2 ring-color-layer-4"
+                css={{ marginLeft: idx > 0 ? '-0.375rem' : undefined }}
+                src={asset.icon}
+                alt={asset.name}
+              />
+            ))}
+          </div>
+        </div>
         {addressRepresentation && address ? (
           <div tw="ml-[-0.5rem] cursor-pointer rounded-[6px] p-0.5 hover:bg-color-layer-1">
             <div tw="min-w-0 whitespace-normal break-words text-justify">
