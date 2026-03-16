@@ -253,10 +253,14 @@ export function calculateTradeSummary(
   });
 
   const triggersData = calc(() => {
-    if (
-      effectiveTrade.type !== TradeFormType.TRIGGER_LIMIT &&
-      effectiveTrade.type !== TradeFormType.TRIGGER_MARKET
-    ) {
+    const isTriggerOrder =
+      effectiveTrade.type === TradeFormType.TRIGGER_LIMIT ||
+      effectiveTrade.type === TradeFormType.TRIGGER_MARKET;
+    const hasBracketOrders =
+      effectiveTrade.type === TradeFormType.MARKET &&
+      (effectiveTrade.takeProfitOrder?.priceInput != null ||
+        effectiveTrade.stopLossOrder?.priceInput != null);
+    if (!isTriggerOrder && !hasBracketOrders) {
       return undefined;
     }
 
