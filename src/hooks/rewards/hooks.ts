@@ -1,4 +1,5 @@
 import { BonsaiCore } from '@/bonsai/ontology';
+import { MarketInfo } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -59,6 +60,14 @@ export type BonkPnlItem = {
   pnl: number;
   volume: number;
   position: number;
+};
+
+export type BonkPnlLeaderboardItem = {
+  address: string;
+  pnl: number;
+  position: number;
+  tickers: MarketInfo['assetId'][];
+  volume: number;
 };
 
 export function useFeeLeaderboard({ address }: { address?: string }) {
@@ -143,6 +152,26 @@ export function useBonkPnlDistribution() {
   return {
     isLoading: bonkPnlItemsLoading,
     data: bonkPnlItems,
+  };
+}
+
+async function getBonkPnlLeaderboard() {
+  const res = await fetch(
+    'https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-bonk-pnl-all-time?perPage=2000'
+  );
+  const parsedRes = await res.json();
+  return parsedRes.data as BonkPnlLeaderboardItem[];
+}
+
+export function useBonkPnlLeaderboard() {
+  const { data: bonkPnlLeaderboardItems, isLoading: bonkPnlLeaderboardItemsLoading } = useQuery({
+    queryKey: ['bonk/pnl-leaderboard'],
+    queryFn: wrapAndLogError(() => getBonkPnlLeaderboard(), 'BonkPnl/fetchLeaderboard', true),
+  });
+
+  return {
+    isLoading: bonkPnlLeaderboardItemsLoading,
+    data: bonkPnlLeaderboardItems,
   };
 }
 

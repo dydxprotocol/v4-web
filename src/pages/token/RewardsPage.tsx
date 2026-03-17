@@ -10,6 +10,7 @@ import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
+import { timeUnits } from '@/constants/time';
 
 import { CURRENT_BONK_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -24,11 +25,13 @@ import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Tabs } from '@/components/Tabs';
+import { Tag } from '@/components/Tag';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { BonkIncentivesPanel } from './BonkIncentivesPanel';
+import { BonkPnlLeaderboardPanel } from './BonkPnlLeaderboardPanel';
 import { BonkPnlPanel } from './BonkPnlPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
@@ -42,6 +45,7 @@ import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 enum Tab {
+  Leaderboard = 'Leaderboard',
   BonkPnl = 'BonkPnl',
   Rewards = 'Rewards',
   LiquidationRebates = 'LiquidationRebates',
@@ -49,16 +53,15 @@ enum Tab {
 }
 
 const RewardsPage = () => {
-  const { titleStringKey } = CURRENT_BONK_REWARDS_DETAILS;
+  const { titleStringKey, endTime } = CURRENT_BONK_REWARDS_DETAILS;
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
-  // Bonk is always enabled
   const { complianceState } = useComplianceState();
   const { isTablet } = useBreakpoints();
   const enableLiquidationRebates = useEnableLiquidationRebates();
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(Tab.BonkPnl);
+  const [value, setValue] = useState(Tab.Leaderboard);
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -82,7 +85,22 @@ const RewardsPage = () => {
     </div>
   );
 
+  const endMs = new Date(endTime).getTime();
+  const msRemaining = endMs - Date.now();
+  const hasEnded = msRemaining <= 0;
+  const daysRemaining = Math.ceil(msRemaining / timeUnits.day);
+  const endingSoon = !hasEnded && daysRemaining <= 5;
+
   const tabs = [
+    {
+      content: (
+        <div tw="flexColumn gap-1.5">
+          <BonkPnlLeaderboardPanel />
+        </div>
+      ),
+      label: stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE }),
+      value: Tab.Leaderboard,
+    },
     {
       content: (
         <div tw="flexColumn gap-1.5">
@@ -90,7 +108,18 @@ const RewardsPage = () => {
           <BonkPnlPanel />
         </div>
       ),
-      label: stringGetter({ key: titleStringKey }),
+      label: (
+        <div tw="flex items-center gap-0.5">
+          {stringGetter({ key: titleStringKey })}
+          {hasEnded ? (
+            <Tag>{stringGetter({ key: STRING_KEYS.ENDED })}</Tag>
+          ) : endingSoon ? (
+            <Tag>
+              {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
+            </Tag>
+          ) : null}
+        </div>
+      ),
       value: Tab.BonkPnl,
     },
     ...(enableLiquidationRebates
@@ -142,7 +171,6 @@ const RewardsPage = () => {
         <$DetachedSection>
           <div tw="flex gap-1.5">
             <$Tabs
-              fullWidthTabs
               dividerStyle="underline"
               value={value}
               onValueChange={(v: Tab) => {
@@ -184,4 +212,5 @@ const $Tabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;
   --trigger-active-underline-backgroundColor: var(--color-layer-0);
   background-color: var(--color-layer-0);
+  overscroll-behavior: contain auto;
 ` as typeof Tabs;

@@ -164,7 +164,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     return (
       <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
         {stringGetter({
-          key: STRING_KEYS.DEPOSIT_NETWORK_WARNING,
+          key: STRING_KEYS.DEPOSIT_LOSS_OF_FUNDS_WARNING,
           params: warningMessageParams,
         })}
       </AlertMessage>
