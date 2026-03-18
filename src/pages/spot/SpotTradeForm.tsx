@@ -93,7 +93,7 @@ export const SpotTradeForm = () => {
   return (
     <SpotTabs
       tw="p-1"
-      disabled={form.isPending || form.inputData.walletStatus !== SpotWalletStatus.Connected}
+      disabled={form.inputData.walletStatus !== SpotWalletStatus.Connected}
       value={form.state.side}
       onValueChange={(v) => {
         form.actions.setSide(v as SpotSide);
@@ -107,7 +107,6 @@ export const SpotTradeForm = () => {
               <SpotFormInput
                 ref={inputRef}
                 value={form.state.size}
-                disabled={form.isPending}
                 onInput={({ formattedValue }: { formattedValue: string }) =>
                   form.actions.setSize(formattedValue)
                 }
@@ -138,7 +137,6 @@ export const SpotTradeForm = () => {
                 onSelect={(val) => form.actions.setSize(val)}
                 onOptionsEdit={handleQuickOptionsChange}
                 currentValue={form.state.size}
-                disabled={form.isPending}
                 validation={validationConfig}
                 {...currencyIndicator}
               />
@@ -158,7 +156,6 @@ export const SpotTradeForm = () => {
                   onClick={form.submitTransaction}
                   disabled={!form.canSubmit}
                   state={{
-                    isLoading: form.isPending,
                     isDisabled: !form.canSubmit,
                   }}
                 >

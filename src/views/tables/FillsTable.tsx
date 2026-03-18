@@ -1,7 +1,7 @@
 import { forwardRef, Key, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { PerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
+import { StablePerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -20,6 +20,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import {
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
@@ -60,7 +65,7 @@ export enum FillsTableColumnKey {
 }
 
 export type FillTableRow = {
-  marketSummary: Nullable<PerpetualMarketSummary>;
+  marketSummary: Nullable<StablePerpetualMarketSummary>;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 } & SubaccountFill;
@@ -148,13 +153,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.Time]: {
         columnKey: 'time',
         getCellValue: (row) => row.createdAt,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt != null ? new Date(createdAt).getTime() : undefined}
-            tw="text-color-text-0"
+          <DateAgeOutput
+            value={createdAt != null ? new Date(createdAt).getTime() : null}
+            relativeTimeFormat="singleCharacter"
           />
         ),
       },
@@ -315,7 +318,7 @@ export const FillsTable = forwardRef(
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
     const fills = currentMarket ? marketFills : allFills;
 
-    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.stableData));
 
     useViewPanel(currentMarket, 'fills');
 
@@ -337,36 +340,38 @@ export const FillsTable = forwardRef(
     );
 
     return (
-      <$Table
-        key={currentMarket ?? 'all-fills'}
-        label="Fills"
-        tableId="fills"
-        data={fillsData}
-        getRowKey={(row: FillTableRow) => row.id ?? ''}
-        onRowAction={(key: Key) =>
-          dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
-        }
-        columns={columnKeys.map((key: FillsTableColumnKey) =>
-          getFillsTableColumnDef({
-            key,
-            stringGetter,
-            symbol,
-            width: columnWidths?.[key],
-          })
-        )}
-        slotEmpty={
-          <>
-            <Icon iconName={IconName.History} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
-          </>
-        }
-        initialPageSize={initialPageSize}
-        withOuterBorder={withOuterBorder}
-        withInnerBorders={withInnerBorders}
-        withScrollSnapColumns
-        withScrollSnapRows
-        withFocusStickyRows
-      />
+      <DateAgeModeProvider>
+        <$Table
+          key={currentMarket ?? 'all-fills'}
+          label="Fills"
+          tableId="fills"
+          data={fillsData}
+          getRowKey={(row: FillTableRow) => row.id ?? ''}
+          onRowAction={(key: Key) =>
+            dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
+          }
+          columns={columnKeys.map((key: FillsTableColumnKey) =>
+            getFillsTableColumnDef({
+              key,
+              stringGetter,
+              symbol,
+              width: columnWidths?.[key],
+            })
+          )}
+          slotEmpty={
+            <>
+              <Icon iconName={IconName.History} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
+            </>
+          }
+          initialPageSize={initialPageSize}
+          withOuterBorder={withOuterBorder}
+          withInnerBorders={withInnerBorders}
+          withScrollSnapColumns
+          withScrollSnapRows
+          withFocusStickyRows
+        />
+      </DateAgeModeProvider>
     );
   }
 );

@@ -22,6 +22,7 @@ export enum StatsigFlags {
   abPopupDeposit = 'ab_popup_deposit',
   ffSpotBonk = 'ff_spot_bonk',
   ffOnlyShowLiquidationRebates = 'ff_only_show_liquidation_rebates',
+  ffDydxChat = 'ff_dydx_chat',
 }
 
 export enum CustomFlags {

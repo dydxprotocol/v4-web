@@ -29,6 +29,7 @@ import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
 import { spotSlice } from './spot';
 import { spotFormSlice } from './spotForm';
+import { spotTradesSlice } from './spotTrades';
 import { swapsSlice } from './swaps';
 import { tradeFormSlice } from './tradeForm';
 import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
@@ -51,6 +52,7 @@ const reducers = {
   closePositionForm: closePositionFormSlice.reducer,
   spot: spotSlice.reducer,
   spotForm: spotFormSlice.reducer,
+  spotTrades: spotTradesSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,
@@ -77,6 +79,7 @@ const persistConfig = {
     'tradingView',
     'transfers',
     'swaps',
+    'spotTrades',
     'wallet',
     'appUiConfigs',
     'accountUiMemory',

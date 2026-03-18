@@ -30,14 +30,14 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.4.0
-    version: 3.4.0
+    specifier: 3.6.0
+    version: 3.6.0
   '@dydxprotocol/v4-localization':
     specifier: 1.1.400
     version: 1.1.400
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
-    version: 7.0.5
+    version: 7.0.0-dev.0
   '@emotion/is-prop-valid':
     specifier: ^1.3.0
     version: 1.4.0
@@ -1701,8 +1701,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.4.0:
-    resolution: {integrity: sha512-dMEcqfJAreiDQjrgJyUNGqxUH3sh5J5LG5fKItCRIM7MsygAvf5/kpedQByh6nO6ov+tUw4zgT4OFc9vKN+cMQ==}
+  /@dydxprotocol/v4-client-js@3.6.0:
+    resolution: {integrity: sha512-rg9JTE07X7LyfrFadH+jnNXFFSgMfv5TrfOOqowfzyT5l4MGwDbNArRR1LfI4abcbSMCQRhKsCXEqpM3p3oZ+w==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1736,8 +1736,8 @@ packages:
     resolution: {integrity: sha512-VOPMYxmn9UONmtYxG7N0YBqOlTLIkHukSPy+PTxiOAVIuON2hSP8/TAmvIneGXMXyZhI7InsdhXDcePvozBxwA==}
     dev: false
 
-  /@dydxprotocol/v4-proto@7.0.5:
-    resolution: {integrity: sha512-V4Ii+oRuAAO2wXK9xLt4ztnxMa8pfDzsTXMtPi01cDPVncM5albcttrBzVrzob/YO1nmXwe8ku1LtISoI3BjNg==}
+  /@dydxprotocol/v4-proto@7.0.0-dev.0:
+    resolution: {integrity: sha512-yQ3xMW8GmKCCwtzXF1E/TMYvPYDPRmAR2T/AFXKlE2YF/P/yQMrz/IySzX4Z+wyAMI+G4Sr+AML7V8ehvAcjog==}
     dependencies:
       protobufjs: 6.11.4
     dev: false

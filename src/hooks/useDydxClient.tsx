@@ -180,45 +180,37 @@ const useDydxClientContext = () => {
           'Attempted to make requestAllAccountFills call while indexerClient is undefined'
         );
       }
-      const {
-        fills = [],
-        totalResults,
-        pageSize,
-      } = await indexerClient.account.getParentSubaccountNumberFills(
-        address,
-        subaccountNumber,
-        undefined,
-        undefined,
-        DEFAULT_PAGE_SIZE_TARGET,
-        undefined,
-        undefined,
-        1
-      );
 
-      // We get all the pages but we should exclude the first one, we already have this data
-      const pages = Array.from(
-        {
-          length: Math.ceil(totalResults / pageSize) - 1,
-        },
-        (_, index) => index + 2
-      ).slice(0, DEFAULT_MAX_REQUESTS);
+      const allFills: RawSubaccountFill[] = [];
+      const seenIds = new Set<string>();
 
-      const results = await Promise.all(
-        pages.map((page) =>
-          indexerClient.account.getParentSubaccountNumberFills(
-            address,
-            subaccountNumber,
-            undefined,
-            undefined,
-            pageSize,
-            undefined,
-            undefined,
-            page
-          )
-        )
-      );
+      for (let request = 0; request < DEFAULT_MAX_REQUESTS; request += 1) {
+        const createdBeforeOrAt = allFills.at(-1)?.createdAt ?? undefined;
 
-      const allFills: RawSubaccountFill[] = [...fills, ...results.map((data) => data.fills).flat()];
+        // eslint-disable-next-line no-await-in-loop
+        const { fills = [] } = await indexerClient.account.getParentSubaccountNumberFills(
+          address,
+          subaccountNumber,
+          undefined, // ticker
+          undefined, // tickerType
+          DEFAULT_PAGE_SIZE_TARGET, // limit
+          undefined, // createdBeforeOrAtHeight
+          createdBeforeOrAt, // createdBeforeOrAt (keyset cursor)
+          undefined // page (not used)
+        );
+
+        if (fills.length === 0) {
+          break;
+        }
+
+        const newFills = fills.filter((fill: RawSubaccountFill) => !seenIds.has(fill.id));
+        newFills.forEach((fill: RawSubaccountFill) => seenIds.add(fill.id));
+        allFills.push(...newFills);
+
+        if (fills.length < DEFAULT_PAGE_SIZE_TARGET) {
+          break;
+        }
+      }
 
       // sorts the data in descending order
       return allFills.sort((fillA, fillB) => {

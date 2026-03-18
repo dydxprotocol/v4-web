@@ -1,7 +1,7 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
-import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
+import { StablePerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -46,7 +46,7 @@ export enum FundingPaymentsTableColumnKey {
 }
 
 export type FundingPaymentTableRow = {
-  marketSummary: Nullable<PerpetualMarketSummary>;
+  marketSummary: Nullable<StablePerpetualMarketSummary>;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 } & IndexerFundingPaymentResponseObject;
@@ -210,7 +210,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
     const { data: fundingPayments, status: fundingPaymentsStatus } =
       BonsaiHooks.useFundingPayments();
 
-    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.stableData));
 
     const fundingPaymentsData = useMemo(() => {
       const filteredFundingPayments = fundingPayments?.filter((fundingPayment) => {

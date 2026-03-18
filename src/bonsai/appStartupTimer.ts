@@ -23,7 +23,7 @@ const TOO_LONG_STARTUP = 15 * timeUnits.second;
 
 const firstSeenPath = document.location.pathname;
 
-const STARTUP_SAMPLE_RATE = 0.25;
+const STARTUP_SAMPLE_RATE = 0.5;
 
 export const AppStartupTimer = {
   timeIfFirst(t: keyof StartupStats) {

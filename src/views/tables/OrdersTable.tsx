@@ -1,7 +1,11 @@
 import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { OrderStatus, PerpetualMarketSummary, SubaccountOrder } from '@/bonsai/types/summaryTypes';
+import {
+  OrderStatus,
+  StablePerpetualMarketSummary,
+  SubaccountOrder,
+} from '@/bonsai/types/summaryTypes';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import styled, { css } from 'styled-components';
@@ -25,6 +29,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import {
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
@@ -72,7 +81,7 @@ export enum OrdersTableColumnKey {
 }
 
 export type OrderTableRow = {
-  marketSummary: Nullable<PerpetualMarketSummary>;
+  marketSummary: Nullable<StablePerpetualMarketSummary>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 } & SubaccountOrder;
@@ -233,16 +242,12 @@ const getOrdersTableColumnDef = ({
       [OrdersTableColumnKey.Updated]: {
         columnKey: 'updatedAt',
         getCellValue: (row) => row.updatedAtMilliseconds ?? Infinity,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader />,
         renderCell: ({ updatedAtMilliseconds }) => {
           if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
 
           return (
-            <Output
-              type={OutputType.RelativeTime}
-              value={updatedAtMilliseconds}
-              relativeTimeOptions={{ format: 'singleCharacter' }}
-            />
+            <DateAgeOutput value={updatedAtMilliseconds} relativeTimeFormat="singleCharacter" />
           );
         },
       },
@@ -398,7 +403,7 @@ export const OrdersTable = forwardRef(
       [allOrders, currentMarket, marketOrders, marketTypeFilter]
     );
 
-    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.stableData));
     useViewPanel(currentMarket, tableType === 'OPEN' ? 'openOrders' : 'orderHistory');
 
     const symbol = mapIfPresent(
@@ -419,40 +424,42 @@ export const OrdersTable = forwardRef(
     );
 
     return (
-      <$Table
-        key={currentMarket ?? 'all-orders'}
-        label="Orders"
-        tableId={tableType === 'OPEN' ? 'open-orders' : 'order-history'}
-        data={ordersData}
-        getRowKey={(row: OrderTableRow) => row.id}
-        onRowAction={(key: Key) =>
-          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: `${key}` })))
-        }
-        columns={columnKeys.map((key: OrdersTableColumnKey) =>
-          getOrdersTableColumnDef({
-            key,
-            currentMarket,
-            dispatch,
-            isTablet,
-            stringGetter,
-            symbol,
-            isAccountViewOnly,
-            width: columnWidths?.[key],
-          })
-        )}
-        slotEmpty={
-          <>
-            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
-          </>
-        }
-        initialPageSize={initialPageSize}
-        withOuterBorder={withOuterBorder}
-        withInnerBorders
-        withScrollSnapColumns
-        withScrollSnapRows
-        withFocusStickyRows
-      />
+      <DateAgeModeProvider>
+        <$Table
+          key={currentMarket ?? 'all-orders'}
+          label="Orders"
+          tableId={tableType === 'OPEN' ? 'open-orders' : 'order-history'}
+          data={ordersData}
+          getRowKey={(row: OrderTableRow) => row.id}
+          onRowAction={(key: Key) =>
+            dispatch(openDialog(DialogTypes.OrderDetails({ orderId: `${key}` })))
+          }
+          columns={columnKeys.map((key: OrdersTableColumnKey) =>
+            getOrdersTableColumnDef({
+              key,
+              currentMarket,
+              dispatch,
+              isTablet,
+              stringGetter,
+              symbol,
+              isAccountViewOnly,
+              width: columnWidths?.[key],
+            })
+          )}
+          slotEmpty={
+            <>
+              <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
+            </>
+          }
+          initialPageSize={initialPageSize}
+          withOuterBorder={withOuterBorder}
+          withInnerBorders
+          withScrollSnapColumns
+          withScrollSnapRows
+          withFocusStickyRows
+        />
+      </DateAgeModeProvider>
     );
   }
 );

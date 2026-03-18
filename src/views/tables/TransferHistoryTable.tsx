@@ -17,6 +17,11 @@ import { CopyButton } from '@/components/CopyButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+import {
+  DateAgeModeProvider,
+  DateAgeOutput,
+  DateAgeToggleHeader,
+} from '@/components/Table/DateAgeToggleHeader';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -56,14 +61,9 @@ const getTransferHistoryTableColumnDef = ({
       [TransferHistoryTableColumnKey.Time]: {
         columnKey: TransferHistoryTableColumnKey.Time,
         getCellValue: (row) => row.createdAt,
-        label: stringGetter({ key: STRING_KEYS.TIME }),
+        label: <DateAgeToggleHeader />,
         renderCell: ({ createdAt }) => (
-          <Output
-            type={OutputType.RelativeTime}
-            relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt}
-            tw="text-color-text-0"
-          />
+          <DateAgeOutput value={createdAt} relativeTimeFormat="singleCharacter" />
         ),
       },
       [TransferHistoryTableColumnKey.Action]: {
@@ -147,41 +147,43 @@ export const TransferHistoryTable = ({
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
   return (
-    <$Table
-      label="Transfers"
-      data={transfers}
-      tableId="transfer-history"
-      getRowKey={(row: SubaccountTransfer) => row.id}
-      columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
-        getTransferHistoryTableColumnDef({
-          key,
-          stringGetter,
-          width: columnWidths?.[key],
-          mintscanTxUrl,
-        })
-      )}
-      slotEmpty={
-        <>
-          {stringGetter({ key: STRING_KEYS.TRANSFERS_EMPTY_STATE })}
-          {canAccountTrade ? (
-            <Button
-              action={ButtonAction.Primary}
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
-            >
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
-            </Button>
-          ) : (
-            <OnboardingTriggerButton />
-          )}
-        </>
-      }
-      initialPageSize={initialPageSize}
-      selectionBehavior="replace"
-      withOuterBorder={withOuterBorder}
-      withInnerBorders={withInnerBorders}
-      withScrollSnapColumns
-      withScrollSnapRows
-    />
+    <DateAgeModeProvider>
+      <$Table
+        label="Transfers"
+        data={transfers}
+        tableId="transfer-history"
+        getRowKey={(row: SubaccountTransfer) => row.id}
+        columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
+          getTransferHistoryTableColumnDef({
+            key,
+            stringGetter,
+            width: columnWidths?.[key],
+            mintscanTxUrl,
+          })
+        )}
+        slotEmpty={
+          <>
+            {stringGetter({ key: STRING_KEYS.TRANSFERS_EMPTY_STATE })}
+            {canAccountTrade ? (
+              <Button
+                action={ButtonAction.Primary}
+                onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+              >
+                {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+              </Button>
+            ) : (
+              <OnboardingTriggerButton />
+            )}
+          </>
+        }
+        initialPageSize={initialPageSize}
+        selectionBehavior="replace"
+        withOuterBorder={withOuterBorder}
+        withInnerBorders={withInnerBorders}
+        withScrollSnapColumns
+        withScrollSnapRows
+      />
+    </DateAgeModeProvider>
   );
 };
 const $Table = styled(Table)`

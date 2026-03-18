@@ -4,8 +4,6 @@ import { OrderSide } from '@/bonsai/forms/trade/types';
 import { PositionUniqueId, SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
-
 import { BigNumberish } from '@/lib/numbers';
 import { Nullable } from '@/lib/typeUtils';
 
@@ -66,15 +64,25 @@ export type SelectMarginModeDialogProps = {};
 export type SetMarketLeverageDialogProps = { marketId: string };
 export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
+export type SharePNLShareType = 'open' | 'close' | 'liquidated' | 'partialClose' | 'extended';
 export type SharePNLAnalyticsDialogProps = {
-  marketId: string;
   assetId: string;
-  leverage: Nullable<number>;
-  oraclePrice: Nullable<number>;
-  entryPrice: Nullable<number>;
-  unrealizedPnl: Nullable<number>;
-  side: Nullable<IndexerPositionSide>;
-  sideLabel: Nullable<string>;
+  marketId?: string;
+  isLong: boolean;
+  isCross: boolean;
+  shareType?: SharePNLShareType | undefined;
+  leverage?: Nullable<number>;
+  size?: Nullable<number>;
+  prevSize?: Nullable<number>;
+  pnl?: Nullable<number>;
+  unrealizedPnl?: Nullable<number>;
+  pnlPercentage?: Nullable<number>;
+  entryPrice?: Nullable<number>;
+  exitPrice?: Nullable<number>;
+  liquidationPrice?: Nullable<number>;
+  oraclePrice?: Nullable<number>;
+  sideLabel?: Nullable<string>;
+  closeType?: Nullable<string>;
 };
 export type SimpleUiTradeDialogProps =
   | {
