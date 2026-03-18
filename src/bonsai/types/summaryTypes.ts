@@ -11,6 +11,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerPerpetualPositionResponseObject,
+  IndexerPositionSide,
   IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
@@ -200,6 +201,44 @@ export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
   closedPnl?: number;
 };
 
+export enum TradeAction {
+  OPEN_LONG = 'OPEN_LONG',
+  OPEN_SHORT = 'OPEN_SHORT',
+  CLOSE_LONG = 'CLOSE_LONG',
+  CLOSE_SHORT = 'CLOSE_SHORT',
+  PARTIAL_CLOSE_LONG = 'PARTIAL_CLOSE_LONG',
+  PARTIAL_CLOSE_SHORT = 'PARTIAL_CLOSE_SHORT',
+  ADD_TO_LONG = 'ADD_TO_LONG',
+  ADD_TO_SHORT = 'ADD_TO_SHORT',
+  LIQUIDATION = 'LIQUIDATION',
+}
+
+export type SubaccountTrade = {
+  id: string;
+  marketId: string;
+  orderId: string | undefined;
+  positionUniqueId: PositionUniqueId | undefined;
+  side?: IndexerOrderSide | undefined;
+  positionSide?: IndexerPositionSide | undefined | null;
+  action: TradeAction;
+  price: number | undefined;
+  entryPrice?: number | undefined;
+  size?: number | undefined;
+  prevSize?: number | undefined;
+  additionalSize?: number | undefined;
+  value: number | undefined;
+  fee: string | undefined;
+  closedPnl?: number | undefined;
+  closedPnlPercent?: number | undefined;
+  netClosedPnlPercent?: number | undefined;
+  createdAt: string | undefined;
+  marginMode: MarginMode;
+  orderType: IndexerOrderType | undefined;
+  leverage?: number;
+  liquidationPrice?: number;
+  subaccountNumber?: number;
+};
+
 export type LiveTrade = IndexerWsTradeResponseObject;
 
 export type PendingIsolatedPosition = {
@@ -278,6 +317,26 @@ export type PerpetualMarketSummary = MarketInfo &
 export type PerpetualMarketSummaries = {
   [marketId: string]: PerpetualMarketSummary;
 };
+
+export const unstableMarketSummaryFields = [
+  'oraclePrice',
+  'priceChange24H',
+  'percentChange24h',
+  'nextFundingRate',
+  'volume24H',
+  'trades24H',
+  'openInterest',
+  'openInterestUSDC',
+] satisfies ReadonlyArray<keyof PerpetualMarketSummary>;
+
+export type UnstableMarketSummaryFields = (typeof unstableMarketSummaryFields)[number];
+
+export type StablePerpetualMarketSummary = Omit<
+  PerpetualMarketSummary,
+  UnstableMarketSummaryFields
+>;
+
+export type StablePerpetualMarketSummaries = Record<string, StablePerpetualMarketSummary>;
 
 export type PerpetualMarketFeeDiscount = NonNullable<
   ToPrimitives<FeeTierModule.QueryAllMarketFeeDiscountParamsResponse['params']>

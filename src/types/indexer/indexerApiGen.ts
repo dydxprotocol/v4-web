@@ -223,6 +223,50 @@ export interface IndexerAffiliatesReferralCodeBody {
 /**
  *
  * @export
+ * @interface AppleLoginRedirectRequest
+ */
+export interface IndexerAppleLoginRedirectRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof AppleLoginRedirectRequest
+   */
+  state: string;
+  /**
+   *
+   * @type {string}
+   * @memberof AppleLoginRedirectRequest
+   */
+  code: string;
+}
+/**
+ *
+ * @export
+ * @interface AppleLoginResponse
+ */
+export interface IndexerAppleLoginResponse {
+  /**
+   *
+   * @type {boolean}
+   * @memberof AppleLoginResponse
+   */
+  success: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof AppleLoginResponse
+   */
+  encodedPayload?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof AppleLoginResponse
+   */
+  error?: string | null;
+}
+/**
+ *
+ * @export
  * @interface AssetPositionResponse
  */
 export interface IndexerAssetPositionResponse {
@@ -629,6 +673,24 @@ export interface IndexerFillResponseObject {
    * @memberof FillResponseObject
    */
   orderRouterFee?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  positionSizeBefore?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  entryPriceBefore?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  positionSideBefore?: string | null;
 }
 /**
  *

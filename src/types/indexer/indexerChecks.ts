@@ -24,6 +24,7 @@ import {
   IndexerWsParentSubaccountUpdateObject,
   IndexerWsPerpetualMarketResponse,
   IndexerWsTradesUpdateObject,
+  IndexerCompositeTradeHistoryResponse,
 } from './indexerManual';
 
 export const isWsParentSubaccountSubscribed =
@@ -57,3 +58,5 @@ export const isPerpetualMarketSparklineResponse =
 export const isIndexerHistoricalPnlResponse = typia.createAssert<IndexerPnlResponse>();
 export const isIndexerHistoricalTradingRewardAggregationResponse =
   typia.createAssert<IndexerHistoricalTradingRewardAggregationsResponse>();
+export const isParentSubaccountTradeHistoryResponse =
+  typia.createAssert<IndexerCompositeTradeHistoryResponse>();

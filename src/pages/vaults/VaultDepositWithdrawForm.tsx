@@ -10,10 +10,12 @@ import tw from 'twin.macro';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -548,6 +550,10 @@ export const VaultDepositWithdrawForm = ({
     dispatch(resetVaultForm());
   }, [shouldDisableFormBecauseWallet, dispatch]);
 
+  const { complianceState } = useComplianceState();
+  const depositGeoBlocked =
+    operation === 'DEPOSIT' && complianceState !== ComplianceStates.FULL_ACCESS;
+
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const maybeConnectWalletButton = !canAccountTrade ? (
     <OnboardingTriggerButton size={ButtonSize.Base} />
@@ -587,13 +593,13 @@ export const VaultDepositWithdrawForm = ({
           label={inputFormConfig.formLabel}
           value={amount}
           onChange={setAmount}
-          disabled={shouldDisableFormBecauseWallet}
+          disabled={shouldDisableFormBecauseWallet || depositGeoBlocked}
           slotRight={
             <FormMaxInputToggleButton
               size={ButtonSize.XSmall}
               isInputEmpty={amount === ''}
               isLoading={false}
-              disabled={shouldDisableFormBecauseWallet}
+              disabled={shouldDisableFormBecauseWallet || depositGeoBlocked}
               onPressedChange={(isPressed: boolean) =>
                 isPressed ? onClickMax() : setAmountState('')
               }
@@ -614,7 +620,11 @@ export const VaultDepositWithdrawForm = ({
             type={ButtonType.Submit}
             action={ButtonAction.Primary}
             state={{
-              isDisabled: hasInputErrors || shouldDisableFormBecauseWallet || isSubmitting,
+              isDisabled:
+                hasInputErrors ||
+                shouldDisableFormBecauseWallet ||
+                depositGeoBlocked ||
+                isSubmitting,
               isLoading: isSubmitting,
             }}
             slotLeft={
@@ -729,7 +739,11 @@ export const VaultDepositWithdrawForm = ({
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
               state={{
-                isDisabled: hasInputErrors || shouldDisableFormBecauseWallet || isSubmitting,
+                isDisabled:
+                  hasInputErrors ||
+                  shouldDisableFormBecauseWallet ||
+                  depositGeoBlocked ||
+                  isSubmitting,
                 isLoading: isSubmitting,
               }}
               slotLeft={

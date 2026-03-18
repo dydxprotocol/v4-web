@@ -31,6 +31,7 @@ import {
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillResponse,
+  IndexerCompositeTradeHistoryResponse,
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
@@ -104,6 +105,7 @@ export interface RawDataState {
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
     orders: Loadable<OrdersData>;
+    tradeHistory: Loadable<IndexerCompositeTradeHistoryResponse>;
     transfers: Loadable<IndexerParentSubaccountTransferResponse>;
     blockTradingRewards: Loadable<IndexerHistoricalBlockTradingRewardsResponse>;
   };
@@ -148,6 +150,7 @@ const initialState: RawDataState = {
     stakingTier: loadableIdle(),
     fills: loadableIdle(),
     orders: loadableIdle(),
+    tradeHistory: loadableIdle(),
     transfers: loadableIdle(),
     blockTradingRewards: loadableIdle(),
   },
@@ -224,6 +227,12 @@ export const rawSlice = createSlice({
         action: PayloadAction<Loadable<IndexerCompositeFillResponse>>
       ) => {
         state.account.fills = action.payload;
+      },
+      setAccountTradesRaw: (
+        state,
+        action: PayloadAction<Loadable<IndexerCompositeTradeHistoryResponse>>
+      ) => {
+        state.account.tradeHistory = action.payload;
       },
       setAccountTransfersRaw: (
         state,
@@ -418,6 +427,7 @@ export const {
   setAccountBalancesRaw,
   setAccountStatsRaw,
   setAccountFillsRaw,
+  setAccountTradesRaw,
   setAccountNobleUsdcBalanceRaw,
   setAccountOrdersRaw,
   setAccountTransfersRaw,

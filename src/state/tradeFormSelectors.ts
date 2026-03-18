@@ -141,6 +141,10 @@ export const getClosePositionFormSummary = createAppSelector(
         goodTil: undefined,
         stopLossOrder: undefined,
         takeProfitOrder: undefined,
+        scaleStartPrice: undefined,
+        scaleEndPrice: undefined,
+        scaleTotalOrders: undefined,
+        scaleSkew: undefined,
       },
       inputData
     );

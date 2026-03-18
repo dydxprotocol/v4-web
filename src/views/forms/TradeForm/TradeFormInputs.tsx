@@ -6,12 +6,20 @@ import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
-import { InputErrorData, TradeBoxKeys } from '@/constants/trade';
+import { INTEGER_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import {
+  InputErrorData,
+  MAX_SCALE_ORDERS,
+  MAX_SCALE_SKEW,
+  MIN_SCALE_ORDERS,
+  MIN_SCALE_SKEW,
+  TradeBoxKeys,
+} from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
@@ -37,6 +45,8 @@ type TradeBoxInputConfig = {
   value: string | number;
   decimals?: number;
   slotRight?: React.ReactNode;
+  /** When set, renders a second input inline beside this one. */
+  companionInput?: TradeBoxInputConfig;
 };
 
 export const TradeFormInputs = () => {
@@ -44,9 +54,25 @@ export const TradeFormInputs = () => {
   const stringGetter = useStringGetter();
 
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
-  const { showLimitPrice, showTriggerPrice } = tradeSummary.options;
+  const {
+    showLimitPrice,
+    showTriggerPrice,
+    showScaleStartPrice,
+    showScaleEndPrice,
+    showScaleTotalOrders,
+    showScaleSkew,
+  } = tradeSummary.options;
   const tradeFormValues = useAppSelector(getTradeFormValues);
-  const { limitPrice, triggerPrice, marketId, type } = tradeFormValues;
+  const {
+    limitPrice,
+    triggerPrice,
+    scaleStartPrice,
+    scaleEndPrice,
+    scaleTotalOrders,
+    scaleSkew,
+    marketId,
+    type,
+  } = tradeFormValues;
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -128,8 +154,88 @@ export const TradeFormInputs = () => {
     });
   }
 
-  return tradeFormInputs.map(
-    ({
+  if (showScaleStartPrice && showScaleEndPrice) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.ScaleStartPrice,
+      inputType: InputType.Currency,
+      label: (
+        <>
+          <span>{stringGetter({ key: STRING_KEYS.START })}</span>
+          <Tag>USD</Tag>
+        </>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setScaleStartPrice(value));
+      },
+      value: scaleStartPrice ?? '',
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
+      companionInput: {
+        key: TradeBoxKeys.ScaleEndPrice,
+        inputType: InputType.Currency,
+        label: (
+          <>
+            <span>{stringGetter({ key: STRING_KEYS.END })}</span>
+            <Tag>USD</Tag>
+          </>
+        ),
+        onChange: ({ value }: NumberFormatValues) => {
+          dispatch(tradeFormActions.setScaleEndPrice(value));
+        },
+        value: scaleEndPrice ?? '',
+        decimals: tickSizeDecimals ?? USD_DECIMALS,
+      },
+    });
+  }
+
+  if (showScaleTotalOrders && showScaleSkew) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.ScaleTotalOrders,
+      inputType: InputType.Number,
+      label: (
+        <WithTooltip
+          tooltipString={stringGetter({
+            key: STRING_KEYS.TOTAL_ORDERS_TOOLTIP,
+            params: {
+              MIN: MIN_SCALE_ORDERS,
+              MAX: MAX_SCALE_ORDERS,
+            },
+          })}
+        >
+          {stringGetter({ key: STRING_KEYS.TOTAL_ORDERS })}{' '}
+        </WithTooltip>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(tradeFormActions.setScaleTotalOrders(value));
+      },
+      value: scaleTotalOrders ?? '',
+      decimals: INTEGER_DECIMALS,
+      companionInput: {
+        key: TradeBoxKeys.ScaleSkew,
+        inputType: InputType.Number,
+        label: (
+          <WithTooltip
+            tooltipString={stringGetter({
+              key: STRING_KEYS.SKEW_TOOLTIP,
+              params: {
+                MIN: MIN_SCALE_SKEW,
+                MAX: MAX_SCALE_SKEW,
+              },
+            })}
+          >
+            {stringGetter({ key: STRING_KEYS.SKEW })}
+          </WithTooltip>
+        ),
+        onChange: ({ value }: NumberFormatValues) => {
+          dispatch(tradeFormActions.setScaleSkew(value));
+        },
+        value: scaleSkew ?? '',
+        decimals: 1,
+      },
+    });
+  }
+
+  return tradeFormInputs.map((config) => {
+    const {
       key,
       inputType,
       label,
@@ -139,7 +245,10 @@ export const TradeFormInputs = () => {
       value,
       decimals,
       slotRight,
-    }) => (
+      companionInput,
+    } = config;
+
+    const primaryInput = (
       <FormInput
         key={key}
         id={key}
@@ -152,10 +261,37 @@ export const TradeFormInputs = () => {
         decimals={decimals}
         slotRight={slotRight}
       />
-    )
-  );
+    );
+
+    const inputRow = companionInput ? (
+      <$InlineRow key={key}>
+        {primaryInput}
+        <FormInput
+          key={companionInput.key}
+          id={companionInput.key}
+          type={companionInput.inputType}
+          label={companionInput.label}
+          onChange={companionInput.onChange}
+          onInput={companionInput.onInput}
+          validationConfig={companionInput.validationConfig}
+          value={companionInput.value}
+          decimals={companionInput.decimals}
+          slotRight={companionInput.slotRight}
+        />
+      </$InlineRow>
+    ) : (
+      primaryInput
+    );
+
+    return inputRow;
+  });
 };
 
 const $MidPriceButton = styled(Button)`
   ${formMixins.inputInnerButton}
+`;
+
+const $InlineRow = styled.span`
+  ${layoutMixins.flexEqualColumns}
+  gap: 1rem;
 `;

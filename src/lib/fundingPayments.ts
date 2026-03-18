@@ -1,5 +1,5 @@
 import { OrderSide } from '@/bonsai/forms/trade/types';
-import { PerpetualMarketSummaries } from '@/bonsai/types/summaryTypes';
+import { StablePerpetualMarketSummaries } from '@/bonsai/types/summaryTypes';
 
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import {
@@ -14,7 +14,7 @@ export const getHydratedFundingPayment = ({
 }: {
   id: string;
   data: IndexerFundingPaymentResponseObject;
-  marketSummaries: PerpetualMarketSummaries;
+  marketSummaries: StablePerpetualMarketSummaries;
 }) => {
   return {
     id,

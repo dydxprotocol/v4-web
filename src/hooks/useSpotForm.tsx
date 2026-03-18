@@ -3,15 +3,14 @@ import { useCallback, useMemo } from 'react';
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { randomUUID } from 'crypto';
 
 import { ComplianceStates } from '@/constants/compliance';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSpotTransactionSubmit } from '@/hooks/useSpotTransactionSubmit';
 
-import { Icon, IconName } from '@/components/Icon';
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
 import { appQueryClient } from '@/state/appQueryClient';
@@ -19,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { spotFormActions } from '@/state/spotForm';
 import { getSpotFormSummary } from '@/state/spotFormSelectors';
+import { addSpotTrade, updateSpotTrade } from '@/state/spotTrades';
 
 import { SpotApiSide } from '@/clients/spotApi';
 
@@ -30,8 +30,7 @@ export function useSpotForm() {
   const dispatch = useAppDispatch();
   const formSummary = useAppSelector(getSpotFormSummary);
   const { canDeriveSolanaWallet } = useAccounts();
-  const { mutateAsync: submitTransactionMutation, isPending } = useSpotTransactionSubmit();
-  const notify = useCustomNotification();
+  const { mutateAsync: submitTransactionMutation } = useSpotTransactionSubmit();
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -52,9 +51,8 @@ export function useSpotForm() {
       canDeriveSolanaWallet &&
       !hasErrors &&
       formSummary.summary.payload != null &&
-      !isPending &&
       complianceState !== ComplianceStates.READ_ONLY,
-    [canDeriveSolanaWallet, complianceState, formSummary.summary.payload, hasErrors, isPending]
+    [canDeriveSolanaWallet, complianceState, formSummary.summary.payload, hasErrors]
   );
 
   const actions = useMemo(
@@ -93,64 +91,84 @@ export function useSpotForm() {
   );
 
   const submitTransaction = useCallback(async () => {
+    const side = formSummary.state.side === SpotSide.BUY ? SpotApiSide.BUY : SpotApiSide.SELL;
+    const tokenSymbol = tokenMetadata?.symbol ?? '';
+    const tradeId = `spot-${Date.now()}-${side}-${tokenSymbol}-${formSummary.summary.payload?.pool ?? randomUUID()}`;
+
+    dispatch(
+      addSpotTrade({
+        trade: {
+          id: tradeId,
+          side,
+          tokenSymbol,
+          tokenAmount: '',
+          solAmount: '',
+          txHash: '',
+          status: 'pending',
+          createdAt: Date.now(),
+        },
+      })
+    );
+
+    // Pass payload as a mutation variable so it's captured at invocation time.
+    // React-Query v5's MutationObserver.setOptions() overwrites an in-flight
+    // mutation's mutationFn when pending, so closure-captured values are unsafe.
+    const mutationPromise = submitTransactionMutation({
+      payload: formSummary.summary.payload!,
+    });
+
+    // Reset form — mutation has the payload as a variable, immune to re-render
+    dispatch(spotFormActions.reset());
+
+    appQueryClient.invalidateQueries({
+      queryKey: ['spot', 'portfolioTrades'],
+      exact: false,
+    });
+
     try {
-      const result = await submitTransactionMutation();
-      dispatch(spotFormActions.reset());
-
-      appQueryClient.invalidateQueries({
-        queryKey: ['spot', 'portfolioTrades'],
-        exact: false,
-      });
-
-      const { landResponse } = result;
-      const isBuy = landResponse.side === SpotApiSide.BUY;
-      const tokenSymbol = tokenMetadata?.symbol ?? '';
+      const { landResponse } = await mutationPromise;
 
       const formattedTokenAmount = formatNumberOutput(landResponse.tokenChange, OutputType.Asset, {
         decimalSeparator,
         groupSeparator,
         selectedLocale,
       });
-
       const formattedSolAmount = formatNumberOutput(landResponse.solChange, OutputType.Asset, {
         decimalSeparator,
         groupSeparator,
         selectedLocale,
       });
 
-      notify(
-        {
-          title: 'Trade Successful',
-          slotTitleLeft: <Icon iconName={IconName.CheckCircle} tw="text-color-success" />,
-          body: `${isBuy ? 'Purchased' : 'Sold'} ${formattedTokenAmount} ${tokenSymbol} for ${formattedSolAmount} SOL`,
-        },
-        {
-          toastDuration: 5000,
-        }
+      dispatch(
+        updateSpotTrade({
+          trade: {
+            id: tradeId,
+            tokenAmount: formattedTokenAmount,
+            solAmount: formattedSolAmount,
+            txHash: landResponse.txHash,
+            status: 'success',
+          },
+        })
       );
-
-      return result;
-    } catch (error) {
-      notify(
-        {
-          title: 'Transaction Failed',
-          slotTitleLeft: <Icon iconName={IconName.Warning} tw="text-color-error" />,
-          body: 'Transaction failed. Please try again.',
-        },
-        {
-          toastDuration: 5000,
-        }
+    } catch {
+      dispatch(
+        updateSpotTrade({
+          trade: {
+            id: tradeId,
+            status: 'error',
+          },
+        })
       );
-      throw error;
     }
   }, [
+    formSummary.state.side,
+    formSummary.summary.payload,
+    tokenMetadata?.symbol,
     dispatch,
     submitTransactionMutation,
-    tokenMetadata?.symbol,
     decimalSeparator,
     groupSeparator,
     selectedLocale,
-    notify,
   ]);
 
   return {
@@ -162,7 +180,6 @@ export function useSpotForm() {
     hasErrors,
     primaryAlert,
     canSubmit,
-    isPending,
     handleInputTypeChange,
     submitTransaction,
   };

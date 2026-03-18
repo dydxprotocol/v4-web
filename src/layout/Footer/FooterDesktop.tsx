@@ -5,9 +5,11 @@ import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useApiState } from '@/hooks/useApiState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -16,11 +18,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { GlobalChat } from '@/components/GlobalChat';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setIsChatEnabled } from '@/state/appUiConfigs';
+import { getIsChatEnabled } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isPresent } from '@/lib/typeUtils';
@@ -41,6 +46,8 @@ export const FooterDesktop = () => {
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
   const deployerName = useEnvConfig('deployerName');
   const { statusPage } = useURLConfigs();
+  const isChatEnabled = useStatsigGateValue(StatsigFlags.ffDydxChat);
+  const isChatPreferenceEnabled = useAppSelector(getIsChatEnabled);
 
   const isStatusLoading = !status && !statusErrorMessage;
 
@@ -61,6 +68,8 @@ export const FooterDesktop = () => {
 
   return (
     <$Footer>
+      {isChatEnabled && isChatPreferenceEnabled && <GlobalChat />}
+
       <$Row>
         <WithTooltip
           slotTooltip={
@@ -82,6 +91,12 @@ export const FooterDesktop = () => {
             {label}
           </$FooterButton>
         </WithTooltip>
+
+        {isChatEnabled && !isChatPreferenceEnabled && (
+          <$FooterButton size={ButtonSize.XSmall} onClick={() => dispatch(setIsChatEnabled(true))}>
+            {stringGetter({ key: STRING_KEYS.CHAT })}
+          </$FooterButton>
+        )}
 
         {globalThis.Intercom && (
           <$FooterButton
@@ -137,6 +152,7 @@ export const FooterDesktop = () => {
     </$Footer>
   );
 };
+
 const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   ${layoutMixins.spacedRow}

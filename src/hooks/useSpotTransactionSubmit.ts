@@ -33,10 +33,9 @@ export const useSpotTransactionSubmit = () => {
   const { localSolanaKeypair, solanaAddress } = useAccounts();
   const spotApiEndpoint = useEndpointsConfig().spotApi;
 
-  const makeTransaction = async () => {
-    const createPayload = formSummary.payload;
+  const makeTransaction = async ({ payload }: { payload: SpotApiCreateTransactionRequest }) => {
     // Should never happen - submit button should always be disabled when payload is not truthy
-    if (!createPayload) {
+    if (!payload) {
       logBonsaiError('spot/useSpotTransactionSubmit', 'No payload available', {
         formInputData,
         formState,
@@ -51,19 +50,19 @@ export const useSpotTransactionSubmit = () => {
       'validateWallet';
 
     logBonsaiInfo('spot/useSpotTransactionSubmit', 'Crafting a transaction', {
-      createPayload,
+      payload,
       formInputData,
       formState,
     });
     track(
       AnalyticsEvents.SpotTransactionSubmitStarted({
-        side: createPayload.side,
-        tokenMint: createPayload.tokenMint,
+        side: payload.side,
+        tokenMint: payload.tokenMint,
         tokenSymbol: tokenMetadata?.symbol,
-        tradeRoute: createPayload.tradeRoute,
+        tradeRoute: payload.tradeRoute,
         estimatedUsdAmount: formSummary.amounts?.usd,
         inputType:
-          createPayload.side === SpotApiSide.BUY ? formState.buyInputType : formState.sellInputType,
+          payload.side === SpotApiSide.BUY ? formState.buyInputType : formState.sellInputType,
       })
     );
 
@@ -73,7 +72,7 @@ export const useSpotTransactionSubmit = () => {
       }
 
       const requestWithAccount: SpotApiCreateTransactionRequest = {
-        ...createPayload,
+        ...payload,
         account: solanaAddress,
       };
 
@@ -98,7 +97,7 @@ export const useSpotTransactionSubmit = () => {
       const landTransactionTimer = startTimer();
       const landResponse = await landSpotTransaction(spotApiEndpoint, {
         signedTransaction: signedTransactionBase58,
-        expectedTokenMint: createPayload.tokenMint,
+        expectedTokenMint: payload.tokenMint,
         landingMethod: createResponse.metadata.jupiterRequestId
           ? SpotApiLandingMethod.JUPITER
           : undefined,
@@ -109,7 +108,7 @@ export const useSpotTransactionSubmit = () => {
 
       timingMs.totalMs = totalTimer.elapsed();
       logBonsaiInfo('spot/useSpotTransactionSubmit', 'Successfuly landed a transaction', {
-        createPayload,
+        payload,
         formInputData,
         formState,
         createMetadata: createResponse.metadata,
@@ -118,10 +117,10 @@ export const useSpotTransactionSubmit = () => {
       });
       track(
         AnalyticsEvents.SpotTransactionSubmitSuccess({
-          side: createPayload.side,
-          tokenMint: createPayload.tokenMint,
+          side: payload.side,
+          tokenMint: payload.tokenMint,
           tokenSymbol: tokenMetadata?.symbol,
-          tradeRoute: createPayload.tradeRoute,
+          tradeRoute: payload.tradeRoute,
           usdAmount: landResponse.metrics.boughtUsd + landResponse.metrics.soldUsd,
           solAmount: landResponse.solChange,
           timingMs,
@@ -143,7 +142,7 @@ export const useSpotTransactionSubmit = () => {
 
       logBonsaiError('spot/useSpotTransactionSubmit', 'Transaction failure', {
         error,
-        createPayload,
+        payload,
         formInputData,
         formState,
         step,
@@ -154,10 +153,10 @@ export const useSpotTransactionSubmit = () => {
       });
       track(
         AnalyticsEvents.SpotTransactionSubmitError({
-          side: createPayload.side,
-          tokenMint: createPayload.tokenMint,
+          side: payload.side,
+          tokenMint: payload.tokenMint,
           tokenSymbol: tokenMetadata?.symbol,
-          tradeRoute: createPayload.tradeRoute,
+          tradeRoute: payload.tradeRoute,
           estimatedUsdAmount: formSummary.amounts?.usd,
           step,
           errorName,
