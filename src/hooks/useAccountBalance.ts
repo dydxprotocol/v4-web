@@ -8,11 +8,7 @@ import BigNumber from 'bignumber.js';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
-import {
-  getNobleChainId,
-  getOsmosisChainId,
-  SUPPORTED_COSMOS_CHAINS,
-} from '@/constants/graz';
+import { getNobleChainId, getOsmosisChainId, SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { COSMOS_GAS_RESERVE } from '@/constants/numbers';
 import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
 

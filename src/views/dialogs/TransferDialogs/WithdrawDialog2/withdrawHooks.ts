@@ -81,14 +81,7 @@ export function useWithdrawStep({
       osmosisAddress,
       destinationAddress
     );
-  }, [
-    dydxAddress,
-    nobleAddress,
-    osmosisAddress,
-    sourceAccount,
-    withdrawRoute,
-    destinationAddress,
-  ]);
+  }, [dydxAddress, nobleAddress, osmosisAddress, sourceAccount, withdrawRoute, destinationAddress]);
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
