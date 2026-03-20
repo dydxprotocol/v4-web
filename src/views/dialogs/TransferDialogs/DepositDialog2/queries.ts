@@ -31,17 +31,17 @@ import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
 export function useBalances() {
-  const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { sourceAccount, nobleAddress, osmosisAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   return useQuery({
-    queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress, neutronAddress],
+    queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress],
     queryFn: async () => {
       return skipClient.balances(
-        networkTypeToBalances(sourceAccount, nobleAddress, osmosisAddress, neutronAddress)
+        networkTypeToBalances(sourceAccount, nobleAddress, osmosisAddress)
       );
     },
-    enabled: Boolean(sourceAccount.address && nobleAddress && osmosisAddress && neutronAddress),
+    enabled: Boolean(sourceAccount.address && nobleAddress && osmosisAddress),
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
   });
@@ -120,8 +120,7 @@ function getNativeEvmTokenDenom(chain: Chain) {
 function networkTypeToBalances(
   sourceAccount: SourceAccount,
   nobleAddress?: string,
-  osmosisAddress?: string,
-  neutronAddress?: string
+  osmosisAddress?: string
 ): BalanceRequest {
   if (!sourceAccount.address) {
     throw new Error('fetching balances for undefined address');
@@ -153,16 +152,12 @@ function networkTypeToBalances(
   }
 
   if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-    if (!neutronAddress || !osmosisAddress || !nobleAddress) {
+    if (!osmosisAddress || !nobleAddress) {
       throw new Error('cosmos addresses not defined');
     }
 
     return {
       chains: {
-        [CosmosChainId.Neutron]: {
-          address: neutronAddress,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Neutron]],
-        },
         [CosmosChainId.Osmosis]: {
           address: osmosisAddress,
           denoms: [USDC_ADDRESSES[CosmosChainId.Osmosis]],

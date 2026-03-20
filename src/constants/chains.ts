@@ -62,13 +62,6 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
     gasDenom: 'SOL',
     explorerBaseUrl: 'https://explorer.solana.com',
   },
-  [CosmosChainId.Neutron]: {
-    name: 'Neutron',
-    icon: '/chains/neutron.png',
-    walletNetworkType: WalletNetworkType.Cosmos,
-    gasDenom: 'NTRN',
-    explorerBaseUrl: 'https://mintscan.io/neutron',
-  },
   [CosmosChainId.Noble]: {
     name: 'Noble',
     icon: '/chains/noble.png',
@@ -94,7 +87,6 @@ export const NEAR_INSTANT_DEPOSIT_CHAINS = [
   SOLANA_MAINNET_ID,
   CosmosChainId.Noble,
   CosmosChainId.Osmosis,
-  CosmosChainId.Neutron,
   polygon.id.toString(),
   avalanche.id.toString(),
 ];
