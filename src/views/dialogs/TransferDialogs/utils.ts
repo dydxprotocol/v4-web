@@ -43,7 +43,6 @@ export function getUserAddressesForRoute(
   nobleAddress?: string,
   dydxAddress?: string,
   osmosisAddress?: string,
-  neutronAddress?: string,
   destinationAddress?: string // Withdraw Only: The final stop for the transfer
 ): UserAddress[] {
   const chains = route.requiredChainAddresses;
@@ -62,9 +61,6 @@ export function getUserAddressesForRoute(
       case CosmosChainId.Osmosis:
         if (!osmosisAddress) throw new Error('osmosisAddress undefined');
         return { chainId, address: osmosisAddress };
-      case CosmosChainId.Neutron:
-        if (!neutronAddress) throw new Error('neutronAddress undefined');
-        return { chainId, address: neutronAddress };
       case DYDX_DEPOSIT_CHAIN:
         if (!dydxAddress) throw new Error('dydxAddress undefined');
         return { chainId, address: dydxAddress };
@@ -130,8 +126,6 @@ export function isValidWithdrawalAddress(address: string, chainId: string): bool
       return validateCosmosAddress(address, 'noble');
     case CosmosChainId.Osmosis:
       return validateCosmosAddress(address, 'osmo');
-    case CosmosChainId.Neutron:
-      return validateCosmosAddress(address, 'neutron');
     case SOLANA_MAINNET_ID: {
       return isValidSolanaAddress(address);
     }

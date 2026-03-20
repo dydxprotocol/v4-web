@@ -56,7 +56,6 @@ export function useWithdrawStep({
     localNobleWallet,
     nobleAddress,
     osmosisAddress,
-    neutronAddress,
     sourceAccount,
   } = useAccounts();
   const [isLoading, setIsLoading] = useState(false);
@@ -80,18 +79,9 @@ export function useWithdrawStep({
       nobleAddress,
       dydxAddress,
       osmosisAddress,
-      neutronAddress,
       destinationAddress
     );
-  }, [
-    dydxAddress,
-    neutronAddress,
-    nobleAddress,
-    osmosisAddress,
-    sourceAccount,
-    withdrawRoute,
-    destinationAddress,
-  ]);
+  }, [dydxAddress, nobleAddress, osmosisAddress, sourceAccount, withdrawRoute, destinationAddress]);
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {

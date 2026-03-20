@@ -19,7 +19,7 @@ import { getWalletClient } from '@wagmi/core';
 import { WalletClient } from 'viem';
 import { useConfig } from 'wagmi';
 
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
+import { getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { getSolanaChainId } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -121,8 +121,7 @@ export function getSkipClient() {
 }
 
 const useSkipClientContext = () => {
-  const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators, skip } =
-    useEndpointsConfig();
+  const { solanaRpcUrl, nobleValidator, osmosisValidator, validators, skip } = useEndpointsConfig();
 
   const { compositeClient } = useCompositeClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
@@ -178,7 +177,6 @@ const useSkipClientContext = () => {
       endpointOptions: {
         getRpcEndpointForChain: async (chainId: string) => {
           if (chainId === getNobleChainId()) return nobleValidator;
-          if (chainId === getNeutronChainId()) return neutronValidator;
           if (chainId === getOsmosisChainId()) return osmosisValidator;
           if (chainId === selectedDydxChainId)
             return compositeClient?.network.validatorConfig.restEndpoint ?? validators[0]!;
@@ -196,7 +194,6 @@ const useSkipClientContext = () => {
     setInstanceId(id);
   }, [
     compositeClient?.network.validatorConfig.restEndpoint,
-    neutronValidator,
     nobleValidator,
     osmosisValidator,
     selectedDydxChainId,

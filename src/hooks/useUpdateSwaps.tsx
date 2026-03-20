@@ -28,7 +28,7 @@ const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
 export const useUpdateSwaps = () => {
   const { withdraw } = useSubaccount();
   const dispatch = useAppDispatch();
-  const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { nobleAddress, dydxAddress, osmosisAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   const pendingSwaps = useAppSelector(getPendingSwaps);
@@ -77,8 +77,7 @@ export const useUpdateSwaps = () => {
         undefined,
         nobleAddress,
         dydxAddress,
-        osmosisAddress,
-        neutronAddress
+        osmosisAddress
       );
 
       await skipClient.executeRoute({
@@ -110,7 +109,7 @@ export const useUpdateSwaps = () => {
         },
       });
     },
-    [dispatch, dydxAddress, neutronAddress, nobleAddress, osmosisAddress, skipClient]
+    [dispatch, dydxAddress, nobleAddress, osmosisAddress, skipClient]
   );
 
   useEffect(() => {

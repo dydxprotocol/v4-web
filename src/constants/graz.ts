@@ -10,14 +10,11 @@ import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP, isMainnet } from './ne
 export enum CosmosChainId {
   Osmosis = 'osmosis-1',
   Noble = 'noble-1',
-  Neutron = 'neutron-1',
   OsmosisTestnet = 'osmo-test-5',
   NobleTestnet = 'grand-1',
-  NeutronTestnet = 'pion-1',
 }
 
 export const OSMO_BECH32_PREFIX = 'osmo';
-export const NEUTRON_BECH32_PREFIX = 'neutron';
 
 const selectedNetwork = getLocalStorage({
   key: LocalStorageKey.SelectedNetwork,
@@ -34,15 +31,10 @@ export const getOsmosisChainId = () => {
   return isMainnet ? CosmosChainId.Osmosis : CosmosChainId.OsmosisTestnet;
 };
 
-export const getNeutronChainId = () => {
-  return isMainnet ? CosmosChainId.Neutron : CosmosChainId.NeutronTestnet;
-};
-
 const osmosisChainId = getOsmosisChainId();
 const nobleChainId = getNobleChainId();
-const neutronChainId = getNeutronChainId();
 
-export const SUPPORTED_COSMOS_CHAINS = [dydxChainId, osmosisChainId, nobleChainId, neutronChainId];
+export const SUPPORTED_COSMOS_CHAINS = [dydxChainId, osmosisChainId, nobleChainId];
 
 export const GRAZ_CHAINS = [
   // dYdX
@@ -64,12 +56,6 @@ export const GRAZ_CHAINS = [
     chainId: osmosisChainId,
     rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.osmosisValidator,
     bech32Config: { bech32PrefixAccAddr: OSMO_BECH32_PREFIX },
-  },
-  // Neutron
-  {
-    chainId: neutronChainId,
-    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.neutronValidator,
-    bech32Config: { bech32PrefixAccAddr: NEUTRON_BECH32_PREFIX },
   },
 ];
 
