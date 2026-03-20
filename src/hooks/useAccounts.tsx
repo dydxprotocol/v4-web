@@ -8,13 +8,7 @@ import { Keypair } from '@solana/web3.js';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
-import {
-  getNeutronChainId,
-  getNobleChainId,
-  getOsmosisChainId,
-  NEUTRON_BECH32_PREFIX,
-  OSMO_BECH32_PREFIX,
-} from '@/constants/graz';
+import { getNobleChainId, getOsmosisChainId, OSMO_BECH32_PREFIX } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
   ConnectorType,
@@ -128,7 +122,6 @@ const useAccountsContext = () => {
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
   const [localOsmosisWallet, setLocalOsmosisWallet] = useState<LocalWallet>();
-  const [localNeutronWallet, setLocalNeutronWallet] = useState<LocalWallet>();
   const [localSolanaKeypair, setLocalSolanaKeypair] = useState<Keypair>();
 
   const [hdKey, setHdKey] = useState<PrivateInformation>();
@@ -155,8 +148,6 @@ const useAccountsContext = () => {
 
   const nobleAddress = localNobleWallet?.address;
   const osmosisAddress = localOsmosisWallet?.address;
-  const neutronAddress = localNeutronWallet?.address;
-
   const setWalletFromSignature = useCallback(
     async (signature: string) => {
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
@@ -290,7 +281,6 @@ const useAccountsContext = () => {
     const setCosmosWallets = async () => {
       let nobleWallet: LocalWallet | undefined;
       let osmosisWallet: LocalWallet | undefined;
-      let neutronWallet: LocalWallet | undefined;
       let solanaKeypair: Keypair | undefined;
 
       if (hdKey?.mnemonic) {
@@ -300,9 +290,6 @@ const useAccountsContext = () => {
         osmosisWallet = await (
           await getLazyLocalWallet()
         ).fromMnemonic(hdKey.mnemonic, OSMO_BECH32_PREFIX);
-        neutronWallet = await (
-          await getLazyLocalWallet()
-        ).fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
         solanaKeypair = deriveSolanaKeypairFromMnemonic(hdKey.mnemonic);
       }
 
@@ -317,21 +304,11 @@ const useAccountsContext = () => {
             await getLazyLocalWallet()
           ).fromOfflineSigner(osmosisOfflineSigner);
         }
-        const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
-        if (neutronOfflineSigner !== undefined) {
-          neutronWallet = await (
-            await getLazyLocalWallet()
-          ).fromOfflineSigner(neutronOfflineSigner);
-        }
-
         if (nobleWallet !== undefined) {
           setLocalNobleWallet(nobleWallet);
         }
         if (osmosisWallet !== undefined) {
           setLocalOsmosisWallet(osmosisWallet);
-        }
-        if (neutronWallet !== undefined) {
-          setLocalNeutronWallet(neutronWallet);
         }
         if (solanaKeypair !== undefined) {
           setLocalSolanaKeypair(solanaKeypair);
@@ -383,7 +360,6 @@ const useAccountsContext = () => {
     setLocalDydxWallet(undefined);
     setLocalNobleWallet(undefined);
     setLocalOsmosisWallet(undefined);
-    setLocalNeutronWallet(undefined);
     setLocalSolanaKeypair(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
@@ -424,7 +400,6 @@ const useAccountsContext = () => {
 
     nobleAddress,
     osmosisAddress,
-    neutronAddress,
 
     // Solana spot accounts
     solanaAddress,

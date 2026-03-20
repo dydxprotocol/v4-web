@@ -10,11 +10,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { SkipClient, useSkipClient } from '../transfers/skipClient';
 import { TokenConfigsResult, useTokenConfigs } from '../useTokenConfigs';
 
-const SWAP_VENUES = [
-  { chainId: 'osmosis-1', name: 'osmosis-poolmanager' },
-  { chainId: 'neutron-1', name: 'neutron-duality' },
-  { chainId: 'neutron-1', name: 'neutron-astroport' },
-];
+const SWAP_VENUES = [{ chainId: 'osmosis-1', name: 'osmosis-poolmanager' }];
 
 // Swaps are from dydxchain DYDX <-> dydxchain USDC
 async function getSkipSwapRoute(
