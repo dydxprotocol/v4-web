@@ -26,10 +26,7 @@ export const SKIP_GO_FAST_TRANSFER_LIMIT = 100_000; // hardcoded on Skip's end
 export const SKIP_GO_BPS_FEE = 0.1; // hardcoded to 10bps on Skip's end
 
 // neutron-astroport excluded due to degraded performance causing slow route simulations
-export const SKIP_SWAP_VENUES = [
-  { chainId: 'osmosis-1', name: 'osmosis-poolmanager' },
-  { chainId: 'neutron-1', name: 'neutron-duality' },
-];
+export const SKIP_SWAP_VENUES = [{ chainId: 'osmosis-1', name: 'osmosis-poolmanager' }];
 
 export const SKIP_GO_DESTINATION_FEE = 0.01; // $0.01 since the only destination is Osmosis chain to fulfill the go fast route.
 
