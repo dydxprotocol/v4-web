@@ -62,11 +62,6 @@ export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   },
   { chainId: SOLANA_MAINNET_ID, denom: USDC_ADDRESSES[SOLANA_MAINNET_ID], decimals: USDC_DECIMALS },
   {
-    chainId: CosmosChainId.Neutron,
-    denom: USDC_ADDRESSES[CosmosChainId.Neutron],
-    decimals: USDC_DECIMALS,
-  },
-  {
     chainId: CosmosChainId.Osmosis,
     denom: USDC_ADDRESSES[CosmosChainId.Osmosis],
     decimals: USDC_DECIMALS,
