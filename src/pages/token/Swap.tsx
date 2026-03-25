@@ -1,7 +1,6 @@
 import { EventHandler, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { BigNumber } from 'bignumber.js';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -12,7 +11,6 @@ import {
   AMOUNT_RESERVED_FOR_GAS_USDC,
   OnboardingState,
 } from '@/constants/account';
-import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -31,7 +29,6 @@ import UsdcLogo from '@/icons/usdc-inverted.svg';
 import WarningFilled from '@/icons/warning-filled.svg';
 
 import { Accordion } from '@/components/Accordion';
-import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
@@ -40,9 +37,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { selectHasPendingSwaps } from '@/state/swapSelectors';
-import { addSwap } from '@/state/swaps';
+import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
@@ -60,10 +55,8 @@ function getTokenLabel(token: 'usdc' | 'dydx') {
 const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
 export const Swap = () => {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
 
   const parentSubaccountUsdcBalance = useAppSelector(getSubaccountFreeCollateral);
-  const hasPendingSwap = useAppSelector(selectHasPendingSwaps);
   const onboardingState = useAppSelector(getOnboardingState);
   const { chainTokenAmount: nativeTokenBalance } = useAppSelector(BonsaiCore.account.balances.data);
 
@@ -193,7 +186,6 @@ export const Swap = () => {
     }
     const swapId = `swap-${crypto.randomUUID()}`;
     track(AnalyticsEvents.SwapInitiated({ id: swapId, ...quote }));
-    dispatch(addSwap({ swap: { id: swapId, route: quote, status: 'pending' } }));
   };
 
   return (
@@ -208,7 +200,7 @@ export const Swap = () => {
               {stringGetter({ key: STRING_KEYS.SWAP_FROM })}
             </div>
             <Button
-              disabled={hasPendingSwap}
+              disabled
               buttonStyle={ButtonStyle.WithoutBackground}
               tw="flex h-fit items-center gap-0.375 p-0 font-small-medium hover:[--button-textColor:var(--color-text-1)]"
               onClick={() => setMaxAmount('exact-in')}
@@ -224,7 +216,7 @@ export const Swap = () => {
 
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
-              disabled={hasPendingSwap}
+              disabled
               tw="bg-[unset] font-large-bold"
               $isLoading={mode === 'exact-out' && (isLoading || isPlaceholderData)}
               type="text"
@@ -243,7 +235,7 @@ export const Swap = () => {
           shape={ButtonShape.Square}
           action={ButtonAction.Base}
           onClick={onSwitchTokens}
-          disabled={hasPendingSwap}
+          disabled
         >
           <Icon iconName={IconName.TransferArrows} tw="h-1.25 w-1.25" />
         </$SwapButton>
@@ -282,11 +274,6 @@ export const Swap = () => {
           </div>
         </$InputContainer>
       </div>
-      {hasPendingSwap && (
-        <AlertMessage type={AlertType.Warning}>
-          {stringGetter({ key: STRING_KEYS.SWAP_IN_PROGRESS_WARNING })}
-        </AlertMessage>
-      )}
       {onboardingState !== OnboardingState.AccountConnected ? (
         <OnboardingTriggerButton size={ButtonSize.BasePlus} />
       ) : error ? (
@@ -311,7 +298,7 @@ export const Swap = () => {
           tw="h-3 p-0.75"
           state={{
             isDisabled: !quote || !hasSufficientBalance,
-            isLoading: hasPendingSwap || isLoading,
+            isLoading: true,
           }}
           onClick={onSwap}
           action={ButtonAction.Primary}
