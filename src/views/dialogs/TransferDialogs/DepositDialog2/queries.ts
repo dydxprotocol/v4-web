@@ -10,6 +10,7 @@ import { arbitrum, optimism } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
+import { SKIP_SWAP_VENUES } from '@/constants/skip';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
 import {
@@ -215,6 +216,7 @@ async function getSkipDepositRoutes(
     // TODO(deposit2.0): Manually calculate price impact by comparing USD values and warn user if difference > a certain %
     allowUnsafe: true,
     smartSwapOptions: { evmSwaps: true },
+    swapVenues: SKIP_SWAP_VENUES,
   };
 
   const [slow, fast] = await Promise.all([

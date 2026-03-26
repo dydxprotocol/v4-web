@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
 
 import { DYDX_DEPOSIT_CHAIN } from '@/constants/chains';
+import { SKIP_SWAP_VENUES } from '@/constants/skip';
 import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 
@@ -36,6 +37,7 @@ async function getSkipWithdrawalRoutes(
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
     smartSwapOptions: { evmSwaps: true, splitRoutes: true },
+    swapVenues: SKIP_SWAP_VENUES,
     allowUnsafe,
   };
 
