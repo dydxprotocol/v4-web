@@ -43,7 +43,6 @@ import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketId } from './currentMarketSelectors';
 import { getLocalPlaceOrders } from './localOrdersSelectors';
-import { selectHasPendingSwaps } from './swapSelectors';
 import { selectHasNonExpiredPendingWithdraws } from './transfersSelectors';
 
 /**
@@ -521,9 +520,8 @@ export const selectShouldAccountRebalanceUsdc = createAppSelector(
     BonsaiCore.account.balances.data,
     BonsaiCore.account.childSubaccountSummaries.data,
     selectHasNonExpiredPendingWithdraws,
-    selectHasPendingSwaps,
   ],
-  (balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws, hasPendingSwaps) => {
+  (balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {
     if (childSubaccountSummaries == null) {
       return undefined;
     }
@@ -535,7 +533,7 @@ export const selectShouldAccountRebalanceUsdc = createAppSelector(
       const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
       const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
 
-      if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws && !hasPendingSwaps) {
+      if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
         const amountToDeposit = usdcBalanceBN
           .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
           .toFixed(USDC_DECIMALS);

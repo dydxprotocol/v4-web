@@ -58,7 +58,6 @@ import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
-import { useUpdateSwaps } from './hooks/useUpdateSwaps';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { WalletConnectionProvider } from './hooks/useWalletConnection';
 import { isTruthy } from './lib/isTruthy';
@@ -97,7 +96,6 @@ const Content = () => {
   useAnalytics();
   useCommandMenu();
   useUpdateTransfers();
-  useUpdateSwaps();
   useReferralCode();
   useUiRefreshMigrations();
   useOpenDepositIfRelevant();
