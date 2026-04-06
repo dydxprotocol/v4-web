@@ -140,6 +140,47 @@ export const LIQUIDATION_REBATES_DETAILS = {
   rebateAmountUsd: 1_000_000,
 };
 
+export const RWA_COMPETITION_WEEKS = [
+  { week: 1, name: 'Gold Rush', startDate: '2026-04-06T00:00:00.000Z', endDate: '2026-04-13T00:00:00.000Z' },
+  { week: 2, name: 'Crude Awakening', startDate: '2026-04-13T00:00:00.000Z', endDate: '2026-04-20T00:00:00.000Z' },
+  { week: 3, name: 'Silver Rush', startDate: '2026-04-20T00:00:00.000Z', endDate: '2026-04-27T00:00:00.000Z' },
+];
+
+const RWA_REWARDS = [
+  { positionRange: [1, 1], reward: 3000 },
+  { positionRange: [2, 2], reward: 2000 },
+  { positionRange: [3, 3], reward: 1000 },
+  { positionRange: [4, 5], reward: 750 },
+  { positionRange: [6, 10], reward: 500 },
+];
+
+export const RWA_COMPETITION_DETAILS = {
+  rewards: RWA_REWARDS,
+  rewardAmount: '$10,000',
+  rewardAmountUsd: 10_000,
+  topPrizeAmount: '$3,000',
+  leaderboardSize: 10,
+  startTime: '2026-04-06T00:00:00.000Z',
+  endTime: '2026-04-27T00:00:00.000Z',
+};
+
+export function getActiveRwaWeek() {
+  const now = new Date();
+  return RWA_COMPETITION_WEEKS.find((week) => {
+    const start = new Date(week.startDate);
+    const end = new Date(week.endDate);
+    return now >= start && now < end;
+  });
+}
+
+export function positionToRwaRewards(position: number | undefined) {
+  if (!position) return 0;
+  const reward = RWA_REWARDS.find(
+    (r) => position >= r.positionRange[0]! && position <= r.positionRange[1]!
+  );
+  return reward?.reward ?? 0;
+}
+
 export const FEB_2026_COMPETITION_DETAILS = {
   rewardAmount: '$1M',
   rewardAmountUsd: 1_000_000,
