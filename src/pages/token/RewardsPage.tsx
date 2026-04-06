@@ -12,7 +12,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 import { timeUnits } from '@/constants/time';
 
-import { CURRENT_BONK_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { getActiveRwaWeek, RWA_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableLiquidationRebates } from '@/hooks/useEnableLiquidationRebates';
@@ -30,10 +30,9 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { BonkIncentivesPanel } from './BonkIncentivesPanel';
 import { BonkPnlLeaderboardPanel } from './BonkPnlLeaderboardPanel';
-import { BonkPnlPanel } from './BonkPnlPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
+import { RwaCompetitionPanel } from './RwaCompetitionPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { LiquidationRebatesHeader } from './LiquidationRebatesHeader';
@@ -45,15 +44,14 @@ import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 enum Tab {
+  RwaCompetition = 'RwaCompetition',
   Leaderboard = 'Leaderboard',
-  BonkPnl = 'BonkPnl',
   Rewards = 'Rewards',
   LiquidationRebates = 'LiquidationRebates',
   Competition = 'Competition',
 }
 
 const RewardsPage = () => {
-  const { titleStringKey, endTime } = CURRENT_BONK_REWARDS_DETAILS;
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { complianceState } = useComplianceState();
@@ -61,7 +59,11 @@ const RewardsPage = () => {
   const enableLiquidationRebates = useEnableLiquidationRebates();
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(Tab.Leaderboard);
+  const [value, setValue] = useState(Tab.RwaCompetition);
+
+  const activeWeek = getActiveRwaWeek();
+  const competitionEnd = new Date(RWA_COMPETITION_DETAILS.endTime);
+  const endTime = activeWeek?.endDate ?? RWA_COMPETITION_DETAILS.endTime;
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -87,11 +89,31 @@ const RewardsPage = () => {
 
   const endMs = new Date(endTime).getTime();
   const msRemaining = endMs - Date.now();
-  const hasEnded = msRemaining <= 0;
+  const hasEnded = new Date() >= competitionEnd;
   const daysRemaining = Math.ceil(msRemaining / timeUnits.day);
-  const endingSoon = !hasEnded && daysRemaining <= 5;
+  const endingSoon = !hasEnded && daysRemaining <= 3;
+
+  const weekLabel = activeWeek ? `Week ${activeWeek.week}: ${activeWeek.name}` : null;
 
   const tabs = [
+    {
+      content: <RwaCompetitionPanel />,
+      label: (
+        <div tw="flex items-center gap-0.5">
+          RWA Trading Competition
+          {hasEnded ? (
+            <Tag>{stringGetter({ key: STRING_KEYS.ENDED })}</Tag>
+          ) : endingSoon ? (
+            <Tag>
+              {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
+            </Tag>
+          ) : weekLabel ? (
+            <Tag>{weekLabel}</Tag>
+          ) : null}
+        </div>
+      ),
+      value: Tab.RwaCompetition,
+    },
     {
       content: (
         <div tw="flexColumn gap-1.5">
@@ -100,27 +122,6 @@ const RewardsPage = () => {
       ),
       label: stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE }),
       value: Tab.Leaderboard,
-    },
-    {
-      content: (
-        <div tw="flexColumn gap-1.5">
-          <BonkIncentivesPanel />
-          <BonkPnlPanel />
-        </div>
-      ),
-      label: (
-        <div tw="flex items-center gap-0.5">
-          {stringGetter({ key: titleStringKey })}
-          {hasEnded ? (
-            <Tag>{stringGetter({ key: STRING_KEYS.ENDED })}</Tag>
-          ) : endingSoon ? (
-            <Tag>
-              {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
-            </Tag>
-          ) : null}
-        </div>
-      ),
-      value: Tab.BonkPnl,
     },
     ...(enableLiquidationRebates
       ? [

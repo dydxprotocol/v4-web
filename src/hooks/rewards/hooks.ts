@@ -175,6 +175,52 @@ export function useBonkPnlLeaderboard() {
   };
 }
 
+export type RwaMarketPnlItem = {
+  address: string;
+  pnl: number;
+  volume: number;
+  position: number;
+};
+
+type RwaMarketPnlResponse = {
+  success: boolean;
+  market: string | null;
+  week: number | null;
+  data: RwaMarketPnlItem[];
+  pagination?: {
+    total: number;
+    totalPages: number;
+    page: number;
+    perPage: number;
+  };
+};
+
+async function getRwaMarketPnl() {
+  const res = await fetch(
+    'https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-weekly-bonk-market-pnl?perPage=1000'
+  );
+  const parsedRes = (await res.json()) as RwaMarketPnlResponse;
+  return {
+    data: parsedRes.data,
+    market: parsedRes.market,
+    week: parsedRes.week,
+  };
+}
+
+export function useRwaMarketPnl() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['rwa-market-pnl'],
+    queryFn: wrapAndLogError(() => getRwaMarketPnl(), 'RwaMarketPnl/fetch', true),
+  });
+
+  return {
+    isLoading,
+    data: data?.data,
+    market: data?.market ?? null,
+    week: data?.week ?? null,
+  };
+}
+
 export type LiquidationLeaderboardItem = {
   address: string;
   total_liquidation_losses: string;
