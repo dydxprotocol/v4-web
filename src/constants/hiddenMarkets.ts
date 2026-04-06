@@ -66,4 +66,5 @@ export const HIDDEN_MARKETS = new Set([
   'MOVE',
   'USO',
   'WTI',
+  'XAUT',
 ]);
