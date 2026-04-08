@@ -26,7 +26,6 @@ export const HIDDEN_MARKETS = new Set([
   'ME',
   'PROVE',
   'LA',
-  'LINK',
   'LPT',
   'IOTX',
   'NEWT',
