@@ -28,6 +28,8 @@ import { objectKeys } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+const RWA_EXCLUSION_LIST = new Set(['LINK']);
+
 const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | undefined> = {
   [MarketFilters.AI]: (market) => {
     return market.sectorTags?.includes(MarketFilters.AI);
@@ -67,7 +69,9 @@ const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | u
     return market.sectorTags?.includes(MarketFilters.PREDICTION_MARKET);
   },
   [MarketFilters.RWA]: (market) => {
-    return market.sectorTags?.includes(MarketFilters.RWA);
+    return (
+      market.sectorTags?.includes(MarketFilters.RWA) && !RWA_EXCLUSION_LIST.has(market.assetId)
+    );
   },
   [MarketFilters.LAUNCHABLE]: (market) => {
     return market.isUnlaunched;
