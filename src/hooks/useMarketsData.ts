@@ -66,8 +66,10 @@ const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | u
   [MarketFilters.PREDICTION_MARKET]: (market) => {
     return market.sectorTags?.includes(MarketFilters.PREDICTION_MARKET);
   },
+  // LINK (Chainlink) has 'tokenized-assets' in its CMC sector tags but isn't an RWA.
+  // Easier to special-case here on the FE than to fix upstream metadata on the BE.
   [MarketFilters.RWA]: (market) => {
-    return market.sectorTags?.includes(MarketFilters.RWA);
+    return market.sectorTags?.includes(MarketFilters.RWA) && market.assetId !== 'LINK';
   },
   [MarketFilters.LAUNCHABLE]: (market) => {
     return market.isUnlaunched;
