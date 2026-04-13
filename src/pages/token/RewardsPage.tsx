@@ -100,15 +100,13 @@ const RewardsPage = () => {
       content: <RwaCompetitionPanel />,
       label: (
         <div tw="flex items-center gap-0.5">
-          RWA Trading Competition
+          RWA Trading Competition{weekLabel ? ` / ${weekLabel}` : ''}
           {hasEnded ? (
             <Tag>{stringGetter({ key: STRING_KEYS.ENDED })}</Tag>
           ) : endingSoon ? (
             <Tag>
               {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
             </Tag>
-          ) : weekLabel ? (
-            <Tag>{weekLabel}</Tag>
           ) : null}
         </div>
       ),
