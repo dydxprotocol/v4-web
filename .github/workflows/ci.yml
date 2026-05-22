@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
     - name: Set up pnpm
-      uses: dydxprotocol/setup-pnpm@v2.0.0
+      uses: dydxprotocol/setup-pnpm@3bcbd1d6c86dd1b0bce6d5309bf19fb95282f8ac # v2.0.0
 
     - name: Set up Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
       with:
         node-version: 18
         cache: pnpm

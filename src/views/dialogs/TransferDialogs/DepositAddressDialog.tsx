@@ -171,6 +171,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
               params: {
                 ASSETS: <strong>{assets}</strong>,
                 NETWORK: <strong>{chainName}</strong>,
+                MIN_AMOUNT_TO_DEPOSIT: 20,
                 MIN_INSTANT_DEPOSIT: warningMessageParams.MIN_INSTANT_DEPOSIT,
                 MAX_DEPOSIT: warningMessageParams.MAX_DEPOSIT,
                 LOSS_OF_FUNDS: (

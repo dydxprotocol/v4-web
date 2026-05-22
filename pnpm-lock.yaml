@@ -33,8 +33,8 @@ dependencies:
     specifier: 3.6.0
     version: 3.6.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.403
-    version: 1.1.403
+    specifier: 1.1.404
+    version: 1.1.404
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1702,8 +1702,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.403:
-    resolution: {integrity: sha512-rYqsZoqVoJBbtFM07nb4krFrvuLnvfzga9FC0+yW0kKd+p4d6GDeMXYULnL+vkttDkyjk6sBmvsXpfcCZTYqaA==}
+  /@dydxprotocol/v4-localization@1.1.404:
+    resolution: {integrity: sha512-G0GTLAYvS8Xp8UkiceYU01nDUNNFPEFAmpCQDbHDAWUNFQQwP5VLjq4gO988nFkvOubLJRHs/E9+tzNYDBz+kg==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -11582,7 +11582,7 @@ packages:
   /@vitest/snapshot@1.4.0:
     resolution: {integrity: sha512-saAFnt5pPIA5qDGxOHxJ/XxhMFKkUSBJmVt5VgDsAqPTX6JP326r5C/c9UuCMPoXNzuudTPsYDZCoJ5ilpqG2A==}
     dependencies:
-      magic-string: 0.30.19
+      magic-string: 0.30.21
       pathe: 1.1.2
       pretty-format: 29.7.0
     dev: true
