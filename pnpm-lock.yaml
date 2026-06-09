@@ -33,8 +33,8 @@ dependencies:
     specifier: 3.6.0
     version: 3.6.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.404
-    version: 1.1.404
+    specifier: 1.1.405
+    version: 1.1.405
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1702,8 +1702,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.404:
-    resolution: {integrity: sha512-G0GTLAYvS8Xp8UkiceYU01nDUNNFPEFAmpCQDbHDAWUNFQQwP5VLjq4gO988nFkvOubLJRHs/E9+tzNYDBz+kg==}
+  /@dydxprotocol/v4-localization@1.1.405:
+    resolution: {integrity: sha512-RawHkyc1M5QuZViy41/letgWR0JBK0faIxV9Lj4u//Yw8KUfRthnhqnCWJTSVquMgAtzBPVRaj0wjbqz1adqEg==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -20114,7 +20114,7 @@ packages:
     resolution: {integrity: sha512-9rrA30MRRP3gBD3HTGnC6cDFpaE1kVDWxWgqWJUN0RvDNAo+Nz/9GxB+nHOH0ifbVFy0hSA1V6vFDvnx54lTEQ==}
     engines: {node: '>=14'}
     dependencies:
-      mlly: 1.8.0
+      mlly: 1.8.2
       pkg-types: 1.3.1
     dev: true
 
@@ -21157,15 +21157,6 @@ packages:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
     hasBin: true
-    dev: true
-
-  /mlly@1.8.0:
-    resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
-    dependencies:
-      acorn: 8.16.0
-      pathe: 2.0.3
-      pkg-types: 1.3.1
-      ufo: 1.6.3
     dev: true
 
   /mlly@1.8.2:
@@ -26676,7 +26667,7 @@ packages:
     resolution: {integrity: sha512-ZCfOjYKAjaX2TGI8uif5ah+J3BYFuo+47JOIV1RIz2l7kD9VfnxvRH5UiQDRyMALQC7KFd2hUqIEtHklapNyKA==}
     engines: {node: '>=8.0.0'}
     dependencies:
-      bn.js: 5.2.2
+      bn.js: 5.2.3
       web3-utils: 1.10.3
     dev: false
 
@@ -26724,7 +26715,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       '@ethereumjs/util': 8.1.0
-      bn.js: 5.2.2
+      bn.js: 5.2.3
       ethereum-bloom-filters: 1.2.0
       ethereum-cryptography: 2.2.1
       ethjs-unit: 0.1.6
@@ -26738,7 +26729,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       '@ethereumjs/util': 8.1.0
-      bn.js: 5.2.2
+      bn.js: 5.2.3
       ethereum-bloom-filters: 1.2.0
       ethereum-cryptography: 2.2.1
       ethjs-unit: 0.1.6
