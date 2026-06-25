@@ -26,6 +26,9 @@ import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/
 import { getUserAddressesForRoute, parseError, userAddressHelper } from '../utils';
 import { isInstantDeposit } from './queries';
 
+// Number of seconds for the IBC transfer timeout (Skip default is 5 minutes)
+const DEPOSIT_TIMEOUT_SECONDS = (10 * 60).toString();
+
 type StepResult =
   | { success: true; errorMessage: undefined }
   | { success: false; errorMessage: string };
@@ -119,6 +122,7 @@ export function useDepositSteps({
         sourceAssetDenom: depositRoute.sourceAssetDenom,
         amountOut: depositRoute.estimatedAmountOut ?? '0',
         addressList: userAddressHelper(depositRoute, userAddresses),
+        timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
       });
 
       let approvalMaybeNeeded: (Erc20Approval & { chainId: string }) | undefined;
@@ -199,6 +203,8 @@ export function useDepositSteps({
             userAddresses,
             // Bypass because we manually handle allowance checks above
             bypassApprovalCheck: true,
+            // Extend the IBC transfer timeout from the default 5 minutes to 10 minutes
+            timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainId }) => {
               logBonsaiInfo('depositHooks', 'deposit tx submitted', {
