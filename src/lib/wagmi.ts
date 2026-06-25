@@ -110,33 +110,34 @@ export enum ChainId {
 }
 
 export const getAlchemyRPCUrlForChainId = (chainId: ChainId) => {
-  const alchemyKey = import.meta.env.VITE_ALCHEMY_API_KEY;
-  if (!alchemyKey) return undefined;
+  const alchemyRpcProxyUrl = import.meta.env.VITE_ALCHEMY_RPC_PROXY_URL;
+  if (!alchemyRpcProxyUrl) return undefined;
+
   switch (chainId) {
     case ChainId.ETH_MAINNET:
-      return `https://eth-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/eth-mainnet/v2`;
     case ChainId.ETH_SEPOLIA:
-      return `https://eth-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/eth-sepolia/v2`;
     case ChainId.POLYGON_MAINNET:
-      return `https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/polygon-mainnet/v2`;
     case ChainId.POLYGON_MUMBAI:
-      return `https://polygon-amoy.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/polygon-amoy/v2`;
     case ChainId.OPT_MAINNET:
-      return `https://opt-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/opt-mainnet/v2`;
     case ChainId.OPT_SEPOLIA:
-      return `https://opt-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/opt-sepolia/v2`;
     case ChainId.ARB_MAINNET:
-      return `https://arb-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/arb-mainnet/v2`;
     case ChainId.ARB_SEPOLIA:
-      return `https://arb-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/arb-sepolia/v2`;
     case ChainId.BASE_MAINNET:
-      return `https://base-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/base-mainnet/v2`;
     case ChainId.BASE_SEPOLIA:
-      return `https://base-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/base-sepolia/v2`;
     case ChainId.AVALANCHE_MAINNET:
-      return `https://avax-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/avax-mainnet/v2`;
     case ChainId.AVALANCHE_FUJI:
-      return `https://avax-fuji.g.alchemy.com/v2/${alchemyKey}`;
+      return `${alchemyRpcProxyUrl}/avax-fuji/v2`;
     default:
       return undefined;
   }

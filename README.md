@@ -76,7 +76,7 @@ You'll need to provide a Wallet Connect project id to enable onboarding and wall
 Set environment variables via `.env`.
 
 - `VITE_BASE_URL` (required): The base URL of the deployment (e.g., `https://www.example.com`).
-- `VITE_ALCHEMY_API_KEY` (optional): Add an Alchemy API key for EVM interactions; the app will fall back to public RPCs if not provided.
+- `VITE_ALCHEMY_RPC_PROXY_URL` (optional): Base URL of your Alchemy proxy for EVM RPC requests; the proxy injects the secret Alchemy API key so it is not exposed in the web app (e.g., `https://proxy.example.com`).
 - `VITE_PK_ENCRYPTION_KEY` (optional): AES encryption key used for signature obfuscation; necessary for enabling the "Remember Me" feature.
 - `VITE_V3_TOKEN_ADDRESS` (optional): Address of the V3 $DYDX token.
 - `VITE_TOKEN_MIGRATION_URI` (optional): The URL of the token migration website.
