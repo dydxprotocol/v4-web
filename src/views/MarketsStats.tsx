@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
@@ -12,7 +11,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { NewTag } from '@/components/Tag';
 
 import { ExchangeBillboards } from './ExchangeBillboards';
@@ -50,26 +48,6 @@ export const MarketsStats = (props: MarketsStatsProps) => {
           <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
         </$Section>
       )}
-      <$LiquidationRebatesBanner>
-        <div tw="z-[1] flex max-w-[75%] flex-col justify-between gap-2">
-          <div tw="flex flex-col justify-start gap-0.5">
-            <h3 tw="text-white font-extra-bold">
-              {stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES_BANNER_TITLE })}
-            </h3>
-            <h4 tw="text-color-text-1 font-medium-medium">
-              {stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES_BANNER_SUBTITLE })}
-            </h4>
-          </div>
-          <Button
-            action={ButtonAction.Primary}
-            type={ButtonType.Link}
-            href="https://www.dydx.xyz/liquidation-rebates"
-            tw="self-start"
-          >
-            {stringGetter({ key: STRING_KEYS.LIQUIDATION_REBATES_BANNER_CTA })} →
-          </Button>
-        </div>
-      </$LiquidationRebatesBanner>
     </section>
   );
 };
@@ -91,16 +69,4 @@ const $SectionHeader = styled.div`
   @media ${breakpoints.tablet} {
     padding: 1rem;
   }
-`;
-
-const $LiquidationRebatesBanner = styled.div`
-  background-image: url('/liquidation.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  position: relative;
-  overflow: hidden;
-  padding: 1.5rem;
-  display: grid;
-  border-radius: 0.625rem;
 `;
