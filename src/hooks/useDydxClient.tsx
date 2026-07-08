@@ -340,18 +340,19 @@ const useDydxClientContext = () => {
     resolution,
     fromMs,
     toMs,
+    countBack,
   }: {
     marketId: string;
     resolution: ResolutionString;
     fromMs: number;
     toMs: number;
+    countBack: number;
   }) => {
     const fromIso = new Date(fromMs).toISOString();
     let toIso = new Date(toMs).toISOString();
     const candlesInRange: Candle[] = [];
 
-    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
-    while (true) {
+    while (candlesInRange.length < countBack) {
       // eslint-disable-next-line no-await-in-loop
       const candles = await requestCandles({
         marketId,
@@ -360,26 +361,19 @@ const useDydxClientContext = () => {
         toIso,
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!candles || candles.length === 0) {
         break;
       }
 
       candlesInRange.push(...candles);
-      const length = candlesInRange.length;
+      const oldestTime = new Date(candlesInRange.at(-1)!.startedAt).getTime();
 
-      if (length) {
-        const oldestTime = new Date(candlesInRange.at(-1)!.startedAt).getTime();
-
-        // don't retry if gap is smaller than resolution
-        if (oldestTime - fromMs > RESOLUTION_TO_INTERVAL_MS[resolution]!) {
-          toIso = candlesInRange.at(-1)!.startedAt;
-        } else {
-          break;
-        }
-      } else {
+      // don't retry if gap is smaller than resolution
+      if (oldestTime - fromMs <= RESOLUTION_TO_INTERVAL_MS[resolution]!) {
         break;
       }
+
+      toIso = candlesInRange.at(-1)!.startedAt;
     }
 
     return candlesInRange;
