@@ -103,7 +103,11 @@ function makeCompositeClient({
   }
 
   async function initializeNobleClient() {
-    return (await getLazyStargateClient()).connect(networkConfig.endpoints.nobleValidator);
+    const nobleUrl = networkConfig.endpoints.nobleValidator;
+    if (!nobleUrl) {
+      throw new Error('nobleValidator endpoint not configured');
+    }
+    return (await getLazyStargateClient()).connect(nobleUrl);
   }
 
   async function initializeIndexerClient() {
@@ -296,11 +300,14 @@ function initializeClientWrapper(
         })
       ),
     onError: (e) => {
+      // Noble client is optional: it is only needed for cross-chain (IBC) transfers.
+      // Do NOT set errorInitializing here — a missing/unconfigured noble validator
+      // (e.g. in local dev environments) must not prevent core trading functionality.
       logBonsaiError('CompositeClientManager', 'error initializing noble client', { error: e });
       dispatch(
         setNetworkStateRaw({
           networkId: network,
-          stateToMerge: { nobleClientReady: false, errorInitializing: true },
+          stateToMerge: { nobleClientReady: false },
         })
       );
     },
