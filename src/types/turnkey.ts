@@ -49,7 +49,7 @@ export type GoogleIdTokenPayload = {
 
 export type SignInBody =
   | {
-      signinMethod: 'social' | 'passkey';
+      signinMethod: 'social';
       targetPublicKey: string;
       provider: 'google' | 'apple';
       oidcToken: string;
@@ -57,9 +57,27 @@ export type SignInBody =
     }
   | {
       signinMethod: 'email';
-      targetPublicKey: string;
+      targetPublicKey?: string;
       userEmail: string;
       magicLink: string;
+    }
+  | {
+      signinMethod: 'passkey';
+      // In a full implementation these are required; left optional to allow
+      // initiating the flow and handling multi-step server responses.
+      challenge?: string;
+      attestation?: {
+        transports?: Array<
+          | 'AUTHENTICATOR_TRANSPORT_BLE'
+          | 'AUTHENTICATOR_TRANSPORT_INTERNAL'
+          | 'AUTHENTICATOR_TRANSPORT_NFC'
+          | 'AUTHENTICATOR_TRANSPORT_USB'
+          | 'AUTHENTICATOR_TRANSPORT_HYBRID'
+        >;
+        attestationObject?: string; // base64url
+        clientDataJson?: string; // base64url
+        credentialId: string; // base64url
+      };
     };
 
 export type TurnkeyEmailOnboardingData = {
