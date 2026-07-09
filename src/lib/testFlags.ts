@@ -68,6 +68,10 @@ class TestFlags {
     return this.booleanFlag(this.queryParams.enable_turnkey);
   }
 
+  get enablePasskeyAuth() {
+    return this.booleanFlag(this.queryParams.passkey_auth);
+  }
+
   get spot() {
     return this.booleanFlag(this.queryParams.spot);
   }
