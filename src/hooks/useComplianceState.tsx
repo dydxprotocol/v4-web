@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
-import { useMatch } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute } from '@/constants/routes';
 
 import { Link } from '@/components/Link';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
@@ -27,7 +25,6 @@ export const useComplianceState = () => {
   const geo = useAppSelector(getGeo);
   const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
-  const isSpotPage = useMatch(`${AppRoute.Spot}/*`) != null;
 
   const complianceState = useMemo(() => {
     if (complianceStatus === ComplianceStatus.BLOCKED) {
@@ -49,7 +46,6 @@ export const useComplianceState = () => {
   }, [checkForGeo, complianceStatus, geo]);
 
   const complianceMessage = useMemo(() => {
-    // Applies to both perps & spot
     if (complianceStatus === ComplianceStatus.BLOCKED) {
       return stringGetter({
         key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE_WITH_HELP,
@@ -62,9 +58,6 @@ export const useComplianceState = () => {
         },
       });
     }
-
-    // Rest of the states are not relevant to spot
-    if (isSpotPage) return null;
 
     if (
       complianceState === ComplianceStates.CLOSE_ONLY ||
@@ -79,7 +72,7 @@ export const useComplianceState = () => {
     }
 
     return null;
-  }, [complianceState, complianceStatus, help, isSpotPage, stringGetter]);
+  }, [complianceState, complianceStatus, help, stringGetter]);
 
   const disableConnectButton =
     complianceState === ComplianceStates.READ_ONLY &&

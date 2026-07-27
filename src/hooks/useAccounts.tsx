@@ -140,10 +140,6 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
-  const canDeriveSolanaWallet = useMemo(() => {
-    return sourceAccount.chain !== WalletNetworkType.Cosmos;
-  }, [sourceAccount.chain]);
-
   const solanaAddress = useMemo(
     () => localSolanaKeypair?.publicKey.toBase58(),
     [localSolanaKeypair]
@@ -176,12 +172,12 @@ const useAccountsContext = () => {
   const hasLocalDydxWallet = Boolean(localDydxWallet);
 
   useEffect(() => {
-    if (localDydxWallet && localNobleWallet && localSolanaKeypair) {
-      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet, localSolanaKeypair);
+    if (localDydxWallet && localNobleWallet) {
+      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet);
     } else {
       localWalletManager.clearLocalWallet();
     }
-  }, [localDydxWallet, localNobleWallet, localSolanaKeypair]);
+  }, [localDydxWallet, localNobleWallet]);
 
   useEffect(() => {
     (async () => {
@@ -426,10 +422,8 @@ const useAccountsContext = () => {
     osmosisAddress,
     neutronAddress,
 
-    // Solana spot accounts
+    // Derived Solana wallet address (compliance screening + analytics)
     solanaAddress,
-    localSolanaKeypair,
-    canDeriveSolanaWallet,
 
     // Onboarding state
     saveHasAcknowledgedTerms,

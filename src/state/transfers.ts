@@ -40,18 +40,7 @@ export type Withdraw = {
   txHash: string;
 };
 
-export type SpotWithdraw = {
-  id: string;
-  type: 'spot-withdraw';
-  amount: string;
-  destinationAddress: string;
-  txSignature?: string;
-  status: 'pending' | 'success' | 'error';
-  error?: string;
-  updatedAt?: number;
-};
-
-export type Transfer = Deposit | Withdraw | SpotWithdraw;
+export type Transfer = Deposit | Withdraw;
 
 export function isDeposit(transfer: Transfer): transfer is Deposit {
   return transfer.type === 'deposit';
@@ -59,10 +48,6 @@ export function isDeposit(transfer: Transfer): transfer is Deposit {
 
 export function isWithdraw(transfer: Transfer): transfer is Withdraw {
   return transfer.type === 'withdraw';
-}
-
-export function isSpotWithdraw(transfer: Transfer): transfer is SpotWithdraw {
-  return transfer.type === 'spot-withdraw';
 }
 
 export interface TransferState {
@@ -174,48 +159,8 @@ export const transfersSlice = createSlice({
         return transfer;
       });
     },
-    addSpotWithdraw: (
-      state,
-      action: PayloadAction<{ dydxAddress: DydxAddress; withdraw: SpotWithdraw }>
-    ) => {
-      const { dydxAddress, withdraw } = action.payload;
-      if (!state.transfersByDydxAddress[dydxAddress]) {
-        state.transfersByDydxAddress[dydxAddress] = [];
-      }
-
-      const newWithdraw = { ...withdraw, updatedAt: Date.now() };
-
-      state.transfersByDydxAddress[dydxAddress].push(newWithdraw);
-    },
-    updateSpotWithdraw: (
-      state,
-      action: PayloadAction<{
-        dydxAddress: DydxAddress;
-        withdrawId: string;
-        updates: Partial<SpotWithdraw>;
-      }>
-    ) => {
-      const { dydxAddress, withdrawId, updates } = action.payload;
-      const accountTransfers = state.transfersByDydxAddress[dydxAddress];
-      if (!accountTransfers?.length) return;
-
-      state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
-        if (isSpotWithdraw(transfer) && transfer.id === withdrawId) {
-          return { ...transfer, updatedAt: Date.now(), ...updates };
-        }
-
-        return transfer;
-      });
-    },
   },
 });
 
-export const {
-  addDeposit,
-  addWithdraw,
-  onWithdrawBroadcast,
-  updateDeposit,
-  updateWithdraw,
-  addSpotWithdraw,
-  updateSpotWithdraw,
-} = transfersSlice.actions;
+export const { addDeposit, addWithdraw, onWithdrawBroadcast, updateDeposit, updateWithdraw } =
+  transfersSlice.actions;

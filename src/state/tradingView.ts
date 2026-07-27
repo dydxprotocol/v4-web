@@ -5,13 +5,11 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface TradingViewState {
   chartConfig?: object;
   launchableMarketsChartConfig?: object;
-  spotChartConfig?: object;
 }
 
 const initialState: TradingViewState = {
   chartConfig: undefined,
   launchableMarketsChartConfig: undefined,
-  spotChartConfig: undefined,
 };
 
 export const tradingViewSlice = createSlice({
@@ -24,11 +22,7 @@ export const tradingViewSlice = createSlice({
     updateLaunchableMarketsChartConfig: (state, action: PayloadAction<object>) => {
       state.launchableMarketsChartConfig = action.payload;
     },
-    updateSpotChartConfig: (state, action: PayloadAction<object>) => {
-      state.spotChartConfig = action.payload;
-    },
   },
 });
 
-export const { updateChartConfig, updateLaunchableMarketsChartConfig, updateSpotChartConfig } =
-  tradingViewSlice.actions;
+export const { updateChartConfig, updateLaunchableMarketsChartConfig } = tradingViewSlice.actions;

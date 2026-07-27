@@ -3,14 +3,7 @@ import { RootState } from './_store';
 /**
  * @returns saved chartConfig for TradingView
  */
-export const getTvChartConfig = (
-  state: RootState,
-  isViewingLaunchableMarket?: boolean,
-  isViewingSpotMarket?: boolean
-) => {
-  if (isViewingSpotMarket) {
-    return state.tradingView.spotChartConfig;
-  }
+export const getTvChartConfig = (state: RootState, isViewingLaunchableMarket?: boolean) => {
   if (isViewingLaunchableMarket) {
     return state.tradingView.launchableMarketsChartConfig;
   }

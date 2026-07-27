@@ -9,45 +9,28 @@ import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
-import {
-  favoriteMarket,
-  favoriteSpotToken,
-  unfavoriteMarket,
-  unfavoriteSpotToken,
-} from '@/state/appUiConfigs';
-import { getIsMarketFavorited, getIsSpotTokenFavorited } from '@/state/appUiConfigsSelectors';
+import { favoriteMarket, unfavoriteMarket } from '@/state/appUiConfigs';
+import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 
 export const FavoriteButton = ({
   className,
   marketId,
-  variant = 'perp',
 }: {
   className?: string;
   marketId: string;
-  variant?: 'perp' | 'spot';
 }) => {
   const dispatch = useDispatch();
-  const isSpotFavorited = useAppSelectorWithArgs(getIsSpotTokenFavorited, marketId);
-  const isPerpFavorited = useAppSelectorWithArgs(getIsMarketFavorited, marketId);
-  const isMarketFavorited = variant === 'spot' ? isSpotFavorited : isPerpFavorited;
+  const isMarketFavorited = useAppSelectorWithArgs(getIsMarketFavorited, marketId);
 
   const onToggle = (newIsFavorited: boolean) => {
     if (newIsFavorited) {
-      if (variant === 'spot') {
-        dispatch(favoriteSpotToken(marketId));
-      } else {
-        dispatch(favoriteMarket(marketId));
-        track(AnalyticsEvents.FavoriteMarket({ marketId }));
-      }
+      dispatch(favoriteMarket(marketId));
+      track(AnalyticsEvents.FavoriteMarket({ marketId }));
     } else {
-      if (variant === 'spot') {
-        dispatch(unfavoriteSpotToken(marketId));
-      } else {
-        dispatch(unfavoriteMarket(marketId));
-        track(AnalyticsEvents.UnfavoriteMarket({ marketId }));
-      }
+      dispatch(unfavoriteMarket(marketId));
+      track(AnalyticsEvents.UnfavoriteMarket({ marketId }));
     }
   };
 

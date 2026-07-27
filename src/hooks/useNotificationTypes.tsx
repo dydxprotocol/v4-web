@@ -31,7 +31,6 @@ import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGe
 
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
 import { FillWithNoOrderNotificationRow } from '@/views/Lists/Alerts/FillWithNoOrderNotificationRow';
 import { OrderCancelNotificationRow } from '@/views/Lists/Alerts/OrderCancelNotificationRow';
@@ -62,12 +61,9 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
-import { getSpotTrades } from '@/state/spotTradesSelectors';
-import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
-import { SpotApiSide } from '@/clients/spotApi';
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 // eslint-disable-next-line import/no-cycle
@@ -329,19 +325,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const { type, status } = transfer;
           const id = transfer.id;
 
-          const finalAmount = isSpotWithdraw(transfer)
-            ? `${formatNumberOutput(transfer.amount, OutputType.Number, { decimalSeparator, groupSeparator, selectedLocale, fractionDigits: 4 })} SOL`
-            : formatNumberOutput(
-                transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
-                OutputType.Fiat,
-                { decimalSeparator, groupSeparator, selectedLocale }
-              );
+          const finalAmount = formatNumberOutput(
+            transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
+            OutputType.Fiat,
+            { decimalSeparator, groupSeparator, selectedLocale }
+          );
 
           const isSuccess = status === 'success';
           let body: string = '';
           let title: string = '';
 
-          if (type === 'withdraw' || type === 'spot-withdraw') {
+          if (type === 'withdraw') {
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
             });
@@ -1015,59 +1009,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
           dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
         }
       };
-    },
-  },
-  {
-    type: NotificationType.SpotTrade,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-
-      const spotTrades = useAppSelector(getSpotTrades, shallowEqual);
-
-      useEffect(() => {
-        spotTrades.forEach((trade) => {
-          const isPending = trade.status === 'pending';
-          const isSuccess = trade.status === 'success';
-
-          trigger({
-            id: trade.id,
-            displayData: {
-              slotTitleLeft: isPending ? (
-                <LoadingSpinner tw="text-color-accent [--spinner-width:0.9375rem]" />
-              ) : isSuccess ? (
-                <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
-              ) : (
-                <Icon iconName={IconName.Warning} tw="text-color-error" />
-              ),
-              title: isPending
-                ? stringGetter({ key: STRING_KEYS.PENDING })
-                : isSuccess
-                  ? stringGetter({ key: STRING_KEYS.TRADE_SUCCESSFUL })
-                  : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED }),
-              body: isPending
-                ? `${trade.side === SpotApiSide.BUY ? stringGetter({ key: STRING_KEYS.BUY }) : stringGetter({ key: STRING_KEYS.SELL })} ${trade.tokenSymbol}`
-                : isSuccess
-                  ? stringGetter({
-                      key: STRING_KEYS.TRADE_SUCCESSFUL_DESCRIPTION,
-                      params: {
-                        PURCHASE_DIRECTION:
-                          trade.side === SpotApiSide.BUY
-                            ? stringGetter({ key: STRING_KEYS.PURCHASED })
-                            : stringGetter({ key: STRING_KEYS.SOLD }),
-                        AMOUNT: trade.tokenAmount,
-                        ASSET: trade.tokenSymbol,
-                        SOL_AMOUNT: trade.solAmount,
-                      },
-                    })
-                  : stringGetter({ key: STRING_KEYS.TRANSACTION_FAILED_RETRY }),
-              groupKey: NotificationType.SpotTrade,
-              toastSensitivity: 'foreground',
-              toastDuration: isPending ? Infinity : DEFAULT_TOAST_AUTO_CLOSE_MS,
-            },
-            updateKey: [trade.status],
-          });
-        });
-      }, [spotTrades, stringGetter, trigger]);
     },
   },
   {

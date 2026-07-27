@@ -27,9 +27,6 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
-import { spotSlice } from './spot';
-import { spotFormSlice } from './spotForm';
-import { spotTradesSlice } from './spotTrades';
 import { tradeFormSlice } from './tradeForm';
 import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
 import { tradingViewSlice } from './tradingView';
@@ -49,9 +46,6 @@ const reducers = {
   triggersForm: triggersFormSlice.reducer,
   tradeForm: tradeFormSlice.reducer,
   closePositionForm: closePositionFormSlice.reducer,
-  spot: spotSlice.reducer,
-  spotForm: spotFormSlice.reducer,
-  spotTrades: spotTradesSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,
@@ -76,7 +70,6 @@ const persistConfig = {
     'dismissable',
     'tradingView',
     'transfers',
-    'spotTrades',
     'wallet',
     'appUiConfigs',
     'accountUiMemory',

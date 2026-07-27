@@ -1,4 +1,3 @@
-import { type SpotBuyInputType, type SpotSellInputType } from '@/bonsai/forms/spot';
 import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { ApiStatus, SubaccountFill } from '@/bonsai/types/summaryTypes';
@@ -11,8 +10,6 @@ import { type DisplayUnit, type QuickLimitOption } from '@/constants/trade';
 import { type ConnectorType, type DydxAddress, type WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
-
-import { type SpotApiSide, type SpotApiTradeRoute } from '@/clients/spotApi';
 
 import type { OnboardingState, OnboardingSteps } from './account';
 import { type DialogTypesTypes } from './dialogs';
@@ -597,53 +594,6 @@ export const AnalyticsEvents = unionize(
       campaign: string;
       timestamp: number;
     }>(),
-
-    // Spot Trading
-    SpotTransactionSubmitStarted: ofType<{
-      side: SpotApiSide;
-      tokenMint: string;
-      tokenSymbol?: string;
-      tradeRoute: SpotApiTradeRoute;
-      estimatedUsdAmount?: number;
-      inputType: SpotBuyInputType | SpotSellInputType;
-    }>(),
-    SpotTransactionSubmitSuccess: ofType<{
-      side: SpotApiSide;
-      tokenMint: string;
-      tokenSymbol?: string;
-      tradeRoute: SpotApiTradeRoute;
-      usdAmount: number;
-      solAmount: number;
-      timingMs: Record<string, number>;
-    }>(),
-    SpotTransactionSubmitError: ofType<{
-      side: SpotApiSide;
-      tokenMint: string;
-      tokenSymbol?: string;
-      tradeRoute: SpotApiTradeRoute;
-      estimatedUsdAmount?: number;
-      step: string;
-      errorName: string;
-      errorMessage: string;
-    }>(),
-
-    // Spot Withdrawal
-    SpotSolWithdrawalStarted: ofType<{
-      solAmount: number;
-    }>(),
-    SpotSolWithdrawalSuccess: ofType<{
-      solAmount: number;
-      timingMs: Record<string, number>;
-    }>(),
-    SpotSolWithdrawalError: ofType<{
-      solAmount: number;
-      step: string;
-      errorName: string;
-      errorMessage: string;
-    }>(),
-
-    // Spot Deposit
-    SpotDepositInitiated: ofType<{}>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

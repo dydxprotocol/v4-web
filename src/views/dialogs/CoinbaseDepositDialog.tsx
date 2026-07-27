@@ -1,8 +1,7 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { CoinbaseDepositDialogProps, DialogProps } from '@/constants/dialogs';
@@ -10,7 +9,6 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { CopyIcon } from '@/icons';
@@ -19,11 +17,6 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
-import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
-
-import { track } from '@/lib/analytics/analytics';
-
-import { SpotDepositForm } from './TransferDialogs/DepositDialog2/SpotDepositForm';
 
 const THREE_SECOND_DELAY = 3000;
 export const CoinbaseDepositDialog = ({
@@ -32,22 +25,12 @@ export const CoinbaseDepositDialog = ({
 }: DialogProps<CoinbaseDepositDialogProps>) => {
   const stringGetter = useStringGetter();
   const [showCopyLogo, setShowCopyLogo] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<'perps' | 'spot'>('perps');
-  const { nobleAddress, solanaAddress } = useAccounts();
-  const isSpotEnabled = useEnableSpot();
+  const { nobleAddress } = useAccounts();
   const { complianceState } = useComplianceState();
 
-  useEffect(() => {
-    if (selectedTab === 'spot') {
-      track(AnalyticsEvents.SpotDepositInitiated({}));
-    }
-  }, [selectedTab]);
-
   useLayoutEffect(() => {
-    if (complianceState === ComplianceStates.READ_ONLY) {
+    if (complianceState !== ComplianceStates.FULL_ACCESS) {
       setIsOpen(false);
-    } else if (complianceState !== ComplianceStates.FULL_ACCESS) {
-      setSelectedTab('spot');
     }
   }, [complianceState, setIsOpen]);
 
@@ -94,20 +77,6 @@ export const CoinbaseDepositDialog = ({
     </div>
   );
 
-  const tabs: SpotTabItem[] = [
-    {
-      value: 'perps',
-      label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
-      content: perpetualsContent,
-      disabled: complianceState !== ComplianceStates.FULL_ACCESS,
-    },
-    {
-      value: 'spot',
-      label: stringGetter({ key: STRING_KEYS.SPOT }),
-      content: <SpotDepositForm />,
-    },
-  ];
-
   return (
     <$Dialog
       isOpen
@@ -116,14 +85,7 @@ export const CoinbaseDepositDialog = ({
       setIsOpen={setIsOpen}
       title={<div tw="text-center">{stringGetter({ key: STRING_KEYS.DEPOSIT_VIA_COINBASE })}</div>}
     >
-      <div tw="h-full w-full p-1.25">
-        <SpotTabs
-          value={selectedTab}
-          onValueChange={(v) => setSelectedTab(v as 'perps' | 'spot')}
-          hideTabs={!isSpotEnabled || !solanaAddress}
-          items={tabs}
-        />
-      </div>
+      <div tw="h-full w-full p-1.25">{perpetualsContent}</div>
     </$Dialog>
   );
 };

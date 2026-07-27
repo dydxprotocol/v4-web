@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import styled from 'styled-components';
 import { avalanche, mainnet, polygon } from 'viem/chains';
@@ -16,7 +16,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDepositAddress } from '@/hooks/useDepositAddress';
-import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -32,7 +31,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { formatNumberOutput, OutputType } from '@/components/Output';
 import { SelectItem, SelectMenu, SelectMenuTrigger } from '@/components/SelectMenu';
 import { WithLabel } from '@/components/WithLabel';
-import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -41,9 +39,6 @@ import { track } from '@/lib/analytics/analytics';
 import { calc } from '@/lib/do';
 
 import { DepositAddressCard } from './DepositAddressCard';
-import { SpotDepositForm } from './DepositDialog2/SpotDepositForm';
-
-type DepositTab = 'spot' | 'perpetuals';
 
 const MIN_DEPOSIT = 20;
 const MAX_DEPOSIT = 100_000;
@@ -51,14 +46,12 @@ const ETH_MIN_INSTANT_DEPOSIT = 50;
 
 export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const [selectedChain, setSelectedChain] = useState('1');
-  const [selectedTab, setSelectedTab] = useState<DepositTab>('perpetuals');
   const isSimpleUi = useSimpleUiEnabled();
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
-  const isSpotEnabled = useEnableSpot();
   const { complianceState } = useComplianceState();
 
-  const { dydxAddress, solanaAddress } = useAccounts();
+  const { dydxAddress } = useAccounts();
   const { isUploadingAddress } = useTurnkeyAuth();
   const {
     depositAddresses,
@@ -69,12 +62,8 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
   useEffect(() => {
     // Optimistic Deposit Initiated for tracking purposes
-    if (selectedTab === 'perpetuals') {
-      track(AnalyticsEvents.TurnkeyDepositInitiated({}));
-    } else {
-      track(AnalyticsEvents.SpotDepositInitiated({}));
-    }
-  }, [selectedTab]);
+    track(AnalyticsEvents.TurnkeyDepositInitiated({}));
+  }, []);
 
   useEffect(() => {
     if (failedToFetchDepositAddresses && dydxAddress) {
@@ -88,16 +77,12 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   }, [failedToFetchDepositAddresses, fetchDepositAddressesError?.message, dydxAddress]);
 
   const chains = useMemo(() => {
-    if (selectedTab === 'perpetuals') {
-      const evmChains = EVM_DEPOSIT_CHAINS.map((chain) => {
-        return chain.id;
-      }).filter((chainId) => chainId !== polygon.id); // Polygon unsupported for now
+    const evmChains = EVM_DEPOSIT_CHAINS.map((chain) => {
+      return chain.id;
+    }).filter((chainId) => chainId !== polygon.id); // Polygon unsupported for now
 
-      return [...evmChains, SOLANA_MAINNET_ID];
-    }
-
-    return [SOLANA_MAINNET_ID];
-  }, [selectedTab]);
+    return [...evmChains, SOLANA_MAINNET_ID];
+  }, []);
 
   const perpsDepositAddress: string | undefined = useMemo(() => {
     if (depositAddresses == null) {
@@ -200,21 +185,11 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     });
   };
 
-  const handleTabChange = useCallback(
-    (newTab: 'perps' | 'spot') => {
-      if (newTab === selectedTab) return;
-      setSelectedTab(newTab === 'perps' ? 'perpetuals' : 'spot');
-    },
-    [selectedTab]
-  );
-
   useLayoutEffect(() => {
-    if (complianceState === ComplianceStates.READ_ONLY) {
+    if (complianceState !== ComplianceStates.FULL_ACCESS) {
       setIsOpen(false);
-    } else if (complianceState !== ComplianceStates.FULL_ACCESS) {
-      handleTabChange('spot');
     }
-  }, [complianceState, handleTabChange, setIsOpen]);
+  }, [complianceState, setIsOpen]);
 
   const perpetualsContent = (
     <div tw="flexColumn gap-1">
@@ -282,20 +257,6 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     </div>
   );
 
-  const tabs: SpotTabItem[] = [
-    {
-      value: 'perps',
-      label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
-      content: perpetualsContent,
-      disabled: complianceState !== ComplianceStates.FULL_ACCESS,
-    },
-    {
-      value: 'spot',
-      label: stringGetter({ key: STRING_KEYS.SPOT }),
-      content: <SpotDepositForm />,
-    },
-  ];
-
   return (
     <$Dialog
       isOpen
@@ -314,14 +275,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
       hasHeaderBorder
     >
-      <div tw="h-full w-full overflow-hidden p-1.25">
-        <SpotTabs
-          value={selectedTab === 'perpetuals' ? 'perps' : 'spot'}
-          onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
-          hideTabs={!isSpotEnabled || !solanaAddress}
-          items={tabs}
-        />
-      </div>
+      <div tw="h-full w-full overflow-hidden p-1.25">{perpetualsContent}</div>
     </$Dialog>
   );
 };

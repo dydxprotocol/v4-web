@@ -81,7 +81,6 @@ const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
 const ProfilePage = lazy(() => import('@/pages/Profile'));
 const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
-const SpotPage = lazy(() => import('@/pages/spot/Spot'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
@@ -203,11 +202,6 @@ const Content = () => {
               <Route path={AppRoute.Trade}>
                 <Route path=":market" element={<TradePage />} />
                 <Route path={AppRoute.Trade} element={<TradePage />} />
-              </Route>
-
-              <Route path={AppRoute.Spot}>
-                <Route path=":tokenMint" element={<SpotPage />} />
-                <Route index element={<SpotPage />} />
               </Route>
 
               <Route path={AppRoute.Markets}>
