@@ -1,6 +1,10 @@
 import { ReactNode, useCallback, useMemo } from 'react';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -13,6 +17,8 @@ export const SetupPasskeyDialog = ({
   onClose: () => void;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
+  const { registerPasskey } = useTurnkeyAuth();
+  const stringGetter = useStringGetter();
   const modifiedSetIsOpen = useCallback(
     (isOpen: boolean) => {
       setIsOpen(isOpen);
@@ -59,7 +65,9 @@ export const SetupPasskeyDialog = ({
       }}
     >
       <div tw="column justify-items-center text-center">
-        <h3 tw="mb-0.25 text-color-text-2 font-large-bold">Setup Passkey</h3>
+        <h3 tw="mb-0.25 text-color-text-2 font-large-bold">
+          {stringGetter({ key: STRING_KEYS.REGISTER_PASSKEY, fallback: 'Setup Passkey' })}
+        </h3>
         <p tw="text-color-text-0 font-small-book">Passkeys are a secure alternative to passwords</p>
 
         <div tw="column my-1.5 gap-1.25">
@@ -83,9 +91,15 @@ export const SetupPasskeyDialog = ({
             css={{
               color: 'var(--dialog-backgroundColor, var(--text-color-text-0))',
             }}
+            onClick={() => {
+              registerPasskey();
+              modifiedSetIsOpen(false);
+            }}
           >
             <Icon tw="size-1.5" iconName={IconName.Passkey} />
-            <span>Setup Passkey</span>
+            <span>
+              {stringGetter({ key: STRING_KEYS.REGISTER_PASSKEY, fallback: 'Setup Passkey' })}
+            </span>
           </Button>
 
           <Button
@@ -93,8 +107,9 @@ export const SetupPasskeyDialog = ({
             type={ButtonType.Button}
             action={ButtonAction.Navigation}
             size={ButtonSize.BasePlus}
+            onClick={() => modifiedSetIsOpen(false)}
           >
-            Skip
+            {stringGetter({ key: STRING_KEYS.SKIP_FOR_NOW, fallback: 'Skip for now' })}
           </Button>
         </div>
       </div>

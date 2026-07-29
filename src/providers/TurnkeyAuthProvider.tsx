@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
-import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
+import { SessionType, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
@@ -69,7 +69,7 @@ const useTurnkeyAuthContext = () => {
   const stringGetter = useStringGetter();
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
-  const { indexedDbClient, authIframeClient } = useTurnkey();
+  const { indexedDbClient, authIframeClient, passkeyClient, turnkey } = useTurnkey();
   const { dydxAddress: connectedDydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [emailToken, setEmailToken] = useState<string>();
@@ -85,6 +85,7 @@ const useTurnkeyAuthContext = () => {
     onboardDydx,
     targetPublicKeys,
     getUploadAddressPayload,
+    fetchCredentialId,
   } = useTurnkeyWallet();
 
   /* ----------------------------- Upload Address ----------------------------- */
@@ -217,7 +218,9 @@ const useTurnkeyAuthContext = () => {
           handleEmailResponse({ userEmail, response });
           setEmailSignInStatus('idle');
           break;
-        case LoginMethod.Passkey: // TODO: handle passkey response
+        case LoginMethod.Passkey:
+          handlePasskeyResponse({ response });
+          break;
         default:
           throw new Error('Current unsupported login method');
       }
@@ -330,6 +333,49 @@ const useTurnkeyAuthContext = () => {
       setEmailSignInError(undefined);
     },
     [onboardDydx, indexedDbClient, setWalletFromSignature, uploadAddress]
+  );
+
+  const handlePasskeyResponse = useCallback(
+    async ({ response }: { response: TurnkeyOAuthResponse }) => {
+      const { salt, dydxAddress: uploadedDydxAddress } = response as {
+        salt?: string;
+        dydxAddress?: string;
+      };
+
+      if (!passkeyClient) {
+        throw new Error('Passkey client is not available');
+      }
+      const derivedDydxAddress = await onboardDydx({
+        salt,
+        setWalletFromSignature,
+        tkClient: indexedDbClient,
+      });
+
+      if (uploadedDydxAddress === '' && derivedDydxAddress) {
+        try {
+          await uploadAddress({ tkClient: indexedDbClient, dydxAddress: derivedDydxAddress });
+        } catch (uploadAddressError) {
+          if (
+            uploadAddressError instanceof Error &&
+            !uploadAddressError.message.includes('Dydx address already uploaded')
+          ) {
+            throw uploadAddressError;
+          }
+        }
+      }
+
+      setEmailSignInStatus('success');
+      setEmailSignInError(undefined);
+    },
+    [
+      onboardDydx,
+      indexedDbClient,
+      setWalletFromSignature,
+      uploadAddress,
+      setEmailSignInStatus,
+      setEmailSignInError,
+      passkeyClient,
+    ]
   );
 
   /* ----------------------------- Email Sign In ----------------------------- */
@@ -524,6 +570,82 @@ const useTurnkeyAuthContext = () => {
     setEmailSignInError(undefined);
   }, [searchParams, setSearchParams]);
 
+  /* ----------------------------- Passkey Sign In ----------------------------- */
+
+  const registerPasskey = useCallback(async () => {
+    try {
+      if (!passkeyClient || !indexedDbClient || !turnkey) {
+        throw new Error('Passkey client is not available');
+      }
+
+      const passkey = await passkeyClient.createUserPasskey({
+        rp: {
+          id: 'dydx.trade',
+          name: '2FA Passkey',
+        },
+      });
+
+      const session = await turnkey.getSession();
+      if (!session || !passkey?.encodedChallenge || !passkey?.attestation) {
+        throw new Error('No session found');
+      }
+
+      await indexedDbClient.addUserAuth({
+        userId: session.userId,
+        authenticators: [
+          {
+            authenticatorName: 'Passkey',
+            challenge: passkey.encodedChallenge,
+            attestation: passkey.attestation,
+          },
+        ],
+      });
+    } catch (error) {
+      logBonsaiError('TurnkeyOnboarding', 'Error registering passkey', { error });
+    }
+  }, [passkeyClient, indexedDbClient, turnkey]);
+
+  const signInWithPasskey = useCallback(async () => {
+    try {
+      if (!passkeyClient) {
+        throw new Error('Passkey client is not available');
+      }
+
+      await indexedDbClient!.resetKeyPair();
+      const pubKey = await indexedDbClient!.getPublicKey();
+      if (!pubKey) {
+        throw new Error('No public key available for passkey session');
+      }
+      // Authenticate with the user's passkey for the returned sub-organization
+      await passkeyClient.loginWithPasskey({
+        sessionType: SessionType.READ_WRITE,
+        publicKey: pubKey,
+        expirationSeconds: (60 * 15).toString(), // 15 minutes
+      });
+
+      const credentialId = await fetchCredentialId(indexedDbClient);
+      if (!credentialId) {
+        throw new Error('No user found');
+      }
+
+      // dummy body used to get salt.
+      const bodyWithAttestation: SignInBody = {
+        signinMethod: 'passkey',
+        challenge: credentialId,
+        attestation: {
+          credentialId,
+        },
+      };
+
+      sendSignInRequest({
+        body: JSON.stringify(bodyWithAttestation),
+        loginMethod: LoginMethod.Passkey,
+      });
+    } catch (error) {
+      logBonsaiError('TurnkeyOnboarding', 'Error signing in with passkey', { error });
+    }
+  }, [passkeyClient, indexedDbClient, fetchCredentialId, sendSignInRequest]);
+
   /* ----------------------------- Side Effects ----------------------------- */
 
   /**
@@ -592,6 +714,8 @@ const useTurnkeyAuthContext = () => {
     isUploadingAddress,
     signInWithOauth,
     signInWithOtp,
+    signInWithPasskey,
+    registerPasskey,
     resetEmailSignInStatus,
   };
 };
