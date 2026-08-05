@@ -174,11 +174,9 @@ export const getDydxDatafeed = (
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!symbolInfo) return;
 
-    // TODO: technically we should be prioritizing countBack over the from+to since it really wants at least that many bars
-    const { from, to } = periodParams;
-    const fromMs = from * 1000;
+    const { from, to, countBack } = periodParams;
     // add one to make sure we get current day for 1d view
-    const toMs = to * 1000 + 1;
+    const [fromMs, toMs] = [from * 1000, to * 1000 + 1];
 
     try {
       AppStartupTimer.timeIfFirst('startCandles');
@@ -190,6 +188,7 @@ export const getDydxDatafeed = (
         resolution,
         fromMs,
         toMs,
+        countBack,
       });
       AppStartupTimer.timeIfFirst('loadedCandles');
 
