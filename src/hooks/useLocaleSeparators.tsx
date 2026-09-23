@@ -39,8 +39,9 @@ const useLocaleContext = () => {
     return {
       group: getSeparator({ browserLanguage, separatorType: 'group' }),
       decimal: getSeparator({ browserLanguage, separatorType: 'decimal' }),
+      selectedLocale,
     };
-  }, [browserLanguage]);
+  }, [browserLanguage, selectedLocale]);
 
   return separators;
 };

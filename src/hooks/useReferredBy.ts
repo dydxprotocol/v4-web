@@ -1,7 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { DydxAddress } from '@/constants/wallets';
-
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
@@ -10,14 +8,14 @@ import { useDydxClient } from './useDydxClient';
 export const useReferredBy = () => {
   const { dydxAddress } = useAccounts();
   const { getReferredBy, compositeClient } = useDydxClient();
+  const indexerEndpoint = compositeClient?.indexerClient.config.restEndpoint;
 
-  const queryFn = async ({ queryKey }: { queryKey: (string | DydxAddress | undefined)[] }) => {
-    const [, address] = queryKey;
-    if (!address) {
+  const queryFn = async () => {
+    if (!dydxAddress) {
       return {};
     }
     try {
-      const affliateAddress = await getReferredBy(address);
+      const affliateAddress = await getReferredBy(dydxAddress);
 
       return { affiliateAddress: affliateAddress?.affiliateAddress };
     } catch (error) {
@@ -27,7 +25,7 @@ export const useReferredBy = () => {
   };
 
   return useQuery({
-    queryKey: ['referredBy', dydxAddress],
+    queryKey: ['referredBy', indexerEndpoint, dydxAddress],
     queryFn,
     enabled: Boolean(compositeClient && dydxAddress),
   });

@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import { timeUnits } from '@/constants/time';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
+import { getUserWalletAddress } from '@/state/accountInfoSelectors';
+import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { wrapAndLogError } from '@/lib/asyncUtils';
@@ -22,6 +24,8 @@ export function useTransferForm(initialToUsdc: boolean) {
   const selectedMarketLeverages = useAppSelector(BonsaiRaw.selectedMarketLeverages);
   const walletBalances = useAppSelector(BonsaiCore.account.balances.data);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const dydxAddress = useAppSelector(getUserWalletAddress);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
   const {
     usdcLabel,
     chainTokenLabel,
@@ -83,7 +87,14 @@ export function useTransferForm(initialToUsdc: boolean) {
   const { simulateTransfer } = useSubaccount();
   const { data: feeQueryResult } = useQuery({
     enabled: payload != null && amountDebounced != null && recipientDebounced != null,
-    queryKey: ['simulateTransfer', amountDebounced, recipientDebounced, payload?.type],
+    queryKey: [
+      'simulateTransfer',
+      selectedNetwork,
+      dydxAddress,
+      amountDebounced,
+      recipientDebounced,
+      payload?.type,
+    ],
     queryFn: wrapAndLogError(
       async (): Promise<TransferFeeData> => {
         const result = await simulateTransfer({

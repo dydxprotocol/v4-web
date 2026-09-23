@@ -10,6 +10,7 @@ const PAGE_SIZE = 100;
 
 export const useAffiliatesLeaderboard = () => {
   const { compositeClient } = useDydxClient();
+  const indexerEndpoint = compositeClient?.indexerClient.config.restEndpoint;
 
   const fetchAffiliateStats = async () => {
     if (!compositeClient) return undefined;
@@ -38,7 +39,7 @@ export const useAffiliatesLeaderboard = () => {
   };
 
   return useQuery({
-    queryKey: ['affiliatesLeaderboard'],
+    queryKey: ['affiliatesLeaderboard', indexerEndpoint],
     queryFn: fetchAffiliateStats,
     enabled: Boolean(compositeClient),
     refetchOnMount: false,

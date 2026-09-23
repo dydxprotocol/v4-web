@@ -2,11 +2,25 @@ import BigNumber from 'bignumber.js';
 import { describe, expect, it } from 'vitest';
 
 import {
+  MustBigNumber,
   getFractionDigits,
   getTickSizeFromPrice,
   isNumber,
   roundToNearestFactor,
 } from '../numbers';
+
+describe('MustBigNumber', () => {
+  it('reuses an existing BigNumber', () => {
+    const value = new BigNumber('123.45');
+
+    expect(MustBigNumber(value)).toBe(value);
+  });
+
+  it('converts primitive and empty values', () => {
+    expect(MustBigNumber('123.45')).toEqual(new BigNumber('123.45'));
+    expect(MustBigNumber()).toEqual(new BigNumber(0));
+  });
+});
 
 describe('roundToNearestFactor', () => {
   it('should return NaN if given a tick of 0', () => {

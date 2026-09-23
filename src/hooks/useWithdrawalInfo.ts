@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js';
 import { DialogTypes } from '@/constants/dialogs';
 import { ESTIMATED_BLOCK_TIME } from '@/constants/numbers';
 
+import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -30,12 +31,13 @@ export const useWithdrawalInfo = ({
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const { height } = orEmptyObj(useApiState());
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
   const dispatch = useAppDispatch();
   const { withdrawalSafetyEnabled } = useEnvFeatures();
 
   const { data: usdcWithdrawalCapacity } = useQuery({
     enabled: withdrawalSafetyEnabled,
-    queryKey: ['usdcWithdrawalCapacity'],
+    queryKey: ['usdcWithdrawalCapacity', selectedNetwork, usdcDenom],
     queryFn: wrapAndLogError(
       async () => {
         const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
@@ -50,7 +52,7 @@ export const useWithdrawalInfo = ({
 
   const { data: withdrawalAndTransferGatingStatus } = useQuery({
     enabled: withdrawalSafetyEnabled,
-    queryKey: ['withdrawalTransferGateStatus'],
+    queryKey: ['withdrawalTransferGateStatus', selectedNetwork],
     queryFn: wrapAndLogError(
       () => getWithdrawalAndTransferGatingStatus(),
       'useWithdrawalInfo/getWithdrawalAndTransferGatingStatus',
@@ -74,7 +76,7 @@ export const useWithdrawalInfo = ({
     const dailyBN = MustBigNumber(daily);
     const weeklyBN = MustBigNumber(weekly);
     return BigNumber.minimum(dailyBN, weeklyBN).div(10 ** usdcDecimals);
-  }, [usdcDecimals, usdcWithdrawalCapacity]);
+  }, [usdcDecimals, usdcWithdrawalCapacity, withdrawalSafetyEnabled]);
 
   const withdrawalAndTransferGatingStatusValue = useMemo(() => {
     const { withdrawalsAndTransfersUnblockedAtBlock } = withdrawalAndTransferGatingStatus ?? {};

@@ -25,6 +25,16 @@ import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors'
 import { useMarketsData } from './useMarketsData';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
+export const getValidMarketId = (
+  marketIds: string[],
+  marketId: string | undefined,
+  lastViewedMarket: string
+) => {
+  const preferredMarket = marketId ?? lastViewedMarket;
+  if (marketIds.length === 0) return preferredMarket;
+  return marketIds.includes(preferredMarket) ? preferredMarket : DEFAULT_MARKETID;
+};
+
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
@@ -61,11 +71,10 @@ export const useCurrentMarketId = () => {
     }
   };
 
-  const validId = useMemo(() => {
-    if (marketIds.length === 0) return marketId ?? lastViewedMarket;
-    if (!marketIds.includes(marketId ?? lastViewedMarket)) return DEFAULT_MARKETID;
-    return marketId ?? lastViewedMarket;
-  }, [hasMarketIds, marketId]);
+  const validId = useMemo(
+    () => getValidMarketId(marketIds, marketId, lastViewedMarket),
+    [lastViewedMarket, marketId, marketIds]
+  );
 
   const isViewingUnlaunchedMarket = useMemo(() => {
     if (!hasMarketIds || !hasLoadedLaunchableMarkets) return false;
@@ -88,7 +97,7 @@ export const useCurrentMarketId = () => {
 
   const isViewingPredictionMarket = useMemo(() => {
     return predictionMarkets.some((market) => market.id === marketId);
-  }, [predictionMarkets.length, marketId]);
+  }, [predictionMarkets, marketId]);
 
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId
@@ -136,7 +145,16 @@ export const useCurrentMarketId = () => {
         dispatch(closeDialogInTradeBox());
       }
     }
-  }, [hasMarketIds, hasLoadedLaunchableMarkets, isViewingUnlaunchedMarket, marketId, navigate]);
+  }, [
+    hasMarketIds,
+    hasLoadedLaunchableMarkets,
+    isViewingPredictionMarket,
+    isViewingUnlaunchedMarket,
+    marketId,
+    marketIds,
+    navigate,
+    validId,
+  ]);
 
   useEffect(() => {
     if (isViewingUnlaunchedMarket) {

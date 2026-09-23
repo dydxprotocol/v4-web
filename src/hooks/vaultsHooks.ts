@@ -22,6 +22,7 @@ import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
+import { getSelectedNetwork } from '@/state/appSelectors';
 import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 
 import { track } from '@/lib/analytics/analytics';
@@ -59,9 +60,10 @@ export function useForceRefreshVaultDetails() {
 export const useLoadedVaultDetails = () => {
   const { getMegavaultHistoricalPnl } = useDydxClient();
   const megavaultHistoryStartDateMs = useEnvConfig('megavaultHistoryStartDateMs');
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const vaultDetailsResult = useQuery({
-    queryKey: ['vaultDetails'],
+    queryKey: ['vaultDetails', selectedNetwork],
     queryFn: wrapAndLogBonsaiError(async () => {
       const [dailyResult, hourlyResult] = await Promise.all([
         getMegavaultHistoricalPnl(PnlTickInterval.day),
@@ -147,9 +149,10 @@ const useDebouncedMarketsData = () => {
 export const useLoadedVaultPositions = () => {
   const { getVaultsHistoricalPnl, getMegavaultPositions } = useDydxClient();
   const marketsMap = useDebouncedMarketsData();
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const { data: subvaultHistories } = useQuery({
-    queryKey: ['subvaultHistories'],
+    queryKey: ['subvaultHistories', selectedNetwork],
     queryFn: wrapAndLogBonsaiError(async () => {
       return wrapNullable(await getVaultsHistoricalPnl());
     }, 'subvaultHistories'),
@@ -157,7 +160,7 @@ export const useLoadedVaultPositions = () => {
   });
 
   const { data: vaultPositions } = useQuery({
-    queryKey: ['vaultPositions'],
+    queryKey: ['vaultPositions', selectedNetwork],
     queryFn: wrapAndLogBonsaiError(async () => {
       return wrapNullable(await getMegavaultPositions());
     }, 'vaultPositions'),
@@ -199,9 +202,10 @@ export const useLoadedVaultAccount = () => {
   const { getAllAccountTransfersBetween, compositeClient } = useDydxClient();
   const { dydxAddress } = useAccounts();
   const { getVaultAccountInfo } = useSubaccount();
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const accountVaultQueryResult = useQuery({
-    queryKey: ['vaultAccount', dydxAddress, compositeClient != null],
+    queryKey: ['vaultAccount', selectedNetwork, dydxAddress, compositeClient != null],
     queryFn: wrapAndLogBonsaiError(async () => {
       if (dydxAddress == null || compositeClient == null) {
         return wrapNullable(undefined);
@@ -257,10 +261,12 @@ export const useVaultFormSlippage = () => {
   const vaultBalance = useLoadedVaultAccount().data;
   const { getVaultWithdrawInfo } = useDydxClient();
   const { compositeClient } = useDydxClient();
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const slippageQueryResult = useQuery({
     queryKey: [
       'vaultSlippage',
+      selectedNetwork,
       amount,
       operation,
       vaultBalance?.balanceUsdc,

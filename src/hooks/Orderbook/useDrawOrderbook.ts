@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { CanvasOrderbookLine } from '@/bonsai/types/orderbookTypes';
@@ -63,13 +63,17 @@ export const useDrawOrderbook = ({
 }: ElementProps & StyleProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
-  const priceSizeMap = data.reduce(
-    (acc, row) => {
-      if (!row) return acc;
-      acc[row.price.toString()] = row.size;
-      return acc;
-    },
-    {} as Record<string, number>
+  const priceSizeMap = useMemo(
+    () =>
+      data.reduce(
+        (acc, row) => {
+          if (!row) return acc;
+          acc[row.price.toString()] = row.size;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+    [data]
   );
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);

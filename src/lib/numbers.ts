@@ -15,7 +15,7 @@ export const BIG_NUMBERS = {
 // defaults to zero if null or empty
 export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  new BigNumber(amount || 0);
+  BigNumber.isBigNumber(amount) ? amount : new BigNumber(amount || 0);
 
 // undefined if falsey otherwise a valid bignumber
 export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined => {
