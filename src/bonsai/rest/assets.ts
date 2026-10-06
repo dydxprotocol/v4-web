@@ -56,7 +56,11 @@ export function setUpAssetsQuery(store: RootStore) {
           )
         );
       } catch (e) {
-        logBonsaiError('setUpAssetsQuery', 'Error handling result from react query', e, result);
+        logBonsaiError('setUpAssetsQuery', 'Error handling result from react query', {
+          error: e,
+          status: result.status,
+          fetchStatus: result.fetchStatus,
+        });
       }
     });
     return () => {
