@@ -149,7 +149,7 @@ async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: strin
   identify(AnalyticsUserProperties.BonsaiValidatorUrl(validatorUrl));
   logBonsaiInfo('CompositeClientManager', 'findOptimalNode', {
     validatorUrl,
-    validatorList: validatorEndpoints,
+    validatorCount: validatorEndpoints.length,
     chainId,
     duration: t1 - t0,
   });
