@@ -11,6 +11,8 @@ const instanceId = crypto.randomUUID();
 
 // forwardErrorsToLogs stays on for uncaught exceptions; console and network errors are dropped
 const DROPPED_ORIGINS = new Set(['console', 'network']);
+// Only guards logs that nest their payload under `context` (logBonsaiError / logBonsaiInfo).
+// Other callers' metadata is merged into the top level of the event and is not checked.
 const MAX_CONTEXT_CHARS = 8 * 1024;
 
 const LOG_ENDPOINT_PATH = (PROXY_URL ?? '').endsWith('/') ? 'api/v2/logs' : '/api/v2/logs';

@@ -1,6 +1,7 @@
 import { calc } from '@/lib/do';
 
 import { OperationResult, wrapOperationFailure } from './lib/operationResult';
+import { logBonsaiError } from './logs';
 
 export type MiddlewareResult<TContext, TResult = any> = {
   result: OperationResult<TResult>;
@@ -24,10 +25,10 @@ function getEngineMiddleware<TContext, TEngineResult>(
       try {
         return await engine(ctx);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(
-          'Middleware engine threw an errror. Middleware should never throw errors.',
-          error
+        logBonsaiError(
+          'SimpleMiddleware',
+          'Middleware engine threw an error. Middleware should never throw errors.',
+          { error }
         );
         return wrapOperationFailure('Middleware engine returned improper error');
       }
@@ -68,10 +69,10 @@ function wrapperTaskBuilder<TContext extends {}>(topMiddleware: TopLevelMiddlewa
             try {
               return await nextMiddleware(withAllExtras, next);
             } catch (error) {
-              // eslint-disable-next-line no-console
-              console.error(
-                'Middleware engine threw an error. Middleware should never throw erors.',
-                error
+              logBonsaiError(
+                'SimpleMiddleware',
+                'Middleware threw an error. Middleware should never throw errors.',
+                { error }
               );
               return createMiddlewareFailureResult(
                 wrapOperationFailure('Middleware engine returned improper error'),
