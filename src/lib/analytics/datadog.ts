@@ -9,6 +9,12 @@ const LOGGER_NAME = 'v4-web';
 const SITE_NAME = 'datadoghq.com';
 const instanceId = crypto.randomUUID();
 
+// forwardErrorsToLogs stays on for uncaught exceptions; console and network errors are dropped
+const DROPPED_ORIGINS = new Set(['console', 'network']);
+// Only guards logs that nest their payload under `context` (logBonsaiError / logBonsaiInfo).
+// Other callers' metadata is merged into the top level of the event and is not checked.
+const MAX_CONTEXT_CHARS = 8 * 1024;
+
 const LOG_ENDPOINT_PATH = (PROXY_URL ?? '').endsWith('/') ? 'api/v2/logs' : '/api/v2/logs';
 
 if (CLIENT_TOKEN) {
@@ -21,6 +27,15 @@ if (CLIENT_TOKEN) {
     env: CURRENT_MODE,
     proxy: PROXY_URL ? `${PROXY_URL}${LOG_ENDPOINT_PATH}` : undefined,
     sendLogsAfterSessionExpiration: true,
+    beforeSend: (event) => {
+      if (DROPPED_ORIGINS.has(event.origin)) return false;
+
+      const contextSize = JSON.stringify(event.context ?? null).length;
+      if (contextSize > MAX_CONTEXT_CHARS) {
+        event.context = { truncated: true, originalSize: contextSize };
+      }
+      return true;
+    },
   });
 }
 

@@ -132,8 +132,7 @@ export function createIndexerQueryStoreEffect<T, R>(
           logBonsaiError(
             'IndexerQueryStoreEffect',
             'Error handling result from react query store effect',
-            e,
-            result
+            { error: e, status: result.status, fetchStatus: result.fetchStatus }
           );
         }
       });
@@ -230,8 +229,7 @@ export function createValidatorQueryStoreEffect<T, R>(
           logBonsaiError(
             'ValidatorQueryStoreEffect',
             'Error handling result from react query store effect',
-            e,
-            result
+            { error: e, status: result.status, fetchStatus: result.fetchStatus }
           );
         }
       });
@@ -293,8 +291,7 @@ export function createNobleQueryStoreEffect<T, R>(
         logBonsaiError(
           'NobleClientQueryStoreEffect',
           'Error handling result from react query store effect',
-          e,
-          result
+          { error: e, status: result.status, fetchStatus: result.fetchStatus }
         );
       }
     });
