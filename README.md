@@ -299,7 +299,7 @@ To block OFAC Sanctioned countries:
 2. Create Rule with the following settings:
 
 - If incoming requests match
-  `(ip.geoip.country eq "CU") or (ip.geoip.country eq "IR") or (ip.geoip.country eq "KP") or (ip.geoip.country eq "SY") or (ip.geoip.country eq "MM") or (ip.geoip.subdivision_1_iso_code eq "UA-09") or (ip.geoip.subdivision_1_iso_code eq "UA-14") or (ip.geoip.subdivision_1_iso_code eq "UA-43")`
+  `(ip.geoip.country eq "CU") or (ip.geoip.country eq "IR") or (ip.geoip.country eq "KP") or (ip.geoip.country eq "MM") or (ip.geoip.subdivision_1_iso_code eq "UA-09") or (ip.geoip.subdivision_1_iso_code eq "UA-14") or (ip.geoip.subdivision_1_iso_code eq "UA-43")`
 - This rule will bring up a Cloudflare page when a restricted geography tries to access your site. You will have the option to display:
   1. Custom Text
   - (e.g. `Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use, or have engaged in activity that violates our terms of use, you have been blocked. You may withdraw your funds from the protocol at any time.`)
