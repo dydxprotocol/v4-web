@@ -1,4 +1,4 @@
-import { orderBy } from 'lodash';
+import { orderBy, sortedIndexBy } from 'lodash';
 
 import { isWsCandlesResponse, isWsCandlesUpdateResponse } from '@/types/indexer/indexerChecks';
 import { IndexerWsCandleResponse } from '@/types/indexer/indexerManual';
@@ -8,6 +8,23 @@ import { logBonsaiError } from '../logs';
 import { makeWsValueManager } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
+
+export function mergeCandles<T extends { startedAt: string }>(existing: T[], updates: T[]): T[] {
+  if (updates.length === 0) {
+    return existing;
+  }
+
+  const candles = [...existing];
+  updates.forEach((update) => {
+    const index = sortedIndexBy(candles, update, ({ startedAt }) => startedAt);
+    if (candles[index]?.startedAt === update.startedAt) {
+      candles[index] = update;
+    } else {
+      candles.splice(index, 0, update);
+    }
+  });
+  return candles;
+}
 
 function candlesWebsocketValueCreator(
   websocket: IndexerWebsocket,
@@ -31,17 +48,7 @@ function candlesWebsocketValueCreator(
           logBonsaiError('CandlesTracker', 'found unexpectedly null base data in update');
           return value;
         }
-        if (startingValue.candles.length === 0) {
-          return loadableLoaded({ candles: updates });
-        }
-
-        const allNewTimes = new Set(updates.map(({ startedAt }) => startedAt));
-        const newArr = [
-          ...updates,
-          ...startingValue.candles.filter(({ startedAt }) => !allNewTimes.has(startedAt)),
-        ];
-        const sorted = orderBy(newArr, [(a) => a.startedAt], ['asc']);
-        return loadableLoaded({ candles: sorted });
+        return loadableLoaded({ candles: mergeCandles(startingValue.candles, updates) });
       },
     },
     loadablePending()
