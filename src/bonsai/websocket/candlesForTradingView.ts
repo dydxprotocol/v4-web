@@ -9,6 +9,7 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { CandleResolution, RESOLUTION_MAP } from '@/constants/candles';
+import type { IndexerWsCandleResponseObject } from '@/types/indexer/indexerManual';
 
 import { type RootStore } from '@/state/_store';
 
@@ -22,6 +23,14 @@ export const subscriptionsByGuid: {
       }
     | undefined;
 } = {};
+
+export const getRealtimeCandles = (
+  candles: IndexerWsCandleResponseObject[],
+  lastSeenStartedAt?: string
+) =>
+  lastSeenStartedAt == null
+    ? candles.slice(-1)
+    : candles.filter(({ startedAt }) => startedAt >= lastSeenStartedAt);
 
 export const subscribeOnStream = ({
   store,
@@ -59,25 +68,15 @@ export const subscribeOnStream = ({
         if (data == null || data.candles.length === 0) {
           return;
         }
-        // if we've never seen data before, it's either the existing data or the subscribed message
-        // either way, we take it as the basis and only send further updates
-        // there is a small race condition where messages could be missed between
-        //   when trandingview does the rest query and when we start receiving updates
-        if (mostRecentFirstPointStartedAt == null) {
-          mostRecentFirstPointStartedAt = data.candles.at(-1)?.startedAt;
-          return;
-        }
-        data.candles.forEach((candle) => {
-          if (candle.startedAt >= mostRecentFirstPointStartedAt!) {
-            onRealtimeCallback(
-              mapCandle({
-                ...candle,
-                resolution: candle.resolution as unknown as CandleResolution,
-                orderbookMidPriceClose: candle.orderbookMidPriceClose ?? undefined,
-                orderbookMidPriceOpen: candle.orderbookMidPriceOpen ?? undefined,
-              })
-            );
-          }
+        getRealtimeCandles(data.candles, mostRecentFirstPointStartedAt).forEach((candle) => {
+          onRealtimeCallback(
+            mapCandle({
+              ...candle,
+              resolution: candle.resolution as unknown as CandleResolution,
+              orderbookMidPriceClose: candle.orderbookMidPriceClose ?? undefined,
+              orderbookMidPriceOpen: candle.orderbookMidPriceOpen ?? undefined,
+            })
+          );
         });
         mostRecentFirstPointStartedAt = data.candles.at(-1)?.startedAt;
       }
