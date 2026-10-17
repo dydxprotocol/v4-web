@@ -1,5 +1,7 @@
 import { timeUnits } from '@/constants/time';
 
+const MAX_TRACKED_MESSAGE_GAP = 1_000;
+
 export class MissingMessageDetector {
   private maxSeenId: number | undefined;
 
@@ -24,6 +26,13 @@ export class MissingMessageDetector {
         clearTimeout(this.missing[messageId]);
         delete this.missing[messageId];
       }
+      return;
+    }
+
+    if (messageId - this.maxSeenId - 1 > MAX_TRACKED_MESSAGE_GAP) {
+      const firstMissingId = this.maxSeenId + 1;
+      this.maxSeenId = messageId;
+      this.onTimeout(firstMissingId);
       return;
     }
 

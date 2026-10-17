@@ -79,7 +79,7 @@ export const useApiState = () => {
   const initializationError = useAppSelector(getInitializationError);
   const bonsaiInitializationError = useAppSelector(BonsaiCore.network.clientInitializationError);
   const validatorHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
-  const indexerHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
+  const indexerHeight = useAppSelector(BonsaiCore.network.indexerHeight.data);
 
   const { haltedBlock, status, trailingBlocks } = apiState ?? {};
   const connectionError = getConnectionError({

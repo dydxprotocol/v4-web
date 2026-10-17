@@ -208,11 +208,10 @@ function uncrossOrderbook(asks: RawOrderbookLineBN[], bids: RawOrderbookLineBN[]
     return { asks, bids };
   }
 
-  const asksCopy = [...asks];
-  const bidsCopy = [...bids];
-
-  let lowestAsk = asksCopy.at(0);
-  let highestBid = bidsCopy.at(0);
+  let askIndex = 0;
+  let bidIndex = 0;
+  let lowestAsk = asks[askIndex];
+  let highestBid = bids[bidIndex];
 
   while (lowestAsk && highestBid && isCrossed(lowestAsk, highestBid)) {
     if (lowestAsk.offset === highestBid.offset) {
@@ -220,28 +219,28 @@ function uncrossOrderbook(asks: RawOrderbookLineBN[], bids: RawOrderbookLineBN[]
       // one of the sizes "should" be zero, but we simply check for the larger size.
       if (lowestAsk.size.gte(highestBid.size)) {
         // remove the bid
-        bidsCopy.shift();
-        highestBid = bidsCopy.at(0);
+        bidIndex += 1;
+        highestBid = bids[bidIndex];
       } else {
         // remove the ask
-        asksCopy.shift();
-        lowestAsk = asksCopy.at(0);
+        askIndex += 1;
+        lowestAsk = asks[askIndex];
       }
     } else {
       // If offsets are different, remove the older offset.
       if (lowestAsk.offset < highestBid.offset) {
         // remove the ask
-        asksCopy.shift();
-        lowestAsk = asksCopy.at(0);
+        askIndex += 1;
+        lowestAsk = asks[askIndex];
       } else {
         // remove the bid
-        bidsCopy.shift();
-        highestBid = bidsCopy.at(0);
+        bidIndex += 1;
+        highestBid = bids[bidIndex];
       }
     }
   }
 
-  return { asks: asksCopy, bids: bidsCopy };
+  return { asks: asks.slice(askIndex), bids: bids.slice(bidIndex) };
 }
 
 function isCrossed(ask: RawOrderbookLineBN, bid: RawOrderbookLineBN) {

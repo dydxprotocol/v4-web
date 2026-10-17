@@ -23,7 +23,7 @@ export function setUpAssetsQuery(store: RootStore) {
     const metadataClient = new MetadataServiceClient(endpoint);
 
     const observer = new QueryObserver(appQueryClient, {
-      queryKey: ['metadata', 'assets'],
+      queryKey: ['metadata', 'assets', endpoint],
       queryFn: () =>
         Promise.all([
           wrapAndLogBonsaiError(() => metadataClient.getAssetInfo(), 'assetInfo')(),

@@ -24,6 +24,7 @@ type AffiliatesMetadata = {
 
 export const useAffiliateMetadata = (dydxAddress?: string) => {
   const { compositeClient, getAffiliateInfo } = useDydxClient();
+  const indexerEndpoint = compositeClient?.indexerClient.config.restEndpoint;
 
   const fetchAffiliateMetadata = async () => {
     if (!compositeClient || !dydxAddress) {
@@ -61,7 +62,7 @@ export const useAffiliateMetadata = (dydxAddress?: string) => {
   };
 
   const affiliateMetadataQuery = useQuery({
-    queryKey: ['affiliateMetadata', dydxAddress],
+    queryKey: ['affiliateMetadata', indexerEndpoint, dydxAddress],
     queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress),
     staleTime: 5 * timeUnits.minute,
@@ -73,6 +74,7 @@ export const useAffiliateMetadata = (dydxAddress?: string) => {
 
 const useAffiliatesStatus = (dydxAddress?: string) => {
   const { compositeClient } = useDydxClient();
+  const indexerEndpoint = compositeClient?.indexerClient.config.restEndpoint;
 
   const fetchAccountStats = async () => {
     if (!dydxAddress || !compositeClient) return undefined;
@@ -97,7 +99,7 @@ const useAffiliatesStatus = (dydxAddress?: string) => {
   };
 
   const affiliateStatsQuery = useQuery({
-    queryKey: ['accountStats', dydxAddress],
+    queryKey: ['accountStats', indexerEndpoint, dydxAddress],
     queryFn: fetchAccountStats,
     enabled: Boolean(compositeClient && dydxAddress),
     staleTime: 5 * timeUnits.minute,
@@ -108,6 +110,7 @@ const useAffiliatesStatus = (dydxAddress?: string) => {
 
 const useAffiliateMaxEarning = () => {
   const { compositeClient, getAllAffiliateTiers } = useDydxClient();
+  const indexerEndpoint = compositeClient?.indexerClient.config.restEndpoint;
   const feeTiers = useAppSelector(BonsaiCore.configs.feeTiers);
 
   const fetchAffiliateMaxEarning = async () => {
@@ -124,7 +127,7 @@ const useAffiliateMaxEarning = () => {
   };
 
   const affiliateMaxEarningQuery = useQuery({
-    queryKey: ['affiliateMaxEarning', feeTiers],
+    queryKey: ['affiliateMaxEarning', indexerEndpoint, feeTiers],
     queryFn: fetchAffiliateMaxEarning,
     enabled: Boolean(compositeClient && feeTiers),
     staleTime: Infinity,

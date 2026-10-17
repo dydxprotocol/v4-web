@@ -57,7 +57,7 @@ export const RevealPhrase = ({
   const TurnkeyIframeElementId = 'turnkey-default-iframe-element-id';
 
   const sessionQuery = useQuery({
-    queryKey: ['turnkeySession'],
+    queryKey: ['turnkeySession', primaryTurnkeyWallet?.walletId],
     queryFn: async () => {
       const session = await turnkey!.getSession();
 
@@ -81,7 +81,7 @@ export const RevealPhrase = ({
         error: 'Session expired',
       };
     },
-    enabled: !!turnkey,
+    enabled: Boolean(turnkey && primaryTurnkeyWallet?.walletId),
   });
 
   const initIframe = useCallback(async () => {
