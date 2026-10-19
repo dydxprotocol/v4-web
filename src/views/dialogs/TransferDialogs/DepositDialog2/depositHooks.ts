@@ -205,7 +205,8 @@ export function useDepositSteps({
             bypassApprovalCheck: true,
             // Extend the IBC transfer timeout from the default 5 minutes to 10 minutes
             timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
-            // TODO(deposit2.0): add custom slippage tolerance here
+            // Slippage tolerance: DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT is
+            // applied by the skipClient wrapper (override per-call if needed).
             onTransactionBroadcast: async ({ txHash, chainId }) => {
               logBonsaiInfo('depositHooks', 'deposit tx submitted', {
                 depositId,

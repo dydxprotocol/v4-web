@@ -19,6 +19,7 @@ import { getWalletClient } from '@wagmi/core';
 import { WalletClient } from 'viem';
 import { useConfig } from 'wagmi';
 
+import { DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT } from '@/constants/skip';
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { getSolanaChainId } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -92,17 +93,27 @@ function makeLazySkipClient() {
 
     messagesDirect: async (req: Parameters<typeof messagesDirect>[0]) => {
       const skipClient = await makeOrGetSkiplient();
-      return skipClient.messagesDirect(req);
+      return skipClient.messagesDirect({
+        slippageTolerancePercent: DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT,
+        ...req,
+      });
     },
 
     messages: async (req: Parameters<typeof messages>[0]) => {
       const skipClient = await makeOrGetSkiplient();
-      return skipClient.messages(req);
+      return skipClient.messages({
+        slippageTolerancePercent: DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT,
+        ...req,
+      });
     },
 
     executeRoute: async (req: Parameters<typeof executeRoute>[0]) => {
       const skipClient = await makeOrGetSkiplient();
-      return skipClient.executeRoute({ ...signers, ...req });
+      return skipClient.executeRoute({
+        slippageTolerancePercent: DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT,
+        ...signers,
+        ...req,
+      });
     },
 
     waitForTransaction: async (req: Parameters<typeof waitForTransaction>[0]) => {

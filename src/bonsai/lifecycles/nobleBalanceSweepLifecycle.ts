@@ -2,6 +2,7 @@ import { GAS_MULTIPLIER, LocalWallet, type NobleClient } from '@dydxprotocol/v4-
 import { CosmosTx, Tx } from '@skip-go/client';
 import { parseUnits } from 'viem';
 
+import { DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT } from '@/constants/skip';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { MIN_USDC_AMOUNT_FOR_AUTO_SWEEP } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
@@ -107,7 +108,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
             'noble-1': nobleLocalWallet.address,
           },
           amountIn,
-          slippageTolerancePercent: '1',
+          slippageTolerancePercent: DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT,
         });
 
         const msgDirectTx = msgDirectResponse?.txs?.at(0);

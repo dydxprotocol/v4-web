@@ -5,6 +5,13 @@ import { CHAIN_INFO } from './chains';
 export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;
 
 /**
+ * Default slippage tolerance passed to Skip route requests, in percent units
+ * ('0.1' = 0.1%). When omitted, the Skip API applies its own 1% default —
+ * set explicitly so all route quotes share one tolerance.
+ */
+export const DEFAULT_SKIP_SLIPPAGE_TOLERANCE_PERCENT = '0.1';
+
+/**
  * @url https://docs.skip.build/go/advanced-transfer/go-fast
  * @description The maximum amount that can be transferred using the Go Fast route. All chains currently (4/15/2025) have the same limit.
  */
