@@ -5,12 +5,10 @@ import { sumBy } from 'lodash';
 import { DateTime } from 'luxon';
 import { useWalletClient } from 'wagmi';
 
-import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
-import { SKIP_GO_FAST_TRANSFER_LIMIT, SKIP_GO_FAST_TRANSFER_MIN_MAP } from '@/constants/skip';
 import { ColorToken } from '@/constants/styles/base';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -23,14 +21,12 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { WarningIcon } from '@/icons';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { AccentTag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -92,16 +88,6 @@ export const DepositForm = ({
   });
 
   const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
-  const skipGoFastTransferMin = SKIP_GO_FAST_TRANSFER_MIN_MAP[token.chainId];
-
-  const isBelowInstantDepositMin =
-    skipGoFastTransferMin != null &&
-    depositRoute?.usdAmountIn &&
-    MustBigNumber(depositRoute.usdAmountIn).lt(skipGoFastTransferMin);
-
-  const isAboveInstantDepositMax =
-    depositRoute?.usdAmountIn &&
-    MustBigNumber(depositRoute.usdAmountIn).gt(SKIP_GO_FAST_TRANSFER_LIMIT);
 
   const { freeCollateral } = orEmptyObj(
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
@@ -332,7 +318,6 @@ export const DepositForm = ({
       <span tw="row gap-0.25">
         <Icon css={{ color: ColorToken.Yellow1 }} iconName={IconName.Lightning} />
         <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.INSTANT })}</span>
-        <AccentTag>{stringGetter({ key: STRING_KEYS.FREE })}</AccentTag>
       </span>
     ) : (
       <span>
@@ -401,23 +386,6 @@ export const DepositForm = ({
     />
   );
 
-  const noticeMessage = calc(() => {
-    if (isBelowInstantDepositMin) {
-      return stringGetter({
-        key: STRING_KEYS.FREE_INSTANT_DEPOSIT_MIN,
-        params: { MIN_AMOUNT: skipGoFastTransferMin },
-      });
-    }
-    if (isAboveInstantDepositMax) {
-      return stringGetter({
-        key: STRING_KEYS.FREE_INSTANT_DEPOSIT_MAX,
-        params: { MAX_AMOUNT: SKIP_GO_FAST_TRANSFER_LIMIT },
-      });
-    }
-
-    return undefined;
-  });
-
   const depositContentBottom = (
     <div tw="mt-0.5 flex flex-col gap-0.5">
       {currentStepError && (
@@ -436,11 +404,6 @@ export const DepositForm = ({
       >
         {depositButtonInner}
       </Button>
-      {noticeMessage && (
-        <AlertMessage withAccentText tw="rounded-[0.375rem]" type={AlertType.Notice}>
-          {noticeMessage}
-        </AlertMessage>
-      )}
     </div>
   );
 
