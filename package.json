@@ -5,7 +5,7 @@
   "type": "module",
   "license": "AGPL-3.0",
   "engines": {
-    "node": "=22"
+    "node": "=24"
   },
   "scripts": {
     "dev": "cp ./template.html ./index.html && vite",
@@ -164,7 +164,7 @@
     "@types/crypto-js": "^4.1.1",
     "@types/luxon": "^3.3.0",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^22.7.5",
+    "@types/node": "^24.19.2",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.7",
     "@types/react-window": "^1.8.8",
