@@ -26,15 +26,29 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { RelativeTime } from '@/components/RelativeTime';
 import { Tag } from '@/components/Tag';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
 import { LoadingOutput } from './Loading/LoadingOutput';
 import { NumberValue } from './NumberValue';
+
+const compactNumberFormatters = new Map<string, Intl.NumberFormat>();
+
+export const getCompactNumberFormatter = (locale: string, currency?: string) => {
+  const key = `${locale}:${currency ?? ''}`;
+  let formatter = compactNumberFormatters.get(key);
+  if (!formatter) {
+    formatter = Intl.NumberFormat(locale, {
+      style: currency ? 'currency' : 'decimal',
+      currency,
+      notation: 'compact',
+      maximumSignificantDigits: 3,
+    });
+    compactNumberFormatters.set(key, formatter);
+  }
+  return formatter;
+};
 
 // see useFormattedDateOutput for how to get selectedLocale in app
 export function formatDateOutput(
@@ -100,7 +114,7 @@ export function useFormattedDateOutput(
     'selectedLocale'
   >
 ) {
-  const selectedLocale = useAppSelector(getSelectedLocale);
+  const { selectedLocale } = useLocaleSeparators();
   return useMemo(
     () => formatDateOutput(value, type, { selectedLocale, ...options }),
     [value, type, options, selectedLocale]
@@ -145,9 +159,10 @@ export function formatNumberOutput(
     withSubscript?: boolean;
   }
 ) {
-  const valueBN = MustBigNumber(value).abs();
-  const isNegative = MustBigNumber(value).isNegative();
-  const isPositive = MustBigNumber(value).isPositive() && !MustBigNumber(value).isZero();
+  const rawValue = MustBigNumber(value);
+  const valueBN = rawValue.abs();
+  const isNegative = rawValue.isNegative();
+  const isPositive = rawValue.isPositive() && !rawValue.isZero();
 
   const sign: string | undefined = {
     [ShowSign.Both]: isNegative ? UNICODE.MINUS : isPositive ? UNICODE.PLUS : undefined,
@@ -188,11 +203,7 @@ export function formatNumberOutput(
         return null;
       }
 
-      return Intl.NumberFormat(selectedLocale, {
-        style: 'decimal',
-        notation: 'compact',
-        maximumSignificantDigits: 3,
-      }).format(Math.abs(numValue));
+      return getCompactNumberFormatter(selectedLocale).format(Math.abs(numValue));
     },
     [OutputType.Number]: () => getFormattedVal(valueBN, 0),
     [OutputType.Fiat]: () => getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' }),
@@ -203,12 +214,7 @@ export function formatNumberOutput(
         return null;
       }
 
-      return Intl.NumberFormat(selectedLocale, {
-        style: 'currency',
-        currency: 'USD',
-        notation: 'compact',
-        maximumSignificantDigits: 3,
-      }).format(Math.abs(numValue));
+      return getCompactNumberFormatter(selectedLocale, 'USD').format(Math.abs(numValue));
     },
     [OutputType.Asset]: () => getFormattedVal(valueBN, TOKEN_DECIMALS),
     [OutputType.Percent]: () =>
@@ -361,10 +367,13 @@ export const Output = ({
   },
   timeOptions,
 }: OutputProps) => {
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const isDetailsLoading = useContext(LoadingContext);
-  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const {
+    decimal: decimalSeparator,
+    group: groupSeparator,
+    selectedLocale,
+  } = useLocaleSeparators();
 
   if (!!isLoading || !!isDetailsLoading) {
     return <LoadingOutput className={className} />;

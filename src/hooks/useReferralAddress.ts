@@ -4,12 +4,13 @@ import { useDydxClient } from './useDydxClient';
 
 export const useReferralAddress = (refCode?: string) => {
   const { compositeClient } = useDydxClient();
+  const indexerEndpoint = compositeClient?.indexerClient.config.restEndpoint;
 
   const queryFn = async () => {
     if (!compositeClient || !refCode) {
       return undefined;
     }
-    const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/address`;
+    const endpoint = `${indexerEndpoint}/v4/affiliates/address`;
     const response = await fetch(`${endpoint}?referralCode=${encodeURIComponent(refCode)}`, {
       method: 'GET',
       headers: {
@@ -22,7 +23,7 @@ export const useReferralAddress = (refCode?: string) => {
   };
 
   const query = useQuery({
-    queryKey: ['referralAddress', refCode],
+    queryKey: ['referralAddress', indexerEndpoint, refCode],
     queryFn,
     enabled: Boolean(compositeClient && refCode),
     refetchOnWindowFocus: false,
