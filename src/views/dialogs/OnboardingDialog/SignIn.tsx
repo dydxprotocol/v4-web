@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ConnectorType, WalletInfo, wallets, WalletType } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
@@ -31,6 +31,7 @@ import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { isValidEmail } from '@/lib/emailUtils';
+import { getWalletName } from '@/lib/walletName';
 
 import { AppleAuth } from './AuthButtons/AppleAuth';
 import { GoogleAuth } from './AuthButtons/GoogleAuth';
@@ -81,12 +82,7 @@ export const SignIn = ({
         {stringGetter({
           key: STRING_KEYS.COULD_NOT_CONNECT,
           params: {
-            WALLET:
-              selectedWallet.connectorType === ConnectorType.Injected
-                ? selectedWallet.name
-                : stringGetter({
-                    key: wallets[selectedWallet.name as keyof typeof wallets].stringKey,
-                  }),
+            WALLET: getWalletName(selectedWallet, stringGetter),
           },
         })}
       </h4>
@@ -156,6 +152,7 @@ export const SignIn = ({
             (wallet) =>
               wallet.connectorType === ConnectorType.Injected ||
               wallet.name === WalletType.WalletConnect2 ||
+              wallet.name === WalletType.OathWallet ||
               wallet.name === WalletType.Phantom
           )
           .map((wallet) => (
@@ -168,9 +165,7 @@ export const SignIn = ({
             >
               <div tw="row gap-0.5">
                 <WalletIcon wallet={wallet} />
-                {wallet.connectorType === ConnectorType.Injected
-                  ? wallet.name
-                  : stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })}
+                {getWalletName(wallet, stringGetter)}
               </div>
             </$OtherOptionButton>
           ))}

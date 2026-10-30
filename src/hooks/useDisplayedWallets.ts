@@ -94,6 +94,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
         },
         isPhantomDetected && phantomWallet,
         isKeplrDetected && keplrWallet,
+        { connectorType: ConnectorType.WalletConnect, name: WalletType.OathWallet },
         { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
         isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
         Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
@@ -109,6 +110,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       ...otherInjectedWallets,
       phantomWallet,
       keplrWallet,
+      { connectorType: ConnectorType.WalletConnect, name: WalletType.OathWallet },
       { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
       { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },
       Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
@@ -120,5 +122,5 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       // Note that OKX mobile app users can still connect through the generic WalletConnect option
       !isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
     ].filter(isTruthy) as WalletInfo[];
-  }, [injectedWallets]);
+  }, [injectedWallets, isSimpleUi]);
 };

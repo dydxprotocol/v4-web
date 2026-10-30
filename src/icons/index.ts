@@ -167,6 +167,7 @@ export { default as TestWalletIcon } from './wallets/test-wallet.svg';
 export { default as TokenPocketIcon } from './wallets/tokenpocket.svg';
 export { default as TrustWalletIcon } from './wallets/trust-wallet.svg';
 export { default as TwitterIcon } from './wallets/twitter.svg';
+export { default as OathWalletIcon } from './wallets/oath-wallet.svg';
 export { default as WalletConnectIcon } from './wallets/walletconnect.svg';
 export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
