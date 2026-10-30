@@ -12,6 +12,7 @@ import {
   KeplrIcon,
   MetaMaskIcon,
   OkxWalletIcon,
+  OathWalletIcon,
   PhantomIcon,
   PrivyIcon,
   WalletConnectIcon,
@@ -58,6 +59,7 @@ export enum WalletType {
   CoinbaseWallet = 'COINBASE_WALLET',
   Keplr = 'keplr',
   OkxWallet = 'OKX_WALLET',
+  OathWallet = 'OATH_WALLET',
   WalletConnect2 = 'WALLETCONNECT_2',
   TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
@@ -116,11 +118,15 @@ export type WalletInfo =
 
 type WalletConfig = {
   type: WalletType;
-  stringKey: string;
   icon: string;
-};
+} & ({ stringKey: string; displayName?: never } | { displayName: string; stringKey?: never });
 
 export const wallets = {
+  [WalletType.OathWallet]: {
+    type: WalletType.OathWallet,
+    displayName: 'Oath Wallet',
+    icon: OathWalletIcon,
+  },
   [WalletType.OtherWallet]: {
     type: WalletType.OtherWallet,
     stringKey: STRING_KEYS.OTHER_WALLET,
