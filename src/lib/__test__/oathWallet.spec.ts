@@ -126,3 +126,19 @@ describe('Oath wallet selection', () => {
     ).toBe('Injected example');
   });
 });
+
+describe('wallet name fallback', () => {
+  it.each(['constructor', '__proto__', 'toString', 'Unknown Wallet'])(
+    'preserves an unregistered wallet name (%s)',
+    (name) => {
+      const getter = vi.fn(() => 'translated') as unknown as StringGetterFunction;
+      const wallet: WalletInfo = {
+        connectorType: ConnectorType.DownloadWallet,
+        name,
+        downloadLink: 'https://example.com/wallet',
+      };
+      expect(getWalletName(wallet, getter)).toBe(name);
+      expect(getter).not.toHaveBeenCalled();
+    }
+  );
+});

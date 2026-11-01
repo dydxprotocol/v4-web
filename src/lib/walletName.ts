@@ -5,7 +5,7 @@ import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 export const getWalletName = (wallet: WalletInfo, stringGetter: StringGetterFunction): string => {
   if (wallet.connectorType === ConnectorType.Injected) return wallet.name;
 
-  if (!(wallet.name in wallets)) return wallet.name;
+  if (!Object.prototype.hasOwnProperty.call(wallets, wallet.name)) return wallet.name;
   const walletConfig = wallets[wallet.name as keyof typeof wallets];
   if ('displayName' in walletConfig) return walletConfig.displayName;
   return stringGetter({ key: walletConfig.stringKey });
