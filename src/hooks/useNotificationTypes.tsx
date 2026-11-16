@@ -395,7 +395,29 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
   {
     type: NotificationType.ReleaseUpdates,
-    useTrigger: ({ trigger: _trigger }) => {},
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      // TODO: Replace text with string getter and new href
+      useEffect(() => {
+        trigger({
+          id: 'usdc-migration',
+          displayData: {
+            title: 'USDC Migration',
+            body: 'Upcoming USDC migration from Noble to Injective, subject to governance approval. No action needed for USDC already on dYdX Chain.',
+            toastSensitivity: 'foreground',
+            groupKey: 'usdc-migration',
+            renderActionSlot: () => (
+              <Link href="https://docs.dydx.exchange/usdc-migration" isAccent>
+                {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+              </Link>
+            ),
+          },
+          updateKey: [],
+          shouldUnhide: true,
+        });
+      }, [stringGetter, trigger]);
+    },
     useNotificationAction: () => {
       return () => {};
     },

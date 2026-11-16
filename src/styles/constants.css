@@ -8,9 +8,10 @@
   --page-footer-height: 2rem;
   --page-footer-height-mobile: 4.5rem;
 
-  /* Restriction Warning */
-  --restriction-warning-height: 3.25rem;
-  --restriction-warning-height-mobile: min-content;
+  /* Top Banner (restriction warning / info banner) */
+  --top-banner-height: 3.25rem;
+  --top-banner-height-mobile: min-content;
+  --top-banner-toggle-width: 2.75rem;
 
   /* Sidebar constants */
   --sidebar-width: 20.25rem;

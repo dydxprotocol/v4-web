@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -8,33 +8,27 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { AlertMessage } from './AlertMessage';
 import { IconName } from './Icon';
 import { IconButton } from './IconButton';
+import { SimpleUiBannerAlert } from './TopBanner/SimpleUiBannerAlert';
 
-export const ComplianceBanner = ({ className }: { className?: string }) => {
+export const ComplianceBanner = ({
+  className,
+  slotRight,
+}: {
+  className?: string;
+  slotRight?: React.ReactNode;
+}) => {
   const [showLess, setShowLess] = useState(false);
-  const complianceBannerRef = useRef<HTMLDivElement>(null);
   const stringGetter = useStringGetter();
   const { complianceMessage, showComplianceBanner } = useComplianceState();
   const { isTablet } = useBreakpoints();
   const isSimpleUi = useSimpleUiEnabled();
-
-  useResizeObserver({
-    box: 'border-box',
-    ref: complianceBannerRef,
-    onResize: (size) => {
-      if (size.height) {
-        document.documentElement.style.setProperty('--complianceBanner-height', `${size.height}px`);
-      }
-    },
-  });
 
   if (!showComplianceBanner) {
     return null;
@@ -46,12 +40,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
 
   if (isSimpleUi) {
     return (
-      <$AlertMessage
-        className={className}
-        ref={complianceBannerRef}
-        withAccentText
-        type={AlertType.Error}
-      >
+      <SimpleUiBannerAlert className={className} type={AlertType.Error}>
         {showLess ? (
           stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
         ) : (
@@ -59,6 +48,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
             <span>{complianceMessage}</span>
           </div>
         )}
+        {slotRight}
         <IconButton
           tw="text-color-text-2"
           type={ButtonType.Button}
@@ -66,7 +56,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
           iconName={showLess ? IconName.Caret : IconName.Close}
           buttonStyle={ButtonStyle.WithoutBackground}
         />
-      </$AlertMessage>
+      </SimpleUiBannerAlert>
     );
   }
 
@@ -74,40 +64,40 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
     <$ComplianceBanner className={className}>
       <div tw="absolute inset-0 z-[-1] bg-color-gradient-error" />
       {isTablet && (
-        <IconButton
-          tw="absolute right-0.25 top-0.25 text-color-text-2"
-          type={ButtonType.Button}
-          onClick={toggleShowLess}
-          iconName={showLess ? IconName.Caret : IconName.Close}
-          buttonStyle={ButtonStyle.WithoutBackground}
-        />
+        <div
+          tw="absolute top-0.25"
+          css={{
+            right: slotRight != null ? 'calc(var(--top-banner-toggle-width) + 0.25rem)' : '0.25rem',
+          }}
+        >
+          <IconButton
+            tw="text-color-text-2"
+            type={ButtonType.Button}
+            onClick={toggleShowLess}
+            iconName={showLess ? IconName.Caret : IconName.Close}
+            buttonStyle={ButtonStyle.WithoutBackground}
+          />
+        </div>
       )}
       {showLess && isTablet ? (
         stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
       ) : (
         <span>{complianceMessage}</span>
       )}
+      {slotRight}
     </$ComplianceBanner>
   );
 };
 
-const $AlertMessage = styled(AlertMessage)`
-  border-radius: 0.5rem;
-  max-width: 100%;
-  margin: 0.75rem 0.75rem 0 0.75rem;
-  font: var(--font-base-book);
-  grid-auto-flow: column;
-`;
-
 const $ComplianceBanner = styled.div`
-  height: var(--restriction-warning-currentHeight);
+  height: var(--top-banner-currentHeight);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
 
-  grid-area: RestrictionWarning;
+  grid-area: TopBanner;
   z-index: 1;
   padding: 0.5rem 1rem;
 
