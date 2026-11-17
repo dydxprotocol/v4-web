@@ -2,6 +2,10 @@ import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
 import { PublicKey } from '@solana/web3.js';
 import { isAddress } from 'viem';
 
+import { INJECTIVE_BECH32_PREFIX } from '@/constants/graz';
+
+const ETH_ADDRESS_BYTE_LENGTH = 20;
+
 /**
  *
  * @params {
@@ -40,6 +44,15 @@ export function validateCosmosAddress(address: string, prefix: string) {
   }
 }
 
+export function validateInjectiveAddress(address: string) {
+  try {
+    const { prefix, data } = fromBech32(address);
+    return prefix === INJECTIVE_BECH32_PREFIX && data.length === ETH_ADDRESS_BYTE_LENGTH;
+  } catch (error) {
+    return false;
+  }
+}
+
 type MultiChainAddress =
   | { address?: string | null; network: 'cosmos'; prefix: string }
   | { address?: string | null; network: 'evm' }
@@ -66,6 +79,10 @@ export function isValidAddress(input: MultiChainAddress): boolean {
 
   if (input.network === 'solana') {
     return isValidSolanaAddress(input.address);
+  }
+
+  if (input.prefix === INJECTIVE_BECH32_PREFIX) {
+    return validateInjectiveAddress(input.address);
   }
 
   return validateCosmosAddress(input.address, input.prefix);

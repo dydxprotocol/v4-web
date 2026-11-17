@@ -2,13 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { NOBLE_BECH32_PREFIX, type LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { Keypair } from '@solana/web3.js';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import {
+  getInjectiveChainId,
   getNeutronChainId,
   getNobleChainId,
   getOsmosisChainId,
@@ -32,6 +33,7 @@ import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
+import { createInjectiveLocalWalletFromMnemonic } from '@/lib/injectiveWallet';
 import { deriveSolanaKeypairFromMnemonic } from '@/lib/solanaWallet';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
@@ -127,6 +129,7 @@ const useAccountsContext = () => {
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
+  const [localInjectiveWallet, setLocalInjectiveWallet] = useState<LocalWallet>();
   const [localOsmosisWallet, setLocalOsmosisWallet] = useState<LocalWallet>();
   const [localNeutronWallet, setLocalNeutronWallet] = useState<LocalWallet>();
   const [localSolanaKeypair, setLocalSolanaKeypair] = useState<Keypair>();
@@ -149,9 +152,10 @@ const useAccountsContext = () => {
     dispatch(setLocalWallet({ address: dydxAddress, solanaAddress, subaccountNumber: 0 }));
   }, [dispatch, dydxAddress, solanaAddress]);
 
-  const nobleAddress = localNobleWallet?.address;
+  const injectiveAddress = localInjectiveWallet?.address;
   const osmosisAddress = localOsmosisWallet?.address;
   const neutronAddress = localNeutronWallet?.address;
+  const nobleAddress = localNobleWallet?.address;
 
   const setWalletFromSignature = useCallback(
     async (signature: string) => {
@@ -172,12 +176,12 @@ const useAccountsContext = () => {
   const hasLocalDydxWallet = Boolean(localDydxWallet);
 
   useEffect(() => {
-    if (localDydxWallet && localNobleWallet) {
-      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet);
+    if (localDydxWallet && localInjectiveWallet) {
+      localWalletManager.setLocalWallet(localDydxWallet, localInjectiveWallet);
     } else {
       localWalletManager.clearLocalWallet();
     }
-  }, [localDydxWallet, localNobleWallet]);
+  }, [localDydxWallet, localInjectiveWallet]);
 
   useEffect(() => {
     (async () => {
@@ -285,6 +289,7 @@ const useAccountsContext = () => {
   useEffect(() => {
     const setCosmosWallets = async () => {
       let nobleWallet: LocalWallet | undefined;
+      let injectiveWallet: LocalWallet | undefined;
       let osmosisWallet: LocalWallet | undefined;
       let neutronWallet: LocalWallet | undefined;
       let solanaKeypair: Keypair | undefined;
@@ -293,6 +298,7 @@ const useAccountsContext = () => {
         nobleWallet = await (
           await getLazyLocalWallet()
         ).fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+        injectiveWallet = await createInjectiveLocalWalletFromMnemonic(hdKey.mnemonic);
         osmosisWallet = await (
           await getLazyLocalWallet()
         ).fromMnemonic(hdKey.mnemonic, OSMO_BECH32_PREFIX);
@@ -306,6 +312,12 @@ const useAccountsContext = () => {
         const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
         if (nobleOfflineSigner !== undefined) {
           nobleWallet = await (await getLazyLocalWallet()).fromOfflineSigner(nobleOfflineSigner);
+        }
+        const injectiveOfflineSigner = await getCosmosOfflineSigner(getInjectiveChainId());
+        if (injectiveOfflineSigner !== undefined) {
+          injectiveWallet = await (
+            await getLazyLocalWallet()
+          ).fromOfflineSigner(injectiveOfflineSigner);
         }
         const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
         if (osmosisOfflineSigner !== undefined) {
@@ -322,6 +334,9 @@ const useAccountsContext = () => {
 
         if (nobleWallet !== undefined) {
           setLocalNobleWallet(nobleWallet);
+        }
+        if (injectiveWallet !== undefined) {
+          setLocalInjectiveWallet(injectiveWallet);
         }
         if (osmosisWallet !== undefined) {
           setLocalOsmosisWallet(osmosisWallet);
@@ -377,7 +392,7 @@ const useAccountsContext = () => {
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
     setLocalDydxWallet(undefined);
-    setLocalNobleWallet(undefined);
+    setLocalInjectiveWallet(undefined);
     setLocalOsmosisWallet(undefined);
     setLocalNeutronWallet(undefined);
     setLocalSolanaKeypair(undefined);
@@ -399,7 +414,7 @@ const useAccountsContext = () => {
   return {
     // Wallet connection
     sourceAccount,
-    localNobleWallet,
+    localInjectiveWallet,
 
     // Wallet selection
     selectWallet,
@@ -419,6 +434,7 @@ const useAccountsContext = () => {
     dydxAddress,
 
     nobleAddress,
+    injectiveAddress,
     osmosisAddress,
     neutronAddress,
 

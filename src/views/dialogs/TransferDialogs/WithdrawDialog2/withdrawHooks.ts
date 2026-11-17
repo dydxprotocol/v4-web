@@ -54,6 +54,7 @@ export function useWithdrawStep({
     dydxAddress,
     localDydxWallet,
     localInjectiveWallet,
+    nobleAddress,
     injectiveAddress,
     osmosisAddress,
     neutronAddress,
@@ -77,6 +78,7 @@ export function useWithdrawStep({
     return getUserAddressesForRoute(
       withdrawRoute,
       sourceAccount,
+      nobleAddress,
       injectiveAddress,
       dydxAddress,
       osmosisAddress,
@@ -86,6 +88,7 @@ export function useWithdrawStep({
   }, [
     dydxAddress,
     neutronAddress,
+    nobleAddress,
     injectiveAddress,
     osmosisAddress,
     sourceAccount,

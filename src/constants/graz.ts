@@ -1,4 +1,4 @@
-import { BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
+import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { type ConfigureGrazArgs, type WalletType as GrazWalletType } from 'graz';
 
 import { getLocalStorage } from '@/lib/localStorage';
@@ -8,6 +8,7 @@ import { LocalStorageKey } from './localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP, isMainnet } from './networks';
 
 export enum CosmosChainId {
+  Noble = 'noble-1',
   Injective = 'injective-1',
   InjectiveTestnet = 'injective-888',
   Osmosis = 'osmosis-1',
@@ -28,6 +29,10 @@ const selectedNetwork = getLocalStorage({
 });
 const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
 
+export const getNobleChainId = () => {
+  return isMainnet ? CosmosChainId.Noble : CosmosChainId.NobleTestnet;
+};
+
 export const getInjectiveChainId = () => {
   return isMainnet ? CosmosChainId.Injective : CosmosChainId.InjectiveTestnet;
 };
@@ -43,12 +48,14 @@ export const getNeutronChainId = () => {
 const osmosisChainId = getOsmosisChainId();
 const injectiveChainId = getInjectiveChainId();
 const neutronChainId = getNeutronChainId();
+const nobleChainId = getNobleChainId();
 
 export const SUPPORTED_COSMOS_CHAINS = [
   dydxChainId,
   osmosisChainId,
   injectiveChainId,
   neutronChainId,
+  nobleChainId,
 ];
 
 export const GRAZ_CHAINS = [
@@ -59,6 +66,12 @@ export const GRAZ_CHAINS = [
     bech32Config: {
       bech32PrefixAccAddr: BECH32_PREFIX,
     },
+  },
+  // Noble
+  {
+    chainId: nobleChainId,
+    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator,
+    bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX },
   },
   // Injective
   {

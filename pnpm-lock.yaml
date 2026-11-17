@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.6.0
-    version: 3.6.0
+    specifier: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz
+    version: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz
   '@dydxprotocol/v4-localization':
     specifier: 1.1.405
     version: 1.1.405
@@ -55,7 +55,7 @@ dependencies:
     version: 1.99.1(@solana/web3.js@1.98.4)(@types/react@18.3.26)(bs58@6.0.0)(immer@10.1.3)(react-dom@18.3.1)(react@18.3.1)(typescript@5.9.3)
   '@privy-io/wagmi':
     specifier: ^0.2.13
-    version: 0.2.13(@privy-io/react-auth@1.99.1)(react@18.3.1)(viem@2.38.0)(wagmi@2.17.5)
+    version: 0.2.13(@privy-io/react-auth@1.99.1)(react@18.3.1)(viem@2.57.20)(wagmi@2.17.5)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.2.12(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
@@ -144,8 +144,8 @@ dependencies:
     specifier: ^2.0.1
     version: 2.0.1
   '@skip-go/client':
-    specifier: 1.5.8
-    version: 1.5.8(@solana/web3.js@1.98.4)(viem@2.38.0)
+    specifier: 1.7.1
+    version: 1.7.1(@solana/web3.js@1.98.4)(viem@2.57.20)
   '@solana/web3.js':
     specifier: ^1.93.0
     version: 1.98.4(typescript@5.9.3)
@@ -217,7 +217,7 @@ dependencies:
     version: 3.12.0(@react-spring/web@9.7.5)(react-dom@18.3.1)(react@18.3.1)
   '@wagmi/core':
     specifier: ^2.16.3
-    version: 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)
+    version: 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)
   bignumber.js:
     specifier: ^9.1.1
     version: 9.3.1
@@ -315,11 +315,11 @@ dependencies:
     specifier: ^1.2.1
     version: 1.3.0(@types/react@18.3.26)(react@18.3.1)
   viem:
-    specifier: ^2.38.0
-    version: 2.38.0(typescript@5.9.3)
+    specifier: ^2.38.6
+    version: 2.57.20(typescript@5.9.3)
   wagmi:
     specifier: ^2.17.5
-    version: 2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.38.0)
+    version: 2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.57.20)
 
 devDependencies:
   '@babel/core':
@@ -546,10 +546,6 @@ devDependencies:
     version: 4.5.5(node-fetch@3.3.2)
 
 packages:
-
-  /@adraffy/ens-normalize@1.10.1:
-    resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
-    dev: false
 
   /@adraffy/ens-normalize@1.11.1:
     resolution: {integrity: sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==}
@@ -826,12 +822,13 @@ packages:
       idb-keyval: 6.2.1
       ox: 0.6.9(typescript@5.9.3)
       preact: 10.24.2
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
       zustand: 5.0.3(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.4.0)
     transitivePeerDependencies:
       - '@types/react'
       - bufferutil
       - immer
+      - mppx
       - react
       - typescript
       - use-sync-external-store
@@ -967,12 +964,13 @@ packages:
       idb-keyval: 6.2.1
       ox: 0.6.9(typescript@5.9.3)
       preact: 10.24.2
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
       zustand: 5.0.3(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.4.0)
     transitivePeerDependencies:
       - '@types/react'
       - bufferutil
       - immer
+      - mppx
       - react
       - typescript
       - use-sync-external-store
@@ -1182,15 +1180,6 @@ packages:
       '@cosmjs/utils': 0.32.4
     dev: false
 
-  /@cosmjs/amino@0.33.1:
-    resolution: {integrity: sha512-WfWiBf2EbIWpwKG9AOcsIIkR717SY+JdlXM/SL/bI66BdrhniAF+/ZNis9Vo9HF6lP2UU5XrSmFA4snAvEgdrg==}
-    dependencies:
-      '@cosmjs/crypto': 0.33.1
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/utils': 0.33.1
-    dev: false
-
   /@cosmjs/amino@0.39.0:
     resolution: {integrity: sha512-56WqsZ4xbdJE4KWJTPbw7hUzePflRxRLuxoBlUsa8qIiFumpzZRW0Ycb7IloEF8wAmdgsdfrG1hSJSBlqdFE7A==}
     dependencies:
@@ -1220,22 +1209,20 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@cosmjs/cosmwasm-stargate@0.33.1:
-    resolution: {integrity: sha512-bsEH8FmDHE0zc9WmJuyYEruV/HP7DU98FLP/BMxb1Egk/weH304m1AuIdibdVfFZKYVNq6PkD8+Xvg23qnecIg==}
+  /@cosmjs/cosmwasm@0.39.0:
+    resolution: {integrity: sha512-iAZ3HNUtHKHgwJUj1hEfWfO1Gqhfun4J5oBrAF8zRrEJdmLbeHxTydwkY5CW3pNChiA/Q40M7xiB3Q0nVdNGEg==}
     dependencies:
-      '@cosmjs/amino': 0.33.1
-      '@cosmjs/crypto': 0.33.1
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/proto-signing': 0.33.1
-      '@cosmjs/stargate': 0.33.1
-      '@cosmjs/tendermint-rpc': 0.33.1
-      '@cosmjs/utils': 0.33.1
-      cosmjs-types: 0.9.0
-      pako: 2.1.0
+      '@cosmjs/amino': 0.39.0
+      '@cosmjs/crypto': 0.39.0
+      '@cosmjs/encoding': 0.39.0
+      '@cosmjs/math': 0.39.0
+      '@cosmjs/proto-signing': 0.39.0
+      '@cosmjs/stargate': 0.39.0
+      '@cosmjs/tendermint-rpc': 0.39.0
+      '@cosmjs/utils': 0.39.0
+      cosmjs-types: 0.11.0
     transitivePeerDependencies:
       - bufferutil
-      - debug
       - utf-8-validate
     dev: false
 
@@ -1281,19 +1268,6 @@ packages:
       libsodium-wrappers-sumo: 0.7.15
     dev: false
 
-  /@cosmjs/crypto@0.33.1:
-    resolution: {integrity: sha512-U4kGIj/SNBzlb2FGgA0sMR0MapVgJUg8N+oIAiN5+vl4GZ3aefmoL1RDyTrFS/7HrB+M+MtHsxC0tvEu4ic/zA==}
-    deprecated: This uses elliptic for cryptographic operations, which contains several security-relevant bugs. To what degree this affects your application is something you need to carefully investigate. See https://github.com/cosmos/cosmjs/issues/1708 for further pointers. Starting with version 0.34.0 the cryptographic library has been replaced. However, private keys might still be at risk.
-    dependencies:
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/utils': 0.33.1
-      '@noble/hashes': 1.8.0
-      bn.js: 5.2.3
-      elliptic: 6.6.1
-      libsodium-wrappers-sumo: 0.7.15
-    dev: false
-
   /@cosmjs/crypto@0.39.0:
     resolution: {integrity: sha512-ATRhSXN8w3fvUkj9xzLHwvzylDvvn4f3cC1CQwhQc2OxyzpEEFACS3wHS6iwdJJS99acV8dq+oVOYflUqI0brQ==}
     dependencies:
@@ -1330,14 +1304,6 @@ packages:
       readonly-date: 1.0.0
     dev: false
 
-  /@cosmjs/encoding@0.33.1:
-    resolution: {integrity: sha512-nuNxf29fUcQE14+1p//VVQDwd1iau5lhaW/7uMz7V2AH3GJbFJoJVaKvVyZvdFk+Cnu+s3wCqgq4gJkhRCJfKw==}
-    dependencies:
-      base64-js: 1.5.1
-      bech32: 1.1.4
-      readonly-date: 1.0.0
-    dev: false
-
   /@cosmjs/encoding@0.39.0:
     resolution: {integrity: sha512-+poEaeM8YjGNVtrHLQNWqkhEeDxapjrdpnPCT+JCRh8YNbeHEdftzZLCH5VCBSOtvo7PF0gK1B7sbQbBl6q5pQ==}
     dependencies:
@@ -1357,13 +1323,6 @@ packages:
     resolution: {integrity: sha512-/jt4mBl7nYzfJ2J/VJ+r19c92mUKF0Lt0JxM3MXEJl7wlwW5haHAWtzRujHkyYMXOwIR+gBqT2S0vntXVBRyhQ==}
     dependencies:
       '@cosmjs/stream': 0.32.4
-      xstream: 11.14.0
-    dev: false
-
-  /@cosmjs/json-rpc@0.33.1:
-    resolution: {integrity: sha512-T6VtWzecpmuTuMRGZWuBYHsMF/aznWCYUt/cGMWNSz7DBPipVd0w774PKpxXzpEbyt5sr61NiuLXc+Az15S/Cw==}
-    dependencies:
-      '@cosmjs/stream': 0.33.1
       xstream: 11.14.0
     dev: false
 
@@ -1403,13 +1362,7 @@ packages:
   /@cosmjs/math@0.32.4:
     resolution: {integrity: sha512-++dqq2TJkoB8zsPVYCvrt88oJWsy1vMOuSOKcdlnXuOA/ASheTJuYy4+oZlTQ3Fr8eALDLGGPhJI02W2HyAQaw==}
     dependencies:
-      bn.js: 5.2.2
-    dev: false
-
-  /@cosmjs/math@0.33.1:
-    resolution: {integrity: sha512-ytGkWdKFCPiiBU5eqjHNd59djPpIsOjbr2CkNjlnI1Zmdj+HDkSoD9MUGpz9/RJvRir5IvsXqdE05x8EtoQkJA==}
-    dependencies:
-      bn.js: 5.2.2
+      bn.js: 5.2.3
     dev: false
 
   /@cosmjs/math@0.39.0:
@@ -1436,17 +1389,6 @@ packages:
       '@cosmjs/encoding': 0.32.4
       '@cosmjs/math': 0.32.4
       '@cosmjs/utils': 0.32.4
-      cosmjs-types: 0.9.0
-    dev: false
-
-  /@cosmjs/proto-signing@0.33.1:
-    resolution: {integrity: sha512-Sv4W+MxX+0LVnd+2rU4Fw1HRsmMwSVSYULj7pRkij3wnPwUlTVoJjmKFgKz13ooIlfzPrz/dnNjGp/xnmXChFQ==}
-    dependencies:
-      '@cosmjs/amino': 0.33.1
-      '@cosmjs/crypto': 0.33.1
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/utils': 0.33.1
       cosmjs-types: 0.9.0
     dev: false
 
@@ -1477,18 +1419,6 @@ packages:
     resolution: {integrity: sha512-davcyYziBhkzfXQTu1l5NrpDYv0K9GekZCC9apBRvL1dvMc9F/ygM7iemHjUA+z8tJkxKxrt/YPjJ6XNHzLrkw==}
     dependencies:
       '@cosmjs/stream': 0.32.4
-      isomorphic-ws: 4.0.1(ws@7.5.10)
-      ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      xstream: 11.14.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
-  /@cosmjs/socket@0.33.1:
-    resolution: {integrity: sha512-KzAeorten6Vn20sMiM6NNWfgc7jbyVo4Zmxev1FXa5EaoLCZy48cmT3hJxUJQvJP/lAy8wPGEjZ/u4rmF11x9A==}
-    dependencies:
-      '@cosmjs/stream': 0.33.1
       isomorphic-ws: 4.0.1(ws@7.5.10)
       ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       xstream: 11.14.0
@@ -1549,23 +1479,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@cosmjs/stargate@0.33.1:
-    resolution: {integrity: sha512-CnJ1zpSiaZgkvhk+9aTp5IPmgWn2uo+cNEBN8VuD9sD6BA0V4DMjqe251cNFLiMhkGtiE5I/WXFERbLPww3k8g==}
-    dependencies:
-      '@cosmjs/amino': 0.33.1
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/proto-signing': 0.33.1
-      '@cosmjs/stream': 0.33.1
-      '@cosmjs/tendermint-rpc': 0.33.1
-      '@cosmjs/utils': 0.33.1
-      cosmjs-types: 0.9.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
-
   /@cosmjs/stargate@0.39.0:
     resolution: {integrity: sha512-dQtucU9czF2NUUbEKs19PMfv+EusDFKWHMVK6Hinytmpq9sdk5JUIln+g/8k+UjKcV4HPv6S0AywbhE+tl84kQ==}
     dependencies:
@@ -1590,12 +1503,6 @@ packages:
 
   /@cosmjs/stream@0.32.4:
     resolution: {integrity: sha512-Gih++NYHEiP+oyD4jNEUxU9antoC0pFSg+33Hpp0JlHwH0wXhtD3OOKnzSfDB7OIoEbrzLJUpEjOgpCp5Z+W3A==}
-    dependencies:
-      xstream: 11.14.0
-    dev: false
-
-  /@cosmjs/stream@0.33.1:
-    resolution: {integrity: sha512-bMUvEENjeQPSTx+YRzVsWT1uFIdHRcf4brsc14SOoRQ/j5rOJM/aHfsf/BmdSAnYbdOQ3CMKj/8nGAQ7xUdn7w==}
     dependencies:
       xstream: 11.14.0
     dev: false
@@ -1644,25 +1551,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@cosmjs/tendermint-rpc@0.33.1:
-    resolution: {integrity: sha512-22klDFq2MWnf//C8+rZ5/dYatr6jeGT+BmVbutXYfAK9fmODbtFcumyvB6uWaEORWfNukl8YK1OLuaWezoQvxA==}
-    dependencies:
-      '@cosmjs/crypto': 0.33.1
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/json-rpc': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/socket': 0.33.1
-      '@cosmjs/stream': 0.33.1
-      '@cosmjs/utils': 0.33.1
-      axios: 1.15.0
-      readonly-date: 1.0.0
-      xstream: 11.14.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
-
   /@cosmjs/tendermint-rpc@0.39.0:
     resolution: {integrity: sha512-KowP/6P6Tx+OnGoimYnxuSBIfhB+vWqWER2pZpEIOHId8ZfcjQ9JS2F+Ah+WmZ9D+bKgn4pJ5ImAS13TeShIEw==}
     dependencies:
@@ -1690,10 +1578,6 @@ packages:
 
   /@cosmjs/utils@0.32.4:
     resolution: {integrity: sha512-D1Yc+Zy8oL/hkUkFUL/bwxvuDBzRGpc4cF7/SkdhxX4iHpSLgdOuTt1mhCh9+kl6NQREy9t7SYZ6xeW5gFe60w==}
-    dev: false
-
-  /@cosmjs/utils@0.33.1:
-    resolution: {integrity: sha512-UnLHDY6KMmC+UXf3Ufyh+onE19xzEXjT4VZ504Acmk4PXxqyvG4cCPprlKUFnGUX7f0z8Or9MAOHXBx41uHBcg==}
     dev: false
 
   /@cosmjs/utils@0.39.0:
@@ -1778,37 +1662,6 @@ packages:
         optional: true
     dependencies:
       '@datadog/browser-core': 5.35.1
-    dev: false
-
-  /@dydxprotocol/v4-client-js@3.6.0:
-    resolution: {integrity: sha512-rg9JTE07X7LyfrFadH+jnNXFFSgMfv5TrfOOqowfzyT5l4MGwDbNArRR1LfI4abcbSMCQRhKsCXEqpM3p3oZ+w==}
-    dependencies:
-      '@cosmjs/amino': 0.32.4
-      '@cosmjs/encoding': 0.32.4
-      '@cosmjs/math': 0.32.4
-      '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4
-      '@cosmjs/tendermint-rpc': 0.32.4
-      '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.5.0
-      '@osmonauts/lcd': 0.6.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      axios: 1.1.3
-      bech32: 1.1.4
-      bignumber.js: 9.3.1
-      cosmjs-types: 0.9.0
-      ethereum-cryptography: 2.2.1
-      ethers: 6.16.0
-      https-proxy-agent: 7.0.6
-      long: 4.0.0
-      protobufjs: 7.5.4
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
     dev: false
 
   /@dydxprotocol/v4-localization@1.1.405:
@@ -2798,7 +2651,7 @@ packages:
     dependencies:
       '@ethersproject/bytes': 5.8.0
       '@ethersproject/logger': 5.8.0
-      bn.js: 5.2.2
+      bn.js: 5.2.3
     dev: false
 
   /@ethersproject/bytes@5.8.0:
@@ -2977,7 +2830,7 @@ packages:
       '@ethersproject/bytes': 5.8.0
       '@ethersproject/logger': 5.8.0
       '@ethersproject/properties': 5.8.0
-      bn.js: 5.2.2
+      bn.js: 5.2.3
       elliptic: 6.6.1
       hash.js: 1.1.7
     dev: false
@@ -3154,14 +3007,14 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@gemini-wallet/core@0.2.0(viem@2.38.0):
+  /@gemini-wallet/core@0.2.0(viem@2.57.20):
     resolution: {integrity: sha512-vv9aozWnKrrPWQ3vIFcWk7yta4hQW1Ie0fsNNPeXnjAxkbXr2hqMagEptLuMxpEP2W3mnRu05VDNKzcvAuuZDw==}
     peerDependencies:
       viem: '>=2.0.0'
     dependencies:
       '@metamask/rpc-errors': 7.0.2
       eventemitter3: 5.0.1
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -4117,6 +3970,7 @@ packages:
       - '@cosmjs/proto-signing'
       - debug
       - fp-ts
+      - supports-color
     dev: false
 
   /@leapwallet/cosmos-social-login-core@0.0.1:
@@ -5302,7 +5156,7 @@ packages:
       zod: 3.25.76
     dev: false
 
-  /@privy-io/js-sdk-core@0.37.1(viem@2.38.0):
+  /@privy-io/js-sdk-core@0.37.1(viem@2.57.20):
     resolution: {integrity: sha512-txYMs4CuSDG5NLP0vFGuHYeCOrt7Evu/DS7OC7e+DJ3bdav6BlKARhx7W87YLjsNx+OWURLG9C1JeX/xeXxzSg==}
     peerDependencies:
       permissionless: ^0.2.10
@@ -5328,7 +5182,7 @@ packages:
       libphonenumber-js: 1.12.23
       set-cookie-parser: 2.7.1
       uuid: 9.0.1
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -5380,7 +5234,7 @@ packages:
       '@heroicons/react': 2.2.0(react@18.3.1)
       '@marsidev/react-turnstile': 0.4.1(react-dom@18.3.1)(react@18.3.1)
       '@metamask/eth-sig-util': 6.0.2
-      '@privy-io/js-sdk-core': 0.37.1(viem@2.38.0)
+      '@privy-io/js-sdk-core': 0.37.1(viem@2.57.20)
       '@simplewebauthn/browser': 9.0.1
       '@solana/wallet-adapter-base': 0.9.27(@solana/web3.js@1.98.4)
       '@solana/wallet-standard-wallet-adapter-base': 1.1.4(@solana/web3.js@1.98.4)(bs58@6.0.0)
@@ -5410,7 +5264,7 @@ packages:
       stylis: 4.3.6
       tinycolor2: 1.6.0
       uuid: 9.0.1
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
       web3-core: 1.10.4(encoding@0.1.13)
       web3-core-helpers: 1.10.3
       zustand: 5.0.8(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.4.0)
@@ -5437,6 +5291,7 @@ packages:
       - db0
       - immer
       - ioredis
+      - mppx
       - supports-color
       - typescript
       - uploadthing
@@ -5445,7 +5300,7 @@ packages:
       - zod
     dev: false
 
-  /@privy-io/wagmi@0.2.13(@privy-io/react-auth@1.99.1)(react@18.3.1)(viem@2.38.0)(wagmi@2.17.5):
+  /@privy-io/wagmi@0.2.13(@privy-io/react-auth@1.99.1)(react@18.3.1)(viem@2.57.20)(wagmi@2.17.5):
     resolution: {integrity: sha512-NOyM43Kbc1K+hu3OwaSpKE1twhUEof9+jPefX4f1OLhbnEZGfcKAYP75O9xjc5rxTPgKfod9FSmt/xbKxJfUHw==}
     peerDependencies:
       '@privy-io/react-auth': ^1.64.1
@@ -5455,8 +5310,8 @@ packages:
     dependencies:
       '@privy-io/react-auth': 1.99.1(@solana/web3.js@1.98.4)(@types/react@18.3.26)(bs58@6.0.0)(immer@10.1.3)(react-dom@18.3.1)(react@18.3.1)(typescript@5.9.3)
       react: 18.3.1
-      viem: 2.38.0(typescript@5.9.3)
-      wagmi: 2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.38.0)
+      viem: 2.57.20(typescript@5.9.3)
+      wagmi: 2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.57.20)
     dev: false
 
   /@promptbook/utils@0.69.5:
@@ -8645,9 +8500,10 @@ packages:
     dependencies:
       big.js: 6.2.2
       dayjs: 1.11.13
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -8658,9 +8514,10 @@ packages:
     dependencies:
       big.js: 6.2.2
       dayjs: 1.11.13
-      viem: 2.38.0(typescript@5.9.3)(zod@3.22.4)
+      viem: 2.57.20(typescript@5.9.3)(zod@3.22.4)
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -8671,9 +8528,10 @@ packages:
     dependencies:
       big.js: 6.2.2
       dayjs: 1.11.13
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -8684,9 +8542,10 @@ packages:
     dependencies:
       big.js: 6.2.2
       dayjs: 1.11.13
-      viem: 2.38.0(typescript@5.9.3)(zod@3.22.4)
+      viem: 2.57.20(typescript@5.9.3)(zod@3.22.4)
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -8699,7 +8558,7 @@ packages:
       '@reown/appkit-wallet': 1.7.8(typescript@5.9.3)
       '@walletconnect/universal-provider': 2.21.0(typescript@5.9.3)
       valtio: 1.13.2(@types/react@18.3.26)(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -8722,6 +8581,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -8736,7 +8596,7 @@ packages:
       '@reown/appkit-wallet': 1.8.9(typescript@5.9.3)
       '@walletconnect/universal-provider': 2.21.9(encoding@0.1.13)(typescript@5.9.3)
       valtio: 2.1.7(@types/react@18.3.26)(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -8759,6 +8619,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -8797,6 +8658,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -8835,6 +8697,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -8885,6 +8748,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -8924,6 +8788,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -8962,6 +8827,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -9000,6 +8866,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -9019,7 +8886,7 @@ packages:
       '@walletconnect/logger': 2.1.2
       '@walletconnect/universal-provider': 2.21.0(typescript@5.9.3)
       valtio: 1.13.2(@types/react@18.3.26)(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9042,6 +8909,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -9062,7 +8930,7 @@ packages:
       '@walletconnect/logger': 2.1.2
       '@walletconnect/universal-provider': 2.21.9(encoding@0.1.13)(typescript@5.9.3)
       valtio: 2.1.7(@types/react@18.3.26)(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9085,6 +8953,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -9101,6 +8970,7 @@ packages:
       zod: 3.22.4
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
     dev: false
@@ -9114,6 +8984,7 @@ packages:
       zod: 3.22.4
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
     dev: false
@@ -9133,7 +9004,7 @@ packages:
       '@walletconnect/universal-provider': 2.21.0(typescript@5.9.3)
       bs58: 6.0.0
       valtio: 1.13.2(@types/react@18.3.26)(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9156,6 +9027,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -9179,7 +9051,7 @@ packages:
       bs58: 6.0.0
       semver: 7.7.2
       valtio: 2.1.7(@types/react@18.3.26)(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     optionalDependencies:
       '@lit/react': 1.0.8(@types/react@18.3.26)
     transitivePeerDependencies:
@@ -9204,6 +9076,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -9648,6 +9521,7 @@ packages:
       events: 3.3.0
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -9657,9 +9531,10 @@ packages:
     resolution: {integrity: sha512-N5p/ulfnnA2Pi2M3YeWjULeWbjo7ei22JwU/IXnhoHzKq3pYCN6ynL9mJBOlvDVv892EgLPCWCOwQk/uBT2v0Q==}
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.23.1
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -9777,29 +9652,29 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
-  /@skip-go/client@1.5.8(@solana/web3.js@1.98.4)(viem@2.38.0):
-    resolution: {integrity: sha512-ksI7TIFW7Wc5R5AwuxiIadrP8d5Et1DLgJjcyw5IMuqi5mKP8NevpuqxEMPlOF0cJ1Bkul3GqmnGTnh6T2dnjg==}
+  /@skip-go/client@1.7.1(@solana/web3.js@1.98.4)(viem@2.57.20):
+    resolution: {integrity: sha512-S17zAxExa2aAT5zKcbF0ov+8MUee/ft2orqZm7yxLsOM7FtIZiGO9OEXgTYsC2ofj07Ofbsp8MH7S434lVuzTw==}
     peerDependencies:
       '@solana/web3.js': ^1.95.8
-      viem: 2.x
+      viem: '>=2.39.0'
     dependencies:
-      '@cosmjs/amino': 0.33.1
-      '@cosmjs/cosmwasm-stargate': 0.33.1
-      '@cosmjs/encoding': 0.33.1
-      '@cosmjs/math': 0.33.1
-      '@cosmjs/proto-signing': 0.33.1
-      '@cosmjs/stargate': 0.33.1
+      '@cosmjs/amino': 0.39.0
+      '@cosmjs/cosmwasm': 0.39.0
+      '@cosmjs/encoding': 0.39.0
+      '@cosmjs/math': 0.39.0
+      '@cosmjs/proto-signing': 0.39.0
+      '@cosmjs/stargate': 0.39.0
       '@keplr-wallet/unit': 0.12.279
       '@solana/wallet-adapter-base': 0.9.27(@solana/web3.js@1.98.4)
       '@solana/web3.js': 1.98.4(typescript@5.9.3)
       bech32: 2.0.0
-      cosmjs-types: 0.9.0
+      bignumber.js: 9.3.1
+      cosmjs-types: 0.11.0
       keccak: 3.0.4
       uuid: 11.1.0
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - bufferutil
-      - debug
       - starknet
       - utf-8-validate
     dev: false
@@ -10616,6 +10491,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -10660,6 +10536,7 @@ packages:
       - babel-plugin-react-compiler
       - bufferutil
       - encoding
+      - mppx
       - prop-types
       - react-dom
       - sass
@@ -10681,6 +10558,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -10697,9 +10575,10 @@ packages:
       '@turnkey/crypto': 2.8.1
       '@turnkey/encoding': 0.6.0
     optionalDependencies:
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - bufferutil
+      - mppx
       - typescript
       - utf-8-validate
       - zod
@@ -11461,6 +11340,7 @@ packages:
     transitivePeerDependencies:
       - debug
       - fp-ts
+      - supports-color
     dev: false
 
   /@usecapsule/core-sdk@1.24.1:
@@ -11477,6 +11357,7 @@ packages:
       node-forge: 1.4.0
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/cosmjs-v0-integration@1.24.1(@cosmjs/amino@0.31.3)(@cosmjs/encoding@0.32.4)(@cosmjs/proto-signing@0.32.4):
@@ -11492,24 +11373,27 @@ packages:
       '@usecapsule/core-sdk': 1.24.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/user-management-client@1.18.0:
     resolution: {integrity: sha512-F0q5OQV2GiXQ0US8hnEPaCQ3fITSaubodalhw83wLlYUnC9BY0Xd1hXfGh2lcru17TKQYWIoImWf3aZnwN3LnA==}
     dependencies:
-      axios: 1.15.0
+      axios: 1.21.1
       qs: 6.15.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/user-management-client@1.21.1:
     resolution: {integrity: sha512-a0aQ5dgYILfMsTaFOWW6PjD4mcdL2dZL1BRbncdhA6uhLp/qkG19754tltF/TIQimT5eiJ+BQyL67jdSfPtY1g==}
     dependencies:
-      axios: 1.15.0
+      axios: 1.21.1
       qs: 6.15.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/web-sdk@1.23.0(fp-ts@2.16.11):
@@ -11525,6 +11409,7 @@ packages:
     transitivePeerDependencies:
       - debug
       - fp-ts
+      - supports-color
     dev: false
 
   /@vectis/extension-client@0.7.2:
@@ -11934,7 +11819,7 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@wagmi/connectors@5.11.2(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)(wagmi@2.17.5):
+  /@wagmi/connectors@5.11.2(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)(wagmi@2.17.5):
     resolution: {integrity: sha512-OkiElOI8xXGPDZE5UdG6NgDT3laSkEh9llX1DDapUnfnKecK3Tr/HUf5YzgwDhEoox8mdxp+8ZCjtnTKz56SdA==}
     peerDependencies:
       '@wagmi/core': 2.21.2
@@ -11946,16 +11831,16 @@ packages:
     dependencies:
       '@base-org/account': 1.1.1(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)
       '@coinbase/wallet-sdk': 4.3.6(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)
-      '@gemini-wallet/core': 0.2.0(viem@2.38.0)
+      '@gemini-wallet/core': 0.2.0(viem@2.57.20)
       '@metamask/sdk': 0.33.1
       '@safe-global/safe-apps-provider': 0.18.6(typescript@5.9.3)
       '@safe-global/safe-apps-sdk': 9.1.0(typescript@5.9.3)
-      '@wagmi/core': 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)
+      '@wagmi/core': 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)
       '@walletconnect/ethereum-provider': 2.21.1(@types/react@18.3.26)(react@18.3.1)(typescript@5.9.3)
       cbw-sdk: /@coinbase/wallet-sdk@3.9.3
-      porto: 0.2.19(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)(wagmi@2.17.5)
+      porto: 0.2.19(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)(wagmi@2.17.5)
       typescript: 5.9.3
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -11980,6 +11865,7 @@ packages:
       - encoding
       - immer
       - ioredis
+      - mppx
       - react
       - supports-color
       - uploadthing
@@ -11989,7 +11875,7 @@ packages:
       - zod
     dev: false
 
-  /@wagmi/core@2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0):
+  /@wagmi/core@2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20):
     resolution: {integrity: sha512-Rp4waam2z0FQUDINkJ91jq38PI5wFUHCv1YBL2LXzAQswaEk1ZY8d6+WG3vYGhFHQ22DXy2AlQ8IWmj+2EG3zQ==}
     peerDependencies:
       '@tanstack/query-core': '>=5.0.0'
@@ -12004,7 +11890,7 @@ packages:
       eventemitter3: 5.0.1
       mipd: 0.0.7(typescript@5.9.3)
       typescript: 5.9.3
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
       zustand: 5.0.0(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.4.0)
     transitivePeerDependencies:
       - '@types/react'
@@ -12314,6 +12200,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -12357,6 +12244,7 @@ packages:
       - db0
       - encoding
       - ioredis
+      - mppx
       - react
       - typescript
       - uploadthing
@@ -13824,52 +13712,7 @@ packages:
       typescript: 5.9.3
     dev: false
 
-  /abitype@1.1.0(typescript@5.9.3)(zod@3.22.4):
-    resolution: {integrity: sha512-6Vh4HcRxNMLA0puzPjM5GBgT4aAcFGKZzSgAXvuZ27shJP6NEpielTuqbBmZILR5/xd0PizkBGy5hReKz9jl5A==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3.22.0 || ^4.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-    dependencies:
-      typescript: 5.9.3
-      zod: 3.22.4
-    dev: false
-
-  /abitype@1.1.1(typescript@5.9.3)(zod@3.22.4):
-    resolution: {integrity: sha512-Loe5/6tAgsBukY95eGaPSDmQHIjRZYQq8PB1MpsNccDIK8WiV+Uw6WzaIXipvaxTEL2yEB0OpEaQv3gs8pkS9Q==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3.22.0 || ^4.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-    dependencies:
-      typescript: 5.9.3
-      zod: 3.22.4
-    dev: false
-
-  /abitype@1.1.1(typescript@5.9.3)(zod@4.1.12):
-    resolution: {integrity: sha512-Loe5/6tAgsBukY95eGaPSDmQHIjRZYQq8PB1MpsNccDIK8WiV+Uw6WzaIXipvaxTEL2yEB0OpEaQv3gs8pkS9Q==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3.22.0 || ^4.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-    dependencies:
-      typescript: 5.9.3
-      zod: 4.1.12
-    dev: false
-
-  /abitype@1.2.3(typescript@5.9.3):
+  /abitype@1.2.3(typescript@5.9.3)(zod@3.22.4):
     resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -13881,6 +13724,22 @@ packages:
         optional: true
     dependencies:
       typescript: 5.9.3
+      zod: 3.22.4
+    dev: false
+
+  /abitype@1.2.3(typescript@5.9.3)(zod@4.1.12):
+    resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3.22.0 || ^4.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      typescript: 5.9.3
+      zod: 4.1.12
     dev: false
 
   /abort-controller@3.0.0:
@@ -14343,7 +14202,7 @@ packages:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
       follow-redirects: 1.15.3
-      form-data: 4.0.5
+      form-data: 4.0.6
     transitivePeerDependencies:
       - debug
     dev: false
@@ -14352,7 +14211,7 @@ packages:
     resolution: {integrity: sha512-00tXVRwKx/FZr/IDVFt4C+f9FYairX517WoGCL6dpOntqLkZofjhu43F/Xl44UOpqa+9sLFDrG/XAnFsUYgkDA==}
     dependencies:
       follow-redirects: 1.15.3
-      form-data: 4.0.5
+      form-data: 4.0.6
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -14366,16 +14225,6 @@ packages:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-
-  /axios@1.15.0:
-    resolution: {integrity: sha512-wWyJDlAatxk30ZJer+GeCWS209sA42X+N5jU2jy6oHTp7ufw8uzUTVFBX9+wTfAlhiJXGS0Bq7X6efruWjuK9Q==}
-    dependencies:
-      follow-redirects: 1.15.3
-      form-data: 4.0.5
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /axios@1.21.1:
     resolution: {integrity: sha512-6eI5Q/Y4u/Um9dDlsRoq5pY2rxnUTv+L4PpLitnbk/i4jb3MxLZ5CsN5Ih3IysbeRYK4pR+P7qfMsOQl9fwwFQ==}
@@ -14671,9 +14520,6 @@ packages:
     resolution: {integrity: sha512-XWwnNNFCuuSQ0m3r3C4LE3EiORltHd9M05pq6FOlVeiophzRbMo50Sbz1ehl8K3Z+jw9+vmgnXefY1hz8X+2wA==}
     dev: false
 
-  /bn.js@4.12.2:
-    resolution: {integrity: sha512-n4DSx829VRTRByMRGdjQ9iqsN0Bh4OolPsFnaZBLcbi8iXcB+kJ9s7EnRt4wILZNV3kPLHkRVfOc/HvhC3ovDw==}
-
   /bn.js@4.12.3:
     resolution: {integrity: sha512-fGTi3gxV/23FTYdAoUtLYp6qySe2KE3teyZitipKNRuVYcBkoP/bB3guXN/XVKUe9mxCHXnc9C4ocyz8OmgN0g==}
 
@@ -14691,7 +14537,7 @@ packages:
   /borsh@0.7.0:
     resolution: {integrity: sha512-CLCsZGIBCFnPtkNnieW/a8wmreDmfUtjU2m9yHrzPXIlNbqVs0AQrSatSG6vdNYUqdc83tkQi2eHfF98ubzQLA==}
     dependencies:
-      bn.js: 5.2.2
+      bn.js: 5.2.3
       bs58: 4.0.1
       text-encoding-utf-8: 1.0.2
     dev: false
@@ -16520,7 +16366,7 @@ packages:
   /elliptic@6.6.0:
     resolution: {integrity: sha512-dpwoQcLc/2WLQvJvLRHKZ+f9FgOdjnq11rurqwekGQygGPsYSK29OMMD2WalatiqQ+XGFDglTNixpPfI+lpaAA==}
     dependencies:
-      bn.js: 4.12.2
+      bn.js: 4.12.3
       brorand: 1.1.0
       hash.js: 1.1.7
       hmac-drbg: 1.0.1
@@ -16532,7 +16378,7 @@ packages:
   /elliptic@6.6.1:
     resolution: {integrity: sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==}
     dependencies:
-      bn.js: 4.12.2
+      bn.js: 4.12.3
       brorand: 1.1.0
       hash.js: 1.1.7
       hmac-drbg: 1.0.1
@@ -16653,7 +16499,7 @@ packages:
       has-property-descriptors: 1.0.2
       has-proto: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       internal-slot: 1.1.0
       is-array-buffer: 3.0.5
       is-callable: 1.2.7
@@ -16754,7 +16600,7 @@ packages:
     resolution: {integrity: sha512-d9T8ucsEhh8Bi1woXCf+TIKDIROLG5WCkxg8geBCbvk22kzwC5G2OnXVMO6FUsvQlgUUXQ2itephWDLqDzbeCw==}
     engines: {node: '>= 0.4'}
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.4
     dev: true
 
   /es-to-primitive@1.3.0:
@@ -17625,22 +17471,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /ethers@6.16.0:
-    resolution: {integrity: sha512-U1wulmetNymijEhpSEQ7Ct/P/Jw9/e7R1j5XIbPRydgV2DjLVMsULDlNksq3RQnFgKoLlZf88ijYtWEXcPa07A==}
-    engines: {node: '>=14.0.0'}
-    dependencies:
-      '@adraffy/ens-normalize': 1.10.1
-      '@noble/curves': 1.2.0
-      '@noble/hashes': 1.3.2
-      '@types/node': 22.7.5
-      aes-js: 4.0.0-beta.5
-      tslib: 2.7.0
-      ws: 8.17.1
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
   /ethers@6.17.0:
     resolution: {integrity: sha512-BpyrpIPJ3ydEVow8zGaz1DuPS7YU8DcWxuBnY9a0UA/lvAPwrMr+EPXsfrul628SRaekPNeIM4UFh/91GWZang==}
     engines: {node: '>=14.0.0'}
@@ -17651,7 +17481,7 @@ packages:
       '@types/node': 22.7.5
       aes-js: 4.0.0-beta.5
       tslib: 2.7.0
-      ws: 8.21.0
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -18129,17 +17959,6 @@ packages:
       hasown: 2.0.2
       mime-types: 2.1.35
 
-  /form-data@4.0.5:
-    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
-    engines: {node: '>= 6'}
-    dependencies:
-      asynckit: 0.4.0
-      combined-stream: 1.0.8
-      es-set-tostringtag: 2.1.0
-      hasown: 2.0.2
-      mime-types: 2.1.35
-    dev: false
-
   /form-data@4.0.6:
     resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
     engines: {node: '>= 6'}
@@ -18223,7 +18042,7 @@ packages:
       call-bound: 1.0.4
       define-properties: 1.2.1
       functions-have-names: 1.2.3
-      hasown: 2.0.2
+      hasown: 2.0.4
       is-callable: 1.2.7
     dev: true
 
@@ -19268,7 +19087,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       es-errors: 1.3.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       side-channel: 1.1.0
     dev: true
 
@@ -19727,7 +19546,7 @@ packages:
       call-bound: 1.0.4
       gopd: 1.2.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   /is-running@2.1.0:
     resolution: {integrity: sha512-mjJd3PujZMl7j+D395WTIO5tU5RIDBfVSRtRR4VOJou3H66E38UjbjvDGh3slJzPuolsb+yQFqwHNNdyp5jg3w==}
@@ -19891,7 +19710,7 @@ packages:
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.21.0
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     dev: false
 
   /it-all@1.0.6:
@@ -22233,7 +22052,28 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
+      eventemitter3: 5.0.1
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - zod
+    dev: false
+
+  /ox@0.14.67(typescript@5.9.3)(zod@3.22.4):
+    resolution: {integrity: sha512-6v6UlwgsmiyTujZp0aVDuN8uIBAtl/QZadBADFRZ2zp1+CM9TqDzd+rPKJ5PYvWPlCvz8JvoO9dTr42+1PhBhA==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.1
+      '@noble/ciphers': 1.3.0
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.2.3(typescript@5.9.3)(zod@3.22.4)
       eventemitter3: 5.0.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -22253,7 +22093,7 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@4.1.12)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       eventemitter3: 5.0.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -22273,7 +22113,7 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@4.1.12)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       eventemitter3: 5.0.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -22294,7 +22134,7 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@4.1.12)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       eventemitter3: 5.0.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -22315,49 +22155,7 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@4.1.12)
-      eventemitter3: 5.0.1
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - zod
-    dev: false
-
-  /ox@0.9.6(typescript@5.9.3):
-    resolution: {integrity: sha512-8SuCbHPvv2eZLYXrNmC0EC12rdzXQLdhnOMlHDW2wiCPLxBrOOJwX5L5E61by+UjTPOryqQiRSnjIKCI+GykKg==}
-    peerDependencies:
-      typescript: '>=5.4.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@adraffy/ens-normalize': 1.11.1
-      '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@4.1.12)
-      eventemitter3: 5.0.1
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - zod
-    dev: false
-
-  /ox@0.9.6(typescript@5.9.3)(zod@3.22.4):
-    resolution: {integrity: sha512-8SuCbHPvv2eZLYXrNmC0EC12rdzXQLdhnOMlHDW2wiCPLxBrOOJwX5L5E61by+UjTPOryqQiRSnjIKCI+GykKg==}
-    peerDependencies:
-      typescript: '>=5.4.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@adraffy/ens-normalize': 1.11.1
-      '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@3.22.4)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       eventemitter3: 5.0.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -22378,7 +22176,7 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@5.9.3)(zod@4.1.12)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       eventemitter3: 5.0.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -22819,7 +22617,7 @@ packages:
     engines: {node: '>=12.0.0'}
     dev: false
 
-  /porto@0.2.19(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)(wagmi@2.17.5):
+  /porto@0.2.19(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)(wagmi@2.17.5):
     resolution: {integrity: sha512-q1vEJgdtlEOf6byWgD31GHiMwpfLuxFSfx9f7Sw4RGdvpQs2ANBGfnzzardADZegr87ZXsebSp+3vaaznEUzPQ==}
     hasBin: true
     peerDependencies:
@@ -22840,15 +22638,15 @@ packages:
         optional: true
     dependencies:
       '@tanstack/react-query': 5.90.2(react@18.3.1)
-      '@wagmi/core': 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)
+      '@wagmi/core': 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)
       hono: 4.9.10
       idb-keyval: 6.2.2
       mipd: 0.0.7(typescript@5.9.3)
       ox: 0.9.9(typescript@5.9.3)(zod@4.1.12)
       react: 18.3.1
       typescript: 5.9.3
-      viem: 2.38.0(typescript@5.9.3)
-      wagmi: 2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.38.0)
+      viem: 2.57.20(typescript@5.9.3)
+      wagmi: 2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.57.20)
       zod: 4.1.12
       zustand: 5.0.8(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.4.0)
     transitivePeerDependencies:
@@ -24339,7 +24137,7 @@ packages:
       buffer: 6.0.3
       eventemitter3: 5.0.4
       uuid: 8.3.2
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     optionalDependencies:
       bufferutil: 4.1.0
       utf-8-validate: 5.0.10
@@ -26467,6 +26265,7 @@ packages:
 
   /uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
     dev: false
 
@@ -26615,52 +26414,6 @@ packages:
       - zod
     dev: false
 
-  /viem@2.38.0(typescript@5.9.3):
-    resolution: {integrity: sha512-YU5TG8dgBNeYPrCMww0u9/JVeq2ZCk9fzk6QybrPkBooFysamHXL1zC3ua10aLPt9iWoA/gSVf1D9w7nc5B1aA==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.1.0(typescript@5.9.3)(zod@3.22.4)
-      isows: 1.0.7(ws@8.18.3)
-      ox: 0.9.6(typescript@5.9.3)
-      typescript: 5.9.3
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-    dev: false
-
-  /viem@2.38.0(typescript@5.9.3)(zod@3.22.4):
-    resolution: {integrity: sha512-YU5TG8dgBNeYPrCMww0u9/JVeq2ZCk9fzk6QybrPkBooFysamHXL1zC3ua10aLPt9iWoA/gSVf1D9w7nc5B1aA==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.1.0(typescript@5.9.3)(zod@3.22.4)
-      isows: 1.0.7(ws@8.18.3)
-      ox: 0.9.6(typescript@5.9.3)(zod@3.22.4)
-      typescript: 5.9.3
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-    dev: false
-
   /viem@2.57.20(typescript@5.9.3):
     resolution: {integrity: sha512-LSvREzKT7xFXpmxW2YFJ/OtcZRkSGLp5zywSgadBf0qQCeqh2+FxHHWyrS2zEG7ZfBWQQvk8HI1i4HPzSMD14g==}
     peerDependencies:
@@ -26676,11 +26429,37 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       isows: 1.0.7(ws@8.21.0)
       ox: 0.14.67(typescript@5.9.3)
       typescript: 5.9.3
-      ws: 8.21.0
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - zod
+    dev: false
+
+  /viem@2.57.20(typescript@5.9.3)(zod@3.22.4):
+    resolution: {integrity: sha512-LSvREzKT7xFXpmxW2YFJ/OtcZRkSGLp5zywSgadBf0qQCeqh2+FxHHWyrS2zEG7ZfBWQQvk8HI1i4HPzSMD14g==}
+    peerDependencies:
+      mppx: '>=0.17.0'
+      typescript: '>=5.0.4'
+    peerDependenciesMeta:
+      mppx:
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.2.3(typescript@5.9.3)(zod@3.22.4)
+      isows: 1.0.7(ws@8.21.0)
+      ox: 0.14.67(typescript@5.9.3)(zod@3.22.4)
+      typescript: 5.9.3
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -26986,7 +26765,7 @@ packages:
       throttled-queue: 3.0.0
     dev: true
 
-  /wagmi@2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.38.0):
+  /wagmi@2.17.5(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(viem@2.57.20):
     resolution: {integrity: sha512-Sk2e40gfo68gbJ6lHkpIwCMkH76rO0+toCPjf3PzdQX37rZo9042DdNTYcSg3zhnx8abFJtrk/5vAWfR8APTDw==}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -26998,12 +26777,12 @@ packages:
         optional: true
     dependencies:
       '@tanstack/react-query': 5.90.2(react@18.3.1)
-      '@wagmi/connectors': 5.11.2(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)(wagmi@2.17.5)
-      '@wagmi/core': 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.38.0)
+      '@wagmi/connectors': 5.11.2(@tanstack/react-query@5.90.2)(@types/react@18.3.26)(@wagmi/core@2.21.2)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)(wagmi@2.17.5)
+      '@wagmi/core': 2.21.2(@types/react@18.3.26)(immer@10.1.3)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.57.20)
       react: 18.3.1
       typescript: 5.9.3
       use-sync-external-store: 1.4.0(react@18.3.1)
-      viem: 2.38.0(typescript@5.9.3)
+      viem: 2.57.20(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -27028,6 +26807,7 @@ packages:
       - encoding
       - immer
       - ioredis
+      - mppx
       - supports-color
       - uploadthing
       - utf-8-validate
@@ -27321,7 +27101,7 @@ packages:
       deepmerge-ts: 5.1.0
       got: 12.6.1
       ky: 0.33.3
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bare-buffer
       - bufferutil
@@ -27344,7 +27124,7 @@ packages:
       deepmerge-ts: 7.1.5
       https-proxy-agent: 7.0.6
       undici: 6.24.1
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bare-buffer
       - bufferutil
@@ -27750,8 +27530,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  /ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
-    resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
+  /ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -27764,19 +27544,6 @@ packages:
     dependencies:
       bufferutil: 4.1.0
       utf-8-validate: 5.0.10
-
-  /ws@8.21.0:
-    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
 
   /wsl-utils@0.1.0:
     resolution: {integrity: sha512-h3Fbisa2nKGPxCpm89Hk33lBLsnaGBvctQopaBSOW/uIs6FTe1ATyAnKFJrzVs9vpGdsTe73WF3V4lIsk4Gacw==}
@@ -28090,3 +27857,37 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz:
+    resolution: {integrity: sha512-Rd6obzszVoHa4DuUYu+2thwjKW9iXwdW9EUrLYwqiDEgvFV8DUmzkuablWp1vE44HmYYaS52T9AjLhAA2vp89A==, tarball: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz}
+    name: '@dydxprotocol/v4-client-js'
+    version: 3.6.0
+    dependencies:
+      '@cosmjs/amino': 0.32.4
+      '@cosmjs/crypto': 0.32.4
+      '@cosmjs/encoding': 0.32.4
+      '@cosmjs/math': 0.32.4
+      '@cosmjs/proto-signing': 0.32.4
+      '@cosmjs/stargate': 0.32.4
+      '@cosmjs/tendermint-rpc': 0.32.4
+      '@cosmjs/utils': 0.32.4
+      '@dydxprotocol/v4-proto': 9.5.0
+      '@osmonauts/lcd': 0.6.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      axios: 1.1.3
+      bech32: 1.1.4
+      bignumber.js: 9.3.1
+      cosmjs-types: 0.9.0
+      ethereum-cryptography: 2.2.1
+      ethers: 6.17.0
+      https-proxy-agent: 7.0.6
+      long: 4.0.0
+      protobufjs: 7.5.4
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - supports-color
+      - utf-8-validate
+    dev: false

@@ -62,7 +62,7 @@ export function useDepositSteps({
   const stringGetter = useStringGetter();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
-  const { injectiveAddress, dydxAddress, osmosisAddress } = useAccounts();
+  const { injectiveAddress, dydxAddress, nobleAddress, osmosisAddress } = useAccounts();
 
   async function getStepsQuery() {
     if (!depositRoute || !sourceAccount.address) return [];
@@ -107,6 +107,7 @@ export function useDepositSteps({
     const userAddresses = getUserAddressesForRoute(
       depositRoute,
       sourceAccount,
+      nobleAddress,
       injectiveAddress,
       dydxAddress,
       osmosisAddress

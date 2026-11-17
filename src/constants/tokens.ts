@@ -6,6 +6,11 @@ import { SOLANA_MAINNET_ID } from './solana';
 // USDC has a assetId of 0 on the dYdX Chain
 export const USDC_ASSET_ID = 0;
 
+export const INJECTIVE_USDC_DENOM = 'erc20:0xa00C59fF5a080D2b954d0c75e46E22a0c371235a';
+export const DYDX_CHAIN_DYDX_DENOM = 'adydx';
+export const DYDX_CHAIN_USDC_DENOM =
+  'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5';
+
 export const USDC_ADDRESSES = {
   [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
@@ -14,15 +19,11 @@ export const USDC_ADDRESSES = {
   [polygon.id]: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
   [avalanche.id]: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
   [SOLANA_MAINNET_ID]: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-  [CosmosChainId.Injective]: 'uusdc',
+  [CosmosChainId.Noble]: 'uusdc',
+  [CosmosChainId.Injective]: INJECTIVE_USDC_DENOM,
   [CosmosChainId.Osmosis]: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
   [CosmosChainId.Neutron]: 'ibc/B559A80D62249C8AA07A380E2A2BEA6E5CA9A6F079C912C3A9E9B494105E4F81',
 };
-
-export const INJECTIVE_USDC_DENOM = 'uusdc';
-export const DYDX_CHAIN_DYDX_DENOM = 'adydx';
-export const DYDX_CHAIN_USDC_DENOM =
-  'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5';
 
 export const USDC_DECIMALS = 6;
 export const DYDX_DECIMALS = 18;

@@ -10,7 +10,11 @@ import { WalletNetworkType } from '@/constants/wallets';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { isValidSolanaAddress, validateCosmosAddress } from '@/lib/addressUtils';
+import {
+  isValidSolanaAddress,
+  validateCosmosAddress,
+  validateInjectiveAddress,
+} from '@/lib/addressUtils';
 
 // Because our deposit flow only supports ETH and USDC
 
@@ -41,6 +45,7 @@ export function getUserAddressesForRoute(
   route: RouteResponse,
   sourceAccount?: SourceAccount,
   nobleAddress?: string,
+  injectiveAddress?: string,
   dydxAddress?: string,
   osmosisAddress?: string,
   neutronAddress?: string,
@@ -59,6 +64,9 @@ export function getUserAddressesForRoute(
       case CosmosChainId.Noble:
         if (!nobleAddress) throw new Error('nobleAddress undefined');
         return { chainId, address: nobleAddress };
+      case CosmosChainId.Injective:
+        if (!injectiveAddress) throw new Error('injectiveAddress undefined');
+        return { chainId, address: injectiveAddress };
       case CosmosChainId.Osmosis:
         if (!osmosisAddress) throw new Error('osmosisAddress undefined');
         return { chainId, address: osmosisAddress };
@@ -126,8 +134,9 @@ export const parseWithdrawError = (e: Error, fallbackMessage: string) => {
 
 export function isValidWithdrawalAddress(address: string, chainId: string): boolean {
   switch (chainId) {
-    case CosmosChainId.Noble:
-      return validateCosmosAddress(address, 'noble');
+    case CosmosChainId.Injective:
+    case CosmosChainId.InjectiveTestnet:
+      return validateInjectiveAddress(address);
     case CosmosChainId.Osmosis:
       return validateCosmosAddress(address, 'osmo');
     case CosmosChainId.Neutron:
