@@ -4,15 +4,13 @@ import { Link } from '@/components/Link';
 
 import { useStringGetter } from './useStringGetter';
 
-// TODO: Replace text with stringGetter and new href
 const UsdcMigrationBanner = () => {
   const stringGetter = useStringGetter();
 
   return (
     <span>
-      Upcoming USDC migration from Noble to Injective, subject to governance approval. No action
-      needed for USDC already on dYdX Chain.{' '}
-      <Link tw="inline-block" href="https://docs.dydx.exchange/usdc-migration">
+      {stringGetter({ key: STRING_KEYS.USDC_MIGRATION })}{' '}
+      <Link tw="inline-block" href="https://www.dydx.xyz/blog/usdc-migration-to-injective">
         {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
       </Link>
     </span>

@@ -190,7 +190,7 @@ export const HeaderDesktop = () => {
 
       <$NavAfter>
         {onboardingState === OnboardingState.AccountConnected &&
-          complianceState !== ComplianceStates.READ_ONLY && (
+          complianceState === ComplianceStates.FULL_ACCESS && (
             <Button
               tw="mr-[0.5em]"
               shape={ButtonShape.Pill}
