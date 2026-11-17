@@ -31,7 +31,7 @@ import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
-export function useBalances() {
+export function useBalances({ refetchInterval }: { refetchInterval?: number } = {}) {
   const { sourceAccount, injectiveAddress, osmosisAddress, neutronAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
@@ -45,11 +45,12 @@ export function useBalances() {
     enabled: Boolean(sourceAccount.address && injectiveAddress && osmosisAddress && neutronAddress),
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
+    refetchInterval,
   });
 }
 
-export function useDepositTokenBalances() {
-  const { isLoading, data } = useBalances();
+export function useDepositTokenBalances(options?: { refetchInterval?: number }) {
+  const { isLoading, data } = useBalances(options);
 
   const [withBalances, noBalances] = useMemo(() => {
     if (!data || !data.chains) return [[], []];
@@ -104,7 +105,7 @@ export function useBalance(
   }, [allBalances?.chains, chainId, tokenDenom]);
 }
 
-function getNativeEvmTokenDenom(chain: Chain) {
+export function getNativeEvmTokenDenom(chain: Chain) {
   // special case: chain name is OP Mainnet
   if (chain.id === optimism.id) {
     return 'optimism-native';

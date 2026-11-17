@@ -5,13 +5,15 @@ import { sumBy } from 'lodash';
 import { DateTime } from 'luxon';
 import { useWalletClient } from 'wagmi';
 
+import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
 import { ColorToken } from '@/constants/styles/base';
 import { TokenForTransfer } from '@/constants/tokens';
-import { WalletNetworkType } from '@/constants/wallets';
+import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -21,6 +23,7 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { WarningIcon } from '@/icons';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
@@ -41,7 +44,13 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { getTokenSymbol } from '../../utils';
 import { DepositStep, useDepositSteps } from '../depositHooks';
-import { isInstantDeposit, useBalance, useDepositDeltas, useDepositRoutes } from '../queries';
+import {
+  getNativeEvmTokenDenom,
+  isInstantDeposit,
+  useBalance,
+  useDepositDeltas,
+  useDepositRoutes,
+} from '../queries';
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
 
@@ -98,6 +107,17 @@ export const DepositForm = ({
   );
 
   const { sourceAccount, localDydxWallet } = useAccounts();
+
+  // Embedded wallets (Privy) are often funded with only USDC, leaving nothing to pay gas with
+  const isEmbeddedWallet = sourceAccount.walletInfo?.connectorType === ConnectorType.Privy;
+  const evmChain = EVM_DEPOSIT_CHAINS.find((chain) => String(chain.id) === token.chainId);
+  const gasBalance = useBalance(token.chainId, evmChain ? getNativeEvmTokenDenom(evmChain) : '');
+  const gasDenom = CHAIN_INFO[token.chainId]?.gasDenom;
+  const isMissingGas =
+    isEmbeddedWallet &&
+    evmChain != null &&
+    gasBalance.raw != null &&
+    BigInt(gasBalance.raw) === BigInt(0);
 
   const signer = useMemo(() => {
     if (sourceAccount.chain === WalletNetworkType.Evm) {
@@ -376,14 +396,24 @@ export const DepositForm = ({
       />
     </>
   ) : (
-    <AmountInput
-      tokenBalance={tokenBalance}
-      value={amount}
-      onChange={setAmount}
-      token={token}
-      onTokenClick={onTokenSelect}
-      error={error}
-    />
+    <>
+      <AmountInput
+        tokenBalance={tokenBalance}
+        value={amount}
+        onChange={setAmount}
+        token={token}
+        onTokenClick={onTokenSelect}
+        error={error}
+      />
+      {isMissingGas && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({
+            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
+            params: { TOKEN: gasDenom, BALANCE: gasBalance.formatted ?? '0' },
+          })}
+        </AlertMessage>
+      )}
+    </>
   );
 
   const depositContentBottom = (

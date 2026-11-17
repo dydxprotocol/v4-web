@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
 
 import { ComplianceStates } from '@/constants/compliance';
-import { DepositDialog2Props, DialogProps, DialogTypes } from '@/constants/dialogs';
+import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
@@ -19,8 +19,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
 import { SourceAccount } from '@/state/wallet';
 
 import { DepositFormContent, DepositFormState } from './DepositForm/DepositFormContainer';
@@ -65,7 +63,6 @@ function getDefaultToken(
 }
 
 export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const dispatch = useAppDispatch();
   const { sourceAccount } = useAccounts();
   const { complianceState } = useComplianceState();
   const { isLoading: isLoadingBalances, withBalances } = useDepositTokenBalances();
@@ -73,6 +70,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
+  const isEmbeddedWallet = sourceAccount.walletInfo?.connectorType === ConnectorType.Privy;
 
   const [formState, setFormState] = useState<DepositFormState>('form');
   const [currentPerpsDeposit, setCurrentPerpsDeposit] = useState<{
@@ -85,7 +83,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     {
       form: stringGetter({ key: STRING_KEYS.DEPOSIT }),
       'token-select': stringGetter({ key: STRING_KEYS.SELECT_TOKEN }),
-      'qr-deposit': stringGetter({ key: STRING_KEYS.QR_DEPOSIT }),
+      'wallet-address': stringGetter({ key: STRING_KEYS.SEND_TO_WALLET }),
     } satisfies Record<DepositFormState, string>
   )[formState];
 
@@ -102,12 +100,16 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     }
   };
 
+  const hasCheckedInitialBalancesRef = useRef(false);
+
   useLayoutEffect(() => {
-    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy) {
-      setIsOpen(false);
-      dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({})));
+    if (isLoadingBalances || hasCheckedInitialBalancesRef.current) return;
+    hasCheckedInitialBalancesRef.current = true;
+
+    if (isEmbeddedWallet && withBalances.length === 0) {
+      setFormState('wallet-address');
     }
-  }, [sourceAccount, dispatch, setIsOpen]);
+  }, [isEmbeddedWallet, isLoadingBalances, withBalances.length]);
 
   useLayoutEffect(() => {
     if (complianceState !== ComplianceStates.FULL_ACCESS) {
@@ -146,6 +148,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
               onDeposit={setCurrentPerpsDeposit}
               tokenSelectRef={tokenSelectRef}
               onShowForm={onShowForm}
+              canDepositToWalletAddress={isEmbeddedWallet}
             />
           )}
         </div>

@@ -8,11 +8,15 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TokenBalance, TokenForTransfer } from '@/constants/tokens';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+
+import { truncateAddress } from '@/lib/wallet';
 
 import { getTokenSymbol } from '../../utils';
 import { useDepositTokenBalances } from '../queries';
@@ -22,14 +26,17 @@ export const TokenSelect = ({
   onBack,
   token,
   setToken,
+  onWalletAddressDeposit,
 }: {
   // disable buttons to prevent tab events while TokenSelect has 0 height
   disabled?: boolean;
   onBack: () => void;
   token: TokenForTransfer;
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
+  onWalletAddressDeposit?: () => void;
 }) => {
   const stringGetter = useStringGetter();
+  const { sourceAccount } = useAccounts();
   const { isLoading, withBalances, noBalances } = useDepositTokenBalances();
 
   const onTokenClick = (newToken: TokenForTransfer) => () => {
@@ -66,6 +73,24 @@ export const TokenSelect = ({
             key={balance.denom}
           />
         ))}
+        {onWalletAddressDeposit && (
+          <$TokenRowButton disabled={disabled} onClick={onWalletAddressDeposit}>
+            <div tw="flex items-center gap-0.75">
+              <div tw="flex size-[2rem] place-content-center">
+                <Icon tw="[--icon-size:1.5rem]" iconName={IconName.Wallet} />
+              </div>
+              <div tw="flex flex-col items-start gap-0.125">
+                <div tw="text-color-text-2 font-base-medium">
+                  {stringGetter({ key: STRING_KEYS.SEND_TO_WALLET })}
+                </div>
+                <div tw="text-color-text-0 font-small-book">
+                  {truncateAddress(sourceAccount.address, '0x')}
+                </div>
+              </div>
+            </div>
+            <$CaretIcon iconName={IconName.Caret} />
+          </$TokenRowButton>
+        )}
       </div>
 
       {noBalances.length > 0 && (
@@ -164,4 +189,13 @@ const $TokenRowButton = styled.button.attrs({ type: 'button' })<{ isSelected?: b
       background-color: var(--token-row-active-bgColor, var(--color-layer-4));
       --asset-icon-chain-icon-borderColor: var(--token-row-active-bgColor, var(--color-layer-4));
     `}
+`;
+
+const $CaretIcon = styled(Icon)`
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  align-self: center;
+  color: var(--color-text-0);
+  transform: rotate(-0.25turn);
 `;

@@ -92,7 +92,6 @@ export interface RawDataState {
   };
   account: {
     balances: Loadable<Coin[]>;
-    nobleUsdcBalance: Loadable<Coin>;
     stats: Loadable<AccountStats | undefined>;
     feeTier: Loadable<UserFeeTier | undefined>;
     stakingTier: Loadable<UserStakingTier | undefined>;
@@ -131,7 +130,6 @@ const initialState: RawDataState = {
   account: {
     parentSubaccount: loadableIdle(),
     balances: loadableIdle(),
-    nobleUsdcBalance: loadableIdle(),
     stats: loadableIdle(),
     feeTier: loadableIdle(),
     stakingTier: loadableIdle(),
@@ -183,9 +181,6 @@ export const rawSlice = createSlice({
       },
       setAccountBalancesRaw: (state, action: PayloadAction<Loadable<Coin[]>>) => {
         state.account.balances = action.payload;
-      },
-      setAccountNobleUsdcBalanceRaw: (state, action: PayloadAction<Loadable<Coin>>) => {
-        state.account.nobleUsdcBalance = action.payload;
       },
       setAccountStatsRaw: (state, action: PayloadAction<Loadable<AccountStats | undefined>>) => {
         state.account.stats = action.payload;
@@ -378,7 +373,6 @@ export const {
   setAccountStatsRaw,
   setAccountFillsRaw,
   setAccountTradesRaw,
-  setAccountNobleUsdcBalanceRaw,
   setAccountOrdersRaw,
   setAccountTransfersRaw,
   setAccountBlockTradingRewardsRaw,

@@ -41,7 +41,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
       ? mainnet.id.toString()
       : sourceAccount.chain === SOLANA_MAINNET_ID
         ? SOLANA_MAINNET_ID
-        : CosmosChainId.Noble
+        : CosmosChainId.Injective
   );
 
   const stringGetter = useStringGetter();
