@@ -92,41 +92,43 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         <WithdrawStatus id={currentWithdrawId} onClose={() => setIsOpen(false)} />
       )}
       {!currentWithdrawId && (
-        <div tw="h-full w-full overflow-hidden p-1.25">
-          <div tw="flex h-full w-[200%]">
-            <div
-              tw="w-[50%]"
-              style={{
-                marginLeft: formState === 'form' ? 0 : '-50%',
-                transition: 'margin 500ms',
-              }}
-            >
-              <WithdrawForm
-                amount={amount}
-                setAmount={setAmount}
-                destinationAddress={destinationAddress}
-                setDestinationAddress={setDestinationAddress}
-                destinationChain={destinationChain}
-                onChainSelect={() => setFormState('chain-select')}
-                onWithdraw={onWithdraw}
-                onWithdrawBroadcastUpdate={onWithdrawBroadcastUpdate}
-                onWithdrawSigned={onWithdrawSigned}
-              />
-            </div>
-            <div
-              ref={chainSelectRef}
-              tw="w-[50%] overflow-scroll"
-              style={{
-                pointerEvents: formState === 'form' ? 'none' : undefined,
-                height: formState === 'form' ? 0 : '100%',
-              }}
-            >
-              <ChainSelect
-                disabled={formState === 'form'}
-                selectedChain={destinationChain}
-                setSelectedChain={setDestinationChain}
-                onBack={onShowForm}
-              />
+        <div tw="h-full w-full p-1.25">
+          <div tw="h-full w-full overflow-hidden">
+            <div tw="flex h-full w-[200%]">
+              <div
+                tw="w-[50%]"
+                style={{
+                  marginLeft: formState === 'form' ? 0 : '-50%',
+                  transition: 'margin 500ms',
+                }}
+              >
+                <WithdrawForm
+                  amount={amount}
+                  setAmount={setAmount}
+                  destinationAddress={destinationAddress}
+                  setDestinationAddress={setDestinationAddress}
+                  destinationChain={destinationChain}
+                  onChainSelect={() => setFormState('chain-select')}
+                  onWithdraw={onWithdraw}
+                  onWithdrawBroadcastUpdate={onWithdrawBroadcastUpdate}
+                  onWithdrawSigned={onWithdrawSigned}
+                />
+              </div>
+              <div
+                ref={chainSelectRef}
+                tw="w-[50%] overflow-scroll"
+                style={{
+                  pointerEvents: formState === 'form' ? 'none' : undefined,
+                  height: formState === 'form' ? 0 : '100%',
+                }}
+              >
+                <ChainSelect
+                  disabled={formState === 'form'}
+                  selectedChain={destinationChain}
+                  setSelectedChain={setDestinationChain}
+                  onBack={onShowForm}
+                />
+              </div>
             </div>
           </div>
         </div>
