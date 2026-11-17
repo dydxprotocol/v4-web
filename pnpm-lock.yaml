@@ -547,10 +547,6 @@ devDependencies:
 
 packages:
 
-  /@adraffy/ens-normalize@1.10.1:
-    resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
-    dev: false
-
   /@adraffy/ens-normalize@1.11.1:
     resolution: {integrity: sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==}
     dev: false
@@ -3972,6 +3968,7 @@ packages:
       - '@cosmjs/proto-signing'
       - debug
       - fp-ts
+      - supports-color
     dev: false
 
   /@leapwallet/cosmos-social-login-core@0.0.1:
@@ -11316,6 +11313,7 @@ packages:
     transitivePeerDependencies:
       - debug
       - fp-ts
+      - supports-color
     dev: false
 
   /@usecapsule/core-sdk@1.24.1:
@@ -11332,6 +11330,7 @@ packages:
       node-forge: 1.4.0
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/cosmjs-v0-integration@1.24.1(@cosmjs/amino@0.31.3)(@cosmjs/encoding@0.32.4)(@cosmjs/proto-signing@0.32.4):
@@ -11347,24 +11346,27 @@ packages:
       '@usecapsule/core-sdk': 1.24.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/user-management-client@1.18.0:
     resolution: {integrity: sha512-F0q5OQV2GiXQ0US8hnEPaCQ3fITSaubodalhw83wLlYUnC9BY0Xd1hXfGh2lcru17TKQYWIoImWf3aZnwN3LnA==}
     dependencies:
-      axios: 1.15.0
+      axios: 1.21.1
       qs: 6.15.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/user-management-client@1.21.1:
     resolution: {integrity: sha512-a0aQ5dgYILfMsTaFOWW6PjD4mcdL2dZL1BRbncdhA6uhLp/qkG19754tltF/TIQimT5eiJ+BQyL67jdSfPtY1g==}
     dependencies:
-      axios: 1.15.0
+      axios: 1.21.1
       qs: 6.15.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: false
 
   /@usecapsule/web-sdk@1.23.0(fp-ts@2.16.11):
@@ -11380,6 +11382,7 @@ packages:
     transitivePeerDependencies:
       - debug
       - fp-ts
+      - supports-color
     dev: false
 
   /@vectis/extension-client@0.7.2:
@@ -14198,7 +14201,7 @@ packages:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
       follow-redirects: 1.15.3
-      form-data: 4.0.5
+      form-data: 4.0.6
     transitivePeerDependencies:
       - debug
     dev: false
@@ -14207,7 +14210,7 @@ packages:
     resolution: {integrity: sha512-00tXVRwKx/FZr/IDVFt4C+f9FYairX517WoGCL6dpOntqLkZofjhu43F/Xl44UOpqa+9sLFDrG/XAnFsUYgkDA==}
     dependencies:
       follow-redirects: 1.15.3
-      form-data: 4.0.5
+      form-data: 4.0.6
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -14221,16 +14224,6 @@ packages:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-
-  /axios@1.15.0:
-    resolution: {integrity: sha512-wWyJDlAatxk30ZJer+GeCWS209sA42X+N5jU2jy6oHTp7ufw8uzUTVFBX9+wTfAlhiJXGS0Bq7X6efruWjuK9Q==}
-    dependencies:
-      follow-redirects: 1.15.3
-      form-data: 4.0.5
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /axios@1.21.1:
     resolution: {integrity: sha512-6eI5Q/Y4u/Um9dDlsRoq5pY2rxnUTv+L4PpLitnbk/i4jb3MxLZ5CsN5Ih3IysbeRYK4pR+P7qfMsOQl9fwwFQ==}
@@ -16505,7 +16498,7 @@ packages:
       has-property-descriptors: 1.0.2
       has-proto: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       internal-slot: 1.1.0
       is-array-buffer: 3.0.5
       is-callable: 1.2.7
@@ -16600,13 +16593,13 @@ packages:
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   /es-shim-unscopables@1.1.0:
     resolution: {integrity: sha512-d9T8ucsEhh8Bi1woXCf+TIKDIROLG5WCkxg8geBCbvk22kzwC5G2OnXVMO6FUsvQlgUUXQ2itephWDLqDzbeCw==}
     engines: {node: '>= 0.4'}
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.4
     dev: true
 
   /es-to-primitive@1.3.0:
@@ -17477,22 +17470,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /ethers@6.16.0:
-    resolution: {integrity: sha512-U1wulmetNymijEhpSEQ7Ct/P/Jw9/e7R1j5XIbPRydgV2DjLVMsULDlNksq3RQnFgKoLlZf88ijYtWEXcPa07A==}
-    engines: {node: '>=14.0.0'}
-    dependencies:
-      '@adraffy/ens-normalize': 1.10.1
-      '@noble/curves': 1.2.0
-      '@noble/hashes': 1.3.2
-      '@types/node': 22.7.5
-      aes-js: 4.0.0-beta.5
-      tslib: 2.7.0
-      ws: 8.17.1
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
   /ethers@6.17.0:
     resolution: {integrity: sha512-BpyrpIPJ3ydEVow8zGaz1DuPS7YU8DcWxuBnY9a0UA/lvAPwrMr+EPXsfrul628SRaekPNeIM4UFh/91GWZang==}
     engines: {node: '>=14.0.0'}
@@ -17503,7 +17480,7 @@ packages:
       '@types/node': 22.7.5
       aes-js: 4.0.0-beta.5
       tslib: 2.7.0
-      ws: 8.21.0
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -17981,17 +17958,6 @@ packages:
       hasown: 2.0.2
       mime-types: 2.1.35
 
-  /form-data@4.0.5:
-    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
-    engines: {node: '>= 6'}
-    dependencies:
-      asynckit: 0.4.0
-      combined-stream: 1.0.8
-      es-set-tostringtag: 2.1.0
-      hasown: 2.0.2
-      mime-types: 2.1.35
-    dev: false
-
   /form-data@4.0.6:
     resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
     engines: {node: '>= 6'}
@@ -18075,7 +18041,7 @@ packages:
       call-bound: 1.0.4
       define-properties: 1.2.1
       functions-have-names: 1.2.3
-      hasown: 2.0.2
+      hasown: 2.0.4
       is-callable: 1.2.7
     dev: true
 
@@ -18154,7 +18120,7 @@ packages:
       get-proto: 1.0.1
       gopd: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       math-intrinsics: 1.1.0
 
   /get-iterator@1.0.2:
@@ -18606,7 +18572,6 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       function-bind: 1.1.2
-    dev: false
 
   /hast-util-classnames@3.0.0:
     resolution: {integrity: sha512-tI3JjoGDEBVorMAWK4jNRsfLMYmih1BUOG3VV36pH36njs1IEl7xkNrVTD2mD2yYHmQCa5R/fj61a8IAF4bRaQ==}
@@ -19121,7 +19086,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       es-errors: 1.3.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       side-channel: 1.1.0
     dev: true
 
@@ -19580,7 +19545,7 @@ packages:
       call-bound: 1.0.4
       gopd: 1.2.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   /is-running@2.1.0:
     resolution: {integrity: sha512-mjJd3PujZMl7j+D395WTIO5tU5RIDBfVSRtRR4VOJou3H66E38UjbjvDGh3slJzPuolsb+yQFqwHNNdyp5jg3w==}
@@ -19744,7 +19709,7 @@ packages:
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.21.0
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     dev: false
 
   /it-all@1.0.6:
@@ -24192,7 +24157,7 @@ packages:
       buffer: 6.0.3
       eventemitter3: 5.0.4
       uuid: 8.3.2
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     optionalDependencies:
       bufferutil: 4.1.0
       utf-8-validate: 5.0.10
@@ -26534,7 +26499,7 @@ packages:
       isows: 1.0.7(ws@8.21.0)
       ox: 0.14.67(typescript@5.9.3)
       typescript: 5.9.3
-      ws: 8.21.0
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -27175,7 +27140,7 @@ packages:
       deepmerge-ts: 5.1.0
       got: 12.6.1
       ky: 0.33.3
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bare-buffer
       - bufferutil
@@ -27198,7 +27163,7 @@ packages:
       deepmerge-ts: 7.1.5
       https-proxy-agent: 7.0.6
       undici: 6.24.1
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bare-buffer
       - bufferutil
@@ -27604,8 +27569,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  /ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
-    resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
+  /ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10):
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -27618,19 +27583,6 @@ packages:
     dependencies:
       bufferutil: 4.1.0
       utf-8-validate: 5.0.10
-
-  /ws@8.21.0:
-    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
 
   /wsl-utils@0.1.0:
     resolution: {integrity: sha512-h3Fbisa2nKGPxCpm89Hk33lBLsnaGBvctQopaBSOW/uIs6FTe1ATyAnKFJrzVs9vpGdsTe73WF3V4lIsk4Gacw==}
@@ -27967,11 +27919,11 @@ packages:
       bignumber.js: 9.3.1
       cosmjs-types: 0.9.0
       ethereum-cryptography: 2.2.1
-      ethers: 6.16.0
+      ethers: 6.17.0
       https-proxy-agent: 7.0.6
       long: 4.0.0
       protobufjs: 7.5.4
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
