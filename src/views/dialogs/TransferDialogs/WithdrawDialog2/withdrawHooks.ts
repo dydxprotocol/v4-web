@@ -53,8 +53,8 @@ export function useWithdrawStep({
   const {
     dydxAddress,
     localDydxWallet,
-    localNobleWallet,
-    nobleAddress,
+    localInjectiveWallet,
+    injectiveAddress,
     osmosisAddress,
     neutronAddress,
     sourceAccount,
@@ -77,7 +77,7 @@ export function useWithdrawStep({
     return getUserAddressesForRoute(
       withdrawRoute,
       sourceAccount,
-      nobleAddress,
+      injectiveAddress,
       dydxAddress,
       osmosisAddress,
       neutronAddress,
@@ -86,7 +86,7 @@ export function useWithdrawStep({
   }, [
     dydxAddress,
     neutronAddress,
-    nobleAddress,
+    injectiveAddress,
     osmosisAddress,
     sourceAccount,
     withdrawRoute,
@@ -95,11 +95,11 @@ export function useWithdrawStep({
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
-      if (chainID === CosmosChainId.Noble) {
-        if (!localNobleWallet?.offlineSigner) {
-          throw new Error('No local noblewallet offline signer. Cannot submit tx');
+      if (chainID === CosmosChainId.Injective) {
+        if (!localInjectiveWallet?.offlineSigner) {
+          throw new Error('No local injectivewallet offline signer. Cannot submit tx');
         }
-        return localNobleWallet.offlineSigner;
+        return localInjectiveWallet.offlineSigner;
       }
 
       if (!localDydxWallet?.offlineSigner)
@@ -107,7 +107,7 @@ export function useWithdrawStep({
 
       return localDydxWallet.offlineSigner;
     },
-    [localDydxWallet, localNobleWallet]
+    [localDydxWallet, localInjectiveWallet]
   );
 
   const executeWithdraw = async () => {
@@ -115,7 +115,7 @@ export function useWithdrawStep({
       setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
       if (!userAddresses) throw new Error('No user addresses found');
-      if (!localDydxWallet || !localNobleWallet || !dydxAddress) {
+      if (!localDydxWallet || !localInjectiveWallet || !dydxAddress) {
         throw new Error('No local wallets found');
       }
 

@@ -11,6 +11,7 @@ export interface EndpointsConfig {
   validators: string[];
   skip: string;
   nobleValidator: string;
+  injectiveValidator: string;
   osmosisValidator: string;
   neutronValidator: string;
   faucet?: string;
@@ -30,6 +31,7 @@ export const useEndpointsConfig = () => {
     validators: endpointsConfig.validators,
     skip: endpointsConfig.skip,
     nobleValidator: endpointsConfig.nobleValidator,
+    injectiveValidator: endpointsConfig.injectiveValidator,
     osmosisValidator: endpointsConfig.osmosisValidator,
     neutronValidator: endpointsConfig.neutronValidator,
     faucet: endpointsConfig.faucet,

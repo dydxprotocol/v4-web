@@ -1,5 +1,5 @@
-import { NOBLE_USDC_DENOM } from '@/constants/denoms';
 import { timeUnits } from '@/constants/time';
+import { INJECTIVE_USDC_DENOM } from '@/constants/tokens';
 
 import type { RootStore } from '@/state/_store';
 import { setAccountNobleUsdcBalanceRaw } from '@/state/raw';
@@ -19,7 +19,7 @@ export function setUpNobleBalanceQuery(store: RootStore) {
         return null;
       }
 
-      return () => nobleClient.getBalance(data, NOBLE_USDC_DENOM);
+      return () => nobleClient.getBalance(data, INJECTIVE_USDC_DENOM);
     },
     onResult: (result) => {
       store.dispatch(setAccountNobleUsdcBalanceRaw(queryResultToLoadable(result)));

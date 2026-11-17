@@ -9,8 +9,8 @@ import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
 import {
+  getInjectiveChainId,
   getNeutronChainId,
-  getNobleChainId,
   getOsmosisChainId,
   SUPPORTED_COSMOS_CHAINS,
 } from '@/constants/graz';
@@ -64,7 +64,8 @@ export const useAccountBalance = ({
   const stakingBalances = BonsaiHooks.useStakingDelegations().data?.balances;
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
+  const { injectiveValidator, osmosisValidator, neutronValidator, validators } =
+    useEndpointsConfig();
   const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
 
   const evmAddress =
@@ -121,12 +122,12 @@ export const useAccountBalance = ({
 
   const cosmosQueryFn = useCallback(async () => {
     if (dydxAddress && cosmosAddress && addressOrDenom) {
-      const nobleChainId = getNobleChainId();
+      const injectiveChainId = getInjectiveChainId();
       const osmosisChainId = getOsmosisChainId();
       const neutronChainId = getNeutronChainId();
       const rpc = (() => {
-        if (chainId === nobleChainId) {
-          return nobleValidator;
+        if (chainId === injectiveChainId) {
+          return injectiveValidator;
         }
         if (chainId === osmosisChainId) {
           return osmosisValidator;
@@ -156,7 +157,7 @@ export const useAccountBalance = ({
     usdcDecimals,
     chainId,
     selectedDydxChainId,
-    nobleValidator,
+    injectiveValidator,
     osmosisValidator,
     neutronValidator,
     validators,

@@ -32,17 +32,17 @@ import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
 export function useBalances() {
-  const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { sourceAccount, injectiveAddress, osmosisAddress, neutronAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   return useQuery({
-    queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress, neutronAddress],
+    queryKey: ['balances', sourceAccount.address, injectiveAddress, osmosisAddress, neutronAddress],
     queryFn: async () => {
       return skipClient.balances(
-        networkTypeToBalances(sourceAccount, nobleAddress, osmosisAddress, neutronAddress)
+        networkTypeToBalances(sourceAccount, injectiveAddress, osmosisAddress, neutronAddress)
       );
     },
-    enabled: Boolean(sourceAccount.address && nobleAddress && osmosisAddress && neutronAddress),
+    enabled: Boolean(sourceAccount.address && injectiveAddress && osmosisAddress && neutronAddress),
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
   });
@@ -120,7 +120,7 @@ function getNativeEvmTokenDenom(chain: Chain) {
 
 function networkTypeToBalances(
   sourceAccount: SourceAccount,
-  nobleAddress?: string,
+  injectiveAddress?: string,
   osmosisAddress?: string,
   neutronAddress?: string
 ): BalanceRequest {
@@ -154,7 +154,7 @@ function networkTypeToBalances(
   }
 
   if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-    if (!neutronAddress || !osmosisAddress || !nobleAddress) {
+    if (!neutronAddress || !osmosisAddress || !injectiveAddress) {
       throw new Error('cosmos addresses not defined');
     }
 
@@ -168,9 +168,9 @@ function networkTypeToBalances(
           address: osmosisAddress,
           denoms: [USDC_ADDRESSES[CosmosChainId.Osmosis]],
         },
-        [CosmosChainId.Noble]: {
-          address: nobleAddress,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Noble]],
+        [CosmosChainId.Injective]: {
+          address: injectiveAddress,
+          denoms: [USDC_ADDRESSES[CosmosChainId.Injective]],
         },
       },
     };

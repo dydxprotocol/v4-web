@@ -14,11 +14,12 @@ export const USDC_ADDRESSES = {
   [polygon.id]: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
   [avalanche.id]: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
   [SOLANA_MAINNET_ID]: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-  [CosmosChainId.Noble]: 'uusdc',
+  [CosmosChainId.Injective]: 'uusdc',
   [CosmosChainId.Osmosis]: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
   [CosmosChainId.Neutron]: 'ibc/B559A80D62249C8AA07A380E2A2BEA6E5CA9A6F079C912C3A9E9B494105E4F81',
 };
 
+export const INJECTIVE_USDC_DENOM = 'uusdc';
 export const DYDX_CHAIN_DYDX_DENOM = 'adydx';
 export const DYDX_CHAIN_USDC_DENOM =
   'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5';
@@ -46,8 +47,8 @@ export type TokenBalance = {
 
 export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   {
-    chainId: CosmosChainId.Noble,
-    denom: USDC_ADDRESSES[CosmosChainId.Noble],
+    chainId: CosmosChainId.Injective,
+    denom: USDC_ADDRESSES[CosmosChainId.Injective],
     decimals: USDC_DECIMALS,
   },
   { chainId: mainnet.id.toString(), denom: USDC_ADDRESSES[mainnet.id], decimals: USDC_DECIMALS },

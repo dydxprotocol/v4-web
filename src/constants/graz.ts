@@ -1,4 +1,4 @@
-import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
+import { BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { type ConfigureGrazArgs, type WalletType as GrazWalletType } from 'graz';
 
 import { getLocalStorage } from '@/lib/localStorage';
@@ -8,8 +8,9 @@ import { LocalStorageKey } from './localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP, isMainnet } from './networks';
 
 export enum CosmosChainId {
+  Injective = 'injective-1',
+  InjectiveTestnet = 'injective-888',
   Osmosis = 'osmosis-1',
-  Noble = 'noble-1',
   Neutron = 'neutron-1',
   OsmosisTestnet = 'osmo-test-5',
   NobleTestnet = 'grand-1',
@@ -18,6 +19,7 @@ export enum CosmosChainId {
 
 export const OSMO_BECH32_PREFIX = 'osmo';
 export const NEUTRON_BECH32_PREFIX = 'neutron';
+export const INJECTIVE_BECH32_PREFIX = 'inj';
 
 const selectedNetwork = getLocalStorage({
   key: LocalStorageKey.SelectedNetwork,
@@ -26,8 +28,8 @@ const selectedNetwork = getLocalStorage({
 });
 const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
 
-export const getNobleChainId = () => {
-  return isMainnet ? CosmosChainId.Noble : CosmosChainId.NobleTestnet;
+export const getInjectiveChainId = () => {
+  return isMainnet ? CosmosChainId.Injective : CosmosChainId.InjectiveTestnet;
 };
 
 export const getOsmosisChainId = () => {
@@ -39,10 +41,15 @@ export const getNeutronChainId = () => {
 };
 
 const osmosisChainId = getOsmosisChainId();
-const nobleChainId = getNobleChainId();
+const injectiveChainId = getInjectiveChainId();
 const neutronChainId = getNeutronChainId();
 
-export const SUPPORTED_COSMOS_CHAINS = [dydxChainId, osmosisChainId, nobleChainId, neutronChainId];
+export const SUPPORTED_COSMOS_CHAINS = [
+  dydxChainId,
+  osmosisChainId,
+  injectiveChainId,
+  neutronChainId,
+];
 
 export const GRAZ_CHAINS = [
   // dYdX
@@ -53,11 +60,11 @@ export const GRAZ_CHAINS = [
       bech32PrefixAccAddr: BECH32_PREFIX,
     },
   },
-  // Noble
+  // Injective
   {
-    chainId: nobleChainId,
-    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator,
-    bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX },
+    chainId: injectiveChainId,
+    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator, // TODO: Replace with actual Injective validator
+    bech32Config: { bech32PrefixAccAddr: INJECTIVE_BECH32_PREFIX },
   },
   // Osmosis
   {
