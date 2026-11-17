@@ -33,8 +33,8 @@ dependencies:
     specifier: 3.6.0
     version: 3.6.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.405
-    version: 1.1.405
+    specifier: 1.1.406
+    version: 1.1.406
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1702,8 +1702,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.405:
-    resolution: {integrity: sha512-RawHkyc1M5QuZViy41/letgWR0JBK0faIxV9Lj4u//Yw8KUfRthnhqnCWJTSVquMgAtzBPVRaj0wjbqz1adqEg==}
+  /@dydxprotocol/v4-localization@1.1.406:
+    resolution: {integrity: sha512-2XL2HJNhLCZ4GOuc3HuZHW2xcKji2iQ5QzAC1GB06Qk6muqkWc+9A2JRdzLZiatskAteUgaDWIKtNKsWjGVzSw==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -10574,7 +10574,7 @@ packages:
     resolution: {integrity: sha512-qwQgQqXXTRv2h2AlJef+tMEszLFkCB9dWnrJYIdAwqjubERXEc/geB+S3apRw0yQyTVnsBf8r6BhlrE8vx+3WQ==}
     dependencies:
       '@types/bn.js': 5.2.0
-      '@types/node': 22.19.17
+      '@types/node': 24.19.2
     dev: false
 
   /@types/geojson@7946.0.16:
@@ -10708,7 +10708,7 @@ packages:
   /@types/pbkdf2@3.1.2:
     resolution: {integrity: sha512-uRwJqmiXmh9++aSu1VNEn3iIxWOhd8AHXNSdlaLfdAAdSTY9jYVeGWnzejM3dvrkbqE3/hyQkQQ29IFATEGlew==}
     dependencies:
-      '@types/node': 22.19.17
+      '@types/node': 24.19.2
     dev: false
 
   /@types/prismjs@1.26.5:
@@ -10752,7 +10752,7 @@ packages:
   /@types/secp256k1@4.0.7:
     resolution: {integrity: sha512-Rcvjl6vARGAKRO6jHeKMatGrvOMGrR/AR11N1x2LqintPCyDZ7NBhrh238Z2VZc7aM7KIwnFpFQ7fnfK4H/9Qw==}
     dependencies:
-      '@types/node': 22.19.17
+      '@types/node': 24.19.2
     dev: false
 
   /@types/semver@7.7.1:
@@ -19679,7 +19679,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 22.19.17
+      '@types/node': 24.19.2
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: true

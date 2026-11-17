@@ -395,7 +395,28 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
   {
     type: NotificationType.ReleaseUpdates,
-    useTrigger: ({ trigger: _trigger }) => {},
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        trigger({
+          id: 'usdc-migration',
+          displayData: {
+            title: 'USDC Migration',
+            body: stringGetter({ key: STRING_KEYS.USDC_MIGRATION }),
+            toastSensitivity: 'foreground',
+            groupKey: 'usdc-migration',
+            renderActionSlot: () => (
+              <Link href="https://www.dydx.xyz/blog/usdc-migration-to-injective" isAccent>
+                {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+              </Link>
+            ),
+          },
+          updateKey: [],
+          shouldUnhide: true,
+        });
+      }, [stringGetter, trigger]);
+    },
     useNotificationAction: () => {
       return () => {};
     },

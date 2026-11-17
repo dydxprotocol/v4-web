@@ -41,8 +41,7 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { BonsaiCore } from './bonsai/ontology';
-import { ComplianceBanner } from './components/ComplianceBanner';
-import { RestrictionWarning } from './components/RestrictionWarning';
+import { TopBanner } from './components/TopBanner/TopBanner';
 import { DialogTypes } from './constants/dialogs';
 import { LocalStorageKey } from './constants/localStorage';
 import { CustomFlags, StatsigFlags } from './constants/statsig';
@@ -52,6 +51,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useInfoBanner } from './hooks/useInfoBanner';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
@@ -109,6 +109,8 @@ const Content = () => {
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
+  const { infoBannerContent } = useInfoBanner();
+  const showTopBanner = showComplianceBanner || infoBannerContent != null;
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
 
   // Track current path in Redux for conditional polling
@@ -139,7 +141,7 @@ const Content = () => {
             backgroundColor,
           }}
         >
-          <ComplianceBanner tw="h-fit min-h-0" />
+          <TopBanner infoBannerContent={infoBannerContent} tw="h-fit min-h-0" />
 
           <$SimpleUiMain>
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
@@ -190,10 +192,10 @@ const Content = () => {
       <$Content
         isShowingHeader={isShowingHeader}
         isShowingFooter={isShowingFooter}
-        showRestrictionWarning={showComplianceBanner}
+        showTopBanner={showTopBanner}
       >
         {isShowingHeader && <HeaderDesktop />}
-        <RestrictionWarning />
+        <TopBanner infoBannerContent={infoBannerContent} />
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
@@ -348,12 +350,12 @@ function shouldForwardProp(propName: string, target: WebTarget): boolean {
 const $Content = styled.div<{
   isShowingHeader: boolean;
   isShowingFooter: boolean;
-  showRestrictionWarning: boolean;
+  showTopBanner: boolean;
 }>`
   /* Computed */
   --page-currentHeaderHeight: 0px;
   --page-currentFooterHeight: 0px;
-  --restriction-warning-currentHeight: 0px;
+  --top-banner-currentHeight: 0px;
 
   ${({ isShowingHeader }) =>
     isShowingHeader &&
@@ -375,13 +377,13 @@ const $Content = styled.div<{
       }
     `}
 
-  ${({ showRestrictionWarning }) =>
-    showRestrictionWarning &&
+  ${({ showTopBanner }) =>
+    showTopBanner &&
     css`
-      --restriction-warning-currentHeight: var(--restriction-warning-height);
+      --top-banner-currentHeight: var(--top-banner-height);
 
       @media ${breakpoints.tablet} {
-        --restriction-warning-currentHeight: var(--restriction-warning-height-mobile);
+        --top-banner-currentHeight: var(--top-banner-height-mobile);
       }
     `}
 
@@ -404,12 +406,10 @@ const $Content = styled.div<{
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
 
-  ${({ showRestrictionWarning, isShowingHeader }) => css`
+  ${({ showTopBanner, isShowingHeader }) => css`
     grid-template:
       ${isShowingHeader ? css`'Header' var(--page-currentHeaderHeight)` : ''}
-      ${showRestrictionWarning
-        ? css`'RestrictionWarning' var(--restriction-warning-currentHeight)`
-        : ''}
+      ${showTopBanner ? css`'TopBanner' var(--top-banner-currentHeight)` : ''}
       'Main' minmax(min-content, 1fr)
       'Footer' var(--page-currentFooterHeight)
       / 100%;

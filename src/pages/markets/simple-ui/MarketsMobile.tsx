@@ -51,7 +51,7 @@ const MarketsMobile = () => {
 const $MarketsMobile = styled.div`
   ${layoutMixins.flexColumn}
   position: relative;
-  height: calc(100vh - calc(var(--complianceBanner-height, 0px) + 0.75rem));
+  height: calc(100vh - calc(var(--simpleUi-topBanner-height, 0px) + 0.75rem));
 `;
 
 const $Dialog = styled(Dialog)`
