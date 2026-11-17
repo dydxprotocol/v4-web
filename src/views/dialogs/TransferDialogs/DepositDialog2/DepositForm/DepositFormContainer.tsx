@@ -9,10 +9,9 @@ import { useAppDispatch } from '@/state/appTypes';
 import { addDeposit, Deposit } from '@/state/transfers';
 
 import { DepositForm } from './DepositForm';
-import { QrDeposit } from './QrDeposit';
 import { TokenSelect } from './TokenSelect';
 
-export type DepositFormState = 'form' | 'token-select' | 'qr-deposit';
+export type DepositFormState = 'form' | 'token-select';
 
 export const DepositFormContent = ({
   defaultToken,
@@ -23,7 +22,7 @@ export const DepositFormContent = ({
   onDeposit,
 }: {
   defaultToken: TokenForTransfer;
-  formState: 'form' | 'token-select' | 'qr-deposit';
+  formState: 'form' | 'token-select';
   onShowForm: () => void;
   setFormState: Dispatch<SetStateAction<DepositFormState>>;
   tokenSelectRef: RefObject<HTMLDivElement>;
@@ -36,11 +35,6 @@ export const DepositFormContent = ({
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState<TokenForTransfer>(defaultToken);
 
-  const onShowQrDeposit = () => {
-    setFormState('qr-deposit');
-    tokenSelectRef.current?.scroll({ top: 0 });
-  };
-
   const handleDeposit = (deposit: Deposit) => {
     if (!dydxAddress) return;
 
@@ -50,12 +44,11 @@ export const DepositFormContent = ({
 
   return (
     <div tw="h-full w-full overflow-hidden">
-      <div tw="flex h-full w-[300%]">
+      <div tw="flex h-full w-[200%]">
         <div
-          tw="w-[33.33%]"
+          tw="w-[50%]"
           css={{
-            marginLeft:
-              formState === 'form' ? 0 : formState === 'token-select' ? '-33.33%' : '-66.66%',
+            marginLeft: formState === 'form' ? 0 : '-50%',
             transition: 'margin 500ms',
           }}
         >
@@ -70,7 +63,7 @@ export const DepositFormContent = ({
 
         <div
           ref={tokenSelectRef}
-          tw="w-[33.33%] overflow-scroll"
+          tw="w-[50%] overflow-scroll"
           css={{
             pointerEvents: formState !== 'token-select' ? 'none' : undefined,
             height: formState !== 'token-select' ? 0 : '100%',
@@ -79,22 +72,10 @@ export const DepositFormContent = ({
         >
           <TokenSelect
             disabled={formState !== 'token-select'}
-            onQrDeposit={onShowQrDeposit}
             token={token}
             setToken={setToken}
             onBack={onShowForm}
           />
-        </div>
-
-        <div
-          tw="w-[33.33%] overflow-scroll"
-          css={{
-            pointerEvents: formState !== 'qr-deposit' ? 'none' : undefined,
-            height: formState !== 'qr-deposit' ? 0 : '100%',
-            maxHeight: isMobile ? undefined : '30rem',
-          }}
-        >
-          <QrDeposit disabled={formState !== 'qr-deposit'} />
         </div>
       </div>
     </div>

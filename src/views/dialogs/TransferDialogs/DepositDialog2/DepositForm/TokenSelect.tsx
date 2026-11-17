@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from 'react';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import { AnalyticsEvents } from '@/constants/analytics';
 import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -12,11 +11,8 @@ import { TokenBalance, TokenForTransfer } from '@/constants/tokens';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-
-import { track } from '@/lib/analytics/analytics';
 
 import { getTokenSymbol } from '../../utils';
 import { useDepositTokenBalances } from '../queries';
@@ -24,14 +20,12 @@ import { useDepositTokenBalances } from '../queries';
 export const TokenSelect = ({
   disabled,
   onBack,
-  onQrDeposit,
   token,
   setToken,
 }: {
   // disable buttons to prevent tab events while TokenSelect has 0 height
   disabled?: boolean;
   onBack: () => void;
-  onQrDeposit: () => void;
   token: TokenForTransfer;
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
@@ -41,11 +35,6 @@ export const TokenSelect = ({
   const onTokenClick = (newToken: TokenForTransfer) => () => {
     setToken(newToken);
     onBack();
-  };
-
-  const onCexDeposit = () => {
-    onQrDeposit();
-    track(AnalyticsEvents.SelectQrDeposit());
   };
 
   if (isLoading)
@@ -77,24 +66,6 @@ export const TokenSelect = ({
             key={balance.denom}
           />
         ))}
-        <$TokenRowButton onClick={onCexDeposit}>
-          <div tw="flex items-center gap-0.75">
-            <Icon tw="[--icon-size:2rem]" iconName={IconName.Bank} />
-            <div tw="flex flex-col items-start gap-0.125">
-              <div tw="text-color-text-2 font-base-medium">
-                {stringGetter({ key: STRING_KEYS.DEPOSIT_FROM_CEX })}
-              </div>
-              <div tw="text-color-text-0 font-small-book">
-                {stringGetter({ key: STRING_KEYS.CEX_EXAMPLES })}
-              </div>
-            </div>
-          </div>
-
-          <div tw="row justify-end gap-0.25">
-            <img tw="h-[24px] w-[64px]" src="/exchanges/cex_icons.png" alt="cex icons" />
-            <$CaretIcon iconName={IconName.Caret} />
-          </div>
-        </$TokenRowButton>
       </div>
 
       {noBalances.length > 0 && (
@@ -193,12 +164,4 @@ const $TokenRowButton = styled.button.attrs({ type: 'button' })<{ isSelected?: b
       background-color: var(--token-row-active-bgColor, var(--color-layer-4));
       --asset-icon-chain-icon-borderColor: var(--token-row-active-bgColor, var(--color-layer-4));
     `}
-`;
-
-const $CaretIcon = styled(Icon)`
-  width: 1rem;
-  height: 1rem;
-  min-width: 1rem;
-  color: var(--color-text-0);
-  transform: rotate(-0.25turn);
 `;
