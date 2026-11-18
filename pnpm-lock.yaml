@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz
-    version: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz
+    specifier: 3.6.1
+    version: 3.6.1
   '@dydxprotocol/v4-localization':
     specifier: 1.1.406
     version: 1.1.406
@@ -44,9 +44,6 @@ dependencies:
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.13)(react@18.3.1)
-  '@injectivelabs/sdk-ts':
-    specifier: ^1.20.68
-    version: 1.20.68(google-protobuf@3.21.4)(typescript@5.9.3)
   '@keplr-wallet/types':
     specifier: ^0.12.188
     version: 0.12.279
@@ -838,10 +835,11 @@ packages:
   /@browserstack/ai-sdk-node@1.5.17:
     resolution: {integrity: sha512-odjnFulpBeF64UGHA+bIxkIcALYvEPznTl4U0hRT1AFfn4FqT+4wQdPBYnSnlc2XWTedv4zCDvbp4AFrtKXHEw==}
     dependencies:
-      axios: 1.12.2
+      axios: 1.21.1
       uuid: 9.0.1
     transitivePeerDependencies:
       - debug
+      - supports-color
     dev: true
 
   /@browserstack/wdio-browserstack-service@2.0.1:
@@ -1660,6 +1658,38 @@ packages:
         optional: true
     dependencies:
       '@datadog/browser-core': 5.35.1
+    dev: false
+
+  /@dydxprotocol/v4-client-js@3.6.1:
+    resolution: {integrity: sha512-G9JhzV64930kTkFjwh+YVBGjxbeEMNsskzMGazSfXnN1PBJYoxrQ9aDbUlasAT/W/nCmav3w8/iO4GIjKYo4/g==}
+    dependencies:
+      '@cosmjs/amino': 0.32.4
+      '@cosmjs/crypto': 0.32.4
+      '@cosmjs/encoding': 0.32.4
+      '@cosmjs/math': 0.32.4
+      '@cosmjs/proto-signing': 0.32.4
+      '@cosmjs/stargate': 0.32.4
+      '@cosmjs/tendermint-rpc': 0.32.4
+      '@cosmjs/utils': 0.32.4
+      '@dydxprotocol/v4-proto': 9.5.0
+      '@osmonauts/lcd': 0.6.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      axios: 1.1.3
+      bech32: 1.1.4
+      bignumber.js: 9.3.1
+      cosmjs-types: 0.9.0
+      ethereum-cryptography: 2.2.1
+      ethers: 6.17.0
+      https-proxy-agent: 7.0.6
+      long: 4.0.0
+      protobufjs: 7.5.4
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - supports-color
+      - utf-8-validate
     dev: false
 
   /@dydxprotocol/v4-localization@1.1.406:
@@ -3374,173 +3404,6 @@ packages:
     dependencies:
       browser-headers: 0.4.1
       google-protobuf: 3.21.4
-    dev: false
-
-  /@injectivelabs/abacus-proto-ts-v2@1.17.5:
-    resolution: {integrity: sha512-6/W2i87y1uqcBSlncBMLKyiBje2ZNf4/PmVN2baMS3irJzGkfmAuVj2aIVyDnhDJ/bxuS7pv5MPPFF1h0u0PTw==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/core-proto-ts-v2@1.20.5:
-    resolution: {integrity: sha512-8yotgFu4qVq+pFTMv42pZMikWnsfrMkDiLgwmCuUYyekR0RmfpniSePKLAJQ+/R0o06l/hfY8OUuAHO6nxhLRw==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/exceptions@1.20.68:
-    resolution: {integrity: sha512-lG9MNzsHqmcNeoTRyi3JY/ruCMYj5eCUWMuijxjSG110+W8oQ+2rjOR5yFEIw2qCATZqQY6NTdcWhFpf5W6j5Q==}
-    dependencies:
-      http-status-codes: 2.3.0
-    dev: false
-
-  /@injectivelabs/grpc-web-node-http-transport@0.0.2(@injectivelabs/grpc-web@0.0.1):
-    resolution: {integrity: sha512-rpyhXLiGY/UMs6v6YmgWHJHiO9l0AgDyVNv+jcutNVt4tQrmNvnpvz2wCAGOFtq5LuX/E9ChtTVpk3gWGqXcGA==}
-    peerDependencies:
-      '@injectivelabs/grpc-web': '>=0.0.1'
-    dependencies:
-      '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
-    dev: false
-
-  /@injectivelabs/grpc-web-react-native-transport@0.0.2(@injectivelabs/grpc-web@0.0.1):
-    resolution: {integrity: sha512-mk+aukQXnYNgPsPnu3KBi+FD0ZHQpazIlaBZ2jNZG7QAVmxTWtv3R66Zoq99Wx2dnE946NsZBYAoa0K5oSjnow==}
-    peerDependencies:
-      '@injectivelabs/grpc-web': '>=0.0.1'
-    dependencies:
-      '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
-    dev: false
-
-  /@injectivelabs/grpc-web@0.0.1(google-protobuf@3.21.4):
-    resolution: {integrity: sha512-Pu5YgaZp+OvR5UWfqbrPdHer3+gDf+b5fQoY+t2VZx1IAVHX8bzbN9EreYTvTYtFeDpYRWM8P7app2u4EX5wTw==}
-    peerDependencies:
-      google-protobuf: ^3.14.0
-    dependencies:
-      browser-headers: 0.4.1
-      google-protobuf: 3.21.4
-    dev: false
-
-  /@injectivelabs/indexer-proto-ts-v2@1.21.0:
-    resolution: {integrity: sha512-r9TjwIkD+XUtJo6/PtzZMHUiJbIhoxq7NYE2Srk9craGivzxvLR83haxEQNWLYdC+tm8RE8JGByqBXsDUO1a8Q==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/mito-proto-ts-v2@1.17.3:
-    resolution: {integrity: sha512-Fo6k1MCPT3CKUS9tbMbl/poGv7R8KHtA7RfU7mvxxVWS7MpF+LLZA6UgegfEA1iiJgIrhe+eEwEvhIOe6SiUzw==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/networks@1.20.68:
-    resolution: {integrity: sha512-fYID+tZdTD28u/rNfns6gUJSaM/Ay31WUCtZvjHSfrwUptRu7nvdEaXzcJyV4cg2LTM8qLelVOzJ2Ff1jnrn1Q==}
-    dependencies:
-      '@injectivelabs/ts-types': 1.20.68
-    dev: false
-
-  /@injectivelabs/olp-proto-ts-v2@1.17.6:
-    resolution: {integrity: sha512-3jTAyj342TXVe8qsVcDzAUnH5vAbqoHy5jqTUxHvJtfDaJ+X0uvN6d/yj60CxmrDOyKrn6pFx0prZ6J3Tl8S6g==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/platform-services-proto-ts-v2@1.0.13:
-    resolution: {integrity: sha512-dAI6BAIf4KjSgk0QNQjh5Zw8JnaU2Y2S9php5p3g1Liy6kegBYxTQxrymU8pjChgx7OJZB/79V1sj3BCsgA6Rg==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/sdk-ts@1.20.68(google-protobuf@3.21.4)(typescript@5.9.3):
-    resolution: {integrity: sha512-8Uq5UC+Ho4kWQXa3MsHcg6C1z+QiNXyOCHkvc43w1cw7AvNAVx8ala3dpPXsC1pMwfqFiFWiHEjRH5EBVArJ3w==}
-    dependencies:
-      '@cosmjs/amino': 0.39.0
-      '@cosmjs/proto-signing': 0.39.0
-      '@cosmjs/stargate': 0.39.0
-      '@injectivelabs/abacus-proto-ts-v2': 1.17.5
-      '@injectivelabs/core-proto-ts-v2': 1.20.5
-      '@injectivelabs/exceptions': 1.20.68
-      '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
-      '@injectivelabs/grpc-web-node-http-transport': 0.0.2(@injectivelabs/grpc-web@0.0.1)
-      '@injectivelabs/grpc-web-react-native-transport': 0.0.2(@injectivelabs/grpc-web@0.0.1)
-      '@injectivelabs/indexer-proto-ts-v2': 1.21.0
-      '@injectivelabs/mito-proto-ts-v2': 1.17.3
-      '@injectivelabs/networks': 1.20.68
-      '@injectivelabs/olp-proto-ts-v2': 1.17.6
-      '@injectivelabs/platform-services-proto-ts-v2': 1.0.13
-      '@injectivelabs/tc-abacus-proto-ts-v2': 1.18.9
-      '@injectivelabs/ts-types': 1.20.68
-      '@injectivelabs/utils': 1.20.68
-      '@injectivelabs/ws-price-oracle-proto-ts-v2': 1.0.5
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-      '@scure/base': 1.2.6
-      '@scure/bip39': 1.6.0
-      axios: 1.21.1
-      cosmjs-types: 0.11.0
-      ethers: 6.17.0
-      eventemitter3: 5.0.4
-      http-status-codes: 2.3.0
-      rxjs: 7.8.2
-      snakecase-keys: 5.5.0
-      viem: 2.58.0(typescript@5.9.3)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - google-protobuf
-      - mppx
-      - supports-color
-      - typescript
-      - utf-8-validate
-      - zod
-    dev: false
-
-  /@injectivelabs/tc-abacus-proto-ts-v2@1.18.9:
-    resolution: {integrity: sha512-UrK9cbnkoQk3iigt8WNZ/GqSRllp2JSXI0mR8YK5/3DPOndHWyImejKzBqYrvqmwku5t86LQKMg0WZ3KZNiQ0A==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@injectivelabs/ts-types@1.20.68:
-    resolution: {integrity: sha512-pYjoroodGHLtmpyylArpPLqXNecVmDBb8wDzlAumz/kVVCZzn4LZSOLOelAX7SfTPJMDfGuKoQthSLNQmYw2EQ==}
-    dev: false
-
-  /@injectivelabs/utils@1.20.68:
-    resolution: {integrity: sha512-zLUW8Rr1jZdWcsdTQ1tBEfX8Xm+NTA1a9MtgRqQuo3nJQuW2gYKIve9Bp0Cy546Q6HwNfp3MgeXa1pYcciu7dw==}
-    dependencies:
-      '@injectivelabs/exceptions': 1.20.68
-      '@injectivelabs/networks': 1.20.68
-      '@injectivelabs/ts-types': 1.20.68
-      axios: 1.21.1
-      bignumber.js: 9.3.1
-      http-status-codes: 2.3.0
-      store2: 2.14.4
-    transitivePeerDependencies:
-      - debug
-      - supports-color
-    dev: false
-
-  /@injectivelabs/ws-price-oracle-proto-ts-v2@1.0.5:
-    resolution: {integrity: sha512-dGCUzEurROr8RiasViZH+i2g8FJdl46Vcm6pnyUcldxHgYCztlJNDxzUc5Unqze7+9+bWeu+5QMwXhw5DrtCvA==}
-    dependencies:
-      '@protobuf-ts/grpcweb-transport': 2.11.1
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
     dev: false
 
   /@inquirer/ansi@1.0.0:
@@ -5316,23 +5179,6 @@ packages:
     dependencies:
       spacetrim: 0.11.59
     dev: true
-
-  /@protobuf-ts/grpcweb-transport@2.11.1:
-    resolution: {integrity: sha512-1W4utDdvOB+RHMFQ0soL4JdnxjXV+ddeGIUg08DvZrA8Ms6k5NN6GBFU2oHZdTOcJVpPrDJ02RJlqtaoCMNBtw==}
-    dependencies:
-      '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.11.1
-    dev: false
-
-  /@protobuf-ts/runtime-rpc@2.11.1:
-    resolution: {integrity: sha512-4CqqUmNA+/uMz00+d3CYKgElXO9VrEbucjnBFEjqI4GuDrEQ32MaI3q+9qPBvIGOlL4PmHXrzM32vBPWRhQKWQ==}
-    dependencies:
-      '@protobuf-ts/runtime': 2.11.1
-    dev: false
-
-  /@protobuf-ts/runtime@2.11.1:
-    resolution: {integrity: sha512-KuDaT1IfHkugM2pyz+FwiY80ejWrkH1pAtOBOZFuR6SXEFTsnb/jiQWQ1rCIrcKx2BtyxnxW6BWwsVSA/Ie+WQ==}
-    dev: false
 
   /@protobufjs/aspromise@1.1.2:
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -13727,20 +13573,6 @@ packages:
       zod: 4.1.12
     dev: false
 
-  /abitype@1.2.3(typescript@5.9.3):
-    resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3.22.0 || ^4.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-    dependencies:
-      typescript: 5.9.3
-    dev: false
-
   /abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
@@ -14235,7 +14067,6 @@ packages:
     transitivePeerDependencies:
       - debug
       - supports-color
-    dev: false
 
   /axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -16225,6 +16056,7 @@ packages:
     dependencies:
       no-case: 3.0.4
       tslib: 2.8.1
+    dev: true
 
   /dot-prop@5.3.0:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
@@ -17967,7 +17799,6 @@ packages:
       es-set-tostringtag: 2.1.0
       hasown: 2.0.4
       mime-types: 2.1.35
-    dev: false
 
   /formdata-node@5.0.1:
     resolution: {integrity: sha512-8xnIjMYGKPj+rY2BTbAmpqVpi8der/2FT4d9f7J32FlsCpO5EzZPq3C/N56zdv8KweHzVF6TGijsS1JT6r1H2g==}
@@ -18859,10 +18690,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /http-status-codes@2.3.0:
-    resolution: {integrity: sha512-RJ8XvFvpPM/Dmc5SV+dC4y5PCeOhT3x1Hq0NU3rjGeg5a/CqlhZ7uudknPwZFz4aeAXDcbAyaeP7GAo9lvngtA==}
-    dev: false
-
   /http2-wrapper@2.2.1:
     resolution: {integrity: sha512-V5nVw1PAOgfI3Lmeaj2Exmeg7fenjhRUgz1lPSezy1CuhPYbgQtbQj4jZfEAEMlaL+vupsvhjqCyjzob0yxsmQ==}
     engines: {node: '>=10.19.0'}
@@ -19704,14 +19531,6 @@ packages:
       ws: 8.18.3
     dev: false
 
-  /isows@1.0.7(ws@8.21.0):
-    resolution: {integrity: sha512-I1fSfDCZL5P0v33sVqeTDSpcstAg/N+wF5HS033mogOVIp4B+oHC7oOCsA3axAbBSGTJ8QubbNmnIRN/h8U7hg==}
-    peerDependencies:
-      ws: '*'
-    dependencies:
-      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-    dev: false
-
   /it-all@1.0.6:
     resolution: {integrity: sha512-3cmCc6Heqe3uWi3CVM/k51fa/XbMFpQVzFoDsV0IZNHSQDyAXl3c4MjHkFX5kF3922OGj7Myv1nSEUgRtcuM1A==}
     dev: true
@@ -20529,6 +20348,7 @@ packages:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
     dependencies:
       tslib: 2.8.1
+    dev: true
 
   /lowercase-keys@3.0.0:
     resolution: {integrity: sha512-ozCC6gdQ+glXOQsveKD0YsDy8DSQFjDTz4zyzEHNV5+JP5D62LmfDZ6o1cycFx9ouG940M5dE8C8CTewdj2YWQ==}
@@ -20593,6 +20413,7 @@ packages:
   /map-obj@4.3.0:
     resolution: {integrity: sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==}
     engines: {node: '>=8'}
+    dev: true
 
   /map-stream@0.1.0:
     resolution: {integrity: sha512-CkYQrPYZfWnu/DAmVCpTSX/xHpKZ80eKh2lAkyA6AJTef6bW+6JpbQZN5rofum7da+SyN1bi5ctTm+lTfcCW3g==}
@@ -21667,6 +21488,7 @@ packages:
     dependencies:
       lower-case: 2.0.2
       tslib: 2.8.1
+    dev: true
 
   /node-addon-api@2.0.2:
     resolution: {integrity: sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==}
@@ -22036,27 +21858,6 @@ packages:
       object-keys: 1.1.1
       safe-push-apply: 1.0.0
     dev: true
-
-  /ox@0.14.67(typescript@5.9.3):
-    resolution: {integrity: sha512-6v6UlwgsmiyTujZp0aVDuN8uIBAtl/QZadBADFRZ2zp1+CM9TqDzd+rPKJ5PYvWPlCvz8JvoO9dTr42+1PhBhA==}
-    peerDependencies:
-      typescript: '>=5.4.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@adraffy/ens-normalize': 1.11.1
-      '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
-      eventemitter3: 5.0.1
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - zod
-    dev: false
 
   /ox@0.6.7(typescript@5.9.3):
     resolution: {integrity: sha512-17Gk/eFsFRAZ80p5eKqv89a57uXjd3NgIf1CaXojATPBuujVc/fQSVhBeAU9JCRB+k7J50WQAyWTxK19T9GgbA==}
@@ -23027,7 +22828,6 @@ packages:
   /proxy-from-env@2.1.0:
     resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
     engines: {node: '>=10'}
-    dev: false
 
   /ps-tree@1.2.0:
     resolution: {integrity: sha512-0VnamPPYHl4uaU/nSFeZZpR21QAWRz+sRv4iW9+v/GS/J5U5iZB5BNN6J0RMoOvdx2gWM2+ZFMIm58q24e4UYA==}
@@ -24539,15 +24339,7 @@ packages:
     dependencies:
       dot-case: 3.0.4
       tslib: 2.8.1
-
-  /snakecase-keys@5.5.0:
-    resolution: {integrity: sha512-r3kRtnoPu3FxGJ3fny6PKNnU3pteb29o6qAa0ugzhSseKNWRkw1dw8nIjXMyyKaU9vQxxVIE62Mb3bKbdrgpiw==}
-    engines: {node: '>=12'}
-    dependencies:
-      map-obj: 4.3.0
-      snake-case: 3.0.4
-      type-fest: 3.13.1
-    dev: false
+    dev: true
 
   /socket.io-client@4.8.1:
     resolution: {integrity: sha512-hJVXfu3E28NmzGk8o1sHhN3om52tRvwYeidbj7xKy2eIIse5IoKX3USlS6Tqt3BHAtflLIkCQBkzVrEEfWUyYQ==}
@@ -24728,10 +24520,6 @@ packages:
       es-errors: 1.3.0
       internal-slot: 1.1.0
     dev: true
-
-  /store2@2.14.4:
-    resolution: {integrity: sha512-srTItn1GOvyvOycgxjAnPA63FZNwy0PTyUBFMHRM+hVFltAeoh0LmNBz9SZqUS9mMqGk8rfyWyXn3GH5ReJ8Zw==}
-    dev: false
 
   /stream-browserify@3.0.0:
     resolution: {integrity: sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA==}
@@ -25682,6 +25470,7 @@ packages:
   /type-fest@3.13.1:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
+    dev: true
 
   /type-fest@4.26.0:
     resolution: {integrity: sha512-OduNjVJsFbifKb57UqZ2EMP1i4u64Xwow3NYXUtBbD4vIwJdQd4+xl8YDou1dlm4DVrtwT/7Ky8z8WyCULVfxw==}
@@ -26474,32 +26263,6 @@ packages:
       ox: 0.9.6(typescript@5.9.3)(zod@3.22.4)
       typescript: 5.9.3
       ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-    dev: false
-
-  /viem@2.58.0(typescript@5.9.3):
-    resolution: {integrity: sha512-oBGZGy6VptLmAATtEua71a7FzCXT5y74dQoeDP8EDHmBsWhQ34rXeHKz6tHeciKWnJ3zBT1u8sby8tAtg0gouA==}
-    peerDependencies:
-      mppx: '>=0.17.0'
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      mppx:
-        optional: true
-      typescript:
-        optional: true
-    dependencies:
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
-      isows: 1.0.7(ws@8.21.0)
-      ox: 0.14.67(typescript@5.9.3)
-      typescript: 5.9.3
-      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -27896,37 +27659,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz:
-    resolution: {integrity: sha512-Rd6obzszVoHa4DuUYu+2thwjKW9iXwdW9EUrLYwqiDEgvFV8DUmzkuablWp1vE44HmYYaS52T9AjLhAA2vp89A==, tarball: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-3.6.0.tgz}
-    name: '@dydxprotocol/v4-client-js'
-    version: 3.6.0
-    dependencies:
-      '@cosmjs/amino': 0.32.4
-      '@cosmjs/crypto': 0.32.4
-      '@cosmjs/encoding': 0.32.4
-      '@cosmjs/math': 0.32.4
-      '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4
-      '@cosmjs/tendermint-rpc': 0.32.4
-      '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.5.0
-      '@osmonauts/lcd': 0.6.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      axios: 1.1.3
-      bech32: 1.1.4
-      bignumber.js: 9.3.1
-      cosmjs-types: 0.9.0
-      ethereum-cryptography: 2.2.1
-      ethers: 6.17.0
-      https-proxy-agent: 7.0.6
-      long: 4.0.0
-      protobufjs: 7.5.4
-      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
-    dev: false
