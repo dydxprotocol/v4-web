@@ -37,6 +37,7 @@ import { isInstantDeposit } from './queries';
 
 // Number of seconds for the IBC transfer timeout (Skip default is 24 hours)
 const DEPOSIT_TIMEOUT_SECONDS = (24 * 60 * 60).toString();
+const SLIPPAGE_TOLERANCE_PERCENT = '1';
 
 type StepResult =
   | { success: true; errorMessage: undefined }
@@ -159,6 +160,7 @@ export function useDepositSteps({
         amountOut: depositRoute.estimatedAmountOut ?? '0',
         addressList: userAddressHelper(depositRoute, userAddresses),
         timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
+        slippageTolerancePercent: SLIPPAGE_TOLERANCE_PERCENT,
       });
 
       let approvalMaybeNeeded: (Erc20Approval & { chainId: string }) | undefined;
