@@ -1,8 +1,10 @@
 import { selectIndexerReady, selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 
+import { AddressFormat } from '@/types/turnkey';
+
 import { useAppSelector } from '@/state/appTypes';
-import { selectIsTurnkeyConnected } from '@/state/walletSelectors';
+import { getTurnkeyPrimaryWallet, selectIsTurnkeyConnected } from '@/state/walletSelectors';
 
 import { useAccounts } from './useAccounts';
 
@@ -11,8 +13,14 @@ export const useDepositAddress = () => {
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const indexerReady = useAppSelector(selectIndexerReady);
   const isTurnkeyConnected = useAppSelector(selectIsTurnkeyConnected);
+  const primaryTurnkeyWallet = useAppSelector(getTurnkeyPrimaryWallet);
 
-  const canQueryForDepositAddresses = dydxAddress != null && indexerReady && isTurnkeyConnected;
+  const turnkeyEvmAddress = primaryTurnkeyWallet?.accounts.find(
+    (account) => account.addressFormat === AddressFormat.Ethereum
+  )?.address;
+
+  const canQueryForDepositAddresses =
+    dydxAddress != null && indexerReady && isTurnkeyConnected && turnkeyEvmAddress != null;
 
   const {
     data: depositAddresses,
@@ -21,7 +29,7 @@ export const useDepositAddress = () => {
     error: fetchDepositAddressesError,
   } = useQuery({
     enabled: canQueryForDepositAddresses,
-    queryKey: ['turnkeyWallets', dydxAddress],
+    queryKey: ['turnkeyWallets', dydxAddress, turnkeyEvmAddress],
     queryFn: async (): Promise<{
       avalancheAddress: string;
       evmAddress: string;
@@ -30,6 +38,13 @@ export const useDepositAddress = () => {
       const response = await fetch(`${indexerUrl}/v4/bridging/getDepositAddress/${dydxAddress}`, {
         method: 'GET',
       }).then((res) => res.json());
+
+      if (
+        typeof response?.evmAddress !== 'string' ||
+        response.evmAddress.toLowerCase() !== turnkeyEvmAddress?.toLowerCase()
+      ) {
+        throw new Error('Deposit addresses do not match the connected Turnkey wallet');
+      }
 
       return response;
     },
