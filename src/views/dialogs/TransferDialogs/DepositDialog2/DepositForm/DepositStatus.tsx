@@ -1,7 +1,4 @@
-import { useMemo } from 'react';
-
 import { ButtonAction } from '@/constants/buttons';
-import { NEAR_INSTANT_DEPOSIT_CHAINS } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
@@ -32,21 +29,14 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
 
   const depositSuccess = deposit?.status === 'success';
 
-  const statusDescription = useMemo(() => {
-    if (depositSuccess) {
-      return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_FOR_TRADING });
-    }
-    if (
-      Boolean(deposit?.isInstantDeposit) ||
-      NEAR_INSTANT_DEPOSIT_CHAINS.includes(deposit?.chainId ?? '')
-    ) {
-      return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_SOON });
-    }
-
-    return stringGetter({ key: STRING_KEYS.YOU_MAY_CLOSE_WINDOW });
-  }, [deposit, depositSuccess, stringGetter]);
+  // TODO: localize
+  const statusDescription = depositSuccess
+    ? 'Your funds have arrived on Injective. Complete your deposit from the notification or your account menu.'
+    : 'Your funds will arrive on Injective. Once they do, you will get a notification to complete your deposit, which you can also do from your account menu. You may close this window.';
 
   if (!deposit) return null;
+
+  const explorerLink = deposit.skipExplorerLink ?? deposit.explorerLink;
 
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">
@@ -61,7 +51,8 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           <div tw="text-large">
             {!depositSuccess
               ? stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })
-              : stringGetter({ key: STRING_KEYS.DEPOSIT_COMPLETED })}
+              : // TODO: localize
+                'Funds arrived on Injective'}
           </div>
           <div tw="text-color-text-0">{statusDescription}</div>
         </div>
@@ -86,12 +77,12 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           : stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
 
-      {deposit.explorerLink && (
+      {explorerLink && (
         <div tw="row justify-between">
           <span tw="text-color-text-0">
             {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTIONS_SHORT })}
           </span>
-          <Link tw="font-small-book" href={deposit.explorerLink} isAccent isInline withIcon>
+          <Link tw="font-small-book" href={explorerLink} isAccent isInline withIcon>
             {truncateAddress(deposit.txHash, '')}
           </Link>
         </div>

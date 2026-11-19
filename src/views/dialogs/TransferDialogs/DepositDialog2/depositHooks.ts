@@ -19,18 +19,25 @@ import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { Deposit } from '@/state/transfers';
+import { useAppDispatch } from '@/state/appTypes';
+import { Deposit, updateDeposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
 import { track } from '@/lib/analytics/analytics';
 import { sleep } from '@/lib/timeUtils';
 import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
 
-import { getUserAddressesForRoute, parseError, userAddressHelper } from '../utils';
+import {
+  getSkipExplorerLink,
+  getUserAddressesForRoute,
+  parseError,
+  userAddressHelper,
+} from '../utils';
 import { isInstantDeposit } from './queries';
 
-// Number of seconds for the IBC transfer timeout (Skip default is 5 minutes)
-const DEPOSIT_TIMEOUT_SECONDS = (10 * 60).toString();
+// Number of seconds for the IBC transfer timeout (Skip default is 24 hours)
+const DEPOSIT_TIMEOUT_SECONDS = (24 * 60 * 60).toString();
+const SLIPPAGE_TOLERANCE_PERCENT = '1';
 
 type StepResult =
   | { success: true; errorMessage: undefined }
@@ -63,6 +70,7 @@ export function useDepositSteps({
   onDeposit: (deposit: Deposit) => void;
 }) {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
 
@@ -152,6 +160,7 @@ export function useDepositSteps({
         amountOut: depositRoute.estimatedAmountOut ?? '0',
         addressList: userAddressHelper(depositRoute, userAddresses),
         timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
+        slippageTolerancePercent: SLIPPAGE_TOLERANCE_PERCENT,
       });
 
       let approvalMaybeNeeded: (Erc20Approval & { chainId: string }) | undefined;
@@ -226,6 +235,9 @@ export function useDepositSteps({
           depositRoute,
         });
 
+        let firstBroadcast: { txHash: string; chainId: string } | undefined;
+        let skipExplorerLink: string | undefined;
+
         try {
           await updatedSkipClient.executeRoute({
             getCosmosSigner,
@@ -233,10 +245,22 @@ export function useDepositSteps({
             userAddresses,
             // Bypass because we manually handle allowance checks above
             bypassApprovalCheck: true,
-            // Extend the IBC transfer timeout from the default 5 minutes to 10 minutes
             timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
             // TODO(deposit2.0): add custom slippage tolerance here
+            onRouteStatusUpdated: (routeDetails) => {
+              skipExplorerLink = getSkipExplorerLink(routeDetails);
+              if (!firstBroadcast || !dydxAddress) return;
+
+              dispatch(
+                updateDeposit({
+                  dydxAddress,
+                  deposit: { ...firstBroadcast, skipExplorerLink },
+                })
+              );
+            },
             onTransactionBroadcast: async ({ txHash, chainId }) => {
+              firstBroadcast ??= { txHash, chainId };
+
               logBonsaiInfo('depositHooks', 'deposit tx submitted', {
                 depositId,
                 txHash,
@@ -262,7 +286,7 @@ export function useDepositSteps({
                   userAddresses,
                 })
               );
-              onDeposit({ ...baseDeposit, token: depositToken });
+              onDeposit({ ...baseDeposit, token: depositToken, skipExplorerLink });
             },
           });
           return { success: true };

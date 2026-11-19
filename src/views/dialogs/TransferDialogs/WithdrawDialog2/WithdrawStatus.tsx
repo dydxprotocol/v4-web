@@ -59,19 +59,25 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       />
     );
 
-  const withdrawalExplorerLinks = withdraw
-    ? withdraw.transactions
-        .map((t) => {
-          if (!t.explorerLink) return null;
+  const withdrawalExplorerLinks = withdraw?.skipExplorerLink
+    ? [
+        <Link key={withdraw.txHash} href={withdraw.skipExplorerLink} withIcon isAccent isInline>
+          {truncateAddress(withdraw.txHash, '')}
+        </Link>,
+      ]
+    : withdraw
+      ? withdraw.transactions
+          .map((t) => {
+            if (!t.explorerLink) return null;
 
-          return (
-            <Link key={t.txHash} href={t.explorerLink} withIcon isAccent isInline>
-              {truncateAddress(t.txHash, '')}
-            </Link>
-          );
-        })
-        .filter(isTruthy)
-    : [];
+            return (
+              <Link key={t.txHash} href={t.explorerLink} withIcon isAccent isInline>
+                {truncateAddress(t.txHash, '')}
+              </Link>
+            );
+          })
+          .filter(isTruthy)
+      : [];
 
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">

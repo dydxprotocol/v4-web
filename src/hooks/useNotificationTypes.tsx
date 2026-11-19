@@ -71,11 +71,12 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS, MaybeBigNumber, MustNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { isPresent, orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { DEC_2025_COMPETITION_DETAILS } from './rewards/util';
+import { useInjectiveBalances } from './transfers/useInjectiveBalances';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
@@ -352,11 +353,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
               key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
             });
 
+            // TODO: localize
             body = isSuccess
-              ? stringGetter({
-                  key: STRING_KEYS.DEPOSIT_AVAILABLE,
-                  params: { AMOUNT_USD: finalAmount },
-                })
+              ? `Your deposit of ${finalAmount} has arrived on Injective. Complete your deposit to start trading.`
               : stringGetter({
                   key: STRING_KEYS.DEPOSIT_PENDING,
                   params: { AMOUNT_USD: finalAmount },
@@ -1359,6 +1358,53 @@ export const notificationTypes: NotificationTypeConfig[] = [
         if (notificationId === CosmosWalletNotificationTypes.CancelOrphanedTriggers) {
           dispatch(openDialog(DialogTypes.CancelOrphanedTriggers()));
         }
+      };
+    },
+  },
+  {
+    type: NotificationType.InjectiveDeposit,
+    useTrigger: ({ trigger, hideNotification }) => {
+      const dispatch = useAppDispatch();
+      const { usdcAmount, hasPendingInjectiveDeposit } = useInjectiveBalances();
+
+      useEffect(() => {
+        if (hasPendingInjectiveDeposit && usdcAmount != null) {
+          // TODO: localize
+          trigger({
+            id: NotificationType.InjectiveDeposit,
+            updateKey: [usdcAmount],
+            displayData: {
+              icon: <Icon iconName={IconName.Deposit} />,
+              title: 'Complete your deposit',
+              body: `${MustBigNumber(usdcAmount).toFixed(USD_DECIMALS)} USDC is waiting on Injective. Send it to dYdX to start trading.`,
+              toastSensitivity: 'background',
+              groupKey: NotificationType.InjectiveDeposit,
+              toastDuration: Infinity,
+              renderActionSlot: () => (
+                <Link
+                  isAccent
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(openDialog(DialogTypes.InjectiveDeposit()));
+                  }}
+                >
+                  Complete deposit →
+                </Link>
+              ),
+            },
+          });
+        } else {
+          hideNotification({
+            type: NotificationType.InjectiveDeposit,
+            id: NotificationType.InjectiveDeposit,
+          });
+        }
+      }, [dispatch, hasPendingInjectiveDeposit, hideNotification, trigger, usdcAmount]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useAppDispatch();
+      return () => {
+        dispatch(openDialog(DialogTypes.InjectiveDeposit()));
       };
     },
   },

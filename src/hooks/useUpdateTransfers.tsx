@@ -63,10 +63,7 @@ export function useUpdateTransfers() {
               dispatch(
                 updateDeposit({
                   dydxAddress,
-                  deposit: {
-                    ...transfer,
-                    explorerLink: txInfo.explorerLink,
-                  },
+                  deposit: { txHash, chainId, explorerLink: txInfo.explorerLink },
                 })
               );
             },
@@ -83,11 +80,7 @@ export function useUpdateTransfers() {
             dispatch(
               updateDeposit({
                 dydxAddress,
-                deposit: {
-                  ...transfer,
-                  finalAmountUsd: finalAmount,
-                  status,
-                },
+                deposit: { txHash, chainId, finalAmountUsd: finalAmount, status },
               })
             );
 
@@ -158,10 +151,7 @@ export function useUpdateTransfers() {
                   dispatch(
                     updateWithdraw({
                       dydxAddress,
-                      withdraw: {
-                        ...transfer,
-                        transactions: subTransactions,
-                      },
+                      withdraw: { id: transfer.id, transactions: subTransactions },
                     })
                   );
                 },

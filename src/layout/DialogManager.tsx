@@ -52,6 +52,7 @@ import { TradingKeysDialog } from '@/views/dialogs/TradingKeysDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { DepositAddressDialog } from '@/views/dialogs/TransferDialogs/DepositAddressDialog';
 import { DepositDialog2 } from '@/views/dialogs/TransferDialogs/DepositDialog2/DepositDialog2';
+import { InjectiveDepositDialog } from '@/views/dialogs/TransferDialogs/InjectiveDepositDialog';
 import { TransferStatusDialog } from '@/views/dialogs/TransferDialogs/TransferStatusDialog';
 import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2/WithdrawDialog2';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
@@ -116,6 +117,7 @@ export const DialogManager = React.memo(() => {
     FillDetails: (args) => <FillDetailsDialog {...args} {...modalProps} />,
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
+    InjectiveDeposit: (args) => <InjectiveDepositDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
     ManageAccount: (args) => <ManageAccountDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,

@@ -13,6 +13,7 @@ import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
 
+import { useInjectiveBalances } from '@/hooks/transfers/useInjectiveBalances';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -65,6 +66,7 @@ export const AccountMenu = () => {
   const isTurnkey = useAppSelector(selectIsTurnkeyConnected);
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
+  const { hasPendingInjectiveDeposit } = useInjectiveBalances();
 
   const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
@@ -265,6 +267,19 @@ export const AccountMenu = () => {
                       )
                     )
                   }
+                />
+              </$ConfirmPendingDeposit>
+            )}
+            {hasPendingInjectiveDeposit && (
+              // TODO: localize
+              <$ConfirmPendingDeposit>
+                You have USDC on Injective
+                <br /> waiting to be deposited
+                <$IconButton
+                  action={ButtonAction.Base}
+                  shape={ButtonShape.Square}
+                  iconName={IconName.Send}
+                  onClick={() => dispatch(openDialog(DialogTypes.InjectiveDeposit()))}
                 />
               </$ConfirmPendingDeposit>
             )}
