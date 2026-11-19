@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
@@ -9,6 +10,7 @@ import { DialogProps, InjectiveDepositDialogProps } from '@/constants/dialogs';
 import { getInjectiveChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
+import { IS_GAS_SPONSORSHIP_ENABLED } from '@/constants/transfers';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useInjectiveBalances } from '@/hooks/transfers/useInjectiveBalances';
@@ -28,6 +30,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
+import { GasSponsorshipGrant, requestGasSponsorship } from '@/lib/gasSponsorship';
 import { getInjectiveIbcTransferFee, sendInjectiveUsdcToDydx } from '@/lib/injectiveTx';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -53,7 +56,7 @@ const AUTO_DEPOSIT_TIMEOUT = 2 * timeUnits.minute;
 export const InjectiveDepositDialog = ({ setIsOpen }: DialogProps<InjectiveDepositDialogProps>) => {
   const stringGetter = useStringGetter();
   const { skipClient } = useSkipClient();
-  const { injectiveValidator } = useEndpointsConfig();
+  const { indexer, injectiveValidator } = useEndpointsConfig();
   const { dydxAddress, localInjectiveWallet } = useAccounts();
   const { deposit } = useSubaccount();
   const isKeplr = useAppSelector(selectIsKeplrConnected);
@@ -98,13 +101,24 @@ export const InjectiveDepositDialog = ({ setIsOpen }: DialogProps<InjectiveDepos
                 return { success: false, errorMessage: 'No USDC found on Injective' };
               }
 
+              let sponsorship: GasSponsorshipGrant | undefined;
               const fee = getInjectiveIbcTransferFee();
               if (balances.inj < fee) {
-                // TODO: request a fee allowance from the gas sponsorship endpoint instead
-                return {
-                  success: false,
-                  errorMessage: `Not enough INJ to pay for gas. Send at least ${formatUnits(fee, INJ_DECIMALS)} INJ to ${injectiveAddress}.`,
-                };
+                const notEnoughInjMessage = `Not enough INJ to pay for gas. Send at least ${formatUnits(fee, INJ_DECIMALS)} INJ to ${injectiveAddress}.`;
+                if (!IS_GAS_SPONSORSHIP_ENABLED) {
+                  return { success: false, errorMessage: notEnoughInjMessage };
+                }
+
+                try {
+                  sponsorship = await requestGasSponsorship({
+                    indexerUrl: indexer.api,
+                    dydxAddress,
+                    injectiveAddress,
+                  });
+                } catch (error) {
+                  logBonsaiError('InjectiveDepositDialog/gasSponsorship', error);
+                  return { success: false, errorMessage: notEnoughInjMessage };
+                }
               }
 
               ibcTxHashRef.current = await sendInjectiveUsdcToDydx({
@@ -113,6 +127,10 @@ export const InjectiveDepositDialog = ({ setIsOpen }: DialogProps<InjectiveDepos
                 injectiveAddress,
                 dydxAddress,
                 amount: balances.usdc.toString(),
+                // Fees are paid from the sponsor's allowance, priced to fit within it
+                feeGranter: sponsorship?.granter,
+                gasLimit: sponsorship && BigInt(sponsorship.gasLimit),
+                gasPrice: sponsorship && BigInt(sponsorship.gasPrice),
               });
             }
 
@@ -167,6 +185,7 @@ export const InjectiveDepositDialog = ({ setIsOpen }: DialogProps<InjectiveDepos
     [
       deposit,
       dydxAddress,
+      indexer.api,
       injectiveAddress,
       injectiveValidator,
       isKeplr,
