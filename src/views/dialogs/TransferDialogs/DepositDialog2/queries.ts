@@ -6,14 +6,14 @@ import { BalanceRequest, RouteRequest, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { orderBy, partition } from 'lodash';
 import { Chain, parseUnits } from 'viem';
-import { arbitrum, optimism } from 'viem/chains';
+import { arbitrum, injective, optimism } from 'viem/chains';
 
-import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
+import { EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
 import {
-  DYDX_CHAIN_USDC_DENOM,
+  INJECTIVE_EVM_USDC_ADDRESS,
   TokenBalance,
   TokenForTransfer,
   USDC_ADDRESSES,
@@ -209,8 +209,8 @@ async function getSkipDepositRoutes(
   const routeOptions: RouteRequest = {
     sourceAssetDenom: token.denom,
     sourceAssetChainId: token.chainId,
-    destAssetDenom: DYDX_CHAIN_USDC_DENOM,
-    destAssetChainId: DYDX_DEPOSIT_CHAIN,
+    destAssetDenom: INJECTIVE_EVM_USDC_ADDRESS,
+    destAssetChainId: injective.id.toString(),
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
     // TODO(deposit2.0): Manually calculate price impact by comparing USD values and warn user if difference > a certain %
