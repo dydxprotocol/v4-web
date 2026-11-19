@@ -20,15 +20,16 @@ import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
+import { updateWithdraw, Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
 import { AttemptBigNumber } from '@/lib/numbers';
 
 import { DYDX_DEPOSIT_CHAIN } from '../consts';
 import {
+  getSkipExplorerLink,
   getUserAddressesForRoute,
   isInstantTransfer,
   isValidWithdrawalAddress,
@@ -49,6 +50,7 @@ export function useWithdrawStep({
   onWithdrawSigned: (withdrawId: string) => void;
 }) {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const { skipClient } = useSkipClient();
   const {
     dydxAddress,
@@ -123,6 +125,9 @@ export function useWithdrawStep({
       }
 
       const withdrawId = `withdraw-${crypto.randomUUID()}`;
+      // The explorer link can update before the withdraw is created on the first broadcast
+      let isWithdrawCreated = false;
+      let skipExplorerLink: string | undefined;
 
       logBonsaiInfo('withdrawHooks', 'withdraw initiated', {
         withdrawId,
@@ -152,6 +157,11 @@ export function useWithdrawStep({
         onTransactionSigned: async () => {
           onWithdrawSigned(withdrawId);
         },
+        onRouteStatusUpdated: (routeDetails) => {
+          skipExplorerLink = getSkipExplorerLink(routeDetails);
+          if (!isWithdrawCreated) return;
+          dispatch(updateWithdraw({ dydxAddress, withdraw: { id: withdrawId, skipExplorerLink } }));
+        },
         onTransactionBroadcast: async ({ txHash, chainId }) => {
           // First Broadcast will always originate from v4 chain
           if (chainId === DYDX_DEPOSIT_CHAIN) {
@@ -174,6 +184,7 @@ export function useWithdrawStep({
               isInstantWithdraw: isInstantTransfer(withdrawRoute),
               transferAssetRelease: null,
               txHash,
+              skipExplorerLink,
             };
             logBonsaiInfo('withdrawHooks', 'withdraw tx submitted', {
               withdrawId,
@@ -183,6 +194,7 @@ export function useWithdrawStep({
             });
             track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
             onWithdraw(baseWithdraw);
+            isWithdrawCreated = true;
           } else {
             logBonsaiInfo('withdrawHooks', 'additional withdraw tx submitted', {
               withdrawId,

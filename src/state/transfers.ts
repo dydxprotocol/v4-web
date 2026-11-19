@@ -16,6 +16,7 @@ export type Deposit = {
   finalAmountUsd?: string;
   isInstantDeposit: boolean;
   explorerLink?: string;
+  skipExplorerLink?: string;
   updatedAt?: number;
 };
 
@@ -38,6 +39,7 @@ export type Withdraw = {
   status: 'pending' | 'success' | 'error';
   updatedAt?: number;
   txHash: string;
+  skipExplorerLink?: string;
 };
 
 export type Transfer = Deposit | Withdraw;

@@ -48,6 +48,8 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
 
   if (!deposit) return null;
 
+  const explorerLink = deposit.skipExplorerLink ?? deposit.explorerLink;
+
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">
       <div tw="flex flex-col gap-0.5">
@@ -86,12 +88,12 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           : stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
 
-      {deposit.explorerLink && (
+      {explorerLink && (
         <div tw="row justify-between">
           <span tw="text-color-text-0">
             {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTIONS_SHORT })}
           </span>
-          <Link tw="font-small-book" href={deposit.explorerLink} isAccent isInline withIcon>
+          <Link tw="font-small-book" href={explorerLink} isAccent isInline withIcon>
             {truncateAddress(deposit.txHash, '')}
           </Link>
         </div>

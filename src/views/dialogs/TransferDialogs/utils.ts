@@ -1,4 +1,4 @@
-import { RouteResponse, UserAddress } from '@skip-go/client';
+import { RouteDetails, RouteResponse, UserAddress } from '@skip-go/client';
 import { ChainMismatchError, isAddress, UserRejectedRequestError } from 'viem';
 import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
@@ -16,6 +16,25 @@ import {
   validateCosmosAddress,
   validateInjectiveAddress,
 } from '@/lib/addressUtils';
+
+const SKIP_EXPLORER_URL = 'https://explorer.skip.build/';
+
+export function getSkipExplorerLink({
+  route,
+  userAddresses,
+  transactionDetails,
+  status,
+}: RouteDetails) {
+  const bytes = new TextEncoder().encode(
+    JSON.stringify({ route, userAddresses, transactionDetails, status })
+  );
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return `${SKIP_EXPLORER_URL}?data=${encodeURIComponent(btoa(binary))}`;
+}
 
 // Because our deposit flow only supports ETH and USDC
 
