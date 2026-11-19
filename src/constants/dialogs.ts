@@ -31,6 +31,7 @@ export type ConfirmPendingDepositDialogProps = {
   usdcBalance: number;
 };
 export type DepositAddressDialogProps = {};
+export type InjectiveDepositDialogProps = {};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
 export type EmailSignInStatusDialogProps = {};
@@ -153,6 +154,7 @@ export const DialogTypes = unionize(
     FillDetails: ofType<FillDetailsDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
+    InjectiveDeposit: ofType<InjectiveDepositDialogProps>(),
     ManageAccount: ofType<ManageAccountDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),

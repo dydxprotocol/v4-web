@@ -12,10 +12,8 @@ import ConnectingLine from '@/icons/connecting-line.svg';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { DepositStep } from '../depositHooks';
-
 type DepositStepsProps = {
-  steps: DepositStep[];
+  steps: Array<{ type: string }>;
   currentStep: number;
   currentStepError?: string;
   onRetry: () => void;
@@ -26,7 +24,7 @@ type StyleProps = {
 };
 
 const STEP_TYPE_TO_INFO: {
-  [type: string]: { titleKey: string; icon: ReactNode };
+  [type: string]: { titleKey?: string; title?: string; icon: ReactNode };
 } = {
   network: {
     titleKey: STRING_KEYS.SWITCH_NETWORKS,
@@ -38,6 +36,14 @@ const STEP_TYPE_TO_INFO: {
   },
   deposit: {
     titleKey: STRING_KEYS.CONFIRM_DEPOSIT,
+    icon: <Icon size="1.5rem" iconName={IconName.Deposit} />,
+  },
+  'ibc-transfer': {
+    title: 'Send USDC to dYdX',
+    icon: <Icon size="1.5rem" iconName={IconName.Send} />,
+  },
+  subaccount: {
+    title: 'Deposit to trading account',
     icon: <Icon size="1.5rem" iconName={IconName.Deposit} />,
   },
 };
@@ -95,7 +101,7 @@ export const DepositSteps = ({
                     tw="transition-all duration-300"
                     css={[i === currentStep ? tw`opacity-100` : tw`opacity-50`]}
                   >
-                    {stringGetter({ key: stepInfo.titleKey })}
+                    {stepInfo.titleKey ? stringGetter({ key: stepInfo.titleKey }) : stepInfo.title}
                   </div>
                   {error && <div tw="text-small text-color-error">{error}</div>}
                 </div>
