@@ -353,11 +353,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
               key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
             });
 
+            // TODO: localize
             body = isSuccess
-              ? stringGetter({
-                  key: STRING_KEYS.DEPOSIT_AVAILABLE,
-                  params: { AMOUNT_USD: finalAmount },
-                })
+              ? `Your deposit of ${finalAmount} has arrived on Injective. Complete your deposit to start trading.`
               : stringGetter({
                   key: STRING_KEYS.DEPOSIT_PENDING,
                   params: { AMOUNT_USD: finalAmount },
