@@ -44,12 +44,13 @@ export const TokenSelect = ({
     onBack();
   };
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div tw="flex h-full flex-col items-center justify-center">
         <LoadingSpinner />
       </div>
     );
+  }
 
   return (
     <div tw="flex flex-col gap-0.5 py-1">

@@ -1,6 +1,6 @@
 import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
 import { PublicKey } from '@solana/web3.js';
-import { isAddress } from 'viem';
+import { getAddress, isAddress } from 'viem';
 
 import { INJECTIVE_BECH32_PREFIX } from '@/constants/graz';
 
@@ -51,6 +51,18 @@ export function validateInjectiveAddress(address: string) {
   } catch (error) {
     return false;
   }
+}
+
+/**
+ * Converts an Injective (inj) bech32 address to its Injective EVM (0x) address.
+ * Injective accounts use ethsecp256k1 (coin type 60), so the bech32 data is the EVM address.
+ * @warning Only pass Injective-derived addresses.
+ */
+export function getInjectiveEvmAddress(injectiveAddress: string): string {
+  if (!validateInjectiveAddress(injectiveAddress)) {
+    throw new Error(`Invalid injective address: ${injectiveAddress}`);
+  }
+  return getAddress(`0x${toHex(fromBech32(injectiveAddress).data)}`);
 }
 
 type MultiChainAddress =

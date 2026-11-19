@@ -1,13 +1,16 @@
+import { useCallback } from 'react';
+
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { Erc20Approval, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
-import { Address, WalletClient, maxUint256 } from 'viem';
+import { Address, maxUint256, WalletClient } from 'viem';
 import { useChainId } from 'wagmi';
 
 import ERC20ABI from '@/abi/erc20.json';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { isEvmDepositChainId } from '@/constants/chains';
+import { getInjectiveChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -62,7 +65,32 @@ export function useDepositSteps({
   const stringGetter = useStringGetter();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
-  const { injectiveAddress, dydxAddress, nobleAddress, osmosisAddress } = useAccounts();
+
+  const {
+    injectiveAddress,
+    dydxAddress,
+    nobleAddress,
+    osmosisAddress,
+    localInjectiveWallet,
+    localDydxWallet,
+  } = useAccounts();
+
+  const getCosmosSigner = useCallback(
+    async (chainID: string) => {
+      if (chainID === getInjectiveChainId()) {
+        if (!localInjectiveWallet?.offlineSigner) {
+          throw new Error('No local injectivewallet offline signer. Cannot submit tx');
+        }
+        return localInjectiveWallet.offlineSigner;
+      }
+
+      if (!localDydxWallet?.offlineSigner)
+        throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+
+      return localDydxWallet.offlineSigner;
+    },
+    [localDydxWallet, localInjectiveWallet]
+  );
 
   async function getStepsQuery() {
     if (!depositRoute || !sourceAccount.address) return [];
@@ -200,6 +228,7 @@ export function useDepositSteps({
 
         try {
           await updatedSkipClient.executeRoute({
+            getCosmosSigner,
             route: depositRoute,
             userAddresses,
             // Bypass because we manually handle allowance checks above

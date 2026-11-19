@@ -11,6 +11,7 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
+import { IS_DEPOSIT_UNDER_MAINTENANCE } from '@/constants/transfers';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -55,6 +56,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   } = useDepositAddress();
 
   useEffect(() => {
+    if (IS_DEPOSIT_UNDER_MAINTENANCE) return;
     // Optimistic Deposit Initiated for tracking purposes
     track(AnalyticsEvents.TurnkeyDepositInitiated({}));
   }, []);
@@ -185,7 +187,12 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     }
   }, [complianceState, setIsOpen]);
 
-  const perpetualsContent = (
+  // Hide the deposit address entirely so users can't send funds while deposits are paused
+  const perpetualsContent = IS_DEPOSIT_UNDER_MAINTENANCE ? (
+    <AlertMessage type={AlertType.Warning}>
+      Deposits are temporarily under maintenance. Please check back soon.
+    </AlertMessage>
+  ) : (
     <div tw="flexColumn gap-1">
       <DepositNetworkSelect
         chains={chains}

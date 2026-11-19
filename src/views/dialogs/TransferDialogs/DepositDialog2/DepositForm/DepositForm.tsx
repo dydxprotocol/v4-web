@@ -13,6 +13,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
 import { ColorToken } from '@/constants/styles/base';
 import { TokenForTransfer } from '@/constants/tokens';
+import { IS_DEPOSIT_UNDER_MAINTENANCE } from '@/constants/transfers';
 import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
@@ -147,6 +148,7 @@ export const DepositForm = ({
   const hasInput = MustBigNumber(depositRoute?.usdAmountIn).gt(0);
 
   const depositDisabled =
+    IS_DEPOSIT_UNDER_MAINTENANCE ||
     isFetching ||
     !hasSufficientBalance ||
     !depositRoute ||
@@ -155,6 +157,7 @@ export const DepositForm = ({
     isAccountViewOnly;
 
   const depositButtonInner = useMemo(() => {
+    if (IS_DEPOSIT_UNDER_MAINTENANCE) return 'Under Maintenance';
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
     if (hasInput && !isDepositingMoreThanMin) {
       return (
@@ -405,6 +408,11 @@ export const DepositForm = ({
         onTokenClick={onTokenSelect}
         error={error}
       />
+      {IS_DEPOSIT_UNDER_MAINTENANCE && (
+        <AlertMessage type={AlertType.Warning}>
+          Deposits are temporarily under maintenance. Please check back soon.
+        </AlertMessage>
+      )}
       {isMissingGas && (
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
@@ -427,7 +435,9 @@ export const DepositForm = ({
         onClick={onDepositClick}
         state={{
           isDisabled: depositDisabled,
-          isLoading: isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
+          isLoading:
+            !IS_DEPOSIT_UNDER_MAINTENANCE &&
+            (isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction),
         }}
         action={ButtonAction.Primary}
         type={ButtonType.Submit}

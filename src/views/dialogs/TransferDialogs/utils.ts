@@ -2,7 +2,7 @@ import { RouteResponse, UserAddress } from '@skip-go/client';
 import { ChainMismatchError, isAddress, UserRejectedRequestError } from 'viem';
 import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
-import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
+import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId, isInjectiveEvmChainId } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
@@ -11,6 +11,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 import { SourceAccount } from '@/state/wallet';
 
 import {
+  getInjectiveEvmAddress,
   isValidSolanaAddress,
   validateCosmosAddress,
   validateInjectiveAddress,
@@ -77,6 +78,21 @@ export function getUserAddressesForRoute(
         if (!dydxAddress) throw new Error('dydxAddress undefined');
         return { chainId, address: dydxAddress };
       default:
+        if (isInjectiveEvmChainId(chainId)) {
+          if (sourceAccount?.chain === WalletNetworkType.Evm) {
+            return { chainId, address: sourceAccount.address as string };
+          }
+
+          if (sourceAccount?.chain === WalletNetworkType.Cosmos) {
+            if (!injectiveAddress) throw new Error('injectiveAddress undefined');
+
+            return {
+              chainId,
+              address: getInjectiveEvmAddress(injectiveAddress),
+            };
+          }
+        }
+
         if (
           (isEvmDepositChainId(chainId) && sourceAccount?.chain === WalletNetworkType.Evm) ||
           (chainId === SOLANA_MAINNET_ID && sourceAccount?.chain === SOLANA_MAINNET_ID)

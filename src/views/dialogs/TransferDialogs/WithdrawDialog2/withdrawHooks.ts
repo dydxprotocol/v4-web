@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 import { initial } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { CosmosChainId } from '@/constants/graz';
+import { getInjectiveChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { USDC_ASSET_ID } from '@/constants/tokens';
@@ -98,7 +98,7 @@ export function useWithdrawStep({
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
-      if (chainID === CosmosChainId.Injective) {
+      if (chainID === getInjectiveChainId()) {
         if (!localInjectiveWallet?.offlineSigner) {
           throw new Error('No local injectivewallet offline signer. Cannot submit tx');
         }

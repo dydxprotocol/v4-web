@@ -126,10 +126,13 @@ export function useUpdateTransfers() {
 
         if (!hasError) {
           const { subtransaction: trackedSubtransaction } = getSubtransactionAndIdx(transfer);
+          const originSubtransaction = transfer.transactions[0];
+          const isTrackingOrigin = trackedSubtransaction != null && !trackedSubtransaction.txHash;
+          const target = isTrackingOrigin ? originSubtransaction : trackedSubtransaction;
 
-          if (trackedSubtransaction && trackedSubtransaction.txHash) {
-            const chainId = trackedSubtransaction.chainId;
-            const txHash = trackedSubtransaction.txHash;
+          if (trackedSubtransaction && target?.txHash) {
+            const chainId = target.chainId;
+            const txHash = target.txHash;
             const transferKey = `${chainId}-${txHash}`;
             if (transactionToCallback.current[transferKey]) continue;
 
@@ -176,22 +179,35 @@ export function useUpdateTransfers() {
                   getSubtransactionAndIdx(latestTransfer);
 
                 // Assume the final asset transfer is always USDC
-                const finalAmount = latestTransfer.transferAssetRelease?.amount
-                  ? formatUnits(BigInt(latestTransfer.transferAssetRelease.amount), USDC_DECIMALS)
+                const finalAmount = response.transferAssetRelease?.amount
+                  ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
                   : undefined;
 
                 const currentTransactionStatus = handleResponseStatus(response.status);
                 const currentTransactionError = currentTransactionStatus === 'error';
-                const transactionsCopy = [...latestTransfer.transactions];
+                const isRouteComplete =
+                  currentTransactionStatus === 'success' &&
+                  response.transferAssetRelease?.released === true;
 
                 if (!subtransaction) {
                   throw new Error('No subtransaction found');
                 }
 
-                transactionsCopy[subtransactionIdx] = {
-                  ...subtransaction,
-                  status: currentTransactionStatus,
-                };
+                let transactionsCopy = [...latestTransfer.transactions];
+
+                if (isRouteComplete) {
+                  // Skip has released the asset at the destination, so every hop has succeeded
+                  transactionsCopy = transactionsCopy.map((tx) =>
+                    tx.status === 'pending' || tx.status === 'idle'
+                      ? { ...tx, status: 'success' as const }
+                      : tx
+                  );
+                } else if (!isTrackingOrigin || currentTransactionError) {
+                  transactionsCopy[subtransactionIdx] = {
+                    ...subtransaction,
+                    status: currentTransactionStatus,
+                  };
+                }
 
                 const hasPending = transactionsCopy.some(
                   (tx) => tx.status === 'pending' || tx.status === 'idle'
@@ -210,6 +226,7 @@ export function useUpdateTransfers() {
                       ...latestTransfer,
                       transactions: transactionsCopy,
                       finalAmountUsd: finalAmount,
+                      transferAssetRelease: response.transferAssetRelease,
                       status,
                     },
                   })
