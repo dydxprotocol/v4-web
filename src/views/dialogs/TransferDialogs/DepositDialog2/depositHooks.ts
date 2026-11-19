@@ -19,7 +19,8 @@ import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { Deposit } from '@/state/transfers';
+import { useAppDispatch } from '@/state/appTypes';
+import { Deposit, inFlightDepositIds, onDepositBroadcast, updateDeposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
 import { track } from '@/lib/analytics/analytics';
@@ -29,8 +30,11 @@ import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/
 import { getUserAddressesForRoute, parseError, userAddressHelper } from '../utils';
 import { isInstantDeposit } from './queries';
 
-// Number of seconds for the IBC transfer timeout (Skip default is 5 minutes)
-const DEPOSIT_TIMEOUT_SECONDS = (10 * 60).toString();
+// IBC transfer timeout, set when /msgs builds the route's txs. On a multi-tx route
+// (e.g. Base -> Injective -> dYdX) the Injective IBC tx is only broadcast after the CCTP
+// leg lands, and a CCTP standard-finality transfer takes ~15-20 minutes. A short timeout
+// expires before that tx is sent, so it fails on chain with "timeout elapsed".
+const DEPOSIT_TIMEOUT_SECONDS = (24 * 60 * 60).toString();
 
 type StepResult =
   | { success: true; errorMessage: undefined }
@@ -63,6 +67,7 @@ export function useDepositSteps({
   onDeposit: (deposit: Deposit) => void;
 }) {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
 
@@ -220,6 +225,11 @@ export function useDepositSteps({
       // passing in updatedSkipClient is hack until that is available
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
         const depositId = `deposit-${crypto.randomUUID()}`;
+        // Origin tx of this deposit, set on the first broadcast. Later broadcasts of a
+        // multi-tx route are attached to the same deposit instead of creating a new one.
+        let originTx: { txHash: string; chainId: string } | undefined;
+        let broadcastCount = 0;
+        inFlightDepositIds.add(depositId);
 
         logBonsaiInfo('depositHooks', 'deposit initiated', {
           depositId,
@@ -233,7 +243,6 @@ export function useDepositSteps({
             userAddresses,
             // Bypass because we manually handle allowance checks above
             bypassApprovalCheck: true,
-            // Extend the IBC transfer timeout from the default 5 minutes to 10 minutes
             timeoutSeconds: DEPOSIT_TIMEOUT_SECONDS,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainId }) => {
@@ -243,6 +252,21 @@ export function useDepositSteps({
                 chainId,
                 depositRoute,
               });
+              broadcastCount += 1;
+
+              if (originTx) {
+                if (dydxAddress) {
+                  dispatch(
+                    onDepositBroadcast({
+                      dydxAddress,
+                      depositId,
+                      subtransaction: { txHash, chainId, status: 'pending' },
+                    })
+                  );
+                }
+                return;
+              }
+              originTx = { txHash, chainId };
 
               const baseDeposit = {
                 id: depositId,
@@ -262,7 +286,12 @@ export function useDepositSteps({
                   userAddresses,
                 })
               );
-              onDeposit({ ...baseDeposit, token: depositToken });
+              onDeposit({
+                ...baseDeposit,
+                token: depositToken,
+                txsRequired: depositRoute.txsRequired,
+                transactions: [{ txHash, chainId, status: 'pending' }],
+              });
             },
           });
           return { success: true };
@@ -272,10 +301,19 @@ export function useDepositSteps({
             route: depositRoute,
           });
 
+          // The route failed after its first tx went out but before every tx was broadcast
+          // (e.g. the user rejected the next signature), so the deposit will never complete.
+          // Once every tx is out, the tracker decides the final status instead.
+          if (originTx && dydxAddress && broadcastCount < depositRoute.txsRequired) {
+            dispatch(updateDeposit({ dydxAddress, deposit: { ...originTx, status: 'error' } }));
+          }
+
           return {
             success: false,
             errorMessage: stringGetter({ key: parseError(e, STRING_KEYS.YOUR_DEPOSIT_FAILED) }),
           };
+        } finally {
+          inFlightDepositIds.delete(depositId);
         }
       },
     });

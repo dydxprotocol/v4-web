@@ -17,6 +17,10 @@ export type Deposit = {
   isInstantDeposit: boolean;
   explorerLink?: string;
   updatedAt?: number;
+  // Multi-tx routes (e.g. Base -> Injective -> dYdX) broadcast one tx per signing chain.
+  // `txHash`/`chainId` above stay the origin tx; every broadcast tx is listed here in order.
+  txsRequired?: number;
+  transactions?: WithdrawSubtransaction[];
 };
 
 export type WithdrawSubtransaction = {
@@ -41,6 +45,11 @@ export type Withdraw = {
 };
 
 export type Transfer = Deposit | Withdraw;
+
+// Ids of deposits whose route is still executing in this session (depositHooks adds and removes
+// them). After a reload this is empty, which tells the tracker a multi-tx deposit whose next tx
+// was never broadcast will not progress any further.
+export const inFlightDepositIds = new Set<string>();
 
 export function isDeposit(transfer: Transfer): transfer is Deposit {
   return transfer.type === 'deposit';
@@ -94,6 +103,35 @@ export const transfersSlice = createSlice({
 
         return transfer;
       });
+    },
+    onDepositBroadcast: (
+      state,
+      action: PayloadAction<{
+        dydxAddress: DydxAddress;
+        depositId: string;
+        subtransaction: WithdrawSubtransaction;
+      }>
+    ) => {
+      const { dydxAddress, depositId, subtransaction } = action.payload;
+      // Mutate in place (Immer) so a no-op update leaves state untouched and does not
+      // re-trigger the transfer tracking effect.
+      const deposit = state.transfersByDydxAddress[dydxAddress]?.find(
+        (t): t is Deposit => isDeposit(t) && t.id === depositId
+      );
+      if (!deposit) return;
+
+      deposit.transactions ??= [];
+      const existing = deposit.transactions.find((tx) => tx.txHash === subtransaction.txHash);
+      if (existing) {
+        // Already recorded: only fill in the explorer link, never reset its status.
+        if (subtransaction.explorerLink && !existing.explorerLink) {
+          existing.explorerLink = subtransaction.explorerLink;
+        }
+        return;
+      }
+
+      deposit.transactions.push(subtransaction);
+      deposit.updatedAt = Date.now();
     },
     addWithdraw: (
       state,
@@ -162,5 +200,11 @@ export const transfersSlice = createSlice({
   },
 });
 
-export const { addDeposit, addWithdraw, onWithdrawBroadcast, updateDeposit, updateWithdraw } =
-  transfersSlice.actions;
+export const {
+  addDeposit,
+  addWithdraw,
+  onDepositBroadcast,
+  onWithdrawBroadcast,
+  updateDeposit,
+  updateWithdraw,
+} = transfersSlice.actions;

@@ -10,7 +10,16 @@ import { USDC_DECIMALS } from '@/constants/tokens';
 import { store } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch } from '@/state/appTypes';
-import { isDeposit, isWithdraw, updateDeposit, updateWithdraw, Withdraw } from '@/state/transfers';
+import {
+  Deposit,
+  inFlightDepositIds,
+  isDeposit,
+  isWithdraw,
+  onDepositBroadcast,
+  updateDeposit,
+  updateWithdraw,
+  Withdraw,
+} from '@/state/transfers';
 import { selectPendingTransfers } from '@/state/transfersSelectors';
 
 import { track } from '@/lib/analytics/analytics';
@@ -48,27 +57,80 @@ export function useUpdateTransfers() {
       const transfer = pendingTransfers[i]!;
 
       if (isDeposit(transfer)) {
-        const { chainId, txHash } = transfer;
+        // Multi-tx routes (e.g. Base -> Injective -> dYdX) list every broadcast tx in
+        // `transactions`. Track the latest pending one; the deposit completes when the last
+        // required tx succeeds. Single-tx deposits track the origin tx as before.
+        const txsRequired = transfer.txsRequired ?? 1;
+        const isMultiTx = txsRequired > 1 && !!transfer.transactions?.length;
+        const target = isMultiTx
+          ? [...transfer.transactions!].reverse().find((tx) => tx.txHash && tx.status === 'pending')
+          : { chainId: transfer.chainId, txHash: transfer.txHash };
+
+        if (!target?.txHash) {
+          // Earlier legs are done but the next tx was never broadcast, and the route is no
+          // longer executing (e.g. the app was reloaded before signing it). Funds are on an
+          // intermediate chain and nothing will move them, so stop showing it as pending.
+          if (
+            isMultiTx &&
+            transfer.transactions!.length < txsRequired &&
+            !inFlightDepositIds.has(transfer.id)
+          ) {
+            dispatch(
+              updateDeposit({
+                dydxAddress,
+                deposit: { txHash: transfer.txHash, chainId: transfer.chainId, status: 'error' },
+              })
+            );
+          }
+          continue;
+        }
+
+        const { chainId, txHash } = target;
         const transferKey = `${chainId}-${txHash}`;
         if (transactionToCallback.current[transferKey]) continue;
 
         transactionToCallback.current[transferKey] = true;
+        let lastState: TransactionState | undefined;
+
+        const getLatestDeposit = () =>
+          store
+            .getState()
+            .transfers.transfersByDydxAddress[
+              dydxAddress
+            ]?.find((t): t is Deposit => isDeposit(t) && t.id === transfer.id) ?? transfer;
 
         skipClient
           .waitForTransaction({
             chainId,
             txHash,
+            onStatusUpdated(txStatus) {
+              lastState = txStatus.state;
+            },
             async onTransactionTracked(txInfo) {
               if (!txInfo.explorerLink) return;
-              dispatch(
-                updateDeposit({
-                  dydxAddress,
-                  deposit: {
-                    ...transfer,
-                    explorerLink: txInfo.explorerLink,
-                  },
-                })
-              );
+              // The deposit-level link stays the origin tx; later txs keep their own link.
+              if (txHash === transfer.txHash && chainId === transfer.chainId) {
+                dispatch(
+                  updateDeposit({
+                    dydxAddress,
+                    deposit: { txHash, chainId, explorerLink: txInfo.explorerLink },
+                  })
+                );
+              }
+              if (isMultiTx) {
+                dispatch(
+                  onDepositBroadcast({
+                    dydxAddress,
+                    depositId: transfer.id,
+                    subtransaction: {
+                      txHash,
+                      chainId,
+                      status: 'pending',
+                      explorerLink: txInfo.explorerLink,
+                    },
+                  })
+                );
+              }
             },
           })
           .then((response) => {
@@ -77,19 +139,55 @@ export function useUpdateTransfers() {
               ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
               : undefined;
 
-            const status = handleResponseStatus(response.status);
+            // `status` is deprecated on the response; `state` is what waitForTransaction checks.
+            const txStatus: Deposit['status'] = handleResponseStatus(response.state);
             const { token, ...rest } = transfer;
+            let status: Deposit['status'] = txStatus;
 
-            dispatch(
-              updateDeposit({
-                dydxAddress,
-                deposit: {
-                  ...transfer,
-                  finalAmountUsd: finalAmount,
-                  status,
-                },
-              })
-            );
+            if (isMultiTx) {
+              const latestDeposit = getLatestDeposit();
+              // A late result for an earlier leg must not reopen a finished deposit.
+              if (latestDeposit.status !== 'pending') return;
+
+              const transactions = (latestDeposit.transactions ?? []).map((tx) =>
+                tx.txHash === txHash ? { ...tx, status: txStatus } : tx
+              );
+              const isLastTx =
+                transactions.length >= (latestDeposit.txsRequired ?? 1) &&
+                transactions[transactions.length - 1]?.txHash === txHash;
+
+              // An earlier leg succeeding only means funds reached the intermediate chain.
+              status = txStatus === 'success' && !isLastTx ? 'pending' : txStatus;
+              const finalTransactions =
+                status === 'success'
+                  ? transactions.map((tx) => ({ ...tx, status: 'success' as const }))
+                  : transactions;
+
+              dispatch(
+                updateDeposit({
+                  dydxAddress,
+                  deposit: {
+                    txHash: latestDeposit.txHash,
+                    chainId: latestDeposit.chainId,
+                    transactions: finalTransactions,
+                    finalAmountUsd: status === 'success' ? finalAmount : undefined,
+                    status,
+                  },
+                })
+              );
+            } else {
+              dispatch(
+                updateDeposit({
+                  dydxAddress,
+                  deposit: {
+                    txHash: transfer.txHash,
+                    chainId: transfer.chainId,
+                    finalAmountUsd: finalAmount,
+                    status,
+                  },
+                })
+              );
+            }
 
             if (status === 'success') {
               logBonsaiInfo('useUpdateTransfers', 'deposit finalized', {
@@ -117,6 +215,32 @@ export function useUpdateTransfers() {
           })
           .catch((error) => {
             log('useUpdateTransfers/deposit', error);
+
+            // waitForTransaction throws once Skip reports a terminal failure (e.g. a later leg
+            // rejected with "timeout elapsed"). Without this the deposit stays pending forever.
+            if (lastState === 'STATE_COMPLETED_ERROR' || lastState === 'STATE_ABANDONED') {
+              const latestDeposit = getLatestDeposit();
+              if (latestDeposit.status !== 'pending') return;
+              dispatch(
+                updateDeposit({
+                  dydxAddress,
+                  deposit: {
+                    txHash: transfer.txHash,
+                    chainId: transfer.chainId,
+                    status: 'error',
+                    ...(isMultiTx && {
+                      transactions: (latestDeposit.transactions ?? []).map((tx) =>
+                        tx.txHash === txHash ? { ...tx, status: 'error' as const } : tx
+                      ),
+                    }),
+                  },
+                })
+              );
+              return;
+            }
+
+            // Not a terminal state (e.g. a network error while polling): allow tracking again.
+            delete transactionToCallback.current[transferKey];
           });
       }
 
