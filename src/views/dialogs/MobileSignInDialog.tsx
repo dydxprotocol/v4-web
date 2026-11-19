@@ -22,6 +22,27 @@ import { ToggleButton } from '@/components/ToggleButton';
 
 import { log } from '@/lib/telemetry';
 
+const ENCRYPTION_KEY_LENGTH = 24;
+const ENCRYPTION_KEY_GROUP_SIZE = 4;
+const ENCRYPTION_KEY_GROUP_STARTS = Array.from(
+  { length: ENCRYPTION_KEY_LENGTH / ENCRYPTION_KEY_GROUP_SIZE },
+  (_, group) => group * ENCRYPTION_KEY_GROUP_SIZE
+);
+
+const generateEncryptionKey = () => {
+  const digits: string[] = [];
+  const bytes = new Uint8Array(ENCRYPTION_KEY_LENGTH * 2);
+  while (digits.length < ENCRYPTION_KEY_LENGTH) {
+    globalThis.crypto.getRandomValues(bytes);
+    bytes.forEach((byte) => {
+      if (byte < 250 && digits.length < ENCRYPTION_KEY_LENGTH) {
+        digits.push(String(byte % 10));
+      }
+    });
+  }
+  return digits.join('');
+};
+
 enum MobileSignInState {
   Waiting = 'Waiting',
   Scanning = 'Scanning',
@@ -79,8 +100,7 @@ export const MobileSignInDialog = ({
   const [isScanning, setIsScanning] = useState(false);
   const stringGetter = useStringGetter();
 
-  // Generate a random 6 digit encryptionKey
-  const encryptionKey = useMemo(() => String(Math.floor(100000 + Math.random() * 900000)), []);
+  const encryptionKey = useMemo(generateEncryptionKey, []);
 
   const title = {
     [MobileSignInState.Waiting]: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
@@ -119,7 +139,14 @@ export const MobileSignInDialog = ({
           })}
         </p>
         <span data-hj-suppress>
-          Encryption Key: <strong>{encryptionKey}</strong>
+          Encryption Key (enter without spaces):{' '}
+          <strong>
+            {ENCRYPTION_KEY_GROUP_STARTS.map((start) => (
+              <$EncryptionKeyGroup key={start}>
+                {encryptionKey.slice(start, start + ENCRYPTION_KEY_GROUP_SIZE)}
+              </$EncryptionKeyGroup>
+            ))}
+          </strong>
         </span>
         <MobileQrCode
           encryptionKey={encryptionKey}
@@ -172,6 +199,12 @@ const $Content = styled.div`
     svg {
       width: auto;
     }
+  }
+`;
+
+const $EncryptionKeyGroup = styled.span`
+  & + & {
+    margin-left: 0.5ch;
   }
 `;
 
