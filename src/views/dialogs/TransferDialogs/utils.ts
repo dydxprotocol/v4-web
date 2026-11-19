@@ -98,18 +98,8 @@ export function getUserAddressesForRoute(
         return { chainId, address: dydxAddress };
       default:
         if (isInjectiveEvmChainId(chainId)) {
-          if (sourceAccount?.chain === WalletNetworkType.Evm) {
-            return { chainId, address: sourceAccount.address as string };
-          }
-
-          if (sourceAccount?.chain === WalletNetworkType.Cosmos) {
-            if (!injectiveAddress) throw new Error('injectiveAddress undefined');
-
-            return {
-              chainId,
-              address: getInjectiveEvmAddress(injectiveAddress),
-            };
-          }
+          if (!injectiveAddress) throw new Error('injectiveAddress undefined');
+          return { chainId, address: getInjectiveEvmAddress(injectiveAddress) };
         }
 
         if (
