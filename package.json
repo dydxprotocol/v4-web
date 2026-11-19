@@ -218,7 +218,7 @@
     "typescript": "^5.9.3",
     "url-polyfill": "^1.1.12",
     "util": "^0.12.5",
-    "vite": "^7.1.9",
+    "vite": "^7.3.8",
     "vite-plugin-node-stdlib-browser": "^0.2.1",
     "vite-plugin-restart": "^0.4.0",
     "vite-plugin-svgr": "^3.2.0",
@@ -229,7 +229,9 @@
   },
   "pnpm": {
     "overrides": {
-      "follow-redirects": "1.15.3"
+      "follow-redirects": "1.15.3",
+      "vite@>=6.0.0 <6.4.6": "6.4.6",
+      "vite@>=7.0.0 <7.3.8": "7.3.8"
     }
   },
   "babelMacros": {
