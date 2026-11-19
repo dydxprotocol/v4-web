@@ -383,13 +383,6 @@ export const AccountMenu = () => {
             ]
           : []),
         onboardingState === OnboardingState.AccountConnected &&
-          hdKey && {
-            value: 'MobileQrSignIn',
-            icon: <Icon iconName={IconName.Qr} />,
-            label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
-            onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn({}))),
-          },
-        onboardingState === OnboardingState.AccountConnected &&
           hdKey &&
           !isTurnkey && {
             value: 'MnemonicExport',

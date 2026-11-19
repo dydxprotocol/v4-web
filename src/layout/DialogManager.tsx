@@ -30,7 +30,6 @@ import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ManageAccountDialog } from '@/views/dialogs/ManageAccountDialog/ManageAccountDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
-import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PredictionMarketIntroDialog } from '@/views/dialogs/PredictionMarketIntroDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
@@ -122,7 +121,6 @@ export const DialogManager = React.memo(() => {
     ManageAccount: (args) => <ManageAccountDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
-    MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,
     Onboarding: (args) => <OnboardingDialog {...args} {...modalProps} />,
     OrderDetails: (args) => <OrderDetailsDialog {...args} {...modalProps} />,
     PredictionMarketIntro: (args) => <PredictionMarketIntroDialog {...args} {...modalProps} />,

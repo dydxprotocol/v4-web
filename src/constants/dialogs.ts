@@ -51,7 +51,6 @@ export type ExternalNavKeplrDialogProps = {};
 export type ManageAccountDialogProps = {};
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
-export type MobileSignInDialogProps = { skipWaiting?: boolean };
 export type OnboardingDialogProps = {};
 export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
@@ -158,7 +157,6 @@ export const DialogTypes = unionize(
     ManageAccount: ofType<ManageAccountDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
-    MobileSignIn: ofType<MobileSignInDialogProps>(),
     Onboarding: ofType<OnboardingDialogProps>(),
     OrderDetails: ofType<OrderDetailsDialogProps>(),
     PredictionMarketIntro: ofType<PredictionMarketIntroDialogProps>(),
