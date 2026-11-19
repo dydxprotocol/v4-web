@@ -2,7 +2,6 @@ import { RouteRequest } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
 
-import { SKIP_SWAP_VENUES } from '@/constants/skip';
 import { timeUnits } from '@/constants/time';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
@@ -33,7 +32,6 @@ async function getSkipSwapRoute(
     sourceAssetChainId: chainId,
     destAssetDenom: outputTokenDenom,
     destAssetChainId: chainId,
-    swapVenues: SKIP_SWAP_VENUES,
     smartSwapOptions: {
       splitRoutes: true,
     },

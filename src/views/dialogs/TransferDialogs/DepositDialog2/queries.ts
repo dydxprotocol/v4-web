@@ -10,7 +10,6 @@ import { arbitrum, optimism } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
-import { SKIP_SWAP_VENUES } from '@/constants/skip';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
 import {
@@ -31,25 +30,26 @@ import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
-export function useBalances() {
-  const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
+export function useBalances({ refetchInterval }: { refetchInterval?: number } = {}) {
+  const { sourceAccount, injectiveAddress, osmosisAddress, neutronAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   return useQuery({
-    queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress, neutronAddress],
+    queryKey: ['balances', sourceAccount.address, injectiveAddress, osmosisAddress, neutronAddress],
     queryFn: async () => {
       return skipClient.balances(
-        networkTypeToBalances(sourceAccount, nobleAddress, osmosisAddress, neutronAddress)
+        networkTypeToBalances(sourceAccount, injectiveAddress, osmosisAddress, neutronAddress)
       );
     },
-    enabled: Boolean(sourceAccount.address && nobleAddress && osmosisAddress && neutronAddress),
+    enabled: Boolean(sourceAccount.address && injectiveAddress && osmosisAddress && neutronAddress),
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
+    refetchInterval,
   });
 }
 
-export function useDepositTokenBalances() {
-  const { isLoading, data } = useBalances();
+export function useDepositTokenBalances(options?: { refetchInterval?: number }) {
+  const { isLoading, data } = useBalances(options);
 
   const [withBalances, noBalances] = useMemo(() => {
     if (!data || !data.chains) return [[], []];
@@ -104,7 +104,7 @@ export function useBalance(
   }, [allBalances?.chains, chainId, tokenDenom]);
 }
 
-function getNativeEvmTokenDenom(chain: Chain) {
+export function getNativeEvmTokenDenom(chain: Chain) {
   // special case: chain name is OP Mainnet
   if (chain.id === optimism.id) {
     return 'optimism-native';
@@ -120,7 +120,7 @@ function getNativeEvmTokenDenom(chain: Chain) {
 
 function networkTypeToBalances(
   sourceAccount: SourceAccount,
-  nobleAddress?: string,
+  injectiveAddress?: string,
   osmosisAddress?: string,
   neutronAddress?: string
 ): BalanceRequest {
@@ -154,7 +154,7 @@ function networkTypeToBalances(
   }
 
   if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-    if (!neutronAddress || !osmosisAddress || !nobleAddress) {
+    if (!neutronAddress || !osmosisAddress || !injectiveAddress) {
       throw new Error('cosmos addresses not defined');
     }
 
@@ -168,9 +168,9 @@ function networkTypeToBalances(
           address: osmosisAddress,
           denoms: [USDC_ADDRESSES[CosmosChainId.Osmosis]],
         },
-        [CosmosChainId.Noble]: {
-          address: nobleAddress,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Noble]],
+        [CosmosChainId.Injective]: {
+          address: injectiveAddress,
+          denoms: [USDC_ADDRESSES[CosmosChainId.Injective]],
         },
       },
     };
@@ -216,7 +216,7 @@ async function getSkipDepositRoutes(
     // TODO(deposit2.0): Manually calculate price impact by comparing USD values and warn user if difference > a certain %
     allowUnsafe: true,
     smartSwapOptions: { evmSwaps: true },
-    swapVenues: SKIP_SWAP_VENUES,
+    allowMultiTx: true,
   };
 
   const [slow, fast] = await Promise.all([

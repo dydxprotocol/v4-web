@@ -1,6 +1,10 @@
 import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
 import { PublicKey } from '@solana/web3.js';
-import { isAddress } from 'viem';
+import { getAddress, isAddress } from 'viem';
+
+import { INJECTIVE_BECH32_PREFIX } from '@/constants/graz';
+
+const ETH_ADDRESS_BYTE_LENGTH = 20;
 
 /**
  *
@@ -40,6 +44,27 @@ export function validateCosmosAddress(address: string, prefix: string) {
   }
 }
 
+export function validateInjectiveAddress(address: string) {
+  try {
+    const { prefix, data } = fromBech32(address);
+    return prefix === INJECTIVE_BECH32_PREFIX && data.length === ETH_ADDRESS_BYTE_LENGTH;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Converts an Injective (inj) bech32 address to its Injective EVM (0x) address.
+ * Injective accounts use ethsecp256k1 (coin type 60), so the bech32 data is the EVM address.
+ * @warning Only pass Injective-derived addresses.
+ */
+export function getInjectiveEvmAddress(injectiveAddress: string): string {
+  if (!validateInjectiveAddress(injectiveAddress)) {
+    throw new Error(`Invalid injective address: ${injectiveAddress}`);
+  }
+  return getAddress(`0x${toHex(fromBech32(injectiveAddress).data)}`);
+}
+
 type MultiChainAddress =
   | { address?: string | null; network: 'cosmos'; prefix: string }
   | { address?: string | null; network: 'evm' }
@@ -66,6 +91,10 @@ export function isValidAddress(input: MultiChainAddress): boolean {
 
   if (input.network === 'solana') {
     return isValidSolanaAddress(input.address);
+  }
+
+  if (input.prefix === INJECTIVE_BECH32_PREFIX) {
+    return validateInjectiveAddress(input.address);
   }
 
   return validateCosmosAddress(input.address, input.prefix);

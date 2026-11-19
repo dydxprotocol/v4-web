@@ -2,7 +2,7 @@ import { RouteResponse, UserAddress } from '@skip-go/client';
 import { ChainMismatchError, isAddress, UserRejectedRequestError } from 'viem';
 import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
-import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
+import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId, isInjectiveEvmChainId } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
@@ -10,7 +10,12 @@ import { WalletNetworkType } from '@/constants/wallets';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { isValidSolanaAddress, validateCosmosAddress } from '@/lib/addressUtils';
+import {
+  getInjectiveEvmAddress,
+  isValidSolanaAddress,
+  validateCosmosAddress,
+  validateInjectiveAddress,
+} from '@/lib/addressUtils';
 
 // Because our deposit flow only supports ETH and USDC
 
@@ -41,6 +46,7 @@ export function getUserAddressesForRoute(
   route: RouteResponse,
   sourceAccount?: SourceAccount,
   nobleAddress?: string,
+  injectiveAddress?: string,
   dydxAddress?: string,
   osmosisAddress?: string,
   neutronAddress?: string,
@@ -59,6 +65,9 @@ export function getUserAddressesForRoute(
       case CosmosChainId.Noble:
         if (!nobleAddress) throw new Error('nobleAddress undefined');
         return { chainId, address: nobleAddress };
+      case CosmosChainId.Injective:
+        if (!injectiveAddress) throw new Error('injectiveAddress undefined');
+        return { chainId, address: injectiveAddress };
       case CosmosChainId.Osmosis:
         if (!osmosisAddress) throw new Error('osmosisAddress undefined');
         return { chainId, address: osmosisAddress };
@@ -69,6 +78,21 @@ export function getUserAddressesForRoute(
         if (!dydxAddress) throw new Error('dydxAddress undefined');
         return { chainId, address: dydxAddress };
       default:
+        if (isInjectiveEvmChainId(chainId)) {
+          if (sourceAccount?.chain === WalletNetworkType.Evm) {
+            return { chainId, address: sourceAccount.address as string };
+          }
+
+          if (sourceAccount?.chain === WalletNetworkType.Cosmos) {
+            if (!injectiveAddress) throw new Error('injectiveAddress undefined');
+
+            return {
+              chainId,
+              address: getInjectiveEvmAddress(injectiveAddress),
+            };
+          }
+        }
+
         if (
           (isEvmDepositChainId(chainId) && sourceAccount?.chain === WalletNetworkType.Evm) ||
           (chainId === SOLANA_MAINNET_ID && sourceAccount?.chain === SOLANA_MAINNET_ID)
@@ -126,8 +150,9 @@ export const parseWithdrawError = (e: Error, fallbackMessage: string) => {
 
 export function isValidWithdrawalAddress(address: string, chainId: string): boolean {
   switch (chainId) {
-    case CosmosChainId.Noble:
-      return validateCosmosAddress(address, 'noble');
+    case CosmosChainId.Injective:
+    case CosmosChainId.InjectiveTestnet:
+      return validateInjectiveAddress(address);
     case CosmosChainId.Osmosis:
       return validateCosmosAddress(address, 'osmo');
     case CosmosChainId.Neutron:

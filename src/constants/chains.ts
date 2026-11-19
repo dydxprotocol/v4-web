@@ -1,4 +1,4 @@
-import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
+import { arbitrum, avalanche, base, injective, mainnet, optimism, polygon } from 'viem/chains';
 
 import { CosmosChainId } from './graz';
 import { SOLANA_MAINNET_ID } from './solana';
@@ -69,12 +69,12 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
     gasDenom: 'NTRN',
     explorerBaseUrl: 'https://mintscan.io/neutron',
   },
-  [CosmosChainId.Noble]: {
-    name: 'Noble',
-    icon: '/chains/noble.png',
+  [CosmosChainId.Injective]: {
+    name: 'Injective',
+    icon: '/chains/injective.png',
     walletNetworkType: WalletNetworkType.Cosmos,
     gasDenom: 'USDC',
-    explorerBaseUrl: 'https://mintscan.io/noble',
+    explorerBaseUrl: 'https://mintscan.io/injective',
   },
   [CosmosChainId.Osmosis]: {
     name: 'Osmosis',
@@ -89,10 +89,13 @@ export const EVM_DEPOSIT_CHAINS = [mainnet, base, optimism, arbitrum, polygon, a
 export function isEvmDepositChainId(chainId: string) {
   return EVM_DEPOSIT_CHAINS.map((chain) => String(chain.id)).includes(chainId);
 }
+export function isInjectiveEvmChainId(chainId: string) {
+  return chainId === injective.id.toString();
+}
 
 export const NEAR_INSTANT_DEPOSIT_CHAINS = [
   SOLANA_MAINNET_ID,
-  CosmosChainId.Noble,
+  CosmosChainId.Injective,
   CosmosChainId.Osmosis,
   CosmosChainId.Neutron,
   polygon.id.toString(),

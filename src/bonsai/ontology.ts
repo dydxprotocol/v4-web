@@ -74,7 +74,7 @@ import {
   selectAssetInfo,
   selectAssetLogo,
 } from './selectors/assets';
-import { selectAccountBalances, selectAccountNobleUsdcBalance } from './selectors/balances';
+import { selectAccountBalances } from './selectors/balances';
 import {
   selectRawIndexerHeightDataLoading,
   selectRawMarketsData,
@@ -188,9 +188,6 @@ interface BonsaiCoreShape {
     balances: {
       data: BasicSelector<AccountBalances>;
     };
-    nobleUsdcBalance: {
-      data: BasicSelector<string | undefined>;
-    };
     stakingTier: {
       data: BasicSelector<UserStakingTierSummary | undefined>;
     };
@@ -275,9 +272,6 @@ export const BonsaiCore: BonsaiCoreShape = {
     },
     balances: {
       data: selectAccountBalances,
-    },
-    nobleUsdcBalance: {
-      data: selectAccountNobleUsdcBalance,
     },
     stakingTier: {
       data: selectAccountStakingTier,

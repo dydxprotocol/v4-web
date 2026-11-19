@@ -19,7 +19,12 @@ import { getWalletClient } from '@wagmi/core';
 import { WalletClient } from 'viem';
 import { useConfig } from 'wagmi';
 
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
+import {
+  getInjectiveChainId,
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+} from '@/constants/graz';
 import { getSolanaChainId } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -121,12 +126,19 @@ export function getSkipClient() {
 }
 
 const useSkipClientContext = () => {
-  const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators, skip } =
-    useEndpointsConfig();
+  const {
+    solanaRpcUrl,
+    injectiveValidator,
+    neutronValidator,
+    nobleValidator,
+    osmosisValidator,
+    validators,
+    skip,
+  } = useEndpointsConfig();
 
   const { compositeClient } = useCompositeClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const { sourceAccount, localDydxWallet } = useAccounts();
+  const { sourceAccount, localDydxWallet, localInjectiveWallet } = useAccounts();
   const wagmiConfig = useConfig();
 
   const [instanceId, setInstanceId] = useState<string>();
@@ -146,6 +158,14 @@ const useSkipClientContext = () => {
           if (!localDydxWallet?.offlineSigner) {
             throw new Error('no cosmos wallet connected');
           }
+
+          if (chainId === getInjectiveChainId()) {
+            if (!localInjectiveWallet?.offlineSigner) {
+              throw new Error('no injective wallet connected');
+            }
+            return localInjectiveWallet.offlineSigner;
+          }
+
           return localDydxWallet.offlineSigner;
         }
         if (!window.keplr) {
@@ -170,13 +190,14 @@ const useSkipClientContext = () => {
     skipClient.setSigners(signers);
     const id = crypto.randomUUID();
     setInstanceId(id);
-  }, [sourceAccount.chain, wagmiConfig, localDydxWallet]);
+  }, [sourceAccount.chain, wagmiConfig, localDydxWallet, localInjectiveWallet]);
 
   useEffect(() => {
     const options: SkipClientOptions = {
       apiUrl: skip,
       endpointOptions: {
         getRpcEndpointForChain: async (chainId: string) => {
+          if (chainId === getInjectiveChainId()) return injectiveValidator;
           if (chainId === getNobleChainId()) return nobleValidator;
           if (chainId === getNeutronChainId()) return neutronValidator;
           if (chainId === getOsmosisChainId()) return osmosisValidator;
@@ -198,6 +219,7 @@ const useSkipClientContext = () => {
     compositeClient?.network.validatorConfig.restEndpoint,
     neutronValidator,
     nobleValidator,
+    injectiveValidator,
     osmosisValidator,
     selectedDydxChainId,
     skip,

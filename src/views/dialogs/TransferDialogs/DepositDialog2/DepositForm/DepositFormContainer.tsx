@@ -1,5 +1,6 @@
-import { Dispatch, RefObject, SetStateAction, useState } from 'react';
+import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
 
+import { timeUnits } from '@/constants/time';
 import { TokenForTransfer } from '@/constants/tokens';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -8,11 +9,14 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useAppDispatch } from '@/state/appTypes';
 import { addDeposit, Deposit } from '@/state/transfers';
 
+import { useDepositTokenBalances } from '../queries';
 import { DepositForm } from './DepositForm';
-import { QrDeposit } from './QrDeposit';
 import { TokenSelect } from './TokenSelect';
+import { WalletAddressDeposit } from './WalletAddressDeposit';
 
-export type DepositFormState = 'form' | 'token-select' | 'qr-deposit';
+export type DepositFormState = 'form' | 'token-select' | 'wallet-address';
+
+const WALLET_ADDRESS_BALANCE_REFETCH_INTERVAL = 10 * timeUnits.second;
 
 export const DepositFormContent = ({
   defaultToken,
@@ -21,13 +25,15 @@ export const DepositFormContent = ({
   setFormState,
   tokenSelectRef,
   onDeposit,
+  canDepositToWalletAddress,
 }: {
   defaultToken: TokenForTransfer;
-  formState: 'form' | 'token-select' | 'qr-deposit';
+  formState: DepositFormState;
   onShowForm: () => void;
   setFormState: Dispatch<SetStateAction<DepositFormState>>;
   tokenSelectRef: RefObject<HTMLDivElement>;
   onDeposit: (args: { txHash: string; chainId: string }) => void;
+  canDepositToWalletAddress?: boolean;
 }) => {
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
@@ -36,10 +42,31 @@ export const DepositFormContent = ({
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState<TokenForTransfer>(defaultToken);
 
-  const onShowQrDeposit = () => {
-    setFormState('qr-deposit');
-    tokenSelectRef.current?.scroll({ top: 0 });
-  };
+  const { withBalances } = useDepositTokenBalances({
+    refetchInterval:
+      formState === 'wallet-address' ? WALLET_ADDRESS_BALANCE_REFETCH_INTERVAL : undefined,
+  });
+
+  const highestBalance = withBalances.at(0);
+  const hadBalancesRef = useRef(withBalances.length > 0);
+
+  useEffect(() => {
+    const hasBalances = highestBalance != null;
+    if (
+      !hadBalancesRef.current &&
+      hasBalances &&
+      formState === 'wallet-address' &&
+      highestBalance.decimals != null
+    ) {
+      setToken({
+        chainId: highestBalance.chainId,
+        denom: highestBalance.denom,
+        decimals: highestBalance.decimals,
+      });
+      onShowForm();
+    }
+    hadBalancesRef.current = hasBalances;
+  }, [formState, highestBalance, onShowForm]);
 
   const handleDeposit = (deposit: Deposit) => {
     if (!dydxAddress) return;
@@ -79,22 +106,24 @@ export const DepositFormContent = ({
         >
           <TokenSelect
             disabled={formState !== 'token-select'}
-            onQrDeposit={onShowQrDeposit}
             token={token}
             setToken={setToken}
             onBack={onShowForm}
+            onWalletAddressDeposit={
+              canDepositToWalletAddress ? () => setFormState('wallet-address') : undefined
+            }
           />
         </div>
 
         <div
           tw="w-[33.33%] overflow-scroll"
           css={{
-            pointerEvents: formState !== 'qr-deposit' ? 'none' : undefined,
-            height: formState !== 'qr-deposit' ? 0 : '100%',
+            pointerEvents: formState !== 'wallet-address' ? 'none' : undefined,
+            height: formState !== 'wallet-address' ? 0 : '100%',
             maxHeight: isMobile ? undefined : '30rem',
           }}
         >
-          <QrDeposit disabled={formState !== 'qr-deposit'} />
+          {canDepositToWalletAddress && <WalletAddressDeposit />}
         </div>
       </div>
     </div>

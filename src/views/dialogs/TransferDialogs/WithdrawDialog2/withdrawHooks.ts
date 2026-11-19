@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 import { initial } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { CosmosChainId } from '@/constants/graz';
+import { getInjectiveChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { USDC_ASSET_ID } from '@/constants/tokens';
@@ -53,8 +53,9 @@ export function useWithdrawStep({
   const {
     dydxAddress,
     localDydxWallet,
-    localNobleWallet,
+    localInjectiveWallet,
     nobleAddress,
+    injectiveAddress,
     osmosisAddress,
     neutronAddress,
     sourceAccount,
@@ -78,6 +79,7 @@ export function useWithdrawStep({
       withdrawRoute,
       sourceAccount,
       nobleAddress,
+      injectiveAddress,
       dydxAddress,
       osmosisAddress,
       neutronAddress,
@@ -87,6 +89,7 @@ export function useWithdrawStep({
     dydxAddress,
     neutronAddress,
     nobleAddress,
+    injectiveAddress,
     osmosisAddress,
     sourceAccount,
     withdrawRoute,
@@ -95,11 +98,11 @@ export function useWithdrawStep({
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
-      if (chainID === CosmosChainId.Noble) {
-        if (!localNobleWallet?.offlineSigner) {
-          throw new Error('No local noblewallet offline signer. Cannot submit tx');
+      if (chainID === getInjectiveChainId()) {
+        if (!localInjectiveWallet?.offlineSigner) {
+          throw new Error('No local injectivewallet offline signer. Cannot submit tx');
         }
-        return localNobleWallet.offlineSigner;
+        return localInjectiveWallet.offlineSigner;
       }
 
       if (!localDydxWallet?.offlineSigner)
@@ -107,7 +110,7 @@ export function useWithdrawStep({
 
       return localDydxWallet.offlineSigner;
     },
-    [localDydxWallet, localNobleWallet]
+    [localDydxWallet, localInjectiveWallet]
   );
 
   const executeWithdraw = async () => {
@@ -115,7 +118,7 @@ export function useWithdrawStep({
       setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
       if (!userAddresses) throw new Error('No user addresses found');
-      if (!localDydxWallet || !localNobleWallet || !dydxAddress) {
+      if (!localDydxWallet || !localInjectiveWallet || !dydxAddress) {
         throw new Error('No local wallets found');
       }
 
