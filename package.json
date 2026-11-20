@@ -152,7 +152,7 @@
     "wagmi": "^2.17.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.9",
+    "@babel/core": "^7.29.13",
     "@commitlint/cli": "^19.0.3",
     "@commitlint/config-conventional": "^19.0.3",
     "@ladle/react": "^4.0.2",
@@ -178,9 +178,9 @@
     "@wdio/mocha-framework": "^8.32.4",
     "@wdio/spec-reporter": "^8.32.4",
     "@wdio/types": "^8.32.4",
-    "ajv": "^8.12.0",
+    "ajv": "^8.20.0",
     "assert": "^2.0.0",
-    "axios": "^1.6.7",
+    "axios": "^1.21.1",
     "babel-loader": "^9.1.2",
     "babel-plugin-macros": "^3.1.0",
     "babel-plugin-styled-components": "^2.1.4",
@@ -204,7 +204,7 @@
     "minimist": "^1.2.8",
     "node-fetch": "^3.3.1",
     "pnpm": "^8.6.6",
-    "postcss": "^8.4.39",
+    "postcss": "^8.5.33",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.5",
     "readline-sync": "^1.4.10",
@@ -229,7 +229,7 @@
   },
   "pnpm": {
     "overrides": {
-      "follow-redirects": "1.15.3",
+      "follow-redirects": "^1.16.3",
       "vite@>=6.0.0 <6.4.6": "6.4.6",
       "vite@>=7.0.0 <7.3.8": "7.3.8"
     }
