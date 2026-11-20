@@ -10,7 +10,8 @@ const pnpmVersionFromPackageJson = packageManager.startsWith('pnpm@')
   ? packageManager.split('@')[1]
   : null;
 
-const requiredMajorPnpmVersion = pnpmVersionFromPackageJson[0];
+// Take the full major component; indexing [0] read "10.x" as major "1".
+const requiredMajorPnpmVersion = pnpmVersionFromPackageJson?.split('.')[0];
 
 if (!requiredMajorPnpmVersion) {
   console.error('Error: Could not find pnpm version in package.json');
