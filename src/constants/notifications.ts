@@ -24,6 +24,7 @@ export enum NotificationType {
   CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
   DepositAddressEvents = 'DepositAddressEvents', // lifecycle events for deposit notifications
   InjectiveDeposit = 'InjectiveDeposit', // USDC waiting on Injective to be sent to dYdX
+  DepositPolicyUpdate = 'DepositPolicyUpdate', // Turnkey account must sign in again to keep deposits working
 }
 
 export enum NotificationCategoryPreferences {
@@ -59,6 +60,7 @@ export const NotificationTypeCategory: {
   [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
   [NotificationType.DepositAddressEvents]: NotificationCategoryPreferences.MustSee,
   [NotificationType.InjectiveDeposit]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.DepositPolicyUpdate]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -68,6 +70,7 @@ export const SingleSessionNotificationTypes = [
   NotificationType.Custom,
   NotificationType.CosmosWalletLifecycle,
   NotificationType.InjectiveDeposit,
+  NotificationType.DepositPolicyUpdate,
 ];
 
 export type NotificationId = string | number;

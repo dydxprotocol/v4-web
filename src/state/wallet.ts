@@ -107,11 +107,15 @@ export const walletSlice = createSlice({
 export interface WalletEphemeralState {
   localWalletNonce?: number;
   hdKeyNonce?: number;
+  // The Turnkey account still permits only an earlier deposit route, and bringing it up to date
+  // needs the user to sign in again
+  turnkeyDepositPolicyNeedsSignIn: boolean;
 }
 
 const initialEphemeralState: WalletEphemeralState = {
   localWalletNonce: undefined,
   hdKeyNonce: undefined,
+  turnkeyDepositPolicyNeedsSignIn: false,
 };
 
 export const walletEphemeralSlice = createSlice({
@@ -123,6 +127,9 @@ export const walletEphemeralSlice = createSlice({
     },
     setHdKeyNonce: (state, action: PayloadAction<number | undefined>) => {
       state.hdKeyNonce = action.payload;
+    },
+    setTurnkeyDepositPolicyNeedsSignIn: (state, action: PayloadAction<boolean>) => {
+      state.turnkeyDepositPolicyNeedsSignIn = action.payload;
     },
   },
 });
@@ -140,4 +147,5 @@ export const {
   clearTurnkeyPrimaryWallet,
 } = walletSlice.actions;
 
-export const { setLocalWalletNonce, setHdKeyNonce } = walletEphemeralSlice.actions;
+export const { setLocalWalletNonce, setHdKeyNonce, setTurnkeyDepositPolicyNeedsSignIn } =
+  walletEphemeralSlice.actions;
