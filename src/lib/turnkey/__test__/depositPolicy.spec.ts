@@ -1,3 +1,4 @@
+import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { hashTypedData, type Hex, recoverAddress, toHex } from 'viem';
 import { generatePrivateKey, mnemonicToAccount, privateKeyToAccount, sign } from 'viem/accounts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -24,6 +25,10 @@ const USER_KEY = toHex(
 );
 const OTHER_KEY = generatePrivateKey();
 const DYDX_ADDRESS = response.dydxAddress;
+// The Injective account whose key the app holds, which the fixture was requested for.
+const INJECTIVE_ADDRESS = response.injectiveAddress;
+// What an indexer that derived the address from the dYdX address would answer for.
+const INJECTIVE_ADDRESS_WITH_DYDX_BYTES = toBech32('inj', fromBech32(DYDX_ADDRESS).data);
 
 const getPolicy = (): DepositPolicy => structuredClone(response) as DepositPolicy;
 
@@ -67,38 +72,36 @@ describe('deposit policy', () => {
   });
 
   describe('fetchDepositPolicy', () => {
-    it('fetches the policy of the account', async () => {
-      fetchMock.mockResolvedValue(jsonResponse(response));
-      const policy = await fetchDepositPolicy({
-        indexerUrl: `${INDEXER_URL}/`,
+    const fetchPolicy = (indexerUrl = INDEXER_URL) =>
+      fetchDepositPolicy({
+        indexerUrl,
         dydxAddress: DYDX_ADDRESS,
+        injectiveAddress: INJECTIVE_ADDRESS,
       });
+
+    it('fetches the policy of the account for the Injective account it names', async () => {
+      fetchMock.mockResolvedValue(jsonResponse(response));
+      const policy = await fetchPolicy(`${INDEXER_URL}/`);
       expect(policy).toEqual(response);
       expect(fetchMock).toHaveBeenCalledWith(
-        `${INDEXER_URL}/v4/turnkey/depositPolicy/${DYDX_ADDRESS}`,
+        `${INDEXER_URL}/v4/turnkey/depositPolicy/${DYDX_ADDRESS}?injectiveAddress=${INJECTIVE_ADDRESS}`,
         {}
       );
     });
 
     it('returns undefined for an account the indexer does not know', async () => {
       fetchMock.mockResolvedValue(jsonResponse({ errors: [{ msg: 'not found' }] }, 404));
-      expect(
-        await fetchDepositPolicy({ indexerUrl: INDEXER_URL, dydxAddress: DYDX_ADDRESS })
-      ).toBeUndefined();
+      expect(await fetchPolicy()).toBeUndefined();
     });
 
     it('fails with the message of the indexer', async () => {
       fetchMock.mockResolvedValue(jsonResponse({ errors: [{ msg: 'Too many requests' }] }, 429));
-      await expect(
-        fetchDepositPolicy({ indexerUrl: INDEXER_URL, dydxAddress: DYDX_ADDRESS })
-      ).rejects.toThrow(new DepositPolicyError('Too many requests'));
+      await expect(fetchPolicy()).rejects.toThrow(new DepositPolicyError('Too many requests'));
     });
 
     it('fails on a response of another shape', async () => {
       fetchMock.mockResolvedValue(jsonResponse({ dydxAddress: DYDX_ADDRESS }));
-      await expect(
-        fetchDepositPolicy({ indexerUrl: INDEXER_URL, dydxAddress: DYDX_ADDRESS })
-      ).rejects.toThrow(DepositPolicyError);
+      await expect(fetchPolicy()).rejects.toThrow(DepositPolicyError);
     });
   });
 
@@ -147,11 +150,13 @@ describe('deposit policy', () => {
     const sync = (
       client: ReturnType<typeof createClient>,
       policy: DepositPolicy = getPolicy(),
-      expectedEvmAddress: string | undefined = response.evm.address
+      expectedEvmAddress: string | undefined = response.evm.address,
+      injectiveAddress: string = INJECTIVE_ADDRESS
     ) =>
       syncDepositPolicy({
         indexerUrl: INDEXER_URL,
         dydxAddress: DYDX_ADDRESS,
+        injectiveAddress,
         policy,
         turnkey: asTurnkey(client),
         expectedEvmAddress,
@@ -195,6 +200,9 @@ describe('deposit policy', () => {
       expect(options.method).toBe('POST');
       const body = JSON.parse(options.body);
       expect(body.dydxAddress).toBe(DYDX_ADDRESS);
+      // The indexer bridges the account's deposits to this address from now on.
+      expect(body.injectiveAddress).toBe(INJECTIVE_ADDRESS);
+      expect(Object.keys(body).sort()).toEqual(['dydxAddress', 'injectiveAddress', 'signatures']);
       expect(body.signatures.map((s: any) => s.chainId)).toEqual([
         '42161',
         '1',
@@ -348,10 +356,37 @@ describe('deposit policy', () => {
         const client = createClient();
         await expect(sync(client, otherAccount)).rejects.toThrow(DepositPolicyValidationError);
         expectNothingDone(client);
+      });
 
+      it('the indexer answers for another Injective account than the one named', async () => {
+        // As an indexer would that derived the address from the dYdX address.
         const otherDestination = getPolicy();
-        otherDestination.injectiveAddress = 'inj1someoneelse';
-        await expect(sync(client, otherDestination)).rejects.toThrow(DepositPolicyValidationError);
+        otherDestination.injectiveAddress = INJECTIVE_ADDRESS_WITH_DYDX_BYTES;
+        const client = createClient();
+        await expect(sync(client, otherDestination)).rejects.toThrow(
+          new DepositPolicyValidationError('deposit policy is for another account')
+        );
+        expectNothingDone(client);
+      });
+
+      it('the policy is for another Injective account than the one the app holds', async () => {
+        // The response says the right address, but what it asks to approve is for another.
+        const client = createClient();
+        const policy = getPolicy();
+        policy.injectiveAddress = INJECTIVE_ADDRESS_WITH_DYDX_BYTES;
+        await expect(
+          sync(client, policy, response.evm.address, INJECTIVE_ADDRESS_WITH_DYDX_BYTES)
+        ).rejects.toThrow(DepositPolicyValidationError);
+        expectNothingDone(client);
+      });
+
+      it('the app names something that is not an Injective account', async () => {
+        const client = createClient();
+        const policy = getPolicy();
+        policy.injectiveAddress = DYDX_ADDRESS;
+        await expect(sync(client, policy, response.evm.address, DYDX_ADDRESS)).rejects.toThrow(
+          new DepositPolicyValidationError('not an Injective address')
+        );
         expectNothingDone(client);
       });
 

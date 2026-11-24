@@ -57,16 +57,17 @@ class LocalWalletManager {
 
   private localWallet: LocalWallet | undefined;
 
-  private localNobleWallet: LocalWallet | undefined;
+  // The wallet of the Injective account that deposits and withdrawals pass through
+  private localInjectiveWallet: LocalWallet | undefined;
 
   setStore(store: RootStore) {
     this.store = store;
   }
 
-  setLocalWallet(localWallet: LocalWallet, localNobleWallet: LocalWallet) {
+  setLocalWallet(localWallet: LocalWallet, localInjectiveWallet: LocalWallet) {
     this.localWalletNonce = this.localWalletNonce != null ? this.localWalletNonce + 1 : 0;
     this.localWallet = localWallet;
-    this.localNobleWallet = localNobleWallet;
+    this.localInjectiveWallet = localInjectiveWallet;
 
     if (!this.store) {
       log('LocalWalletManager: store has not been set');
@@ -84,18 +85,18 @@ class LocalWalletManager {
     return this.localWallet;
   }
 
-  getLocalNobleWallet(localWalletNonce: number): LocalWallet | undefined {
+  getLocalInjectiveWallet(localWalletNonce: number): LocalWallet | undefined {
     if (localWalletNonce !== this.localWalletNonce) {
       return undefined;
     }
 
-    return this.localNobleWallet;
+    return this.localInjectiveWallet;
   }
 
   clearLocalWallet() {
     this.localWalletNonce = undefined;
     this.localWallet = undefined;
-    this.localNobleWallet = undefined;
+    this.localInjectiveWallet = undefined;
     this.store?.dispatch(setLocalWalletNonce(undefined));
   }
 }

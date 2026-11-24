@@ -15,13 +15,17 @@ import {
   assertExpectedEnableTypedData,
   assertExpectedSolanaPolicy,
   DepositPolicyValidationError,
-  getInjectiveDepositRecipient,
+  getInjectiveMintRecipient,
 } from '../depositPolicyExpectations';
 // A response of the indexer's deposit policy endpoint for an account with the earlier policy,
-// generated with the indexer's own code. The user's key is the first Hardhat test account.
+// generated with the indexer's own code. The user's EVM key is the first account of the phrase
+// Hardhat uses for its test accounts, and the Injective account named is that of the second.
 import response from './depositPolicyResponse.fixture.json';
 
 const DYDX_ADDRESS = response.dydxAddress;
+const INJECTIVE_ADDRESS = response.injectiveAddress;
+// The 20 bytes of INJECTIVE_ADDRESS, as they appear wherever the policy names the recipient.
+const INJECTIVE_ADDRESS_HEX = '70997970c51812dc3a010c7d01b50e0d17dc79c8';
 const EVM_ADDRESS = response.evm.address;
 const OTHER_RECIPIENT = pad('0x00000000000000000000000000000000deadbeef', { size: 32 });
 
@@ -92,22 +96,38 @@ const check = (typedData: any, chainId: string) =>
   assertExpectedEnableTypedData({
     typedData,
     chainId: Number(chainId),
-    dydxAddress: DYDX_ADDRESS,
+    injectiveAddress: INJECTIVE_ADDRESS,
     evmAddress: EVM_ADDRESS,
   });
 
-describe('getInjectiveDepositRecipient', () => {
-  it('is the Injective account with the bytes of the dYdX address', () => {
-    expect(getInjectiveDepositRecipient(DYDX_ADDRESS)).toEqual({
-      injectiveAddress: response.injectiveAddress,
-      mintRecipient: '0x0000000000000000000000000102030405060708090a0b0c0d0e0f1011121314',
-    });
+/** The Injective account with the address bytes of an address of another chain. */
+function withInjectivePrefix(address: string) {
+  return toBech32('inj', fromBech32(address).data);
+}
+
+/** The fixture's Injective address with one of its bytes changed. */
+function getOtherInjectiveAddress() {
+  const { data } = fromBech32(INJECTIVE_ADDRESS);
+  data[0] = data[0]! + 1;
+  return toBech32('inj', data);
+}
+
+describe('getInjectiveMintRecipient', () => {
+  it('is the address bytes of the Injective account, padded to 32', () => {
+    expect(getInjectiveMintRecipient(INJECTIVE_ADDRESS)).toEqual(
+      `0x000000000000000000000000${INJECTIVE_ADDRESS_HEX}`
+    );
   });
 
-  it('rejects an address of another chain', () => {
-    expect(() => getInjectiveDepositRecipient(response.injectiveAddress)).toThrow(
-      DepositPolicyValidationError
-    );
+  it.each([
+    ['a dYdX address', DYDX_ADDRESS],
+    ['an EVM address', EVM_ADDRESS],
+    ['an address with a bad checksum', `${INJECTIVE_ADDRESS.slice(0, -1)}q`],
+    ['an address in upper case', INJECTIVE_ADDRESS.toUpperCase()],
+    ['an address that is not 20 bytes', toBech32('inj', new Uint8Array(32))],
+    ['an empty string', ''],
+  ])('rejects %s', (_name, address) => {
+    expect(() => getInjectiveMintRecipient(address)).toThrow(DepositPolicyValidationError);
   });
 });
 
@@ -356,21 +376,31 @@ describe('assertExpectedEnableTypedData', () => {
       assertExpectedEnableTypedData({
         typedData: getTypedData('42161'),
         chainId: 42161,
-        dydxAddress: DYDX_ADDRESS,
+        injectiveAddress: INJECTIVE_ADDRESS,
         evmAddress: zeroAddress,
       })
     ).toThrow(DepositPolicyValidationError);
   });
 
-  it('rejects the policy of another dYdX account', () => {
+  it.each([
+    ['another Injective account', getOtherInjectiveAddress()],
+    // What the indexer would bridge to if it derived the address itself.
+    ['the Injective account with the bytes of the dYdX address', withInjectivePrefix(DYDX_ADDRESS)],
+    ['something that is not an Injective account', DYDX_ADDRESS],
+  ])('rejects the policy when the app holds the key of %s', (_name, injectiveAddress) => {
     expect(() =>
       assertExpectedEnableTypedData({
         typedData: getTypedData('42161'),
         chainId: 42161,
-        dydxAddress: getOtherDydxAddress(),
+        injectiveAddress,
         evmAddress: EVM_ADDRESS,
       })
     ).toThrow(DepositPolicyValidationError);
+  });
+
+  it('names the Injective account once, as the recipient of the bridge call', () => {
+    const { validatorData } = getTypedData('42161').message;
+    expect(validatorData.toLowerCase().split(INJECTIVE_ADDRESS_HEX)).toHaveLength(2);
   });
 
   it('rejects typed data offered for a chain it was not made for', () => {
@@ -392,41 +422,40 @@ describe('assertExpectedEnableTypedData', () => {
   });
 });
 
-function getOtherDydxAddress() {
-  // The fixture's address with one of its bytes changed.
-  const { data } = fromBech32(DYDX_ADDRESS);
-  data[0] = data[0]! + 1;
-  return toBech32('dydx', data);
-}
-
 describe('assertExpectedSolanaPolicy', () => {
   const getPolicy = (): any => structuredClone(response.solana.policy);
-  const rejects = (policy: any, dydxAddress = DYDX_ADDRESS) =>
-    expect(() => assertExpectedSolanaPolicy({ policy, dydxAddress })).toThrow(
+  const rejects = (policy: any, injectiveAddress = INJECTIVE_ADDRESS) =>
+    expect(() => assertExpectedSolanaPolicy({ policy, injectiveAddress })).toThrow(
       DepositPolicyValidationError
     );
 
   it('accepts what the indexer asks for', () => {
-    expect(assertExpectedSolanaPolicy({ policy: getPolicy(), dydxAddress: DYDX_ADDRESS })).toEqual(
-      response.solana.policy
-    );
+    expect(
+      assertExpectedSolanaPolicy({ policy: getPolicy(), injectiveAddress: INJECTIVE_ADDRESS })
+    ).toEqual(response.solana.policy);
   });
 
   it('drops fields it has not checked', () => {
     const policy = { ...getPolicy(), organizationId: 'another-organization' };
-    expect(assertExpectedSolanaPolicy({ policy, dydxAddress: DYDX_ADDRESS })).toEqual(
+    expect(assertExpectedSolanaPolicy({ policy, injectiveAddress: INJECTIVE_ADDRESS })).toEqual(
       response.solana.policy
     );
   });
 
   it('rejects another recipient', () => {
     const policy = getPolicy();
+    expect(policy.condition).toContain(`'000000000000000000000000${INJECTIVE_ADDRESS_HEX}'`);
     policy.condition = policy.condition.replace(
-      '0000000000000000000000000102030405060708090a0b0c0d0e0f1011121314',
+      `000000000000000000000000${INJECTIVE_ADDRESS_HEX}`,
       OTHER_RECIPIENT.slice(2)
     );
     rejects(policy);
-    rejects(getPolicy(), getOtherDydxAddress());
+  });
+
+  it('rejects the policy when the app holds the key of another Injective account', () => {
+    rejects(getPolicy(), getOtherInjectiveAddress());
+    rejects(getPolicy(), withInjectivePrefix(DYDX_ADDRESS));
+    rejects(getPolicy(), DYDX_ADDRESS);
   });
 
   it('rejects a wider condition', () => {

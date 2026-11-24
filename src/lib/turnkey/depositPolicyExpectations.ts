@@ -1,4 +1,4 @@
-import { fromBech32, toBech32 } from '@cosmjs/encoding';
+import { fromBech32 } from '@cosmjs/encoding';
 import {
   concat,
   decodeAbiParameters,
@@ -22,10 +22,14 @@ import { USDC_ADDRESSES } from '@/constants/tokens';
  * What a Turnkey account is asked to approve so that the indexer can bridge its deposits, and
  * the checks that a request to approve it is exactly that and nothing more.
  *
+ * Deposits are bridged to the Injective account whose key the app holds, which only the app can
+ * name: the indexer cannot work it out. The app gives the indexer that address and gets back
+ * requests to approve bridging to it.
+ *
  * The approvals are made without asking the user, so the app must not sign whatever the indexer
- * returns. It builds the policy it expects from the user's own dYdX address and refuses anything
- * that differs. The values here mirror the policy the indexer builds (`call-policies.ts` and
- * `policy-engine.ts` in comlink) and must change together with it.
+ * returns. It builds the policy it expects from the Injective address it gave and refuses
+ * anything that differs. The values here mirror the policy the indexer builds
+ * (`call-policies.ts` and `policy-engine.ts` in comlink) and must change together with it.
  */
 
 export class DepositPolicyValidationError extends Error {
@@ -35,7 +39,6 @@ export class DepositPolicyValidationError extends Error {
   }
 }
 
-const BECH32_PREFIX_DYDX = 'dydx';
 const ACCOUNT_ADDRESS_BYTE_LENGTH = 20;
 
 /* ----------------------------- EVM ----------------------------- */
@@ -120,21 +123,29 @@ const PERMISSIONS_ABI = [
 const POLICY_AND_SIGNER_ABI = [{ type: 'bytes[]' }] as const;
 
 /**
- * Where an account's deposits are bridged to: the Injective account that shares its 20 address
- * bytes with the dYdX account, as an `inj` address and as the 32-byte CCTP mint recipient.
+ * An Injective account as CCTP names the recipient of a transfer: its 20 address bytes padded
+ * to 32.
+ *
+ * @throws DepositPolicyValidationError if `injectiveAddress` is not the address of an Injective
+ * account, written the usual way.
  */
-export function getInjectiveDepositRecipient(dydxAddress: string): {
-  injectiveAddress: string;
-  mintRecipient: Hex;
-} {
-  const { prefix, data } = fromBech32(dydxAddress);
-  if (prefix !== BECH32_PREFIX_DYDX || data.length !== ACCOUNT_ADDRESS_BYTE_LENGTH) {
-    throw new DepositPolicyValidationError('not a dYdX address');
+export function getInjectiveMintRecipient(injectiveAddress: string): Hex {
+  let decoded: ReturnType<typeof fromBech32>;
+  try {
+    decoded = fromBech32(injectiveAddress);
+  } catch (error) {
+    throw new DepositPolicyValidationError('not an Injective address');
   }
-  return {
-    injectiveAddress: toBech32(INJECTIVE_BECH32_PREFIX, data),
-    mintRecipient: pad(toHex(data), { size: 32 }),
-  };
+  if (
+    decoded.prefix !== INJECTIVE_BECH32_PREFIX ||
+    decoded.data.length !== ACCOUNT_ADDRESS_BYTE_LENGTH ||
+    // bech32 also allows an address in upper case. Addresses are compared as text, so only the
+    // usual form is taken.
+    injectiveAddress !== injectiveAddress.toLowerCase()
+  ) {
+    throw new DepositPolicyValidationError('not an Injective address');
+  }
+  return pad(toHex(decoded.data), { size: 32 });
 }
 
 function getUsdcAddress(chainId: number): Hex {
@@ -153,8 +164,8 @@ const equalTo = (value: Hex, offset: number) => ({
 
 /**
  * The only permissions the bridge session key may be given on `chainId`: approving the relayer
- * to spend USDC, and bridging USDC through it to the account's own Injective address, with the
- * relayer's fee capped. Encoded the way the call policy contract stores them.
+ * to spend USDC, and bridging USDC through it to the one Injective account, with the relayer's
+ * fee capped. Encoded the way the call policy contract stores them.
  */
 function encodeExpectedPermissions(chainId: number, mintRecipient: Hex): Hex {
   const usdc = getUsdcAddress(chainId);
@@ -174,8 +185,8 @@ function encodeExpectedPermissions(chainId: number, mintRecipient: Hex): Hex {
         selector: REQUEST_CCTP_TRANSFER_SELECTOR,
         valueLimit: BigInt(0),
         rules: [
-          // The destination chain is Injective, the recipient is the account's own address
-          // there, and the token is USDC.
+          // The destination chain is Injective, the recipient is the one Injective account, and
+          // the token is USDC.
           equalTo(toHex(INJECTIVE_CCTP_DOMAIN), 32),
           equalTo(mintRecipient, 64),
           equalTo(usdc, 96),
@@ -234,8 +245,10 @@ function assertExpectedValidatorData(validatorData: unknown, chainId: number, mi
 
 /**
  * Checks that typed data from the indexer enables the bridge session key on the user's own
- * account on `chainId`, with the expected permissions and nothing else.
+ * account on `chainId`, with the expected permissions and nothing else: bridging USDC to
+ * `injectiveAddress`.
  *
+ * @param injectiveAddress the Injective account whose key the app holds.
  * @param evmAddress the address of the user's EVM key, which signs the typed data.
  * @throws DepositPolicyValidationError if anything is not as expected. The data must then not be
  * signed.
@@ -243,15 +256,15 @@ function assertExpectedValidatorData(validatorData: unknown, chainId: number, mi
 export function assertExpectedEnableTypedData({
   typedData,
   chainId,
-  dydxAddress,
+  injectiveAddress,
   evmAddress,
 }: {
   typedData: any;
   chainId: number;
-  dydxAddress: string;
+  injectiveAddress: string;
   evmAddress: string;
 }) {
-  const { mintRecipient } = getInjectiveDepositRecipient(dydxAddress);
+  const mintRecipient = getInjectiveMintRecipient(injectiveAddress);
   const expectedVersion = KERNEL_VERSION_BY_CHAIN_ID[chainId];
   if (expectedVersion == null) {
     throw new DepositPolicyValidationError(`deposits are not bridged from chain ${chainId}`);
@@ -325,11 +338,11 @@ const MAX_POLICY_NOTES_LENGTH = 200;
 
 /**
  * The only transaction the bridge API user may be allowed to sign with the user's Solana key:
- * a CCTP v2 burn for Injective with the account's own address as recipient, plus one token
+ * a CCTP v2 burn for Injective with the one Injective account as recipient, plus one token
  * transfer capped at the relayer's fee.
  */
-function getExpectedSolanaPolicyCondition(dydxAddress: string): string {
-  const { mintRecipient } = getInjectiveDepositRecipient(dydxAddress);
+function getExpectedSolanaPolicyCondition(injectiveAddress: string): string {
+  const mintRecipient = getInjectiveMintRecipient(injectiveAddress);
   // The destination domain as the instruction encodes it: 4 bytes, little-endian.
   const domain = pad(toHex(INJECTIVE_CCTP_DOMAIN), { size: 4, dir: 'right' }).slice(2);
   const burn = 'solana.tx.instructions[0]';
@@ -354,23 +367,23 @@ export type ExpectedSolanaPolicy = {
 };
 
 /**
- * Checks that a Turnkey policy from the indexer allows the expected bridge transaction and
- * nothing else, and returns it with only the fields that were checked.
+ * Checks that a Turnkey policy from the indexer allows the expected bridge transaction, to
+ * `injectiveAddress`, and nothing else, and returns it with only the fields that were checked.
  *
  * @throws DepositPolicyValidationError if anything is not as expected. The policy must then not
  * be created.
  */
 export function assertExpectedSolanaPolicy({
   policy,
-  dydxAddress,
+  injectiveAddress,
 }: {
   policy: any;
-  dydxAddress: string;
+  injectiveAddress: string;
 }): ExpectedSolanaPolicy {
   if (policy?.policyName !== SOLANA_BRIDGE_POLICY_NAME || policy.effect !== 'EFFECT_ALLOW') {
     throw new DepositPolicyValidationError('unexpected Solana policy');
   }
-  if (policy.condition !== getExpectedSolanaPolicyCondition(dydxAddress)) {
+  if (policy.condition !== getExpectedSolanaPolicyCondition(injectiveAddress)) {
     throw new DepositPolicyValidationError('unexpected Solana policy condition');
   }
   if (typeof policy.consensus !== 'string' || !SOLANA_POLICY_CONSENSUS.test(policy.consensus)) {

@@ -16,17 +16,19 @@ import {
   assertExpectedEnableTypedData,
   assertExpectedSolanaPolicy,
   DepositPolicyValidationError,
-  getInjectiveDepositRecipient,
+  getInjectiveMintRecipient,
 } from './depositPolicyExpectations';
 
 /**
  * The deposit policy of a Turnkey account: what the indexer may sign for the account in order to
  * bridge deposits made to its deposit addresses.
  *
- * Deposits are bridged over CCTP to the account's own address on Injective. An account set up
- * before that route existed only permits the earlier one, and only its user can change that:
- * for each EVM chain by signing typed data that the indexer then stores, and for Solana by
- * creating a policy in their Turnkey organization.
+ * Deposits are bridged over CCTP to the Injective account whose key the app holds, and sent on
+ * to dYdX from there. The indexer cannot work that account out, so the app names it, and only
+ * the account's user can permit bridging to it: for each EVM chain by signing typed data that
+ * the indexer then stores, and for Solana by creating a policy in their Turnkey organization.
+ * This is needed once for a new account, for an account set up for an earlier route, and again
+ * if the app's Injective account were ever to change.
  */
 
 export enum DepositPolicyStatus {
@@ -44,7 +46,8 @@ export type DepositPolicyEvmApproval = {
 
 export type DepositPolicy = {
   dydxAddress: string;
-  // Where deposits arrive on Injective
+  // Where deposits arrive on Injective once the policy is approved: the account that was named
+  // when the policy was fetched
   injectiveAddress: string;
   evm: {
     // The address of the key that signs the typed data
@@ -55,7 +58,7 @@ export type DepositPolicy = {
     status: DepositPolicyStatus;
     // Present when status is ACTION_REQUIRED
     policy?: unknown;
-    // Policies for the earlier deposit route
+    // Policies for the earlier deposit route or for another Injective account
     obsoletePolicyIds: string[];
   };
 };
@@ -114,7 +117,8 @@ async function toDepositPolicyError(error: unknown): Promise<DepositPolicyError>
 }
 
 /**
- * Fetches what the account still has to approve.
+ * Fetches what the account still has to approve before its deposits are bridged to
+ * `injectiveAddress`.
  *
  * @returns undefined if the indexer has no Turnkey account for the address, which is the case
  * until a new account has uploaded its address, or does not serve deposit policies.
@@ -123,14 +127,17 @@ async function toDepositPolicyError(error: unknown): Promise<DepositPolicyError>
 export async function fetchDepositPolicy({
   indexerUrl,
   dydxAddress,
+  injectiveAddress,
 }: {
   indexerUrl: string;
   dydxAddress: string;
+  injectiveAddress: string;
 }): Promise<DepositPolicy | undefined> {
   try {
+    const query = new URLSearchParams({ injectiveAddress });
     return parseDepositPolicy(
       await simpleFetch(
-        `${removeTrailingSlash(indexerUrl)}/v4/turnkey/depositPolicy/${dydxAddress}`
+        `${removeTrailingSlash(indexerUrl)}/v4/turnkey/depositPolicy/${dydxAddress}?${query}`
       )
     );
   } catch (error) {
@@ -143,10 +150,12 @@ export async function fetchDepositPolicy({
 async function submitDepositPolicySignatures({
   indexerUrl,
   dydxAddress,
+  injectiveAddress,
   signatures,
 }: {
   indexerUrl: string;
   dydxAddress: string;
+  injectiveAddress: string;
   signatures: DepositPolicySignature[];
 }): Promise<string[]> {
   try {
@@ -155,7 +164,7 @@ async function submitDepositPolicySignatures({
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dydxAddress, signatures }),
+        body: JSON.stringify({ dydxAddress, injectiveAddress, signatures }),
       }
     );
     return response.approvedChainIds ?? [];
@@ -225,12 +234,14 @@ async function signDigest({
 async function syncEvmApprovals({
   indexerUrl,
   dydxAddress,
+  injectiveAddress,
   policy,
   evmAddress,
   turnkey,
 }: {
   indexerUrl: string;
   dydxAddress: string;
+  injectiveAddress: string;
   policy: DepositPolicy;
   evmAddress: Hex;
   turnkey: DepositPolicyTurnkeySession;
@@ -243,7 +254,7 @@ async function syncEvmApprovals({
     assertExpectedEnableTypedData({
       typedData,
       chainId: Number(chainId),
-      dydxAddress,
+      injectiveAddress,
       evmAddress,
     });
     return { chainId, digest: hashTypedData(typedData as Parameters<typeof hashTypedData>[0]) };
@@ -259,15 +270,17 @@ async function syncEvmApprovals({
       signature: await signDigest({ ...turnkey, evmAddress, digest }),
     });
   }
-  return submitDepositPolicySignatures({ indexerUrl, dydxAddress, signatures });
+  // The indexer checks the signatures against the same address, and from then on bridges the
+  // account's deposits to it.
+  return submitDepositPolicySignatures({ indexerUrl, dydxAddress, injectiveAddress, signatures });
 }
 
 async function syncSolanaPolicy({
-  dydxAddress,
+  injectiveAddress,
   policy,
   turnkey: { client, organizationId },
 }: {
-  dydxAddress: string;
+  injectiveAddress: string;
   policy: DepositPolicy;
   turnkey: DepositPolicyTurnkeySession;
 }): Promise<{ created: boolean; deletedPolicyIds: string[] }> {
@@ -275,15 +288,16 @@ async function syncSolanaPolicy({
   if (needsSolanaPolicy) {
     await client.createPolicy({
       organizationId,
-      ...assertExpectedSolanaPolicy({ policy: policy.solana.policy, dydxAddress }),
+      ...assertExpectedSolanaPolicy({ policy: policy.solana.policy, injectiveAddress }),
     });
   } else if (policy.solana.status !== DepositPolicyStatus.UP_TO_DATE) {
     // Without the new policy in place, leave the account as it is.
     return { created: false, deletedPolicyIds: [] };
   }
 
-  // The policies for the earlier route are no longer needed. Removing one only ever takes a
-  // permission away, and failing to is harmless, so it does not fail the sync.
+  // The policies for the earlier route or for another Injective account are no longer needed.
+  // Removing one only ever takes a permission away, and failing to is harmless, so it does not
+  // fail the sync.
   const deletedPolicyIds: string[] = [];
   const obsoletePolicyIds = policy.solana.obsoletePolicyIds.filter((id) =>
     POLICY_ID_PATTERN.test(id)
@@ -301,39 +315,29 @@ async function syncSolanaPolicy({
   return { created: needsSolanaPolicy, deletedPolicyIds };
 }
 
-export type DepositPolicySyncResult = {
-  approvedChainIds: string[];
-  solanaPolicyCreated: boolean;
-  deletedPolicyIds: string[];
-};
-
 /**
- * Brings the account's deposit policy up to date, using the Turnkey session of its signed-in
- * user: signs the approvals the indexer asks for and hands them over, creates the Solana policy,
- * and removes the policies of the earlier route.
- *
- * Nothing the indexer sends is signed or created as it is. Each request is checked to be exactly
- * the policy expected for `dydxAddress`, and the whole sync is refused if anything differs.
+ * Checks that everything a deposit policy asks the user to approve is exactly what is expected
+ * for bridging the deposits of `dydxAddress` to `injectiveAddress`.
  *
  * @param expectedEvmAddress the address of the user's EVM key in Turnkey, if it is known.
- * @throws DepositPolicyValidationError if the indexer asks for anything unexpected.
- * @throws DepositPolicyError if signing, storing or creating fails. The EVM chains and Solana
- * are synced independently, so one may have succeeded.
+ * @returns the address of the key that signs the approvals.
+ * @throws DepositPolicyValidationError if the policy is for another account or asks for
+ * anything unexpected. Nothing in it must then be signed or created.
  */
-export async function syncDepositPolicy({
-  indexerUrl,
-  dydxAddress,
+export function assertExpectedDepositPolicy({
   policy,
-  turnkey,
+  dydxAddress,
+  injectiveAddress,
   expectedEvmAddress,
 }: {
-  indexerUrl: string;
-  dydxAddress: string;
   policy: DepositPolicy;
-  turnkey: DepositPolicyTurnkeySession;
+  dydxAddress: string;
+  injectiveAddress: string;
   expectedEvmAddress?: string;
-}): Promise<DepositPolicySyncResult> {
-  const { injectiveAddress } = getInjectiveDepositRecipient(dydxAddress);
+}): { evmAddress: Hex } {
+  // Throws if it is not the address of an Injective account.
+  getInjectiveMintRecipient(injectiveAddress);
+  // An indexer that does not take the address the app names answers for another one.
   if (policy.dydxAddress !== dydxAddress || policy.injectiveAddress !== injectiveAddress) {
     throw new DepositPolicyValidationError('deposit policy is for another account');
   }
@@ -346,19 +350,70 @@ export async function syncDepositPolicy({
   }
   const evmAddress = getAddress(policy.evm.address);
 
-  // Validate everything up front, so that an unexpected request stops the sync before anything
-  // is signed or created.
   const { evmApprovals, needsSolanaPolicy } = getPendingDepositPolicyActions(policy);
   evmApprovals.forEach(({ chainId, typedData }) =>
-    assertExpectedEnableTypedData({ typedData, chainId: Number(chainId), dydxAddress, evmAddress })
+    assertExpectedEnableTypedData({
+      typedData,
+      chainId: Number(chainId),
+      injectiveAddress,
+      evmAddress,
+    })
   );
   if (needsSolanaPolicy) {
-    assertExpectedSolanaPolicy({ policy: policy.solana.policy, dydxAddress });
+    assertExpectedSolanaPolicy({ policy: policy.solana.policy, injectiveAddress });
   }
+  return { evmAddress };
+}
+
+export type DepositPolicySyncResult = {
+  approvedChainIds: string[];
+  solanaPolicyCreated: boolean;
+  deletedPolicyIds: string[];
+};
+
+/**
+ * Brings the account's deposit policy up to date, using the Turnkey session of its signed-in
+ * user: signs the approvals the indexer asks for and hands them over, creates the Solana policy,
+ * and removes the policies that are no longer needed.
+ *
+ * Nothing the indexer sends is signed or created as it is. Each request is checked to be exactly
+ * the policy expected for bridging to `injectiveAddress`, and the whole sync is refused if
+ * anything differs.
+ *
+ * @param injectiveAddress the Injective account whose key the app holds, which was named when
+ * `policy` was fetched. Deposits are bridged to it from then on.
+ * @param expectedEvmAddress the address of the user's EVM key in Turnkey, if it is known.
+ * @throws DepositPolicyValidationError if the indexer asks for anything unexpected.
+ * @throws DepositPolicyError if signing, storing or creating fails. The EVM chains and Solana
+ * are synced independently, so one may have succeeded.
+ */
+export async function syncDepositPolicy({
+  indexerUrl,
+  dydxAddress,
+  injectiveAddress,
+  policy,
+  turnkey,
+  expectedEvmAddress,
+}: {
+  indexerUrl: string;
+  dydxAddress: string;
+  injectiveAddress: string;
+  policy: DepositPolicy;
+  turnkey: DepositPolicyTurnkeySession;
+  expectedEvmAddress?: string;
+}): Promise<DepositPolicySyncResult> {
+  // Everything is checked up front, so that an unexpected request stops the sync before
+  // anything is signed or created.
+  const { evmAddress } = assertExpectedDepositPolicy({
+    policy,
+    dydxAddress,
+    injectiveAddress,
+    expectedEvmAddress,
+  });
 
   const [evm, solana] = await Promise.allSettled([
-    syncEvmApprovals({ indexerUrl, dydxAddress, policy, evmAddress, turnkey }),
-    syncSolanaPolicy({ dydxAddress, policy, turnkey }),
+    syncEvmApprovals({ indexerUrl, dydxAddress, injectiveAddress, policy, evmAddress, turnkey }),
+    syncSolanaPolicy({ injectiveAddress, policy, turnkey }),
   ]);
   const failure = [evm, solana].find((result) => result.status === 'rejected');
   if (failure?.status === 'rejected') {
