@@ -62,7 +62,10 @@ import {
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
-import { selectIsKeplrConnected } from '@/state/walletSelectors';
+import {
+  getTurnkeyDepositPolicyNeedsSignIn,
+  selectIsKeplrConnected,
+} from '@/state/walletSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
@@ -1405,6 +1408,55 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const dispatch = useAppDispatch();
       return () => {
         dispatch(openDialog(DialogTypes.InjectiveDeposit()));
+      };
+    },
+  },
+  {
+    type: NotificationType.DepositPolicyUpdate,
+    useTrigger: ({ trigger, hideNotification }) => {
+      const dispatch = useAppDispatch();
+      const stringGetter = useStringGetter();
+      const needsSignIn = useAppSelector(getTurnkeyDepositPolicyNeedsSignIn);
+
+      useEffect(() => {
+        if (needsSignIn) {
+          // TODO: localize
+          trigger({
+            id: NotificationType.DepositPolicyUpdate,
+            updateKey: [],
+            displayData: {
+              icon: <Icon iconName={IconName.Deposit} />,
+              title: 'Sign in again to keep deposits working',
+              body: 'Your account needs a one-time update before new deposits to your deposit address can be processed. Sign in again to apply it.',
+              toastSensitivity: 'background',
+              groupKey: NotificationType.DepositPolicyUpdate,
+              toastDuration: Infinity,
+              renderActionSlot: () => (
+                <Link
+                  isAccent
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Signing in again starts with signing out, as it does for revealing the phrase.
+                    dispatch(openDialog(DialogTypes.DisconnectWallet({})));
+                  }}
+                >
+                  {stringGetter({ key: STRING_KEYS.REAUTHENTICATE })} →
+                </Link>
+              ),
+            },
+          });
+        } else {
+          hideNotification({
+            type: NotificationType.DepositPolicyUpdate,
+            id: NotificationType.DepositPolicyUpdate,
+          });
+        }
+      }, [dispatch, hideNotification, needsSignIn, stringGetter, trigger]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useAppDispatch();
+      return () => {
+        dispatch(openDialog(DialogTypes.DisconnectWallet({})));
       };
     },
   },
