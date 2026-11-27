@@ -8,7 +8,7 @@ import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
-import { ConnectorType, EvmAddress, WalletNetworkType, wallets } from '@/constants/wallets';
+import { EvmAddress, WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -32,6 +32,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
+import { getWalletName } from '@/lib/walletName';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
@@ -126,13 +127,7 @@ const Profile = () => {
             <$SubHeader>
               <$ConnectedIcon />
               <span>{stringGetter({ key: STRING_KEYS.CONNECTED_TO })}</span>
-              <span>
-                {sourceAccount.walletInfo.connectorType === ConnectorType.Injected
-                  ? sourceAccount.walletInfo.name
-                  : stringGetter({
-                      key: wallets[sourceAccount.walletInfo.name as keyof typeof wallets].stringKey,
-                    })}
-              </span>
+              <span>{getWalletName(sourceAccount.walletInfo, stringGetter)}</span>
             </$SubHeader>
           ) : (
             <span>-</span>

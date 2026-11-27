@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
+import { WalletInfo } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
@@ -22,6 +22,8 @@ import { Link } from '@/components/Link';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { AccentTag } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
+
+import { getWalletName } from '@/lib/walletName';
 
 export const ChooseWallet = ({
   onChooseWallet,
@@ -92,12 +94,7 @@ export const ChooseWallet = ({
             {stringGetter({
               key: STRING_KEYS.COULD_NOT_CONNECT,
               params: {
-                WALLET:
-                  selectedWallet.connectorType === ConnectorType.Injected
-                    ? selectedWallet.name
-                    : stringGetter({
-                        key: wallets[selectedWallet.name as keyof typeof wallets].stringKey,
-                      }),
+                WALLET: getWalletName(selectedWallet, stringGetter),
               },
             })}
           </h4>
@@ -114,11 +111,7 @@ export const ChooseWallet = ({
             slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={isSimpleUi ? ButtonSize.Large : ButtonSize.Small}
           >
-            <$WalletName>
-              {wallet.connectorType === ConnectorType.Injected
-                ? wallet.name
-                : stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })}
-            </$WalletName>
+            <$WalletName>{getWalletName(wallet, stringGetter)}</$WalletName>
           </$WalletButton>
         ))}
       </$Wallets>
