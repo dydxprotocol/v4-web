@@ -11,7 +11,6 @@ import { getLazyTradingKeyUtils } from '@/bonsai/lib/lazyDynamicLibs';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import type { EncodeObject } from '@cosmjs/proto-signing';
 import { IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
@@ -128,53 +127,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           throw error;
         }
       },
-
-      sendSkipWithdrawFromSubaccount: async ({
-        subaccountClient,
-        amount,
-        payload,
-      }: {
-        subaccountClient: SubaccountClient;
-        amount: number;
-        payload: string;
-      }) => {
-        if (!compositeClient) throw new Error('client not initialized');
-        try {
-          const transaction = JSON.parse(payload);
-
-          const msg = compositeClient.withdrawFromSubaccountMessage(
-            subaccountClient,
-            amount.toFixed(usdcDecimals)
-          );
-          const ibcMsg: EncodeObject = {
-            typeUrl: transaction.msgTypeUrl,
-            value: {
-              ...transaction.msg,
-              timeoutTimestamp: transaction.msg.timeoutTimestamp
-                ? // Signer expects BigInt but the payload types the value as string
-                  BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
-                : undefined,
-            },
-          };
-
-          return await compositeClient.send(
-            subaccountClient,
-            () => Promise.resolve([msg, ibcMsg]),
-            false,
-            undefined,
-            TransactionMemo.withdrawFromAccount
-          );
-        } catch (error) {
-          // Reset the default options after the tx is sent.
-          if (isKeplr && window.keplr) {
-            window.keplr.defaultOptions = {};
-          }
-          log('useSubaccount/sendSkipWithdrawFromSubaccount', error);
-          throw error;
-        }
-      },
     }),
-    [compositeClient, isKeplr, usdcDecimals]
+    [compositeClient, usdcDecimals]
   );
 
   const [subaccountNumber] = useState(0);
