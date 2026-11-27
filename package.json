@@ -45,7 +45,7 @@
     "commitlint": "commitlint --edit",
     "wdio": "wdio run ./wdio.conf.ts"
   },
-  "packageManager": "pnpm@8.6.6",
+  "packageManager": "pnpm@10.34.9",
   "dependencies": {
     "@cosmjs/amino": "^0.32.1",
     "@cosmjs/crypto": "^0.32.1",
@@ -203,7 +203,6 @@
     "husky": "^9.0.11",
     "minimist": "^1.2.8",
     "node-fetch": "^3.3.1",
-    "pnpm": "^8.6.6",
     "postcss": "^8.4.39",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.5",
@@ -232,7 +231,26 @@
       "follow-redirects": "1.15.3",
       "vite@>=6.0.0 <6.4.6": "6.4.6",
       "vite@>=7.0.0 <7.3.8": "7.3.8"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
+    "ignoredBuiltDependencies": [
+      "@reown/appkit",
+      "@swc/core",
+      "bufferutil",
+      "edgedriver",
+      "es5-ext",
+      "geckodriver",
+      "keccak",
+      "msw",
+      "protobufjs",
+      "secp256k1",
+      "sharp",
+      "tiny-secp256k1",
+      "unrs-resolver",
+      "utf-8-validate"
+    ]
   },
   "babelMacros": {
     "twin": {
