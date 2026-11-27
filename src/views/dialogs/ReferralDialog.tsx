@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { styled } from 'twin.macro';
 
 import { AFFILIATES_FEE_DISCOUNT_USD } from '@/constants/affiliates';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogProps, ReferralDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,6 +18,10 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
 
+import { updateLatestReferrer } from '@/state/affiliates';
+import { useAppDispatch } from '@/state/appTypes';
+
+import { track } from '@/lib/analytics/analytics';
 import { truncateAddress } from '@/lib/wallet';
 
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
@@ -38,6 +43,7 @@ const CONTENT_SECTIONS = [
 
 export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialogProps>) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
 
   const {
@@ -54,6 +60,16 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
   const isNotEligible = isAffiliatesInfoSuccess && !affiliatesInfo.isEligible;
   const isOwnReferralCode = isReferralAddressFetched && referralAddress === dydxAddress;
   const invalidReferralCode = isReferralAddressFetched && !referralAddress;
+  const isReferrerShown = !isNotEligible && !invalidReferralCode;
+
+  // Save the referrer shown in the title when the user accepts the invite (primary CTA).
+  const onAccept = () => {
+    if (referralAddress && isReferrerShown && !isOwnReferralCode) {
+      track(AnalyticsEvents.AffiliateSaveReferralAddress({ affiliateAddress: referralAddress }));
+      dispatch(updateLatestReferrer(referralAddress));
+    }
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     // User has already registered a referral or is using their own referral
@@ -156,20 +172,12 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
         </div>
         <div tw="flex flex-col items-center gap-0.5">
           {!dydxAddress ? (
-            <OnboardingTriggerButton
-              tw="w-full"
-              size={ButtonSize.Medium}
-              onClick={() => {
-                setIsOpen(false);
-              }}
-            />
+            <OnboardingTriggerButton tw="w-full" size={ButtonSize.Medium} onClick={onAccept} />
           ) : (
             <Button
               action={ButtonAction.Primary}
               size={ButtonSize.Medium}
-              onClick={() => {
-                setIsOpen(false);
-              }}
+              onClick={onAccept}
               tw="w-full"
             >
               {stringGetter({ key: STRING_KEYS.TRADE_NOW })}

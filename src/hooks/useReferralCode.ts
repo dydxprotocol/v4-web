@@ -25,40 +25,29 @@ export function useReferralCode() {
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
 
-  const { data: affiliateMetadata, isPending: isAffiliateMetadataPending } =
-    useAffiliateMetadata(dydxAddress);
+  const { data: affiliateMetadata } = useAffiliateMetadata(dydxAddress);
 
   const { data: referralAddress } = useReferralAddress(testFlags.referralCode);
 
-  const { data: referredBy, isPending: isReferredByPending } = useReferredBy();
+  const { data: referredBy } = useReferredBy();
 
   const latestReferrer = useAppSelector(getLatestReferrer);
 
   const isOwnReferralCode = affiliateMetadata?.metadata?.referralCode === testFlags.referralCode;
 
+  // Show the referral invite; ReferralDialog saves the referrer when the user accepts.
+  // Partner addresses skip the dialog and are saved directly.
   useEffect(() => {
-    if (
-      testFlags.referralCode &&
-      referralAddress != null &&
-      !HIDE_REFERRAL_DIALOG_ADDRESSES.has(referralAddress)
-    ) {
-      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
-    }
-  }, [dispatch, referralAddress]);
+    if (!testFlags.referralCode || referralAddress == null) return;
 
-  useEffect(() => {
-    if (referralAddress) {
+    if (HIDE_REFERRAL_DIALOG_ADDRESSES.has(referralAddress)) {
       track(AnalyticsEvents.AffiliateSaveReferralAddress({ affiliateAddress: referralAddress }));
       dispatch(updateLatestReferrer(referralAddress));
+      return;
     }
-  }, [
-    referralAddress,
-    dispatch,
-    isReferredByPending,
-    referredBy?.affiliateAddress,
-    isAffiliateMetadataPending,
-    isOwnReferralCode,
-  ]);
+
+    dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+  }, [dispatch, referralAddress]);
 
   // If the current user already has a referrer registered, remove the pending referrer address
   // This handles the case of:
